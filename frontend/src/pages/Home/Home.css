@@ -1,6 +1,6 @@
 /* General Styles */
 .landing-page {
-    padding: 1rem;
+  padding: 2rem;
   font-family: Arial, sans-serif;
 }
 
@@ -10,22 +10,29 @@
 }
 
 .subtitle {
-  margin-bottom: 2rem;
-  color: #555;
+  color: #333;
+  font-size: 1.2rem;
 }
 
 /* Content Grid */
 .content-grid {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   gap: 1rem;
+  margin-top: 2rem;
 }
 
 /* Paper Section Styles */
 .paper {
   padding: 1rem;
   background-color: #f9f9f9;
+  height: 100%; /* Ensures the paper stretches to match the height */
+  display: flex;
+  flex-direction: column;
+  justify-content: start; /* Optional: Keeps content spaced evenly */
+  border-radius: 12px !important; /* Override default radius */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1) !important; /* Custom shadow */
 }
 
 .section-title {
@@ -59,26 +66,30 @@ ul li {
 .brain-image {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  max-height: 500px; /* Limit the height */
+  margin: 0 auto; /* Center the image */
+  display: block;
 }
 
 .image-caption {
   margin-top: 0.5rem;
   color: #777;
-}
-
-/* Tier Selection Section */
-.tier-selection {
+  font-size: 1em;
   text-align: center;
-  margin-top: 2rem;
 }
 
-.tier-title {
-  margin-bottom: 1rem;
-}
+/*!* Disease Selection Section *!*/
+/*.disease-selection {*/
+/*  text-align: center;*/
+/*  margin-top: 0;*/
+/*}*/
 
-.tier-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
+/*.disease-title {*/
+/*  margin-bottom: 1rem;*/
+/*}*/
+
+/*.disease-buttons {*/
+/*  display: flex;*/
+/*  justify-content: center;*/
+/*  gap: 1rem;*/
+/*}*/

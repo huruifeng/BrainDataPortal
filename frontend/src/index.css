@@ -11,5 +11,9 @@
 
 body {
   margin: 0;
+  height: 100vh;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f9f9f9;
 }
 

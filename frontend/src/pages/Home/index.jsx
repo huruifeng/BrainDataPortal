@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Box, Typography, Grid, Button, Paper } from "@mui/material";
+import { Box, Typography, Button, Paper } from "@mui/material";
+import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
 import brainImage from "../../assets/images/brainregions/Brain5_Color.png";
+import "./Home.css"; // Import the CSS file
 
-// import DiseaseSelector from "../../components/DiseaseSelector";
+import DiseaseSelector from "../../components/DiseaseSelector";
 // import RegionSelector from "../../components/RegionSelector";
-
-import "./Home.css";
 
 const Home = () => {
   const [disease, setDisease] = useState("Healthy");
@@ -23,21 +23,22 @@ const Home = () => {
         Explore and analyze brain-related omics data with ease.
       </Typography>
 
-      <Grid container spacing={2} alignItems="center" justifyContent="center">
+      <Grid2 container spacing={2} className="content-grid">
         {/* Left Section */}
-        <Grid item xs={12} md={3}>
-          <Paper elevation={3} sx={{ padding: 2 }}>
-            <Typography variant="h6" gutterBottom>
+        <Grid2 xs={12} md={2}>
+          <Typography variant="h6" className="section-title">
               Cell Lines & Tissues
             </Typography>
-            <Typography variant="subtitle1" gutterBottom>
+          <Paper elevation={3} className="paper">
+
+            <Typography variant="subtitle1" className="subsection-title">
               <strong>Ectoderm Tissues</strong>
             </Typography>
             <ul>
               <li>Brain: unrelated donors</li>
               <li>Sun-exposed skin</li>
             </ul>
-            <Typography variant="subtitle1" gutterBottom>
+            <Typography variant="subtitle1" className="subsection-title">
               <strong>Endoderm Tissues</strong>
             </Typography>
             <ul>
@@ -45,7 +46,7 @@ const Home = () => {
               <li>Lung</li>
               <li>Colon</li>
             </ul>
-            <Typography variant="subtitle1" gutterBottom>
+            <Typography variant="subtitle1" className="subsection-title">
               <strong>Cell Line Mixtures</strong>
             </Typography>
             <ul>
@@ -54,31 +55,30 @@ const Home = () => {
               <li>iPSC & Fibroblast</li>
             </ul>
           </Paper>
-        </Grid>
+        </Grid2>
 
         {/* Middle Section (Brain Image) */}
-        <Grid item xs={12} md={5}>
+        <Grid2 xs={12} md={5}>
           <Box sx={{ textAlign: "center" }}>
             <img
-              src={brainImage} // Replace with the actual path to your brain image
+              src={brainImage}
               alt="Brain Regions"
-              style={{
-                maxWidth: "100%",
-                height: "auto",
-                borderRadius: "8px",
-              }}
+              className="brain-image"
             />
-            <Typography variant="caption">
-              Hover over the regions to explore brain areas.
+            <Typography variant="caption" className="image-caption">
+              Hover over / Click on the regions to explore brain areas.
             </Typography>
           </Box>
-        </Grid>
+        </Grid2>
 
         {/* Right Section */}
-        <Grid item xs={12} md={3}>
-          <Paper elevation={3} sx={{ padding: 2 }}>
-            <Typography variant="h6" gutterBottom>
+        <Grid2 xs={12} md={2}>
+          <Typography variant="h6" className="section-title">
               Available Assays
+            </Typography>
+          <Paper elevation={3} className="paper">
+            <Typography variant="subtitle1" className="subsection-title">
+              <strong>Omics Assays</strong>
             </Typography>
             <ul>
               <li>Bulk WGS short read</li>
@@ -89,33 +89,34 @@ const Home = () => {
               <li>Epigenome profiling</li>
             </ul>
           </Paper>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
 
       {/* Disease Selection */}
-      <Box sx={{ textAlign: "center", marginTop: 4 }}>
-        <Typography variant="h6">Select a disease type to see more data</Typography>
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, marginTop: 2 }}>
-          <Button
-            variant={disease === "Healthy" ? "contained" : "outlined"}
-            onClick={() => handleDiseaseChange("Healthy")}
-          >
-            Healthy
-          </Button>
-          <Button
-            variant={disease === "Alzheimer Disease" ? "contained" : "outlined"}
-            onClick={() => handleDiseaseChange("Tier 1")}
-          >
-            Alzheimer Disease
-          </Button>
-          <Button
-            variant={disease === "Parkinson's Disease" ? "contained" : "outlined"}
-            onClick={() => handleDiseaseChange("Tier 2")}
-          >
-            Parkinson&#39;s Disease
-          </Button>
-        </Box>
-      </Box>
+      {/*<Box className="disease-selection">*/}
+      {/*  <Typography variant="h6" className="disease-title">Select a disease type to see more data</Typography>*/}
+      {/*  <Box className="disease-buttons">*/}
+      {/*    <Button*/}
+      {/*      variant={disease === "Healthy" ? "contained" : "outlined"}*/}
+      {/*      onClick={() => handleDiseaseChange("Healthy")}*/}
+      {/*    >*/}
+      {/*      Healthy*/}
+      {/*    </Button>*/}
+      {/*    <Button*/}
+      {/*      variant={disease === "Alzheimer Disease" ? "contained" : "outlined"}*/}
+      {/*      onClick={() => handleDiseaseChange("Alzheimer Disease")}*/}
+      {/*    >*/}
+      {/*      Alzheimer Disease*/}
+      {/*    </Button>*/}
+      {/*    <Button*/}
+      {/*      variant={disease === "Parkinson's Disease" ? "contained" : "outlined"}*/}
+      {/*      onClick={() => handleDiseaseChange("Parkinson's Disease")}*/}
+      {/*    >*/}
+      {/*      Parkinson&#39;s Disease*/}
+      {/*    </Button>*/}
+      {/*  </Box>*/}
+      {/*</Box>*/}
+      <DiseaseSelector  />
     </div>
   );
 };
