@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Box, Typography, Button, Paper } from "@mui/material";
 import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
-import brainImage from "../../assets/images/brainregions/Brain5_Color.png";
+import brainImageOuter from "../../assets/images/brain_outer/Brain5_Color.png";
+import brainImageInner from "../../assets/images/brain_inner/Brian5M_Color.png";
 import "./Home.css"; // Import the CSS file
 
 import DiseaseSelector from "../../components/DiseaseSelector";
-// import RegionSelector from "../../components/RegionSelector";
+import BrainsideSelector from "../../components/BrainsideSelector/index.jsx";
+import BrainRegions from "../../components/BrainRegions/index.jsx";
+// import BrainRegions from "../../components/BrainRegions";
 
 const Home = () => {
   const [disease, setDisease] = useState("Healthy");
@@ -59,16 +62,18 @@ const Home = () => {
 
         {/* Middle Section (Brain Image) */}
         <Grid2 xs={12} md={5}>
-          <Box sx={{ textAlign: "center" }}>
-            <img
-              src={brainImage}
-              alt="Brain Regions"
-              className="brain-image"
-            />
-            <Typography variant="caption" className="image-caption">
-              Hover over / Click on the regions to explore brain areas.
-            </Typography>
-          </Box>
+          <BrainsideSelector  />
+          {/*<Box sx={{ textAlign: "center" }} className="brain-image-container">*/}
+          {/*  <img*/}
+          {/*    src={brainImageOuter}*/}
+          {/*    alt="Brain Regions"*/}
+          {/*    className="brain-image"*/}
+          {/*  />*/}
+          {/*  <Typography variant="caption" className="image-caption">*/}
+          {/*    Hover over / Click on the regions to explore brain areas.*/}
+          {/*  </Typography>*/}
+          {/*</Box>*/}
+          <BrainRegions />
         </Grid2>
 
         {/* Right Section */}
