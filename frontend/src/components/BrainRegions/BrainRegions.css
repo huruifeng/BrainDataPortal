@@ -1,0 +1,52 @@
+
+/* Brain image container */
+.brain-image-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px; /* Optional max width */
+  margin: 0 auto; /* Center the container horizontally */
+  justify-content: center;
+  align-items: center;
+  /*aspect-ratio: 1; !* Maintain a square aspect ratio *!*/
+}
+
+/* Brain image responsiveness */
+.brain-image {
+  max-width: 100%; /* Scale the image to fit within the container */
+  max-height: 100%; /* Prevent overflow vertically */
+  object-fit: contain; /* Maintain aspect ratio of the image */
+  height: auto;
+  transition: all 0.3s ease-in-out;
+}
+
+.image-caption {
+  margin-top: 0.5rem;
+  color: #777;
+  font-size: 1em;
+  text-align: center;
+}
+
+
+.regions-overlay {
+  position: relative;
+  top: -100%; /* Overlay the image */
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.region {
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.region.frontalLobe_outer{top: 0; left: 0; right: 0; height: 100%;z-index: 1;}
+.region.parietalLobe_outer{top: 0;left: 0;right: 0;height: 100%;z-index: 1;}
+
+.region:hover {
+  transform: scale(1.1);
+  z-index: 2;
+    background-color: #10b981;
+}
+
