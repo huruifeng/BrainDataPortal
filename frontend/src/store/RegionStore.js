@@ -1,9 +1,11 @@
 import { create } from "zustand";
 
 const BrainStore = create((set) => ({
-  selectedRegion: null,
+  side: "outer",
+  region: null,
   assays: [],
-  setRegion: (region, assays) => set({ selectedRegion: region, assays }),
+  selectedRegion: null,
+  setRegion: (side, region, assays) => set({ selectedRegion: side, region, assays }),
 }));
 
 export default BrainStore;

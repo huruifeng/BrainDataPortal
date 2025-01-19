@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Box, Typography, Button, Paper } from "@mui/material";
 import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
-import brainImageOuter from "../../assets/images/brain_outer/Brain5_Color.png";
-import brainImageInner from "../../assets/images/brain_inner/Brain5I_Color.png";
 import "./Home.css"; // Import the CSS file
 
 import DiseaseSelector from "../../components/DiseaseSelector";
@@ -61,7 +59,7 @@ const Home = () => {
         </Grid2>
 
         {/* Middle Section (Brain Image) */}
-        <Grid2 xs={12} md={5}>
+        <Grid2 xs={12} md={5} className="middle-section">
           <BrainsideSelector  />
           {/*<Box sx={{ textAlign: "center" }} className="brain-image-container">*/}
           {/*  <img*/}

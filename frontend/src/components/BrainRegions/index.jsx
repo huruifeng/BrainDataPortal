@@ -14,13 +14,15 @@ const brainRegions = {
     parietalLobe_outer: brainRegions_outer.Brain5_ParietalLobe,
     occipitalLobe_outer: brainRegions_outer.Brain5_OccipitalLobe,
     temporalLobe_outer: brainRegions_outer.Brain5_TemporalLobe,
+    regionPoints_outer: brainRegions_outer.regionPaths,
 
     // Inner regions
-    default_inner: brainRegions_inner.Brain5M_Color,
-    frontalLobe_inner: brainRegions_inner.Brain5M_FrontalLobe,
-    parietalLobe_inner: brainRegions_inner.Brain5M_ParietalLobe,
-    occipitalLobe_inner: brainRegions_inner.Brain5M_OccipitalLobe,
-    temporalLobe_inner: brainRegions_inner.Brain5M_PrimarySomasensoryCortex,
+    default_inner: brainRegions_inner.Brain5I_Color,
+    frontalLobe_inner: brainRegions_inner.Brain5I_FrontalLobe,
+    parietalLobe_inner: brainRegions_inner.Brain5I_ParietalLobe,
+    occipitalLobe_inner: brainRegions_inner.Brain5I_OccipitalLobe,
+    temporalLobe_inner: brainRegions_inner.Brain5I_TemporalLobe,
+    regionPoints_inner: brainRegions_outer.regionPaths,
     // Add more regions here
 };
 
@@ -29,18 +31,19 @@ const BrainRegions = () => {
   const [hoveredRegion, setHoveredRegion] = useState(null);
   const { setRegion } = RegionStore();
 
-  const regions = {
-    default_outer: {name: "Default_outer", image: brainRegions.default_outer, assays: ["Assay 1", "Assay 2", "Assay 3"],},
-    frontalLobe_outer: {name: "Frontal Lobe", image: brainRegions.frontalLobe_outer, assays: ["Assay 1", "Assay 2", "Assay 3"],},
-    parietalLobe_outer: { name: "Parietal Lobe", image: brainRegions.parietalLobe_outer, assays: ["Assay A", "Assay B"],},
-    occipitalLobe_outer: { name: "Occipital Lobe", image: brainRegions.occipitalLobe_outer, assays: ["Assay C", "Assay D"],},
-    temporalLobe_outer: { name: "Temporal Lobe", image: brainRegions.temporalLobe_outer, assays: ["Assay E", "Assay F"],},
+  const default_outer= {name: "Default_outer", side: "outer", image: brainRegions.default_outer, assays: ["Assay 1", "Assay 2", "Assay 3"],points:"",}
+  const default_inner= {name: "Default_inner (Inner)", side:"inner", image: brainRegions.default_inner, assays: ["Assay 1", "Assay 2", "Assay 3"],points: "",}
 
-    default_inner: {name: "Default_inner", image: brainRegions.default_inner, assays: ["Assay 1", "Assay 2", "Assay 3"],},
-    frontalLobe_inner: {name: "Frontal Lobe", image: brainRegions.frontalLobe_inner, assays: ["Assay 1", "Assay 2", "Assay 3"],},
-    parietalLobe_inner: { name: "Parietal Lobe", image: brainRegions.parietalLobe_inner, assays: ["Assay A", "Assay B"],},
-    occipitalLobe_inner: { name: "Occipital Lobe", image: brainRegions.occipitalLobe_inner, assays: ["Assay C", "Assay D"],},
-    temporalLobe_inner: { name: "Temporal Lobe", image: brainRegions.temporalLobe_inner, assays: ["Assay E", "Assay F"],},
+  const regions = {
+    frontalLobe_outer: {name: "Frontal Lobe", side:"outer", image: brainRegions.frontalLobe_outer, assays: ["Assay 1", "Assay 2", "Assay 4"],points: brainRegions.regionPoints_outer.FrontalLobe,},
+    parietalLobe_outer: { name: "Parietal Lobe", side:"outer", image: brainRegions.parietalLobe_outer, assays: ["Assay A", "Assay B"],points: brainRegions.regionPoints_outer.ParietalLobe,},
+    occipitalLobe_outer: { name: "Occipital Lobe", side:"outer", image: brainRegions.occipitalLobe_outer, assays: ["Assay C", "Assay D"],points: brainRegions.regionPoints_outer.OccipitalLobe,},
+    temporalLobe_outer: { name: "Temporal Lobe", side:"outer", image: brainRegions.temporalLobe_outer, assays: ["Assay E", "Assay F"],points: brainRegions.regionPoints_outer.TemporalLobe,},
+
+    // frontalLobe_inner: {name: "Frontal Lobe (Inner)", side:"inner", image: brainRegions.frontalLobe_inner, assays: ["Assay 1", "Assay 2", "Assay 4"],points: brainRegions.regionPoints_inner.FrontalLobe,},
+    // parietalLobe_inner: { name: "Parietal Lobe (Inner)", side:"inner", image: brainRegions.parietalLobe_inner, assays: ["Assay A", "Assay B"],points: brainRegions.regionPoints_inner.ParietalLobe,},
+    // occipitalLobe_inner: { name: "Occipital Lobe (Inner)", side:"inner", image: brainRegions.occipitalLobe_inner, assays: ["Assay C", "Assay D"],points: brainRegions.regionPoints_inner.OccipitalLobe,},
+    // temporalLobe_inner: { name: "Temporal Lobe (Inner)", side:"inner", image: brainRegions.temporalLobe_inner, assays: ["Assay E", "Assay F"],points: brainRegions.regionPoints_inner.TemporalLobe,},
     // Add more regions here
   };
 
@@ -49,34 +52,40 @@ const BrainRegions = () => {
   };
 
   const handleClick = (region) => {
-    setRegion(region.name, region.assays);
+    setRegion(region.side, region.name, region.assays);
   };
 
   return (
-   <Box sx={{ textAlign: "center" }} className="brain-image-container">
-      <img
-        src={hoveredRegion ? hoveredRegion.image : brainRegions.default_outer} // Default brain image
-        alt="Brain Regions"
-        className="brain-image"
-        onMouseLeave={() => setHoveredRegion(null)}
-      />
-    <Typography variant="caption" className="image-caption">
-      Hover over / Click on the regions to explore brain areas.
-    </Typography>
-      <Box className="regions-overlay">
-        {Object.entries(regions).map(([key, region]) => (
-          <Box
-            key={key}
-            className={`region ${key}`}
-            onMouseEnter={() => handleHover(region)}
-            onClick={() => handleClick(region)}
-          >
-            {region.name}
-          </Box>
-        ))}
-      </Box>
-    </Box>
-  );
+      <div className="brain-regions-container">
+          <div className="image-overlay-container">
+              <img
+                  src={hoveredRegion ? hoveredRegion.image : default_outer.image}
+                  alt="Brain Regions"
+                  className="brain-image"
+                  onMouseLeave={() => setHoveredRegion(null)}
+              />
+              <svg
+                  className="regions-overlay"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="-2210 -1380 5000 3500"
+                  preserveAspectRatio="xMidYMid meet"
+              >
+                  {Object.entries(regions).map(([key, region]) => (
+                      <polygon
+                          key={key}
+                          points={region.points}
+                          className="region"
+                          onMouseEnter={() => handleHover(region)}
+                          onClick={() => handleClick(region)}
+                      >
+                          <title>{region.name}</title>
+                      </polygon>
+                  ))}
+              </svg>
+          </div>
+      </div>
+
+  )
 };
 
 export default BrainRegions;

@@ -55,6 +55,8 @@ ul li {
   margin-bottom: 0.5rem;
 }
 
+
+
 /* Responsive grid behavior */
 @media (max-width: 768px) {
   .content-grid {
