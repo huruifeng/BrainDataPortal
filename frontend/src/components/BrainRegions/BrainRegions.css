@@ -31,9 +31,9 @@
   fill: rgba(255, 255, 255, 0); /* Transparent by default */
   pointer-events: auto;
   cursor: pointer;
-  transition: fill 0.3s ease;
+  transition: fill 1s ease;
 }
 
 .region:hover {
-  fill: rgba(0, 0, 255, 0.3); /* Highlight color on hover */
+  fill: rgba(0, 0, 0, 0.0); /* Highlight color on hover */
 }

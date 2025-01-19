@@ -5,6 +5,7 @@ const BrainStore = create((set) => ({
   region: null,
   assays: [],
   selectedRegion: null,
+  setSide: (newSide) => set(() => ({ side: newSide })),
   setRegion: (side, region, assays) => set({ selectedRegion: side, region, assays }),
 }));
 
