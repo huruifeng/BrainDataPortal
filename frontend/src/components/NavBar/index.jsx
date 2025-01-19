@@ -2,6 +2,8 @@ import { AppBar, Toolbar, Typography, Button, Menu, MenuItem } from "@mui/materi
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import "./NavBar.css";
+
 const NavBar = () => {
   const [helpMenuAnchor, setHelpMenuAnchor] = useState(null);
 
@@ -9,10 +11,10 @@ const NavBar = () => {
   const closeHelpMenu = () => setHelpMenuAnchor(null);
 
   return (
-    <AppBar position="static">
+    <AppBar sx={{  }} position="static" className="navbar">
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          <Link to="/" style={{ textDecoration: "none", color: "white" }}>
+        <Typography variant="h6" sx={{ flexGrow: 1 }} className="navbar-title">
+          <Link to="/" style={{ textDecoration: "none", color: "white", letterSpacing: "0rem" }}>
             BrainDataPortal
           </Link>
         </Typography>
