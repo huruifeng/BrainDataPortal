@@ -4,9 +4,9 @@ import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
 import "./Home.css"; // Import the CSS file
 
 import DiseaseSelector from "../../components/DiseaseSelector";
-import BrainsideSelector from "../../components/BrainsideSelector/index.jsx";
-import BrainRegions from "../../components/BrainRegions/index.jsx";
-// import BrainRegions from "../../components/BrainRegions";
+import BrainsideSelector from "../../components/BrainsideSelector";
+import BrainRegions from "../../components/BrainRegions";
+import StatBar from "../../components/StatBar";
 
 const Home = () => {
   const [disease, setDisease] = useState("Healthy");
@@ -120,6 +120,7 @@ const Home = () => {
       {/*  </Box>*/}
       {/*</Box>*/}
       <DiseaseSelector  />
+      <StatBar />
     </div>
   );
 };
