@@ -3,7 +3,7 @@ import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Test from "./pages/Test";
-// import Data from "./pages/Data";
+import DataPage from "./pages/Data";
 // import About from "./pages/About";
 // import Analysis from "./pages/Analysis";
 import Login from "./pages/Login/Login.jsx";
@@ -18,6 +18,7 @@ function App() {
 
           <Route path="/" element={<Home />} />
           {/*<Route path="/about" element={<About />} />*/}
+          <Route path="/data" element={<DataPage />} />
 
           <Route path="/login" element={<Login />} />
 
