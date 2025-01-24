@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {Box, Typography} from "@mui/material";
 import RegionStore from "../../store/RegionStore.js";
 
 import * as brainRegions_inner from "../../assets/images/brain_inner";
