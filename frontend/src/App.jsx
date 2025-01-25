@@ -2,12 +2,15 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import Test from "./pages/Test";
+import About from "./pages/About";
 import DataPage from "./pages/Data";
 // import About from "./pages/About";
 // import Analysis from "./pages/Analysis";
 import Login from "./pages/Login/Login.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+
+import Test from "./pages/Test";
+
 
 function App() {
   return (
@@ -17,7 +20,7 @@ function App() {
           <Route path="/test" element={<Test />} />
 
           <Route path="/" element={<Home />} />
-          {/*<Route path="/about" element={<About />} />*/}
+          <Route path="/about" element={<About />} />
           <Route path="/data" element={<DataPage />} />
 
           <Route path="/login" element={<Login />} />

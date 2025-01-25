@@ -1,44 +1,81 @@
 import { useState } from "react";
-import { Box, Typography, Collapse, Checkbox, FormControlLabel } from "@mui/material";
+import { Typography, Divider, Checkbox, FormControlLabel } from "@mui/material";
+import {ExpandLess, ExpandMore} from "@mui/icons-material";
+import "./FilterPanel.css";
 
 const FilterPanel = () => {
-  const [openFilters, setOpenFilters] = useState({
+  const [expandedFilters, setExpandedFilters] = useState({
     assayType: true,
-    organism: true,
+    organism: false,
     cell: false,
     sex: false,
   });
 
-  const toggleFilter = (filterName) => {
-    setOpenFilters((prev) => ({ ...prev, [filterName]: !prev[filterName] }));
+  const toggleFilter = (filter) => {
+    setExpandedFilters((prev) => ({
+      ...prev,
+      [filter]: !prev[filter],
+    }));
   };
 
+  const filters = [
+    {
+      title: "Assay Type",
+      options: ["DNA Binding", "Transcription", "RNA Binding", "Single Cell"],
+      key: "assayType",
+    },
+    {
+      title: "Organism",
+      options: ["Homo Sapiens", "Mus Musculus", "Drosophila", "C. Elegans"],
+      key: "organism",
+    },
+    {
+      title: "Cell",
+      options: ["T Cell", "B Cell", "Stem Cell", "Epithelial Cell"],
+      key: "cell",
+    },
+    {
+      title: "Sex",
+      options: ["Male", "Female", "Unknown"],
+      key: "sex",
+    },
+  ];
+
   return (
-    <Box className="filter-panel">
-      {["Assay Type", "Organism", "Cell", "Sex"].map((filter, index) => (
-        <Box key={index} className="filter-group">
-          <Typography
-            variant="h6"
-            onClick={() => toggleFilter(filter.toLowerCase().replace(" ", ""))}
-            className="filter-title"
-          >
-            {filter}
-          </Typography>
-          <Collapse in={openFilters[filter.toLowerCase().replace(" ", "")]}>
-            <Box className="filter-options">
-              {["Option 1", "Option 2", "Option 3"].map((option, i) => (
+    <div className="filter-panel">
+      <div className="panel-title">
+        <Typography variant="h6">Data filters</Typography>
+      </div>
+      {filters.map((filter, index) => (
+        <div key={filter.key} className="filter-section">
+          {/* Filter Header */}
+          <div className="filter-header" onClick={() => toggleFilter(filter.key)}>
+            <Typography variant="subtitle1">{filter.title}</Typography>
+            <span className="toggle-icon">
+              {expandedFilters[filter.key] ? <ExpandLess /> : <ExpandMore />}
+            </span>
+          </div>
+
+          {/* Filter Options */}
+          {expandedFilters[filter.key] && (
+            <div className="filter-options">
+              {filter.options.map((option, idx) => (
                 <FormControlLabel
-                  key={i}
+                    sx={{fontSize: "0.8rem", display:"block"}}
+                  key={idx}
                   control={<Checkbox />}
                   label={option}
-                  className="filter-option"
+                  className="filter-option-item"
                 />
               ))}
-            </Box>
-          </Collapse>
-        </Box>
+            </div>
+          )}
+
+          {/* Separator */}
+          {index < filters.length - 1 && <Divider />}
+        </div>
       ))}
-    </Box>
+    </div>
   );
 };
 

@@ -1,6 +1,5 @@
-import React from "react";
 import { Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, Paper } from "@mui/material";
-// import "./DataDisplay.css";
+import "./DataDisplay.css";
 
 const DataDisplay = ({ mode, searchQuery }) => {
   const mockData = [

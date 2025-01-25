@@ -23,7 +23,7 @@ const Login = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 400, margin: "auto", textAlign: "center", mt: 8 }}>
+    <Box sx={{ maxWidth: 400, margin: "auto", textAlign: "center", mt: 8,height: "100vh" }}>
       <Typography variant="h4" gutterBottom>Login</Typography>
       <TextField
         label="Username"

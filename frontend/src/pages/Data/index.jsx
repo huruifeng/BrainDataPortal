@@ -1,5 +1,9 @@
 import { useState } from "react";
-import {Box, Typography, Button, Pagination, TextField, ToggleButtonGroup, ToggleButton} from "@mui/material";
+import {Box, Typography, Pagination, TextField, ToggleButtonGroup, ToggleButton, Divider} from "@mui/material";
+import ListIcon from '@mui/icons-material/List';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import PivotTableChart from '@mui/icons-material/PivotTableChart';
+
 import FilterPanel from "./FilterPanel";
 import DataDisplay from "./DataDisplay";
 import "./DataPage.css";
@@ -16,9 +20,10 @@ const DataPage = () => {
     <div className="data-page-container">
       {/* Title Row */}
       <Box className="title-row">
-        <Typography variant="h4">Data Records</Typography>
+        <Typography variant="h4">Explore data resources
+        </Typography>
       </Box>
-
+      <Divider />
       {/* Main Content */}
       <Box className="main-content">
         {/* Left Filter Panel */}
@@ -36,13 +41,13 @@ const DataPage = () => {
               aria-label="display mode"
             >
               <ToggleButton value="table" aria-label="Table">
-                Table
+                <TableChartIcon />
               </ToggleButton>
               <ToggleButton value="list" aria-label="List">
-                List
+                <ListIcon />
               </ToggleButton>
               <ToggleButton value="matrix" aria-label="Matrix">
-                Matrix
+                <PivotTableChart />
               </ToggleButton>
             </ToggleButtonGroup>
 
