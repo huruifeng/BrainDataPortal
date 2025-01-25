@@ -16,8 +16,8 @@ class Study(BaseModel):
     submitter_email: str
     ASAP_grant_id: str
     other_funding_source: str
-    publication_DOI: str = "NA"
-    publication_PMID: str = "NA"
+    publication_DOI: str = None
+    publication_PMID: str = None
     number_of_brain_samples: int
     brain_regions: str
     types_of_samples: str
