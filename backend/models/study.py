@@ -1,30 +1,70 @@
-from enum import Enum
-from pydantic import BaseModel
-from typing_extensions import Optional
+from sqlmodel import SQLModel, Field, Relationship
+import uuid
+from typing import Optional
 
-class Study(BaseModel):
-    ASAP_team_name: str
-    ASAP_lab_name: str
-    project_name: str
-    team_dataset_id: str
-    project_dataset: str
-    project_description: str
-    PI_full_name: str
-    PI_email: str
-    contributor_names: str
-    submitter_name: str
-    submitter_email: str
-    ASAP_grant_id: str
-    other_funding_source: str
-    publication_DOI: str = None
-    publication_PMID: str = None
-    number_of_brain_samples: int
-    brain_regions: str
-    types_of_samples: str
-    DUA_version: str
+
+class StudyBase(SQLModel):
+    ASAP_team_name: str = Field(unique=True, index=True)
+    ASAP_lab_name: str = Field(unique=True, index=True)
+    project_name: str = Field(index=True)
+    team_dataset_id: str = Field()
+    project_dataset: str = Field(index=True)
+    project_description: str = Field(default=None)
+    PI_full_name: str = Field(index=True)
+    PI_email: str = Field(index=True)
+    contributor_names: str = Field(default=None)
+    submitter_name: str = Field(index=True)
+    submitter_email: str = Field(index=True)
+    ASAP_grant_id: str = Field(index=True)
+    other_funding_source: str = Field(default=None)
+    publication_DOI: str = Field(default=None)
+    publication_PMID: str = Field(default=None)
+    number_of_brain_samples: int = Field(default=None)
+    brain_regions: str = Field(default=None)
+    types_of_samples: str = Field(default=None)
+    DUA_version: str = Field(default=None)
 
     ## Optional fields
-    PI_ORCHID: Optional[str] = None
-    PI_google_scholar_id: Optional[str] = None
-    preprocessing_references: Optional[str] = None
-    metadata_version_date: Optional[str] = None
+    PI_ORCHID: Optional[str] = Field(default=None)
+    PI_google_scholar_id: Optional[str] = Field(default=None)
+    preprocessing_references: Optional[str] = Field(default=None)
+    metadata_version_date: Optional[str] = Field(default=None)
+
+class Study(StudyBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
+class StudyCreate(StudyBase):
+    pass
+
+class StudyUpdate(SQLModel):
+    ASAP_team_name: Optional[str] = Field(default=None)
+    ASAP_lab_name: Optional[str] = Field(default=None)
+    project_name: Optional[str] = Field(default=None)
+    team_dataset_id: Optional[str] = Field(default=None)
+    project_dataset: Optional[str] = Field(default=None)
+    project_description: Optional[str] = Field(default=None)
+    PI_full_name: Optional[str] = Field(default=None)
+    PI_email: Optional[str] = Field(default=None)
+    contributor_names: Optional[str] = Field(default=None)
+    submitter_name: Optional[str] = Field(default=None)
+    submitter_email: Optional[str] = Field(default=None)
+    ASAP_grant_id: Optional[str] = Field(default=None)
+    other_funding_source: Optional[str] = Field(default=None)
+    publication_DOI: Optional[str] = Field(default=None)
+    publication_PMID: Optional[str] = Field(default=None)
+    number_of_brain_samples: Optional[int] = Field(default=None)
+    brain_regions: Optional[str] = Field(default=None)
+    types_of_samples: Optional[str] = Field(default=None)
+    DUA_version: Optional[str] = Field(default=None)
+
+    PI_ORCHID: Optional[str] = Field(default=None)
+    PI_google_scholar_id: Optional[str] = Field(default=None)
+    preprocessing_references: Optional[str] = Field(default=None)
+    metadata_version_date: Optional[str] = Field(default=None)
+
+class StudyPublic(StudyBase):
+    id: uuid.UUID
+
+class StudiesPublic(SQLModel):
+    data: list[StudyPublic]
+    count: int

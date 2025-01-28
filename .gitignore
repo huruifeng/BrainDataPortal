@@ -1,4 +1,5 @@
-/docs/
-/backend/.idea/
+docs
+frontend/node_modules
+backend/data
 
 
