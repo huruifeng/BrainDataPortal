@@ -3,7 +3,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
 
 
-class DataBasic(SQLModel, table=True):
+class DataBasic(SQLModel):
     sample_id: str = Field(index=True)
     subject_id: str = Field(index=True)
     source_sample_id: str = Field(index=True)

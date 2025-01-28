@@ -38,6 +38,9 @@ class SampleBase(SQLModel):
     pm_PH: Optional[float] = Field(default=None)
     donor_id: Optional[str] = Field(default=None)
 
+    sample_data_type: str = Field(default=None)
+    sample_data_location: str = Field(default=None)
+
 class Sample(SampleBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
