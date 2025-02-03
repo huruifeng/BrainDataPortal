@@ -3,13 +3,13 @@ from typing import Optional
 import uuid
 
 class ProtocolBase(SQLModel):
-    sample_collection_summary: str = Field(index=True)
-    cell_extraction_summary: str = Field(index=True)
-    lib_prep_summary: str = Field(index=True)
-    data_processing_summary: str = Field(index=True)
-    github_url: str = Field(index=True)
-    protocols_io_DOI: str = Field(index=True)
-    other_reference: Optional[str] = Field(index=True)
+    sample_collection_summary: str | None = Field(default="NA")
+    cell_extraction_summary: str | None = Field(default="NA")
+    lib_prep_summary: str | None = Field(default="NA")
+    data_processing_summary: str | None = Field(default="NA")
+    github_url: str | None = Field(default="NA")
+    protocols_io_DOI: str | None = Field(default="NA")
+    other_reference: Optional[str] | None = Field(default="NA")
 
 class Protocol(ProtocolBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
