@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from db import create_db_and_tables
+from routes import db_routes
 
 app = FastAPI()
 
@@ -17,6 +18,11 @@ app.add_middleware(
 
 app.add_event_handler("startup", create_db_and_tables)
 
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+app.include_router(db_routes.router, prefix="/db")
 
 if __name__ == "__main__":
     import uvicorn

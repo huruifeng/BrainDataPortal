@@ -5,8 +5,6 @@ from typing import Optional
 
 class DataBasic(SQLModel):
     sample_id: str = Field(index=True)
-    subject_id: str = Field(index=True)
-    source_sample_id: str = Field(index=True)
     replicate: str = Field(index=True)
     replicate_count: int = Field(default=None)
     repeated_sample: int = Field(default=None)
@@ -14,6 +12,7 @@ class DataBasic(SQLModel):
     file_type: str = Field(default=None)
     file_name: str = Field(default=None)
     file_description: str = Field(default=None)
+    local_path: str = Field(default=None)
     file_MD5: str = Field(default=None)
     technology: str = Field(default=None)
     omic: str = Field(default=None)

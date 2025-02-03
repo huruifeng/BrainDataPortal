@@ -3,6 +3,10 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
 
 class ClinpathBase(SQLModel):
+    subject_id: str = Field(index=True)
+    source_subject_id: str = Field(index=True)
+    duration_pmi:float = Field()
+    path_autopsy_dx_main: str = Field()
     path_autopsy_second_dx: Optional[str] = Field()
     path_autopsy_third_dx: Optional[str] = Field()
     path_autopsy_fourth_dx: Optional[str] = Field()
@@ -15,7 +19,7 @@ class ClinpathBase(SQLModel):
     cause_death: str = Field()
     other_cause_death_1: Optional[str] = Field()
     other_cause_death_2: Optional[str] = Field()
-    brain_weight: str = Field()
+    brain_weight: float = Field()
     path_braak_nft: str = Field()
     path_braak_asyn: str = Field()
     path_cerad: str = Field()
