@@ -56,12 +56,10 @@ def insert_clinpath(clinpath: Clinpath, session: Session = Depends(get_session))
 def get_data_by_id(id: uuid.UUID, session):
     if not id:
         raise ValueError("id is empty")
-
     data = session.get(Data, id)
 
     if not data:
         raise HTTPException(status_code=404, detail="Data not found")
-
     return data
 
 def get_all_data(session):
@@ -69,6 +67,22 @@ def get_all_data(session):
     result = session.exec(statement)  # Execute the query
     return result.all()  # Fetch all results
 
+def get_sample_by_id(id: uuid.UUID, session):
+    if not id:
+        raise ValueError("id is empty")
+    statement = select(Sample).where(Sample.sample_id == id)  # Create a SELECT query
+    sample = session.exec(statement).first()
 
+    if not sample:
+        raise HTTPException(status_code=404, detail="Sample not found")
+    return sample
+
+def get_all_samples(session):
+    statement = select(Sample)
+    result = session.exec(statement)
+    return result.all()
+
+## ===================================================
+## update functions
 
 

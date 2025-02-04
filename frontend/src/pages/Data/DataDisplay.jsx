@@ -1,54 +1,166 @@
-import { Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, Paper } from "@mui/material";
+import { useState } from "react";
+import {
+    Box,
+    Typography,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Paper,
+    Pagination, ToggleButtonGroup, ToggleButton, TextField, FormControl, InputLabel, Select, MenuItem, Grid,
+} from "@mui/material";
 import "./DataDisplay.css";
+import TableChartIcon from "@mui/icons-material/TableChart";
+import ListIcon from "@mui/icons-material/List";
+import PivotTableChart from "@mui/icons-material/PivotTableChart";
 
-const DataDisplay = ({ mode, searchQuery }) => {
-  const mockData = [
-    { id: 1, name: "Record 1", description: "Description of record 1" },
-    { id: 2, name: "Record 2", description: "Description of record 2" },
-    { id: 3, name: "Record 3", description: "Description of record 3" },
-  ];
+const DataDisplay = ({ dataRecords}) => {
+    const [page, setPage] = useState(1);
+    const [displayMode, setDisplayMode] = useState("table"); // "table" or "list"
+    const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredData = mockData.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    const [recordsPerPage, setRecordsPerPage] = useState(15);
 
-  return (
-    <Box className="data-display">
-      {mode === "table" ? (
-        <Paper className="data-table">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Description</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredData.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>{record.id}</TableCell>
-                  <TableCell>{record.name}</TableCell>
-                  <TableCell>{record.description}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
-      ) : (
-        <Box className="data-list">
-          {filteredData.map((record) => (
-            <Box key={record.id} className="list-item">
-              <Typography variant="h6">{record.name}</Typography>
-              <Typography variant="body1">{record.description}</Typography>
+  const handleChange = (event) => {
+    setRecordsPerPage(event.target.value);
+  };
+
+    const handleDisplayModeChange = (event, newMode) => {
+        setDisplayMode(newMode);
+    };
+
+
+    // Filter data based on the search query
+    const filteredData = dataRecords.filter(
+        (item) =>
+            item.sample_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.subject_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.tissue.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.brain_region.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.region_level_1.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.sample_data_type.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Pagination logic: Get only the records for the current page
+    const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+    const displayedData = filteredData.slice(
+        (page - 1) * recordsPerPage,
+        page * recordsPerPage
+    );
+
+    const handlePageChange = (event, value) => {
+        setPage(value);
+    };
+
+    return (
+        <Box className="data-display-area">
+            <Box className="data-toolbar">
+                <div>
+                    <ToggleButtonGroup
+                        size="small"
+                        value={displayMode}
+                        exclusive
+                        onChange={handleDisplayModeChange}
+                        aria-label="display mode"
+                    >
+                        <ToggleButton value="table" aria-label="Table">
+                            <TableChartIcon />
+                        </ToggleButton>
+                        <ToggleButton value="list" aria-label="List">
+                            <ListIcon />
+                        </ToggleButton>
+                        <ToggleButton value="matrix" aria-label="Matrix">
+                            <PivotTableChart />
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                    <FormControl sx={{ m: 1, minWidth: 120, margin: "0 8px" }} size="small">
+                      <InputLabel id="select-records-per-page-label">Records / Page</InputLabel>
+                      <Select
+                        labelId="select-records-per-page"
+                        id="select-records-per-page"
+                        value={recordsPerPage}
+                        label="Records / Page"
+                        onChange={handleChange}
+                      >
+                        <MenuItem value={15}>15</MenuItem>
+                        <MenuItem value={30}>30</MenuItem>
+                        <MenuItem value={50}>50</MenuItem>
+                        <MenuItem value={100}>100</MenuItem>
+                      </Select>
+                    </FormControl>
+                </div>
+
+                <TextField
+                    label="Search"
+                    variant="outlined"
+                    size="small"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input"
+                />
             </Box>
-          ))}
+
+            <Box className="data-display">
+                {displayMode === "table" ? (
+                    <Paper className="data-table">
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Sample ID</TableCell>
+                                    <TableCell>Source subject</TableCell>
+                                    <TableCell>Tissue</TableCell>
+                                    <TableCell>Brain region</TableCell>
+                                    <TableCell>Sub-region</TableCell>
+                                    <TableCell>Data type</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {displayedData.map((record) => (
+                                    <TableRow key={record.sample_id}>
+                                        <TableCell>{record.sample_id}</TableCell>
+                                        <TableCell>{record.subject_id}</TableCell>
+                                        <TableCell>{record.tissue}</TableCell>
+                                        <TableCell>{record.brain_region}</TableCell>
+                                        <TableCell>{record.region_level_1}</TableCell>
+                                        <TableCell>{record.sample_data_type}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Paper>
+                ) : (
+                    <Box className="data-list">
+                        {displayedData.map((record) => (
+                            <Box key={record.sample_id} className="list-item">
+                                <Typography variant="h6">{record.sample_id}</Typography>
+                                <Typography variant="body1">
+                                  <Box display="flex" gap={2}>
+                                    <Box><b>Source subject:</b> {record.subject_id}</Box>
+                                    <Box><b>Tissue:</b> {record.tissue}</Box>
+                                    <Box><b>Brain Region:</b> {record.brain_region}</Box>
+                                    <Box><b>Region Level 1:</b> {record.region_level_1}</Box>
+                                    <Box><b>Assay type:</b> {record.sample_data_type}</Box>
+                                  </Box>
+                                </Typography>
+                            </Box>
+                        ))}
+                    </Box>
+                )}
+
+                {/* Pagination Component */}
+                {totalPages > 1 && (
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange}
+                        color="primary"
+                        className="pagination"
+                    />
+                )}
+            </Box>
         </Box>
-      )}
-    </Box>
-  );
+    );
 };
 
 export default DataDisplay;

@@ -2,8 +2,6 @@ import { useState } from "react";
 import { Typography, Divider, Checkbox, FormControlLabel } from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
 import "./FilterPanel.css";
-import useDataStore from "../../store/DataStore.js";
-import {getData_get} from "../../api/api.js";
 
 const FilterPanel = () => {
     const [expandedFilters, setExpandedFilters] = useState({
@@ -12,21 +10,6 @@ const FilterPanel = () => {
         cell: false,
         sex: false,
     });
-
-    const {datarecords, setDatarecords } = useDataStore();
-
-    const fetchData = async (data_id="all") => {
-        try {
-            const response = await getData_get(data_id);
-            console.log(response);
-            const data = await response.data.json();
-            setDatarecords(data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
-
-    fetchData();
 
     const toggleFilter = (filter) => {
         setExpandedFilters((prev) => ({

@@ -12,32 +12,48 @@ import Login from "./pages/Login/Login.jsx";
 
 import Test from "./pages/Test";
 import UnauthorizedPage from "./pages/Unauthorized/index.jsx";
+import {Bounce, ToastContainer} from "react-toastify";
 
 
 function App() {
   return (
     <Router>
       <NavBar />
-      <Routes>
-          <Route path="/test" element={<Test />} />
+            {/* Global Toast Configuration */}
+            <ToastContainer
+                position="top-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={true}
+                closeOnClick={false}
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition={Bounce}
+            />
 
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/data" element={<DataPage />} />
+          <Routes>
+              <Route path="/test" element={<Test />} />
 
-          <Route path="/login" element={<Login />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/data" element={<DataPage />} />
 
-          {/* Protected Routes */}
-          {/*<Route path="/data" element={<ProtectedRoute roles={['admin', 'user']}><Data /></ProtectedRoute>}/>*/}
-          {/*<Route path="/analysis" element={<ProtectedRoute roles={['admin']}><Analysis /></ProtectedRoute>}/>*/}
+              <Route path="/login" element={<Login />} />
 
-          {/* Unauthorized page for invalid role access */}
-          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+              {/* Protected Routes */}
+              {/*<Route path="/data" element={<ProtectedRoute roles={['admin', 'user']}><Data /></ProtectedRoute>}/>*/}
+              {/*<Route path="/analysis" element={<ProtectedRoute roles={['admin']}><Analysis /></ProtectedRoute>}/>*/}
 
-          {/* Page not found */}
-          <Route path="*" element={<NotFoundPage />} />
+              {/* Unauthorized page for invalid role access */}
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-      </Routes>
+              {/* Page not found */}
+              <Route path="*" element={<NotFoundPage />} />
+
+          </Routes>
       <Footer />
     </Router>
   );

@@ -6,6 +6,7 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
+    height: fit-content;
 }
 
 .panel-title {
@@ -16,7 +17,7 @@
 
 /* Filter section container */
 .filter-section {
-    margin-bottom: 0px;
+    /*margin-bottom: 0px;*/
 }
 
 /* Filter header with expand/collapse icon */
