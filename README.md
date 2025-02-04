@@ -17,9 +17,9 @@
    - In the backend directory.
 
        ```pip install -r requirements.txt```
-3. Run the backend, change to backend directory.
+3. Run the backend, in the BrainDataPortal directory.
 
-   ```python3 main.py```
+   ```python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 ```
 4. Run the frontend, change to frontend directory.
 
    ```npm run dev```

@@ -2,9 +2,8 @@ import uuid
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
 
-
 class SubjectBase(SQLModel):
-    subject_id: str = Field(unique=True, index=True)
+    subject_id: str = Field(unique=True, index=True, primary_key=True)
     source_subject_id: str = Field(index=True)
     AMPPD_id: str = Field(index=True)
     GP2_id: str = Field(index=True)
@@ -32,6 +31,8 @@ class SubjectBase(SQLModel):
 
 class Subject(SubjectBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    subject_sample: list["Sample"] = Relationship(back_populates="subject")
+    subject_clinpath: Optional["Clinpath"] = Relationship(back_populates="subject")
 
 class SubjectCreate(SubjectBase):
     pass

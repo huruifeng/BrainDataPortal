@@ -1,12 +1,12 @@
 import uuid
 from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional
+from typing import Optional, List
 
 
 class SampleBase(SQLModel):
-    sample_id: str = Field(index=True, unique=True)
+    sample_id: str = Field(index=True, unique=True, primary_key=True)
     source_sample_id: str = Field(index=True)
-    subject_id: str = Field(index=True)
+    subject_id: str = Field(index=True, foreign_key="subject.subject_id")
     replicate: str = Field(default="NA")
     replicate_count: int = Field(default=-1)
     repeated_sample: int = Field(default=-1)
@@ -23,7 +23,7 @@ class SampleBase(SQLModel):
     input_cell_count: int = Field(default=-1)
     assay: str = Field(default="NA")
     sequencing_end: str = Field(default="NA")
-    sequencing_length: str = Field(default="NA")
+    sequencing_length: int = Field(default="NA")
     sequencing_instrument: str = Field(default="NA")
     organism_ontology_term_id: str = Field(default="NA")
     development_stage_ontology_term_id: str = Field(default="NA")
@@ -41,8 +41,14 @@ class SampleBase(SQLModel):
     sample_data_type: str = Field(default="NA")
     sample_data_location: str = Field(default="NA")
 
+
 class Sample(SampleBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    # Relationship to Data (one-to-many)
+    sample_data: List["Data"] = Relationship(back_populates="sample")
+    subject: Optional["Subject"] = Relationship(back_populates="sample")
+
+
 
 class SampleCreate(SampleBase):
     pass

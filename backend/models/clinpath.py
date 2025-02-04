@@ -2,8 +2,11 @@ import uuid
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
 
+from backend.models import Subject
+
+
 class ClinpathBase(SQLModel):
-    subject_id: str = Field(index=True)
+    subject_id: str = Field(index=True, unique=True, primary_key=True, foreign_key="subject.subject_id")
     source_subject_id: str = Field(index=True)
     duration_pmi:float = Field()
     path_autopsy_dx_main: str = Field()
@@ -40,9 +43,9 @@ class ClinpathBase(SQLModel):
     dig_slide_avail: Optional[str]| None = Field(default="NA")
     quant_path_avail: Optional[str]| None = Field(default="NA")
 
-
 class Clinpath(ClinpathBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    subject: Optional["Subject"] = Relationship(back_populates="subject_clinpath")
 
 class ClinpathCreate(ClinpathBase):
     pass

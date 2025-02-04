@@ -3,12 +3,12 @@ from sqlmodel import Session, SQLModel
 from sqlmodel import create_engine
 from fastapi import Depends
 
-from models.data import Data
-from models.study import Study
-from models.sample import Sample
-from models.protocol import Protocol
-from models.subject import Subject
-from models.clinpath import Clinpath
+from backend.models.data import Data
+from backend.models.study import Study
+from backend.models.sample import Sample
+from backend.models.protocol import Protocol
+from backend.models.subject import Subject
+from backend.models.clinpath import Clinpath
 
 # DATABASE_URL = "sqlite:///./database.db"
 DATABASE_URL = "postgresql://huruifeng:123456&Abc@localhost:5432/braindataportal"

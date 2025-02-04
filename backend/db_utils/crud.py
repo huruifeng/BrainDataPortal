@@ -1,11 +1,11 @@
-from models.data import Data
-from models.study import Study
-from models.sample import Sample
-from models.protocol import Protocol
-from models.subject import Subject
-from models.clinpath import Clinpath
+from backend.models.data import Data
+from backend.models.study import Study
+from backend.models.sample import Sample
+from backend.models.protocol import Protocol
+from backend.models.subject import Subject
+from backend.models.clinpath import Clinpath
 
-from db import SessionDep
+from backend.db import SessionDep
 
 def insert_data(data: Data, session: SessionDep):
     session.add(data)
