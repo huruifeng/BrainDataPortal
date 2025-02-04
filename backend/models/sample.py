@@ -46,7 +46,7 @@ class Sample(SampleBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     # Relationship to Data (one-to-many)
     sample_data: List["Data"] = Relationship(back_populates="sample")
-    subject: Optional["Subject"] = Relationship(back_populates="sample")
+    subject: Optional["Subject"] = Relationship(back_populates="subject_sample")
 
 
 

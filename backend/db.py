@@ -12,7 +12,7 @@ from backend.models.clinpath import Clinpath
 
 # DATABASE_URL = "sqlite:///./database.db"
 DATABASE_URL = "postgresql://huruifeng:123456&Abc@localhost:5432/braindataportal"
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=False)
 
 def create_db_and_tables():
     ## Create database and tables only if they don't exist

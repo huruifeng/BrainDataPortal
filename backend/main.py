@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.db import create_db_and_tables
-from backend.routes import db_routes
+from backend.routes import db_routes, API_routes
 app = FastAPI()
 
 app.add_middleware(
@@ -22,6 +22,7 @@ async def root():
     return "Hello, Welcome to BrainDataPortal!"
 
 app.include_router(db_routes.router, prefix="/db")
+app.include_router(API_routes.router, prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn
