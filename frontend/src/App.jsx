@@ -18,43 +18,46 @@ import {Bounce, ToastContainer} from "react-toastify";
 function App() {
   return (
     <Router>
-      <NavBar />
-            {/* Global Toast Configuration */}
-            <ToastContainer
-                position="top-center"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={true}
-                closeOnClick={false}
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-                transition={Bounce}
-            />
+         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+              <NavBar />
+                {/* Global Toast Configuration */}
+             <ToastContainer
+                    position="top-center"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={true}
+                    closeOnClick={false}
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    transition={Bounce}
+             />
+             {/* Main Content (grows dynamically) */}
+             <div style={{ flex: 1 }}>
+                  <Routes>
+                      <Route path="/test" element={<Test />} />
 
-          <Routes>
-              <Route path="/test" element={<Test />} />
+                      <Route path="/" element={<Home />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/data" element={<DataPage />} />
 
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/data" element={<DataPage />} />
+                      <Route path="/login" element={<Login />} />
 
-              <Route path="/login" element={<Login />} />
+                      {/* Protected Routes */}
+                      {/*<Route path="/data" element={<ProtectedRoute roles={['admin', 'user']}><Data /></ProtectedRoute>}/>*/}
+                      {/*<Route path="/analysis" element={<ProtectedRoute roles={['admin']}><Analysis /></ProtectedRoute>}/>*/}
 
-              {/* Protected Routes */}
-              {/*<Route path="/data" element={<ProtectedRoute roles={['admin', 'user']}><Data /></ProtectedRoute>}/>*/}
-              {/*<Route path="/analysis" element={<ProtectedRoute roles={['admin']}><Analysis /></ProtectedRoute>}/>*/}
+                      {/* Unauthorized page for invalid role access */}
+                      <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-              {/* Unauthorized page for invalid role access */}
-              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                      {/* Page not found */}<Route path="*" element={<NotFoundPage />} />
 
-              {/* Page not found */}
-              <Route path="*" element={<NotFoundPage />} />
-
-          </Routes>
-      <Footer />
+                </Routes>
+             </div>
+             <Footer />
+         </div>
     </Router>
   );
 }

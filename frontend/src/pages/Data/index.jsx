@@ -13,7 +13,7 @@ const DataPage = () => {
     }, [fetchSampleData]);
 
     return (
-        <div className="data-page-container">
+        <div className="data-page-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             {/* Title Row */}
             <Box className="title-row">
                 <Typography variant="h4">Explore data resources
@@ -22,7 +22,7 @@ const DataPage = () => {
             <Divider />
 
             {/* Main Content */}
-            <Box className="main-content">
+            <Box className="main-content" style={{ flex: 2, display: 'flex', flexDirection: 'row' }}>
                 {/* Left Filter Panel */}
                 <FilterPanel />
                 {/* Right Data Display Area */}

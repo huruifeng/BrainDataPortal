@@ -54,7 +54,7 @@ const DataDisplay = ({ dataRecords}) => {
     };
 
     return (
-        <Box className="data-display-area">
+        <Box className="data-display-area" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <Box className="data-toolbar">
                 <div>
                     <ToggleButtonGroup
@@ -101,7 +101,7 @@ const DataDisplay = ({ dataRecords}) => {
                 />
             </Box>
 
-            <Box className="data-display">
+            <Box className="data-display" style={{ flex: 1, overflowY: 'auto' }}>
                 {displayMode === "table" ? (
                     <Paper className="data-table">
                         <Table>
