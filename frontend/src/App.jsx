@@ -4,12 +4,14 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import DataPage from "./pages/Data";
-// import About from "./pages/About";
+import NotFoundPage from "./pages/NotFound";
+
 // import Analysis from "./pages/Analysis";
 import Login from "./pages/Login/Login.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
+// import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 import Test from "./pages/Test";
+import UnauthorizedPage from "./pages/Unauthorized/index.jsx";
 
 
 function App() {
@@ -30,10 +32,10 @@ function App() {
           {/*<Route path="/analysis" element={<ProtectedRoute roles={['admin']}><Analysis /></ProtectedRoute>}/>*/}
 
           {/* Unauthorized page for invalid role access */}
-          <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Page not found */}
-          <Route path="*" element={<div>Page Not Found</div>} />
+          <Route path="*" element={<NotFoundPage />} />
 
       </Routes>
       <Footer />
