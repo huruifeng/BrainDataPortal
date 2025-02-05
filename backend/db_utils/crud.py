@@ -82,6 +82,11 @@ def get_all_samples(session):
     result = session.exec(statement)
     return result.all()
 
+def get_sample_by_conditions(conditions: dict, session):
+    statement = select(Sample).where(conditions)
+    result = session.exec(statement)
+    return result.all()
+
 ## ===================================================
 ## update functions
 

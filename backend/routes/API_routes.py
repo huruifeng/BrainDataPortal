@@ -36,4 +36,9 @@ async def get_sample(sample_id: str | uuid.UUID, session: SessionDep):
         if not get_sample_by_id(sample_id,session):
             raise HTTPException(status_code=404, detail="Sample not found")
         return get_sample_by_id(sample_id,session)
+@router.get("/getsample_by_conditions/")
+async def getsample_conditions(conditions: dict, session: SessionDep):
+    samples = get_sample_by_conditions(conditions, session)
+    return samples
+
 

@@ -6,7 +6,7 @@ const useDataStore = create((set) => ({
     dataRecords: [],
     datafetchStatus: null,
 
-     sampleRecords: [],
+    sampleRecords: [],
     samplefetchStatus: null,
 
     setDatarecords: (dataRecords) => set({ dataRecords }),
