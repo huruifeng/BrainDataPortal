@@ -1,4 +1,6 @@
 import uuid
+
+import numpy as np
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 
@@ -8,8 +10,8 @@ class SampleBase(SQLModel):
     source_sample_id: str = Field(index=True)
     subject_id: str = Field(index=True, foreign_key="subject.subject_id")
     replicate: str = Field(default="NA")
-    replicate_count: int = Field(default=-1)
-    repeated_sample: int = Field(default=-1)
+    replicate_count: int = Field(default=np.nan)
+    repeated_sample: int = Field(default=np.nan)
     batch: str = Field(default="NA")
     tissue: str = Field(default="NA")
     brain_region: str = Field(default="NA")
@@ -44,7 +46,6 @@ class SampleBase(SQLModel):
     data_location: str = Field(default="NA")
 
     data_protocol: str = Field(default="NA", foreign_key="protocol.protocol_id")
-    protocol_version: str = Field(default="NA")
 
 
 class Sample(SampleBase, table=True):

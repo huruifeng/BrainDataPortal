@@ -1,4 +1,6 @@
 import uuid
+
+import numpy as np
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
 
@@ -8,7 +10,7 @@ from backend.models import Subject
 class ClinpathBase(SQLModel):
     subject_id: str = Field(index=True, unique=True, primary_key=True, foreign_key="subject.subject_id")
     source_subject_id: str = Field(index=True)
-    duration_pmi:float = Field()
+    duration_pmi:float = Field(default=np.nan)
     path_autopsy_dx_main: str = Field()
     path_autopsy_second_dx: Optional[str] | None = Field(default="NA")
     path_autopsy_third_dx: Optional[str] | None = Field(default="NA")
@@ -17,16 +19,16 @@ class ClinpathBase(SQLModel):
     path_autopsy_sixth_dx: Optional[str] | None = Field(default="NA")
     path_autopsy_seventh_dx: Optional[str] | None = Field(default="NA")
     path_autopsy_eight_dx: Optional[str] | None = Field(default="NA")
-    path_year_death: int = Field(ge=1920, le=2050)
-    age_at_death: int = Field()
-    cause_death: str = Field()
+    path_year_death: int = Field(ge=1920, le=2050, default= np.nan)
+    age_at_death: int = Field(default=np.nan)
+    cause_death: str = Field(default="NA")
     other_cause_death_1: Optional[str] | None = Field(default="NA")
     other_cause_death_2: Optional[str] | None = Field(default="NA")
-    brain_weight: float = Field()
-    path_braak_nft: str = Field()
-    path_braak_asyn: str = Field()
-    path_cerad: str = Field()
-    path_thal: str = Field()
+    brain_weight: float = Field(default=np.nan)
+    path_braak_nft: str = Field(default="NA")
+    path_braak_asyn: str = Field(default="NA")
+    path_cerad: str = Field(default="NA")
+    path_thal: str = Field(default="NA")
     known_pathogenic_mutation: Optional[str] | None = Field(default="NA")
     PD_pathogenic_mutation: Optional[str] | None = Field(default="NA")
     path_mckeith: Optional[str] | None = Field(default="NA")

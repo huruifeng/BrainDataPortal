@@ -1,3 +1,4 @@
+import numpy as np
 from sqlmodel import SQLModel, Field, Relationship
 import uuid
 from typing import Optional
@@ -8,11 +9,11 @@ class StudyBase(SQLModel):
     name: str = Field(index=True, unique=True)
     description: str = Field(default="NA")
 
-    dataset_id: str = Field(default="NA")
-    dataset_name: str = Field(default="NA")
-
     ASAP_team_name: str = Field(index=True)
-    ASAP_lab: str = Field(index=True)
+    ASAP_lab_name: str = Field(index=True)
+
+    team_dataset_id: str = Field(default="NA")
+    dataset_name: str = Field(default="NA")
 
     PI_full_name: str = Field(index=True)
     PI_email: str = Field(index=True)
@@ -22,7 +23,7 @@ class StudyBase(SQLModel):
     ASAP_grant_id: str = Field(default="NA")
     publication_DOI: str = Field(default="NA")
     publication_PMID: str = Field(default="NA")
-    number_of_brain_samples: int = Field(default="NA")
+    number_of_samples: int = Field(default=np.nan)
     brain_regions: str = Field(default="NA")
     types_of_samples: str = Field(default="NA")
     DUA_version: str = Field(default="NA")

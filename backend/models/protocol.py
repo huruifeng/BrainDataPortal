@@ -5,7 +5,6 @@ import uuid
 class ProtocolBase(SQLModel):
     protocol_id: str = Field(unique=True, index=True, primary_key=True)
     name: str = Field(index=True)
-    description: str = Field(default="NA")
     version: str = Field(default="NA")
     sample_collection_summary: str | None = Field(default="NA")
     cell_extraction_summary: str | None = Field(default="NA")
