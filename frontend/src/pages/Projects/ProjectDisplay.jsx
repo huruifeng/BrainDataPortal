@@ -8,15 +8,15 @@ import {
     TableCell,
     TableBody,
     Paper,
-    Pagination, ToggleButtonGroup, ToggleButton, TextField, FormControl, InputLabel, Select, MenuItem,
+    Pagination, ToggleButtonGroup, ToggleButton, TextField, FormControl, InputLabel, Select, MenuItem, Grid,
 } from "@mui/material";
-import "./DataDisplay.css";
+import "./ProjectDisplay.css";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import ListIcon from "@mui/icons-material/List";
 import PivotTableChart from "@mui/icons-material/PivotTableChart";
 import {Link} from "react-router-dom";
 
-const DataDisplay = ({ dataRecords}) => {
+const ProjectDisplay = ({ dataRecords}) => {
     const [page, setPage] = useState(1);
     const [displayMode, setDisplayMode] = useState("table"); // "table" or "list"
     const [searchQuery, setSearchQuery] = useState("");
@@ -35,12 +35,12 @@ const DataDisplay = ({ dataRecords}) => {
     // Filter data based on the search query
     const filteredData = dataRecords.filter(
         (item) =>
-            item.sample_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.subject_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.tissue.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.brain_region.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.region_level_1.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.sample_data_type.toLowerCase().includes(searchQuery.toLowerCase())
+            item.project_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.PI_full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.first_contributor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.n_samples.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.sample_type.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Pagination logic: Get only the records for the current page
@@ -108,25 +108,27 @@ const DataDisplay = ({ dataRecords}) => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Sample ID</TableCell>
-                                    <TableCell>Source subject</TableCell>
-                                    <TableCell>Tissue</TableCell>
+                                    <TableCell>Project ID</TableCell>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>PI</TableCell>
+                                    <TableCell>First contributor</TableCell>
+                                    <TableCell># Samples</TableCell>
                                     <TableCell>Brain region</TableCell>
-                                    <TableCell>Sub-region</TableCell>
-                                    <TableCell>Data type</TableCell>
+                                    <TableCell>Assay</TableCell>
                                     <TableCell>View</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {displayedData.map((record) => (
-                                    <TableRow key={record.sample_id}>
-                                        <TableCell>{record.sample_id}</TableCell>
-                                        <TableCell>{record.subject_id}</TableCell>
-                                        <TableCell>{record.tissue}</TableCell>
-                                        <TableCell>{record.brain_region}</TableCell>
-                                        <TableCell>{record.region_level_1}</TableCell>
-                                        <TableCell>{record.data_type}</TableCell>
-                                        <TableCell><Link to={`/umap/${record.project_id}?sample=${record.sample_id}`}>View UMAP</Link></TableCell>
+                                    <TableRow key={record.project_id}>
+                                        <TableCell><Link to={`/data/${record.project_id}`}>{record.project_id}</Link></TableCell>
+                                        <TableCell>{record.name}</TableCell>
+                                        <TableCell>{record.PI_full_name}</TableCell>
+                                        <TableCell>{record.first_contributor}</TableCell>
+                                        <TableCell>{record.n_samples}</TableCell>
+                                        <TableCell>{record.brain_regions}</TableCell>
+                                        <TableCell>{record.assay}</TableCell>
+                                        <TableCell><Link to={`/umap/${record.project_id}?sample=all`}>UMAP</Link></TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -135,17 +137,20 @@ const DataDisplay = ({ dataRecords}) => {
                 ) : (
                     <Box className="data-list">
                         {displayedData.map((record) => (
-                            <Box key={record.sample_id} className="list-item">
-                                <Typography variant="h6">{record.sample_id}</Typography>
-                                <Typography variant="body1">
-                                  <Box display="flex" gap={2}>
-                                    <Box><b>Source subject:</b> {record.subject_id}</Box>
-                                    <Box><b>Tissue:</b> {record.tissue}</Box>
-                                    <Box><b>Brain Region:</b> {record.brain_region}</Box>
-                                    <Box><b>Region Level 1:</b> {record.region_level_1}</Box>
-                                    <Box><b>Assay type:</b> {record.data_type}</Box>
+                            <Box key={record.project_id} className="list-item">
+                                <Typography variant="h6"><Link to={`/data/${record.project_id}`}>{record.project_id}</Link></Typography>
+                                 <Box>{record.name}</Box>
+                                  <Box display="flex" gap={2} sx={{fontSize: "14px", padding: "8px 0"}}>
+                                    <Box><b>PI:</b> {record.PI_full_name}</Box>
+                                    <Box><b>First contributor:</b> {record.first_contributor}</Box>
+                                    <Box><b>Brain Region:</b> {record.brain_regions}</Box>
+                                    <Box><b># Samples:</b> {record.n_samples}</Box>
+                                    <Box><b>Assay type:</b> {record.assay}</Box>
                                   </Box>
-                                </Typography>
+                                <Box sx={{fontSize: "14px", padding: "8px 0"}}>
+                                    <Link to={`/umap/${record.project_id}?sample=all`}>View UMAP</Link>
+                                </Box>
+
                             </Box>
                         ))}
                     </Box>
@@ -166,4 +171,4 @@ const DataDisplay = ({ dataRecords}) => {
     );
 };
 
-export default DataDisplay;
+export default ProjectDisplay;

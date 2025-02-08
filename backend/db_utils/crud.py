@@ -3,12 +3,7 @@ import uuid
 from fastapi import Depends, HTTPException
 from sqlmodel import Session, select
 
-from backend.models.data import Data
-from backend.models.study import Study
-from backend.models.sample import Sample
-from backend.models.protocol import Protocol
-from backend.models.subject import Subject
-from backend.models.clinpath import Clinpath
+from backend.models import *
 
 from backend.db import get_session
 
@@ -67,10 +62,10 @@ def get_all_data(session):
     result = session.exec(statement)  # Execute the query
     return result.all()  # Fetch all results
 
-def get_sample_by_id(id: uuid.UUID, session):
-    if not id:
-        raise ValueError("id is empty")
-    statement = select(Sample).where(Sample.sample_id == id)  # Create a SELECT query
+def get_sample_by_id(sample_id: str, session):
+    if not sample_id:
+        raise ValueError("sample_id is empty")
+    statement = select(Sample).where(Sample.sample_id == sample_id)  # Create a SELECT query
     sample = session.exec(statement).first()
 
     if not sample:
@@ -84,6 +79,21 @@ def get_all_samples(session):
 
 def get_sample_by_conditions(conditions: dict, session):
     statement = select(Sample).where(conditions)
+    result = session.exec(statement)
+    return result.all()
+
+def get_project_by_id(project_id: str, session):
+    if not id:
+        raise ValueError("project id is empty")
+    statement = select(Project).where(Project.project_id == project_id)  # Create a SELECT query
+    project = session.exec(statement).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return project
+
+def get_all_projects(session):
+    statement = select(Project)
     result = session.exec(statement)
     return result.all()
 

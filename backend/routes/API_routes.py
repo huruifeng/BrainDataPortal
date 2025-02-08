@@ -17,9 +17,10 @@ async def get_data(data_id: str | uuid.UUID, session: SessionDep):
             raise HTTPException(status_code=404, detail="Data table is empty")
         return data
     else:
-        if not get_data_by_id(data_id,session):
+        data = get_data_by_id(data_id,session)
+        if not data:
             raise HTTPException(status_code=404, detail="Data not found")
-        return get_data_by_id(data_id,session)
+        return data
 
 
 @router.get("/getsample/{sample_id}")
@@ -33,9 +34,27 @@ async def get_sample(sample_id: str | uuid.UUID, session: SessionDep):
             raise HTTPException(status_code=404, detail="Sample table is empty")
         return sample
     else:
-        if not get_sample_by_id(sample_id,session):
+        sample = get_sample_by_id(sample_id,session)
+        if not sample:
             raise HTTPException(status_code=404, detail="Sample not found")
-        return get_sample_by_id(sample_id,session)
+        return sample
+
+@router.get("/getproject/{project_id}")
+async def get_project(project_id: str | uuid.UUID, session: SessionDep):
+    if not project_id:
+        raise HTTPException(status_code=400, detail="project_id is empty")
+
+    if project_id == "all":
+        projects = get_all_projects(session)
+        if not projects:
+            raise HTTPException(status_code=404, detail="Project table is empty")
+        return projects
+    else:
+        project = get_project_by_id(project_id,session)
+        if not project:
+            raise HTTPException(status_code=404, detail="project not found")
+        return project
+
 @router.get("/getsample_by_conditions/")
 async def getsample_conditions(conditions: dict, session: SessionDep):
     samples = get_sample_by_conditions(conditions, session)

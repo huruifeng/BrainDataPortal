@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import { toast } from "react-toastify";
-import {getData_get, getSample_get} from "../api/api.js";
+import {getData_get, getProject_get, getSample_get} from "../api/api.js";
 
 const useDataStore = create((set) => ({
     dataRecords: [],
@@ -9,7 +9,8 @@ const useDataStore = create((set) => ({
     sampleRecords: [],
     samplefetchStatus: null,
 
-    setDatarecords: (dataRecords) => set({ dataRecords }),
+    projectRecords: [],
+    projectfetchStatus: null,
 
     fetchDataTable: async (data_id="all") => {
         try {
@@ -51,7 +52,28 @@ const useDataStore = create((set) => ({
             await set({ sampleRecords: [], samplefetchStatus: "error" });
             toast.error("Error while fetching sample data.");
         }
-    }
+    },
+
+    fetchProjectTable: async () => {
+        try {
+            const response = await getProject_get();
+            // console.log(response);
+            if(response.status === 200){
+                const data = await response.data;
+                await set({ projectRecords: data, projectfetchStatus: "success" });
+                // toast.success("Data loaded successfully!");
+            }else{
+                console.error("Error fetching data:", response.data);
+                await set({ projectRecords: [], projectfetchStatus: "failed" });
+                 toast.error("Failed to fetch project data.");
+            }
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            await set({ projectRecords: [], projectfetchStatus: "error" });
+            toast.error("Error while fetching project data.");
+        }
+    },
 }));
 
 export default useDataStore;

@@ -38,6 +38,16 @@ export const getSample_get = async (sample_id="all") => {
     }
 }
 
+export const getProject_get = async (project_id="all") => {
+    try {
+        const response = await axios.get(`${API_URL}/getproject/${project_id}`);
+        return response;
+    } catch (error) {
+        console.error("Error reading project records:", error);
+        throw error;
+    }
+}
+
 export const getSampleCondition_get = async (conditions) => {
     try {
         const queryStr = jsonToQueryString(conditions);
