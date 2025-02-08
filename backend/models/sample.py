@@ -38,15 +38,22 @@ class SampleBase(SQLModel):
     pm_PH: Optional[float] | None = Field(default=-1)
     donor_id: Optional[str] | None  = Field(default="NA")
 
-    sample_data_type: str = Field(default="NA")
-    sample_data_location: str = Field(default="NA")
+    project: str = Field(index=True, foreign_key="project.project_id")
+
+    data_type: str = Field(default="NA")
+    data_location: str = Field(default="NA")
+
+    data_protocol: str = Field(default="NA", foreign_key="protocol.protocol_id")
+    protocol_version: str = Field(default="NA")
 
 
 class Sample(SampleBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     # Relationship to Data (one-to-many)
     sample_data: List["Data"] = Relationship(back_populates="sample")
-    subject: Optional["Subject"] = Relationship(back_populates="subject_sample")
+    subject: Optional["Subject"] = Relationship(back_populates="subject_samples")
+    project: Optional["Project"] = Relationship(back_populates="samples")
+    protocol: Optional["Protocol"] = Relationship(back_populates="samples")
 
 
 

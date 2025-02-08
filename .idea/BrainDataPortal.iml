@@ -5,6 +5,8 @@
       <excludeFolder url="file://$MODULE_DIR$/docs" />
       <excludeFolder url="file://$MODULE_DIR$/frontend/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/backend/database" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/projects" />
     </content>
     <orderEntry type="jdk" jdkName="BrainDataPortal" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

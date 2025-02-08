@@ -4,12 +4,16 @@ from typing import Optional
 
 
 class StudyBase(SQLModel):
-    ASAP_team_name: str = Field(unique=True, index=True)
-    ASAP_lab_name: str = Field(unique=True, index=True)
-    project_name: str = Field(index=True)
-    team_dataset_id: str = Field(default="NA")
-    project_dataset: str = Field(default="NA")
-    project_description: str = Field(default="NA")
+    study_id: str = Field(index=True, unique=True, primary_key=True)
+    name: str = Field(index=True, unique=True)
+    description: str = Field(default="NA")
+
+    dataset_id: str = Field(default="NA")
+    dataset_name: str = Field(default="NA")
+
+    ASAP_team_name: str = Field(index=True)
+    ASAP_lab: str = Field(index=True)
+
     PI_full_name: str = Field(index=True)
     PI_email: str = Field(index=True)
     contributor_names: str = Field(default="NA")
@@ -32,6 +36,7 @@ class StudyBase(SQLModel):
 
 class Study(StudyBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    project: list["Project"] = Relationship(back_populates="study")
 
 class StudyCreate(StudyBase):
     pass

@@ -31,7 +31,7 @@ class SubjectBase(SQLModel):
 
 class Subject(SubjectBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    subject_sample: list["Sample"] = Relationship(back_populates="subject")
+    subject_samples: list["Sample"] = Relationship(back_populates="subject")
     subject_clinpath: Optional["Clinpath"] = Relationship(back_populates="subject")
 
 class SubjectCreate(SubjectBase):

@@ -3,7 +3,5 @@ frontend/node_modules
 backend/database
 backend/venv
 
-
-
-
 .Rproj.user
+/backend/projects/
