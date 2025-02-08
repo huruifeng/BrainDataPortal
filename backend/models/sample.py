@@ -40,7 +40,7 @@ class SampleBase(SQLModel):
     pm_PH: Optional[float] | None = Field(default=-1)
     donor_id: Optional[str] | None  = Field(default="NA")
 
-    project: str = Field(index=True, foreign_key="project.project_id")
+    project_id: str = Field(index=True, foreign_key="project.project_id")
 
     data_type: str = Field(default="NA")
     data_location: str = Field(default="NA")
