@@ -62,24 +62,20 @@ def get_all_data(session):
     result = session.exec(statement)  # Execute the query
     return result.all()  # Fetch all results
 
-def get_sample_by_id(sample_id: str, session):
-    if not sample_id:
-        raise ValueError("sample_id is empty")
-    statement = select(Sample).where(Sample.sample_id == sample_id)  # Create a SELECT query
-    sample = session.exec(statement).first()
-
-    if not sample:
-        raise HTTPException(status_code=404, detail="Sample not found")
-    return sample
-
 def get_all_samples(session):
     statement = select(Sample)
     result = session.exec(statement)
     return result.all()
 
 def get_sample_by_conditions(conditions: dict, session):
-    statement = select(Sample).where(conditions)
-    result = session.exec(statement)
+    query = select(Sample)
+    for key, value in conditions.items():
+        if hasattr(Sample, key):
+            query = query.where(getattr(Sample, key).in_(value))
+        else:
+            pass
+
+    result = session.exec(query)
     return result.all()
 
 def get_project_by_id(project_id: str, session):

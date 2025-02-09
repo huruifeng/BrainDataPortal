@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -43,6 +43,8 @@ function App() {
                       <Route path="/" element={<Home />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/projects" element={<ProjectsPage />} />
+
+                      <Route path="/data" element={<Navigate to="/data/all" replace />} />
                       <Route path="/data/:project_id" element={<DataPage />} />
 
                       <Route path="/login" element={<Login />} />
@@ -54,7 +56,8 @@ function App() {
                       {/* Unauthorized page for invalid role access */}
                       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-                      {/* Page not found */}<Route path="*" element={<NotFoundPage />} />
+                      {/* Page not found */}
+                      <Route path="*" element={<NotFoundPage />} />
 
                 </Routes>
              </div>

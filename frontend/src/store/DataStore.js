@@ -33,9 +33,10 @@ const useDataStore = create((set) => ({
         }
     },
 
-    fetchSampleData: async (sample_id) => {
+    fetchSampleData: async (conditions) => {
         try {
-            const response = await getSample_get(sample_id);
+            conditions = {project_id: "all", sample_id: "all",...conditions}
+            const response = await getSample_get(conditions);
             // console.log(response);
             if(response.status === 200){
                 const data = await response.data;

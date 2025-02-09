@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from starlette.requests import Request
 
 from backend.db import SessionDep
 from backend.db_utils.crud import *
@@ -23,21 +24,40 @@ async def get_data(data_id: str | uuid.UUID, session: SessionDep):
         return data
 
 
-@router.get("/getsample/{sample_id}")
-async def get_sample(sample_id: str | uuid.UUID, session: SessionDep):
-    if not sample_id:
-        raise HTTPException(status_code=400, detail="sample_id is empty")
+@router.get("/getsample")
+async def get_sample(request:Request, session: SessionDep):
+    sample_ids = request.query_params.getlist("sample_id")
+    project_ids = request.query_params.getlist("project_id")
+    conditions = {k: request.query_params.getlist(k) for k, v in request.query_params.items()}
 
-    if sample_id == "all":
-        sample = get_all_samples(session)
-        if not sample:
-            raise HTTPException(status_code=404, detail="Sample table is empty")
-        return sample
+    if not sample_ids and not project_ids:
+        raise HTTPException(status_code=400, detail="Project_id or sample_id is empty")
+
+    if project_ids[0] == "all":
+        conditions.pop("project_id")
+        if sample_ids[0] == "all":
+            sample = get_all_samples(session)
+            if not sample:
+                raise HTTPException(status_code=404, detail="Sample table is empty")
+            return sample
+        else:
+            sample = get_sample_by_conditions(conditions,session)
+            if not sample:
+                raise HTTPException(status_code=404, detail="Sample not found")
+            return sample
     else:
-        sample = get_sample_by_id(sample_id,session)
-        if not sample:
-            raise HTTPException(status_code=404, detail="Sample not found")
-        return sample
+        if sample_ids[0] == "all":
+            conditions.pop("sample_id")
+            samples = get_sample_by_conditions(conditions,session)
+            if not samples:
+                raise HTTPException(status_code=404, detail="Sample table is empty")
+            return samples
+        else:
+            sample = get_sample_by_conditions(conditions,session)
+            if not sample:
+                raise HTTPException(status_code=404, detail="Sample not found")
+            return sample
+
 
 @router.get("/getproject/{project_id}")
 async def get_project(project_id: str | uuid.UUID, session: SessionDep):
@@ -54,10 +74,3 @@ async def get_project(project_id: str | uuid.UUID, session: SessionDep):
         if not project:
             raise HTTPException(status_code=404, detail="project not found")
         return project
-
-@router.get("/getsample_by_conditions/")
-async def getsample_conditions(conditions: dict, session: SessionDep):
-    samples = get_sample_by_conditions(conditions, session)
-    return samples
-
-

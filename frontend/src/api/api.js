@@ -28,9 +28,10 @@ export const getData_get = async (data_id="all") => {
     }
 }
 
-export const getSample_get = async (sample_id="all") => {
+export const getSample_get = async (conditions) => {
+    console.log(conditions);
     try {
-        const response = await axios.get(`${API_URL}/getsample/${sample_id}`);
+        const response = await axios.get(`${API_URL}/getsample`, {params: conditions});
         return response;
     } catch (error) {
         console.error("Error reading sample records:", error);
@@ -46,16 +47,4 @@ export const getProject_get = async (project_id="all") => {
         console.error("Error reading project records:", error);
         throw error;
     }
-}
-
-export const getSampleCondition_get = async (conditions) => {
-    try {
-        const queryStr = jsonToQueryString(conditions);
-        const response = await axios.get(`${API_URL}/getsample_by_conditions/?${queryStr}`);
-        return response;
-    } catch (error) {
-        console.error("Error reading sample records:", error);
-        throw error;
-    }
-
 }
