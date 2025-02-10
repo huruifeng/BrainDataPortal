@@ -14,6 +14,7 @@ import Login from "./pages/Login/Login.jsx";
 import Test from "./pages/Test";
 import UnauthorizedPage from "./pages/Unauthorized/index.jsx";
 import {Bounce, ToastContainer} from "react-toastify";
+import UmapView from "./pages/UmapView/index.jsx";
 
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
 
                       <Route path="/data" element={<Navigate to="/data/all" replace />} />
                       <Route path="/data/:project_id" element={<DataPage />} />
+                      <Route path="/umap/:project_id" element={<UmapView />} />
 
                       <Route path="/login" element={<Login />} />
 
