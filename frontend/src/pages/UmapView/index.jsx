@@ -7,7 +7,7 @@ import {
     Typography,
     OutlinedInput,
     ListItemText,
-    Checkbox
+    Checkbox, Box, Divider
 } from "@mui/material";
 
 import useUmapStore from "../../store/UmapStore.js";
@@ -15,6 +15,7 @@ import useDataStore from "../../store/DataStore.js"; // Import CSS file
 
 import "./UmapView.css";
 import {useParams} from "react-router-dom";
+import UmapPlot from "./UmapPlot.jsx";
 
 function UmapView() {
     const {sampleRecords,fetchSampleData} = useDataStore();
@@ -62,59 +63,67 @@ function UmapView() {
       },
     };
   return (
-    <div className="umap-container">
-      {/* Right Panel for Sample & Gene Selection (20%) */}
-      <div className="umap-panel">
-        <Typography variant="h6">Select Samples & Genes</Typography>
+    <div className="umap-page-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+       {/* Title Row */}
+        <Box className="title-row">
+            <Typography variant="h5">UMAP Visualization</Typography>
+        </Box>
+        <Divider />
+        <div className="umap-content">
 
-        {/* Sample Selection */}
-        <FormControl sx={{ m: 1, width: 300 }} size="small">
-           <InputLabel id="sample-multiple-checkbox-label">Samples</InputLabel>
-            <Select
-              labelId="sample-multiple-checkbox-label"
-              id="sample-multiple-checkbox"
-              multiple
-              value={selectedSamples}
-              onChange={handleSampleChange}
-              input={<OutlinedInput label="Samples" />}
-              renderValue={(selected) => selected.join(',')}
-              MenuProps={MenuProps}
-             >
-              {sampleRecords.map((s_i) => (
-                <MenuItem key={s_i.sample_id} value={s_i.sample_id}>
-                  <Checkbox checked={selectedSamples.includes(s_i.sample_id)} />
-                  <ListItemText primary={s_i.sample_id} />
-                </MenuItem>
-              ))}
-            </Select>
-        </FormControl>
+          {/* Right Panel for Sample & Gene Selection (20%) */}
+          <div className="umap-panel">
+            <Typography variant="h6">Select Samples & Genes</Typography>
 
-        {/* Gene Selection */}
-        <FormControl sx={{ m: 1, width: 300 }} size="small">
-            <InputLabel id="gene-multiple-checkbox-label">Genes</InputLabel>
-            <Select
-              labelId="gene-multiple-checkbox-label"
-              id="gene-multiple-checkbox"
-              multiple
-              value={selectedGenes}
-              onChange={handleGeneChange}
-              input={<OutlinedInput label="Samples" />}
-              renderValue={(selected) => selected.join(',')}
-              MenuProps={MenuProps}
-              >
-                 {geneRecords.map((g_i) => (
-                <MenuItem key={g_i} value={g_i}>
-                  <Checkbox checked={selectedGenes.includes(g_i)} />
-                  <ListItemText primary={g_i} />
-                </MenuItem>
-              ))}
-              </Select>
-        </FormControl>
-      </div>
-         {/* Left UMAP Plot Area (80%) */}
-      <div className="umap-main">
-        <Typography variant="h5">UMAP Plot</Typography>
-      </div>
+            {/* Sample Selection */}
+            <FormControl sx={{ m: 1, width: 300 }} size="small">
+               <InputLabel id="sample-multiple-checkbox-label">Samples</InputLabel>
+                <Select
+                  labelId="sample-multiple-checkbox-label"
+                  id="sample-multiple-checkbox"
+                  multiple
+                  value={selectedSamples}
+                  onChange={handleSampleChange}
+                  input={<OutlinedInput label="Samples" />}
+                  renderValue={(selected) => selected.join(',')}
+                  MenuProps={MenuProps}
+                 >
+                  {sampleRecords.map((s_i) => (
+                    <MenuItem key={s_i.sample_id} value={s_i.sample_id}>
+                      <Checkbox checked={selectedSamples.includes(s_i.sample_id)} />
+                      <ListItemText primary={s_i.sample_id} />
+                    </MenuItem>
+                  ))}
+                </Select>
+            </FormControl>
+
+            {/* Gene Selection */}
+            <FormControl sx={{ m: 1, width: 300 }} size="small">
+                <InputLabel id="gene-multiple-checkbox-label">Genes</InputLabel>
+                <Select
+                  labelId="gene-multiple-checkbox-label"
+                  id="gene-multiple-checkbox"
+                  multiple
+                  value={selectedGenes}
+                  onChange={handleGeneChange}
+                  input={<OutlinedInput label="Samples" />}
+                  renderValue={(selected) => selected.join(',')}
+                  MenuProps={MenuProps}
+                  >
+                     {geneRecords.map((g_i) => (
+                    <MenuItem key={g_i} value={g_i}>
+                      <Checkbox checked={selectedGenes.includes(g_i)} />
+                      <ListItemText primary={g_i} />
+                    </MenuItem>
+                  ))}
+                  </Select>
+            </FormControl>
+          </div>
+             {/* Left UMAP Plot Area (80%) */}
+          <div className="umap-main">
+              <UmapPlot />
+          </div>
+        </div>
     </div>
   );
 }
