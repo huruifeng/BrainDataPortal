@@ -7,7 +7,7 @@ import {
     Typography,
     OutlinedInput,
     ListItemText,
-    Checkbox, Box, Divider
+    Checkbox, Box, Divider, CircularProgress
 } from "@mui/material";
 
 import useUmapStore from "../../store/UmapStore.js";
@@ -33,7 +33,7 @@ function UmapView() {
       "Gene 5",
       "Gene 6",
     ]
-    const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes } = useUmapStore();
+    const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes, umapData, loading, error } = useUmapStore();
 
     const handleSampleChange = (event) => {
         const {target: { value },} = event;
@@ -119,9 +119,17 @@ function UmapView() {
                   </Select>
             </FormControl>
           </div>
-             {/* Left UMAP Plot Area (80%) */}
+          {/* Left UMAP Plot Area (80%) */}
           <div className="umap-main">
-              <UmapPlot />
+            {loading ? (
+              <CircularProgress />
+            ) : error ? (
+              <Typography color="error">{error}</Typography>
+            ) : umapData ? (
+              <UmapPlot data={umapData} />
+            ) : (
+              <Typography variant="h6">Select Samples & Genes to Load UMAP</Typography>
+            )}
           </div>
         </div>
     </div>

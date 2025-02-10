@@ -3,9 +3,22 @@ from starlette.requests import Request
 
 from backend.db import SessionDep
 from backend.db_utils.crud import *
+from backend.funcs.get_data import get_umap_data
 
 router = APIRouter()
 
+@router.get("/")
+async def read_root():
+    return {"Hello": "World"}
+
+@router.get("/getumapdata/")
+async def get_umapdata(request:Request, session: SessionDep):
+    samples = request.query_params.getlist("sample_id")
+    genes = request.query_params.getlist("gene_id")
+    if not samples or not genes:
+        raise HTTPException(status_code=400, detail="Sample_id or gene_id is empty")
+    response = get_umap_data(samples, genes)
+    return response
 
 @router.get("/getdata/{data_id}")
 async def get_data(data_id: str | uuid.UUID, session: SessionDep):
