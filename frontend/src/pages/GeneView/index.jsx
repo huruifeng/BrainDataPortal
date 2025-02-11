@@ -18,6 +18,9 @@ function UmapView() {
         fetchSampleData({project_id: "all"})
     }, [fetchSampleData]);
 
+    const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
+
+
     const { project_id } = useParams(); // Extracts project_id from the URL
 
     const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes, umapData, loading, error } = useGeneStore();
@@ -48,6 +51,7 @@ function UmapView() {
             {/* Gene Selection with Fuzzy Search & Chips */}
             <Autocomplete
               multiple
+              autoSelect={true}
               size={"small"}
               options={geneOptions}
               value={selectedGenes}
@@ -65,12 +69,13 @@ function UmapView() {
                   />
                 ))
               }
-              renderInput={(params) => <TextField {...params} label="Search Gene" variant="outlined" />}
+              renderInput={(params) => <TextField {...params} label="Search Gene" variant="standard" />}
             />
 
             {/* Sample Selection */}
             <Autocomplete
               multiple
+              autoSelect={true}
               size={"small"}
               options={sampleOptions}
               value={selectedSamples}
@@ -88,7 +93,7 @@ function UmapView() {
                   />
                 ))
               }
-              renderInput={(params) => <TextField {...params} label="Search Sample" variant="outlined" style={{margin:"10px 0px"}}/>}
+              renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard" style={{margin:"10px 0px"}}/>}
             />
           </div>
           {/* Left UMAP Plot Area (80%) */}
