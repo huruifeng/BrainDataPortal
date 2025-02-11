@@ -126,7 +126,7 @@ const DataDisplay = ({ dataRecords}) => {
                                         <TableCell>{record.brain_region}</TableCell>
                                         <TableCell>{record.region_level_1}</TableCell>
                                         <TableCell>{record.data_type}</TableCell>
-                                        <TableCell><Link to={`/umap/${record.project_id}?sample=${record.sample_id}`}>View UMAP</Link></TableCell>
+                                        <TableCell><Link to={`/geneview/${record.project_id}?sample=${record.sample_id}`}>View UMAP</Link></TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -144,6 +144,9 @@ const DataDisplay = ({ dataRecords}) => {
                                     <Box><b>Brain Region:</b> {record.brain_region}</Box>
                                     <Box><b>Region Level 1:</b> {record.region_level_1}</Box>
                                     <Box><b>Assay type:</b> {record.data_type}</Box>
+                                  </Box>
+                                  <Box sx={{fontSize: "14px", padding: "8px 0"}}>
+                                    <Link to={`/geneview/${record.project_id}?sample=${record.sample_id}`}>View UMAP</Link>
                                   </Box>
                                 </Typography>
                             </Box>

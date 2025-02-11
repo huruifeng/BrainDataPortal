@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import {getUmapData} from "../api/api.js";
 
-const useUmapStore = create((set, get) => ({
+const useGeneStore = create((set, get) => ({
   selectedSamples: [],
   selectedGenes: [],
   umapData: null, // Store API response data
@@ -33,4 +33,4 @@ const useUmapStore = create((set, get) => ({
   },
 }));
 
-export default useUmapStore;
+export default useGeneStore;

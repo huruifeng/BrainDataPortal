@@ -128,7 +128,7 @@ const ProjectDisplay = ({ dataRecords}) => {
                                         <TableCell>{record.n_samples}</TableCell>
                                         <TableCell>{record.brain_regions}</TableCell>
                                         <TableCell>{record.assay}</TableCell>
-                                        <TableCell><Link to={`/umap/${record.project_id}?sample=all`}>UMAP</Link></TableCell>
+                                        <TableCell><Link to={`/geneview/${record.project_id}?sample=all`}>UMAP</Link></TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -148,7 +148,7 @@ const ProjectDisplay = ({ dataRecords}) => {
                                     <Box><b>Assay type:</b> {record.assay}</Box>
                                   </Box>
                                 <Box sx={{fontSize: "14px", padding: "8px 0"}}>
-                                    <Link to={`/umap/${record.project_id}?sample=all`}>View UMAP</Link>
+                                    <Link to={`/geneview/${record.project_id}?sample=all`}>View UMAP</Link>
                                 </Box>
 
                             </Box>
