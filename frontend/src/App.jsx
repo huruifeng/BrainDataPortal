@@ -14,7 +14,7 @@ import Login from "./pages/Login/Login.jsx";
 import Test from "./pages/Test";
 import UnauthorizedPage from "./pages/Unauthorized/index.jsx";
 import {Bounce, ToastContainer} from "react-toastify";
-import GeneView from "./pages/GeneView/index.jsx";
+import GeneView from "./pages/GeneView";
 
 
 
@@ -48,6 +48,8 @@ function App() {
 
                       <Route path="/samples" element={<Navigate to="/samples/all" replace />} />
                       <Route path="/samples/:dataset_id" element={<SamplesPage />} />
+
+                      <Route path="/geneview" element={<Navigate to="/geneview/all" replace />} />
                       <Route path="/geneview/:dataset_id" element={<GeneView />} />
 
                       <Route path="/login" element={<Login />} />

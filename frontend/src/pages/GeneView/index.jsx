@@ -10,29 +10,36 @@ import UmapPlot from "./UmapPlot.jsx";
 
 const geneOptions = ["ABCD", "ACEE", "HIGH", "XXYT", "EGGH","HJJ"];
 
-function UmapView() {
+function GeneView() {
     const {dataset_id } = useParams(); // Extracts dataset_id from the URL
-    const datasetId = dataset_id ?? datasetId; // Use default if undefined
+    const datasetId = dataset_id ?? "all"; // Use default if undefined
 
     // get the query parameters
     // const queryParams = new URLSearchParams(window.location.search);
     const [queryParams, setQueryParams] = useSearchParams();
-    const gene = queryParams.get("gene");
-    const sample = queryParams.get("sample");
+    let gene = queryParams.getAll("gene");
+    let sample = queryParams.getAll("sample");
+    gene = gene ?? "all";
+    sample = sample ?? "all";
+
+    console.log(datasetId,gene, sample);
 
     const {sampleRecords,fetchSampleData} = useDataStore();
     useEffect(() => {
-        fetchSampleData({dataset_id: "all"})
+        fetchSampleData({dataset_id: datasetId})
     }, [fetchSampleData]);
 
     const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
-
+    sampleOptions.unshift("all");
 
     const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes, umapData, loading, error } = useGeneStore();
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");
 
-
+    useEffect(() => {
+        setSelectedSamples(sample);
+        setSelectedGenes(gene);
+    }, []);
 
     const handleSampleChange = (event, newValue) => {
         setSelectedSamples(newValue);
@@ -65,16 +72,19 @@ function UmapView() {
               inputValue={geneSearchText}
               onInputChange={(event, newInputValue) => setGeneSearchText(newInputValue)}
               renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    key={option}
-                    label={option}
-                    {...getTagProps({ index })}
-                    color="primary"
-                    onDelete={() => setSelectedGenes(selectedGenes.filter(g => g !== option))}
-                  />
-                ))
-              }
+                  value.map((option, index) => {
+                    const { key, ...tagProps } = getTagProps({ index }); // Destructure and remove `key`
+                    return (
+                      <Chip
+                        key={key}  // Pass key explicitly
+                        label={option}
+                        {...tagProps} // Spread the remaining props
+                        color="primary"
+                        onDelete={() => setSelectedGenes(selectedGenes.filter(g => g !== option))}
+                      />
+                    );
+                  })
+                }
               renderInput={(params) => <TextField {...params} label="Search Gene" variant="standard" />}
             />
 
@@ -88,16 +98,19 @@ function UmapView() {
               inputValue={sampleSearchText}
               onInputChange={(event, newInputValue) => setSampleSearchText(newInputValue)}
               renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    key={option}
-                    label={option}
-                    {...getTagProps({ index })}
-                    color="primary"
-                    onDelete={() => setSelectedSamples(selectedSamples.filter(g => g !== option))}
-                  />
-                ))
-              }
+                  value.map((option, index) => {
+                    const { key, ...tagProps } = getTagProps({ index }); // Destructure and remove `key`
+                    return (
+                      <Chip
+                        key={key}  // Pass key explicitly
+                        label={option}
+                        {...tagProps} // Spread the remaining props
+                        color="primary"
+                        onDelete={() => setSelectedSamples(selectedSamples.filter(g => g !== option))}
+                      />
+                    );
+                  })
+                }
               renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard" style={{margin:"10px 0px"}}/>}
             />
           </div>
@@ -118,4 +131,4 @@ function UmapView() {
   );
 }
 
-export default UmapView;
+export default GeneView;
