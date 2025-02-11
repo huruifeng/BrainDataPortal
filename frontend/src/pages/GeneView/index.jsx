@@ -25,6 +25,8 @@ function GeneView() {
 
     const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
     sampleOptions.unshift("all");
+    const geneOptions = geneList.map((gene) => gene);
+    geneOptions.unshift("all");
 
     const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes, umapData, loading, error } = useGeneStore();
 
@@ -33,15 +35,25 @@ function GeneView() {
 
     // Initialize state from URL parameters on first render
     useEffect(() => {
-        setSelectedSamples(initialSamples.length ? initialSamples : []);
+        setSelectedSamples(initialSamples.length ? initialSamples : ["all"]);
         setSelectedGenes(initialGenes.length ? initialGenes : []);
     }, []);
 
     /** Updates the query parameters in the URL */
     const updateQueryParams = (genes, samples) => {
         const newParams = new URLSearchParams();
-        genes.forEach((gene) => newParams.append("gene", gene));
-        samples.forEach((sample) => newParams.append("sample", sample));
+        if(genes.length === 0 || genes.includes("all")){
+            newParams.append("gene", "all");
+        }else{
+            genes.forEach((gene) => newParams.append("gene", gene));
+        }
+        if (samples.length === 0 || samples.includes("all")) {
+            newParams.append("sample", "all");
+        }else{
+            samples.forEach((sample) => newParams.append("sample", sample));
+        }
+        // genes.forEach((gene) => newParams.append("gene", gene));
+        // samples.forEach((sample) => newParams.append("sample", sample));
         setQueryParams(newParams);
     };
 
