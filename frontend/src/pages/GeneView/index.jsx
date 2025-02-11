@@ -33,11 +33,13 @@ function GeneView() {
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");
 
-    // Initialize state from URL parameters on first render
     useEffect(() => {
-        setSelectedSamples(initialSamples.length ? initialSamples : ["all"]);
-        setSelectedGenes(initialGenes.length ? initialGenes : []);
+        const initialSelectedSamples = initialSamples.length ? initialSamples : ["all"];
+        const initialSelectedGenes = initialGenes.length ? initialGenes : [];
+
+        useGeneStore.getState().setSelections(initialSelectedSamples, initialSelectedGenes);
     }, []);
+
 
     /** Updates the query parameters in the URL */
     const updateQueryParams = (genes, samples) => {

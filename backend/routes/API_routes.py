@@ -14,8 +14,9 @@ async def read_root():
 
 @router.get("/getumapdata")
 async def getumapdata(request:Request, session: SessionDep):
-    samples = request.query_params.getlist("sample_id")
-    genes = request.query_params.getlist("gene_id")
+    samples = request.query_params.getlist("samples")
+    genes = request.query_params.getlist("genes")
+    print(request)
     if not samples or not genes:
         raise HTTPException(status_code=400, detail="Sample_id or gene_id is empty")
     response = get_umap_data(samples, genes)
