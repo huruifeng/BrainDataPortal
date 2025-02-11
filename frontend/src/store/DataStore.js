@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import { toast } from "react-toastify";
-import {getData_get, getDataset_get, getSample_get} from "../api/api.js";
+import {getAllGenes_get, getData_get, getDataset_get, getSample_get} from "../api/api.js";
 
 const useDataStore = create((set) => ({
     dataRecords: [],
@@ -12,9 +12,12 @@ const useDataStore = create((set) => ({
     datasetRecords: [],
     datasetfetchStatus: null,
 
-    fetchDataTable: async (data_id="all") => {
+    geneList: [],
+    genefetchStatus: null,
+
+    fetchDataTable: async (dataset_id="all") => {
         try {
-            const response = await getData_get(data_id);
+            const response = await getData_get(dataset_id);
             // console.log(response);
             if(response.status === 200){
                 const data = await response.data;
@@ -66,15 +69,37 @@ const useDataStore = create((set) => ({
             }else{
                 console.error("Error fetching data:", response.data);
                 await set({ datasetRecords: [], datasetfetchStatus: "failed" });
-                 toast.error("Failed to fetch dataset data.");
+                 toast.error("Failed to fetch datasets.");
             }
 
         } catch (error) {
             console.error("Error fetching data:", error);
             await set({ datasetRecords: [], datasetfetchStatus: "error" });
-            toast.error("Error while fetching dataset data.");
+            toast.error("Error while fetching datasets.");
         }
     },
+
+    fetchGeneList: async (dataset_id="all") => {
+        try {
+            const response = await getAllGenes_get(dataset_id);
+            // console.log(response);
+            if(response.status === 200){
+                const data = await response.data;
+                await set({ geneList: data, genefetchStatus: "success" });
+                // toast.success("Sample loaded successfully!");
+            }else{
+                console.error("Error fetching data:", response.data);
+                await set({ geneList: [], genefetchStatus: "failed" });
+                 toast.error("Failed to fetch gene list.");
+            }
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            await set({ geneList: [], genefetchStatus: "error" });
+            toast.error("Error while fetching gene list.");
+        }
+    }
+
 }));
 
 export default useDataStore;

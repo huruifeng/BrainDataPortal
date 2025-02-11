@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import json
 
 def get_umap_data(dataset, samples, genes):
     umap_embeddings_file = os.path.join("datasets",dataset, 'umap_embeddings.csv')
@@ -9,4 +10,18 @@ def get_umap_data(dataset, samples, genes):
         return data
     else:
         print(umap_embeddings_file + " not found")
+        return 0
+
+def get_all_genes(dataset):
+    if dataset == "all":
+        genes_file = os.path.join("datasets", 'gene_list.json')
+    else:
+        genes_file = os.path.join("datasets",dataset,'gene_list.json')
+
+    if os.path.exists(genes_file):
+        with open(genes_file, 'r') as f:
+            data = json.load(f)
+        return data
+    else:
+        print(genes_file + " not found")
         return 0

@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from starlette.requests import Request
+from starlette.routing import request_response
 
 from backend.db import SessionDep
 from backend.db_utils.crud import *
-from backend.funcs.get_data import get_umap_data
+from backend.funcs.get_data import *
 
 router = APIRouter()
 
@@ -11,17 +12,27 @@ router = APIRouter()
 async def read_root():
     return {"Hello": "World"}
 
-@router.get("/getumapdata/")
-async def get_umapdata(request:Request, session: SessionDep):
+@router.get("/getumapdata")
+async def getumapdata(request:Request, session: SessionDep):
     samples = request.query_params.getlist("sample_id")
     genes = request.query_params.getlist("gene_id")
     if not samples or not genes:
         raise HTTPException(status_code=400, detail="Sample_id or gene_id is empty")
     response = get_umap_data(samples, genes)
+    if not response:
+        raise HTTPException(status_code=404, detail="Sample table is empty")
+    return response
+
+@router.get("/getallgenes")
+async def getallgenes(request:Request):
+    dataset = request.query_params.get("dataset_id")
+    response = get_all_genes(dataset)
+    if not response:
+        raise HTTPException(status_code=404, detail="Gene list file is missing")
     return response
 
 @router.get("/getdata/{data_id}")
-async def get_data(data_id: str | uuid.UUID, session: SessionDep):
+async def getdata(data_id: str | uuid.UUID, session: SessionDep):
     if not data_id:
         raise HTTPException(status_code=400, detail="data_id is empty")
 
@@ -38,7 +49,7 @@ async def get_data(data_id: str | uuid.UUID, session: SessionDep):
 
 
 @router.get("/getsample")
-async def get_sample(request:Request, session: SessionDep):
+async def getsample(request:Request, session: SessionDep):
     sample_ids = request.query_params.getlist("sample_id")
     dataset_ids = request.query_params.getlist("dataset_id")
     conditions = {k: request.query_params.getlist(k) for k, v in request.query_params.items()}
@@ -73,7 +84,7 @@ async def get_sample(request:Request, session: SessionDep):
 
 
 @router.get("/getdataset/{dataset_id}")
-async def get_dataset(dataset_id: str | uuid.UUID, session: SessionDep):
+async def getdataset(dataset_id: str | uuid.UUID, session: SessionDep):
     if not dataset_id:
         raise HTTPException(status_code=400, detail="dataset_id is empty")
 
