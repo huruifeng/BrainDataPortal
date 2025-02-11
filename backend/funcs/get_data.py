@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 def get_umap_data(dataset, samples, genes):
-    umap_embeddings_file = os.path.join("datasets",dataset, 'umap_embeddings.csv')
+    umap_embeddings_file = os.path.join("backend","datasets",dataset, 'umap_embeddings.csv')
     if os.path.exists(umap_embeddings_file):
         data = pd.read_csv(umap_embeddings_file, index_col=0, header=0)
 
@@ -14,9 +14,9 @@ def get_umap_data(dataset, samples, genes):
 
 def get_all_genes(dataset):
     if dataset == "all":
-        genes_file = os.path.join("datasets", 'gene_list.json')
+        genes_file = os.path.join("backend","datasets", 'gene_list.json')
     else:
-        genes_file = os.path.join("datasets",dataset,'gene_list.json')
+        genes_file = os.path.join("backend","datasets",dataset,'gene_list.json')
 
     if os.path.exists(genes_file):
         with open(genes_file, 'r') as f:
