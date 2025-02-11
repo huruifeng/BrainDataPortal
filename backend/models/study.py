@@ -37,7 +37,7 @@ class StudyBase(SQLModel):
 
 class Study(StudyBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    project: list["Project"] = Relationship(back_populates="study")
+    dataset: list["Dataset"] = Relationship(back_populates="study")
 
 class StudyCreate(StudyBase):
     pass

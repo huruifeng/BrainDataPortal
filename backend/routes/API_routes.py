@@ -28,26 +28,26 @@ async def get_data(data_id: str | uuid.UUID, session: SessionDep):
     if data_id == "all":
         data = get_all_data(session)
         if not data:
-            raise HTTPException(status_code=404, detail="Data table is empty")
+            raise HTTPException(status_code=404, detail="Sample table is empty")
         return data
     else:
         data = get_data_by_id(data_id,session)
         if not data:
-            raise HTTPException(status_code=404, detail="Data not found")
+            raise HTTPException(status_code=404, detail="Sample not found")
         return data
 
 
 @router.get("/getsample")
 async def get_sample(request:Request, session: SessionDep):
     sample_ids = request.query_params.getlist("sample_id")
-    project_ids = request.query_params.getlist("project_id")
+    dataset_ids = request.query_params.getlist("dataset_id")
     conditions = {k: request.query_params.getlist(k) for k, v in request.query_params.items()}
 
-    if not sample_ids and not project_ids:
-        raise HTTPException(status_code=400, detail="Project_id or sample_id is empty")
+    if not sample_ids and not dataset_ids:
+        raise HTTPException(status_code=400, detail="Dataset_id or sample_id is empty")
 
-    if project_ids[0] == "all":
-        conditions.pop("project_id")
+    if dataset_ids[0] == "all":
+        conditions.pop("dataset_id")
         if sample_ids[0] == "all":
             sample = get_all_samples(session)
             if not sample:
@@ -72,18 +72,18 @@ async def get_sample(request:Request, session: SessionDep):
             return sample
 
 
-@router.get("/getproject/{project_id}")
-async def get_project(project_id: str | uuid.UUID, session: SessionDep):
-    if not project_id:
-        raise HTTPException(status_code=400, detail="project_id is empty")
+@router.get("/getdataset/{dataset_id}")
+async def get_dataset(dataset_id: str | uuid.UUID, session: SessionDep):
+    if not dataset_id:
+        raise HTTPException(status_code=400, detail="dataset_id is empty")
 
-    if project_id == "all":
-        projects = get_all_projects(session)
-        if not projects:
-            raise HTTPException(status_code=404, detail="Project table is empty")
-        return projects
+    if dataset_id == "all":
+        datasets = get_all_datasets(session)
+        if not datasets:
+            raise HTTPException(status_code=404, detail="Dataset table is empty")
+        return datasets
     else:
-        project = get_project_by_id(project_id,session)
-        if not project:
-            raise HTTPException(status_code=404, detail="project not found")
-        return project
+        dataset = get_dataset_by_id(dataset_id,session)
+        if not dataset:
+            raise HTTPException(status_code=404, detail="dataset not found")
+        return dataset

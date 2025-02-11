@@ -54,7 +54,7 @@ def get_data_by_id(id: uuid.UUID, session):
     data = session.get(Data, id)
 
     if not data:
-        raise HTTPException(status_code=404, detail="Data not found")
+        raise HTTPException(status_code=404, detail="Sample not found")
     return data
 
 def get_all_data(session):
@@ -78,18 +78,18 @@ def get_sample_by_conditions(conditions: dict, session):
     result = session.exec(query)
     return result.all()
 
-def get_project_by_id(project_id: str, session):
+def get_dataset_by_id(dataset_id: str, session):
     if not id:
-        raise ValueError("project id is empty")
-    statement = select(Project).where(Project.project_id == project_id)  # Create a SELECT query
-    project = session.exec(statement).first()
+        raise ValueError("dataset id is empty")
+    statement = select(Dataset).where(Dataset.dataset_id == dataset_id)  # Create a SELECT query
+    result = session.exec(statement).first()
 
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
-    return project
+    if not result:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    return result
 
-def get_all_projects(session):
-    statement = select(Project)
+def get_all_datasets(session):
+    statement = select(Dataset)
     result = session.exec(statement)
     return result.all()
 

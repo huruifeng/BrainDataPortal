@@ -49,12 +49,12 @@ export const getSample_get = async (conditions) => {
     }
 }
 
-export const getProject_get = async (project_id="all") => {
+export const getDataset_get = async (dataset_id="all") => {
     try {
-        const response = await axios.get(`${API_URL}/getproject/${project_id}`);
+        const response = await axios.get(`${API_URL}/getdataset/${dataset_id}`);
         return response;
     } catch (error) {
-        console.error("Error reading project records:", error);
+        console.error("Error reading dataset records:", error);
         throw error;
     }
 }

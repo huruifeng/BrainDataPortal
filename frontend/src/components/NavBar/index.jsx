@@ -19,8 +19,8 @@ const NavBar = () => {
                     </Link>
                 </Typography>
                 <Button color="inherit" component={Link} to="/about">About</Button>
-                <Button color="inherit" component={Link} to="/projects">Projects</Button>
-                <Button color="inherit" component={Link} to="/data">Data</Button>
+                <Button color="inherit" component={Link} to="/datasets">Datasets</Button>
+                <Button color="inherit" component={Link} to="/samples">Samples</Button>
                 <Button color="inherit" component={Link} to="/analysis">Analysis</Button>
                 <Button color="inherit" onClick={openHelpMenu}>Help</Button>
                 <Menu

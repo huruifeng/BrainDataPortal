@@ -5,7 +5,7 @@ import "./StatBar.css";
 const StatBar = () => {
 
     const stats = [
-      { icon: <People />, value: "86", label: "Projects" },
+      { icon: <People />, value: "86", label: "Datasets" },
       { icon: <LocationOn />, value: "69", label: "Primary Sites" },
       { icon: <Description />, value: "44,736", label: "Cases" },
       { icon: <InsertDriveFile />, value: "1,027,517", label: "Files" },

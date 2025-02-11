@@ -15,13 +15,13 @@ const sampleOptions = ["ABCD", "ACEE", "HIGH", "XXYT", "EGGH","HJJ"];
 function UmapView() {
     const {sampleRecords,fetchSampleData} = useDataStore();
     useEffect(() => {
-        fetchSampleData({project_id: "all"})
+        fetchSampleData({dataset_id: "all"})
     }, [fetchSampleData]);
 
     const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
 
 
-    const { project_id } = useParams(); // Extracts project_id from the URL
+    const { dataset_id } = useParams(); // Extracts dataset_id from the URL
 
     const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes, umapData, loading, error } = useGeneStore();
     const [searchText, setSearchText] = useState("");

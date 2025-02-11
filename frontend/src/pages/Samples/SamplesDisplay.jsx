@@ -10,13 +10,13 @@ import {
     Paper,
     Pagination, ToggleButtonGroup, ToggleButton, TextField, FormControl, InputLabel, Select, MenuItem,
 } from "@mui/material";
-import "./DataDisplay.css";
+import "./SamplesDisplay.css";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import ListIcon from "@mui/icons-material/List";
 import PivotTableChart from "@mui/icons-material/PivotTableChart";
 import {Link} from "react-router-dom";
 
-const DataDisplay = ({ dataRecords}) => {
+const SamplesDisplay = ({ dataRecords}) => {
     const [page, setPage] = useState(1);
     const [displayMode, setDisplayMode] = useState("table"); // "table" or "list"
     const [searchQuery, setSearchQuery] = useState("");
@@ -126,7 +126,7 @@ const DataDisplay = ({ dataRecords}) => {
                                         <TableCell>{record.brain_region}</TableCell>
                                         <TableCell>{record.region_level_1}</TableCell>
                                         <TableCell>{record.data_type}</TableCell>
-                                        <TableCell><Link to={`/geneview/${record.project_id}?sample=${record.sample_id}`}>View UMAP</Link></TableCell>
+                                        <TableCell><Link to={`/geneview/${record.dataset_id}?sample=${record.sample_id}`}>View UMAP</Link></TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -146,7 +146,7 @@ const DataDisplay = ({ dataRecords}) => {
                                     <Box><b>Assay type:</b> {record.data_type}</Box>
                                   </Box>
                                   <Box sx={{fontSize: "14px", padding: "8px 0"}}>
-                                    <Link to={`/geneview/${record.project_id}?sample=${record.sample_id}`}>View UMAP</Link>
+                                    <Link to={`/geneview/${record.dataset_id}?sample=${record.sample_id}`}>View UMAP</Link>
                                   </Box>
                                 </Typography>
                             </Box>
@@ -169,4 +169,4 @@ const DataDisplay = ({ dataRecords}) => {
     );
 };
 
-export default DataDisplay;
+export default SamplesDisplay;

@@ -4,8 +4,8 @@ import uuid
 from typing import Optional
 
 
-class ProjectBase(SQLModel):
-    project_id: str = Field(unique=True, index=True, primary_key=True)
+class DatasetBase(SQLModel):
+    dataset_id: str = Field(unique=True, index=True, primary_key=True)
     name: str = Field(index=True)
     description: str = Field(default="NA")
     dataset_name: str = Field(default="NA")
@@ -25,11 +25,11 @@ class ProjectBase(SQLModel):
 
     study_id: str = Field(foreign_key="study.study_id")
 
-class Project(ProjectBase, table=True):
+class Dataset(DatasetBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    study: "Study" = Relationship(back_populates="project")
-    samples: list["Sample"] = Relationship(back_populates="project")
+    study: "Study" = Relationship(back_populates="dataset")
+    dataset_samples: list["Sample"] = Relationship(back_populates="dataset")
 
 
-class ProjectCreate(ProjectBase):
+class DatasetCreate(DatasetBase):
     pass

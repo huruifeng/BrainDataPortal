@@ -10,13 +10,13 @@ import {
     Paper,
     Pagination, ToggleButtonGroup, ToggleButton, TextField, FormControl, InputLabel, Select, MenuItem, Grid,
 } from "@mui/material";
-import "./ProjectDisplay.css";
+import "./DatasetDisplay.css";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import ListIcon from "@mui/icons-material/List";
 import PivotTableChart from "@mui/icons-material/PivotTableChart";
 import {Link} from "react-router-dom";
 
-const ProjectDisplay = ({ dataRecords}) => {
+const DatasetDisplay = ({ dataRecords}) => {
     const [page, setPage] = useState(1);
     const [displayMode, setDisplayMode] = useState("table"); // "table" or "list"
     const [searchQuery, setSearchQuery] = useState("");
@@ -35,7 +35,7 @@ const ProjectDisplay = ({ dataRecords}) => {
     // Filter data based on the search query
     const filteredData = dataRecords.filter(
         (item) =>
-            item.project_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.dataset_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.PI_full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.first_contributor.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -108,7 +108,7 @@ const ProjectDisplay = ({ dataRecords}) => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Project ID</TableCell>
+                                    <TableCell>Dataset ID</TableCell>
                                     <TableCell>Name</TableCell>
                                     <TableCell>PI</TableCell>
                                     <TableCell>First contributor</TableCell>
@@ -120,15 +120,15 @@ const ProjectDisplay = ({ dataRecords}) => {
                             </TableHead>
                             <TableBody>
                                 {displayedData.map((record) => (
-                                    <TableRow key={record.project_id}>
-                                        <TableCell><Link to={`/data/${record.project_id}`}>{record.project_id}</Link></TableCell>
+                                    <TableRow key={record.dataset_id}>
+                                        <TableCell><Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link></TableCell>
                                         <TableCell>{record.name}</TableCell>
                                         <TableCell>{record.PI_full_name}</TableCell>
                                         <TableCell>{record.first_contributor}</TableCell>
                                         <TableCell>{record.n_samples}</TableCell>
                                         <TableCell>{record.brain_regions}</TableCell>
                                         <TableCell>{record.assay}</TableCell>
-                                        <TableCell><Link to={`/geneview/${record.project_id}?sample=all`}>UMAP</Link></TableCell>
+                                        <TableCell><Link to={`/geneview/${record.dataset_id}?sample=all`}>UMAP</Link></TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -137,8 +137,8 @@ const ProjectDisplay = ({ dataRecords}) => {
                 ) : (
                     <Box className="data-list">
                         {displayedData.map((record) => (
-                            <Box key={record.project_id} className="list-item">
-                                <Typography variant="h6"><Link to={`/data/${record.project_id}`}>{record.project_id}</Link></Typography>
+                            <Box key={record.dataset_id} className="list-item">
+                                <Typography variant="h6"><Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link></Typography>
                                  <Box>{record.name}</Box>
                                   <Box display="flex" gap={2} sx={{fontSize: "14px", padding: "8px 0"}}>
                                     <Box><b>PI:</b> {record.PI_full_name}</Box>
@@ -148,7 +148,7 @@ const ProjectDisplay = ({ dataRecords}) => {
                                     <Box><b>Assay type:</b> {record.assay}</Box>
                                   </Box>
                                 <Box sx={{fontSize: "14px", padding: "8px 0"}}>
-                                    <Link to={`/geneview/${record.project_id}?sample=all`}>View UMAP</Link>
+                                    <Link to={`/geneview/${record.dataset_id}?sample=all`}>View UMAP</Link>
                                 </Box>
 
                             </Box>
@@ -171,4 +171,4 @@ const ProjectDisplay = ({ dataRecords}) => {
     );
 };
 
-export default ProjectDisplay;
+export default DatasetDisplay;

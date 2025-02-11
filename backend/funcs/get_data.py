@@ -1,8 +1,8 @@
 import os
 import pandas as pd
 
-def get_umap_data(project, samples, genes):
-    umap_embeddings_file = os.path.join("projects",project, 'umap_embeddings.csv')
+def get_umap_data(dataset, samples, genes):
+    umap_embeddings_file = os.path.join("datasets",dataset, 'umap_embeddings.csv')
     if os.path.exists(umap_embeddings_file):
         data = pd.read_csv(umap_embeddings_file, index_col=0, header=0)
 

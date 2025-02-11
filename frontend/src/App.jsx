@@ -3,8 +3,8 @@ import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import About from "./pages/About";
-import ProjectsPage from "./pages/Projects";
-import DataPage from "./pages/Data";
+import DatasetsPage from "./pages/Datasets";
+import SamplesPage from "./pages/Samples";
 import NotFoundPage from "./pages/NotFound";
 
 // import Analysis from "./pages/Analysis";
@@ -44,16 +44,16 @@ function App() {
 
                       <Route path="/" element={<Home />} />
                       <Route path="/about" element={<About />} />
-                      <Route path="/projects" element={<ProjectsPage />} />
+                      <Route path="/datasets" element={<DatasetsPage />} />
 
-                      <Route path="/data" element={<Navigate to="/data/all" replace />} />
-                      <Route path="/data/:project_id" element={<DataPage />} />
-                      <Route path="/geneview/:project_id" element={<GeneView />} />
+                      <Route path="/samples" element={<Navigate to="/samples/all" replace />} />
+                      <Route path="/samples/:dataset_id" element={<SamplesPage />} />
+                      <Route path="/geneview/:dataset_id" element={<GeneView />} />
 
                       <Route path="/login" element={<Login />} />
 
                       {/* Protected Routes */}
-                      {/*<Route path="/data" element={<ProtectedRoute roles={['admin', 'user']}><Data /></ProtectedRoute>}/>*/}
+                      {/*<Route path="/data" element={<ProtectedRoute roles={['admin', 'user']}><Sample /></ProtectedRoute>}/>*/}
                       {/*<Route path="/analysis" element={<ProtectedRoute roles={['admin']}><Analysis /></ProtectedRoute>}/>*/}
 
                       {/* Unauthorized page for invalid role access */}

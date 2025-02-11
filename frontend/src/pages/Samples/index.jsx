@@ -2,19 +2,19 @@ import {useEffect} from "react";
 import {Box, Typography, Divider} from "@mui/material";
 
 import FilterPanel from "./FilterPanel";
-import DataDisplay from "./DataDisplay";
-import "./DataPage.css";
+import SamplesDisplay from "./SamplesDisplay.jsx";
+import "./SamplesPage.css";
 import useDataStore from "../../store/DataStore.js";
 import {useParams} from "react-router-dom";
 
-const DataPage = () => {
-    // get project_id from url
-    // const project_id = window.location.pathname.split("/")[2];
-    const { project_id } = useParams(); // Extracts project_id from the URL
+const SamplesPage = () => {
+    // get dataset_id from url
+    // const dataset_id = window.location.pathname.split("/")[2];
+    const { dataset_id } = useParams(); // Extracts dataset_id from the URL
 
     const {sampleRecords,fetchSampleData} = useDataStore();
     useEffect(() => {
-        fetchSampleData({project_id})
+        fetchSampleData({dataset_id})
     }, [fetchSampleData]);
 
     return (
@@ -30,11 +30,11 @@ const DataPage = () => {
             <Box className="main-content" style={{ flex: 2, display: 'flex', flexDirection: 'row' }}>
                 {/* Left Filter Panel */}
                 <FilterPanel />
-                {/* Right Data Display Area */}
-                <DataDisplay dataRecords={sampleRecords} />
+                {/* Right Sample Display Area */}
+                <SamplesDisplay dataRecords={sampleRecords} />
             </Box>
         </div>
     );
 };
 
-export default DataPage;
+export default SamplesPage;

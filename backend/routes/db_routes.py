@@ -86,13 +86,13 @@ async def import_csv(table: str):
             print(e)
             return {"success": False, "message": str(e)}
 
-    elif table == "project":
+    elif table == "dataset":
         try:
-            df = pd.read_csv("backend/files/Project.csv", thousands=',')
+            df = pd.read_csv("backend/files/Dataset.csv", thousands=',')
             df['id'] = [uuid.uuid4() for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
             df.to_sql(table, engine, if_exists="append", index=False)
-            return {"success": True, "message": "Project data imported successfully"}
+            return {"success": True, "message": "Dataset data imported successfully"}
         except Exception as e:
             print(e)
             return {"success": False, "message": str(e)}
