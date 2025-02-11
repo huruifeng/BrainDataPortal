@@ -5,14 +5,21 @@ import useGeneStore from "../../store/GeneStore.js";
 import useDataStore from "../../store/DataStore.js"; // Import CSS file
 
 import "./GeneView.css";
-import {useParams} from "react-router-dom";
+import {useParams, useSearchParams} from "react-router-dom";
 import UmapPlot from "./UmapPlot.jsx";
 
 const geneOptions = ["ABCD", "ACEE", "HIGH", "XXYT", "EGGH","HJJ"];
-const sampleOptions = ["ABCD", "ACEE", "HIGH", "XXYT", "EGGH","HJJ"];
-
 
 function UmapView() {
+    const {dataset_id } = useParams(); // Extracts dataset_id from the URL
+    const datasetId = dataset_id ?? datasetId; // Use default if undefined
+
+    // get the query parameters
+    // const queryParams = new URLSearchParams(window.location.search);
+    const [queryParams, setQueryParams] = useSearchParams();
+    const gene = queryParams.get("gene");
+    const sample = queryParams.get("sample");
+
     const {sampleRecords,fetchSampleData} = useDataStore();
     useEffect(() => {
         fetchSampleData({dataset_id: "all"})
@@ -21,10 +28,10 @@ function UmapView() {
     const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
 
 
-    const { dataset_id } = useParams(); // Extracts dataset_id from the URL
-
     const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes, umapData, loading, error } = useGeneStore();
-    const [searchText, setSearchText] = useState("");
+    const [geneSearchText, setGeneSearchText] = useState("");
+    const [sampleSearchText, setSampleSearchText] = useState("");
+
 
 
     const handleSampleChange = (event, newValue) => {
@@ -39,25 +46,24 @@ function UmapView() {
     <div className="umap-page-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
        {/* Title Row */}
         <Box className="title-row">
-            <Typography variant="h5">UMAP Visualization</Typography>
+            <Typography variant="h6">Exploration of gene expression</Typography>
         </Box>
         <Divider />
         <div className="umap-content">
 
           {/* Right Panel for Sample & Gene Selection (20%) */}
           <div className="umap-panel">
-            <Typography variant="h6">Select Samples & Genes</Typography>
+            <Typography variant="subtitle1">Select Samples & Genes</Typography>
 
             {/* Gene Selection with Fuzzy Search & Chips */}
             <Autocomplete
               multiple
-              autoSelect={true}
               size={"small"}
               options={geneOptions}
               value={selectedGenes}
               onChange={handleGeneChange}
-              inputValue={searchText}
-              onInputChange={(event, newInputValue) => setSearchText(newInputValue)}
+              inputValue={geneSearchText}
+              onInputChange={(event, newInputValue) => setGeneSearchText(newInputValue)}
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
                   <Chip
@@ -75,13 +81,12 @@ function UmapView() {
             {/* Sample Selection */}
             <Autocomplete
               multiple
-              autoSelect={true}
               size={"small"}
               options={sampleOptions}
               value={selectedSamples}
               onChange={handleSampleChange}
-              inputValue={searchText}
-              onInputChange={(event, newInputValue) => setSearchText(newInputValue)}
+              inputValue={sampleSearchText}
+              onInputChange={(event, newInputValue) => setSampleSearchText(newInputValue)}
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
                   <Chip

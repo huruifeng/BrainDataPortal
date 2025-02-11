@@ -2,7 +2,6 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:8000"; // Replace with your backend URL
 
-
 const API_URL = `${BASE_URL}/api`;
 
 function jsonToQueryString(json) {
@@ -39,7 +38,7 @@ export const getData_get = async (data_id="all") => {
 }
 
 export const getSample_get = async (conditions) => {
-    console.log(conditions);
+    // console.log(conditions);
     try {
         const response = await axios.get(`${API_URL}/getsample`, {params: conditions});
         return response;
