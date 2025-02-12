@@ -7,8 +7,6 @@ import useDataStore from "../../store/DataStore.js";
 import UmapPlot from "./UmapPlot.jsx";
 import "./GeneView.css";
 
-const geneOptions = ["ABCD", "ACEE", "HIGH", "XXYT", "EGGH", "HJJ"];
-
 function GeneView() {
     const { dataset_id } = useParams();
     const datasetId = dataset_id ?? "all";
@@ -25,6 +23,7 @@ function GeneView() {
 
     const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
     sampleOptions.unshift("all");
+
     const geneOptions = geneList.map((gene) => gene);
     geneOptions.unshift("all");
 
@@ -34,28 +33,22 @@ function GeneView() {
     const [sampleSearchText, setSampleSearchText] = useState("");
 
     useEffect(() => {
-        const initialSelectedSamples = initialSamples.length ? initialSamples : ["all"];
+        const initialSelectedSamples = initialSamples.length ? initialSamples : [];
         const initialSelectedGenes = initialGenes.length ? initialGenes : [];
 
-        useGeneStore.getState().setSelections(initialSelectedSamples, initialSelectedGenes);
-    }, []);
+        useGeneStore.setState({
+            selectedSamples: initialSelectedSamples,
+            selectedGenes: initialSelectedGenes
+        });
 
+        useGeneStore.getState().fetchUmapData(); // Fetch data once after both are set
+    }, []);
 
     /** Updates the query parameters in the URL */
     const updateQueryParams = (genes, samples) => {
         const newParams = new URLSearchParams();
-        if(genes.length === 0 || genes.includes("all")){
-            newParams.append("gene", "all");
-        }else{
-            genes.forEach((gene) => newParams.append("gene", gene));
-        }
-        if (samples.length === 0 || samples.includes("all")) {
-            newParams.append("sample", "all");
-        }else{
-            samples.forEach((sample) => newParams.append("sample", sample));
-        }
-        // genes.forEach((gene) => newParams.append("gene", gene));
-        // samples.forEach((sample) => newParams.append("sample", sample));
+        genes.forEach((gene) => newParams.append("gene", gene));
+        samples.forEach((sample) => newParams.append("sample", sample));
         setQueryParams(newParams);
     };
 
@@ -99,7 +92,7 @@ function GeneView() {
                                 const { key, ...tagProps } = getTagProps({ index });
                                 return (
                                     <Chip
-                                        key={key}
+                                        key={option}
                                         label={option}
                                         {...tagProps}
                                         color="primary"
@@ -129,7 +122,7 @@ function GeneView() {
                                 const { key, ...tagProps } = getTagProps({ index });
                                 return (
                                     <Chip
-                                        key={key}
+                                        key={option}
                                         label={option}
                                         {...tagProps}
                                         color="primary"
