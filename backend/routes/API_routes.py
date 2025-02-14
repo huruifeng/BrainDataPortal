@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from starlette.requests import Request
-from starlette.routing import request_response
 
 from backend.db import SessionDep
 from backend.db_utils.crud import *
@@ -13,7 +12,7 @@ async def read_root():
     return {"Hello": "World"}
 
 @router.get("/getumapdata")
-async def getumapdata(request:Request, session: SessionDep):
+async def getumapdata(request:Request):
     samples = request.query_params.getlist("samples")
     genes = request.query_params.getlist("genes")
     print(request)

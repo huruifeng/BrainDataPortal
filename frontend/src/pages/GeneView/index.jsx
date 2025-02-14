@@ -25,7 +25,6 @@ function GeneView() {
     sampleOptions.unshift("all");
 
     const geneOptions = geneList.map((gene) => gene);
-    geneOptions.unshift("all");
 
     const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes, umapData, loading, error } = useGeneStore();
 
@@ -67,15 +66,15 @@ function GeneView() {
     console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
 
     return (
-        <div className="umap-page-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div className="plot-page-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             {/* Title Row */}
             <Box className="title-row">
                 <Typography variant="h6">Exploration of Gene Expression</Typography>
             </Box>
             <Divider />
-            <div className="umap-content">
+            <div className="plot-content">
                 {/* Right Panel for Sample & Gene Selection (20%) */}
-                <div className="umap-panel">
+                <div className="plot-panel">
                     <Typography variant="subtitle1">Select Samples & Genes</Typography>
 
                     {/* Gene Selection with Fuzzy Search & Chips */}
@@ -139,7 +138,7 @@ function GeneView() {
                     />
                 </div>
                 {/* Left UMAP Plot Area (80%) */}
-                <div className="umap-main">
+                <div className="plot-main">
                     {loading ? (
                         <CircularProgress />
                     ) : error ? (
@@ -147,7 +146,7 @@ function GeneView() {
                     ) : umapData ? (
                         <UmapPlot data={umapData} />
                     ) : (
-                        <Typography variant="h6">Select Samples & Genes to Load UMAP</Typography>
+                        <Typography variant="h6">Select Samples & Genes to load plots</Typography>
                     )}
                 </div>
             </div>

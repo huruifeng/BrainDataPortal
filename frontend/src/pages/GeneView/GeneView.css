@@ -1,5 +1,5 @@
 /* UmapView */
-.umap-page-container {
+.plot-page-container {
     width:100%;
     height: 100vh;
     margin: 0 auto;
@@ -10,12 +10,12 @@
     margin: 8px 24px;
 }
 
-.umap-content {
+.plot-content {
   display: flex;
   height: 100vh;
 }
 
-.umap-main {
+.plot-main {
   flex: 3;
   background-color: #f5f5f5;
   display: flex;
@@ -23,7 +23,7 @@
   justify-content: center;
 }
 
-.umap-panel {
+.plot-panel {
   flex: 1;
   background-color: #ffffff;
   border-left: 1px solid #ddd;
