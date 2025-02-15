@@ -2,13 +2,13 @@
 import React from "react";
 import ReactECharts from "echarts-for-react";
 
-const UmapPlot = ({ data }) => {
+const UmapPlot = ({gene, data }) => {
     // console.log(data)
   if (!data || data.length === 0) return <p>No data available</p>;
-const scatterData = data.map((p) => ({
+    const scatterData = data.map((p) => ({
       name: 'point',
       value: [p.UMAP_1, p.UMAP_2],
-      itemStyle: { color: p.color }
+      itemStyle: { color: gene==="" ? p.color : p[gene] },
     }));
 
  var options = {

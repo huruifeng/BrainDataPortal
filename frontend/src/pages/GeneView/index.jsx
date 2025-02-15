@@ -187,13 +187,13 @@ function GeneView() {
                                   selectedGenes.map((gene, index) => (
                                     <div key={index} className="umap-plot-item">
                                         <div className="plot-wrapper">
-                                            <UmapPlot data={umapData} />
+                                            <UmapPlot gene={gene} data={umapData} />
                                         </div>
                                     </div>
                                     )) :
                                   <div className="umap-plot-item">
                                         <div className="plot-wrapper">
-                                            <UmapPlot data={umapData} />
+                                            <UmapPlot gene={""} data={umapData} />
                                         </div>
                                     </div>
                               }

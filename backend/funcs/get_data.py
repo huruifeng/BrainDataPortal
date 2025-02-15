@@ -40,7 +40,7 @@ def assign_colors_continuous(values, cmap_name="viridis"):
 
     Parameters:
     values (list or np.array): A list or array of continuous values.
-    cmap_name (str): Name of the colormap to use (default: "viridis").
+    cmap_name (str): Name of the colormap to use, like "viridis","Reds", "Purples".
 
     Returns:
     list: A list of HEX color codes corresponding to the input values.
@@ -53,7 +53,6 @@ def assign_colors_continuous(values, cmap_name="viridis"):
     return colors  # Map values to colors
 
 
-
 def get_umap_data(dataset, samples, genes):
     umap_embeddings_file = os.path.join("backend","datasets",dataset, 'umap_embeddings_with_meta_100k.csv')
     data_df = pd.read_csv(umap_embeddings_file, index_col=0, header=0)
@@ -63,11 +62,21 @@ def get_umap_data(dataset, samples, genes):
         data_df.loc[~data_df['sample_id'].isin(samples), "CellSubtypes"] = "Other"
         data_df = data_df.loc[data_df['sample_id'].isin(samples)]
 
-    color_map = assign_colors_group(data_df['CellSubtypes'])
-    # print(color_map)
-    data_df['color'] = data_df['CellSubtypes'].map(color_map)
+    if len(genes) > 0:
+        for gene in genes:
+            gene_expr_file = os.path.join("backend","datasets",dataset, "genes",gene+".json")
+            with open(gene_expr_file, 'r') as f:
+                cell_expr = json.load(f)
+                data_df[gene] = data_df.index.map(cell_expr).fillna(0)
+                colors = assign_colors_continuous(data_df[gene], cmap_name="Reds")
+                data_df[gene] = data_df[gene].astype(str)
+                data_df.loc[:,gene] = colors
+        data_df = data_df.loc[:, ["UMAP_1", "UMAP_2"]+genes]
+    else:
+        color_map = assign_colors_group(data_df['CellSubtypes'])
 
-    data_df = data_df.loc[:, ["UMAP_1", "UMAP_2", "CellSubtypes", "color"]]
+        data_df['color'] = data_df['CellSubtypes'].map(color_map)
+        data_df = data_df.loc[:, ["UMAP_1", "UMAP_2", "CellSubtypes", "color"]]
 
     results =  data_df.to_dict(orient="records")
     return results
