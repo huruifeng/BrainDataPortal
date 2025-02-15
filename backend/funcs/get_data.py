@@ -53,7 +53,7 @@ def assign_colors_continuous(values, cmap_name="viridis"):
     return colors  # Map values to colors
 
 
-def get_umap_data(dataset, samples, genes):
+def get_umap_echart(dataset, samples, genes):
     umap_embeddings_file = os.path.join("backend","datasets",dataset, 'umap_embeddings_with_meta_100k.csv')
     data_df = pd.read_csv(umap_embeddings_file, index_col=0, header=0)
     ## Cell,UMAP_1,UMAP_2,sample_id,case,sex,age,seurat_clusters,MajorCellTypes,CellSubtypes
