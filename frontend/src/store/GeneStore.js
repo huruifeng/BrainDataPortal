@@ -5,7 +5,7 @@ const useGeneStore = create((set, get) => ({
     dataSet: null,
     selectedSamples: [],
     selectedGenes: [],
-    umapData: null, // Store API response data
+    umapDataList: {},// Store API response data
     metaData: null,
     loading: false,
     error: null,
@@ -31,8 +31,29 @@ const useGeneStore = create((set, get) => ({
         set({ loading: true, error: null });
 
         try {
-            const response = await getUmapData(dataSet,selectedSamples, selectedGenes);
-            set({ umapData: response.data, loading: false });
+            if (!selectedGenes.length) {
+                // if no gene selected, assign a value "all"
+               const response = await getUmapData(dataSet,selectedSamples, ["all"]);
+               get().umapDataList["all"] = response.data;
+            }else{
+                for (var gene of selectedGenes) {
+                    if(!get().umapDataList[gene]){
+                        const response = await getUmapData(dataSet,selectedSamples, [gene]);
+                        get().umapDataList[gene] = response.data;
+                    }
+                }
+                // remove gene item if it is not selected
+                for (var key in get().umapDataList) {
+                    if(!selectedGenes.includes(key)){
+                        delete get().umapDataList[key];
+                    }
+                }
+            }
+
+            set({ umapDataList: get().umapDataList, loading: false });
+
+            // const response = await getUmapData(dataSet,selectedSamples, selectedGenes);
+            // set({ umapData: response.data, loading: false });
         } catch (error) {
             set({ error: "Failed to fetch UMAP data:"+error, loading: false });
         }

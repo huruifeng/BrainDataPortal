@@ -62,7 +62,7 @@ def get_umap_data(dataset, samples, genes):
         data_df.loc[~data_df['sample_id'].isin(samples), "CellSubtypes"] = "Other"
         data_df = data_df.loc[data_df['sample_id'].isin(samples)]
 
-    if len(genes) > 0:
+    if len(genes) > 0 and not(genes[0] == "all" or "all" in genes):
         for gene in genes:
             gene_expr_file = os.path.join("backend","datasets",dataset, "genes",gene+".json")
             with open(gene_expr_file, 'r') as f:

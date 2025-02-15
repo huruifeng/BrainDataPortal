@@ -8,7 +8,7 @@ const UmapPlot = ({gene, data }) => {
     const scatterData = data.map((p) => ({
       name: 'point',
       value: [p.UMAP_1, p.UMAP_2],
-      itemStyle: { color: gene==="" ? p.color : p[gene] },
+      itemStyle: { color: gene==="all" ? p.color : p[gene] },
     }));
 
  var options = {

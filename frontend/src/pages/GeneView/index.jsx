@@ -38,7 +38,7 @@ function GeneView() {
     const geneOptions = geneList.map((gene) => gene);
 
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useGeneStore();
-    const { setDataset, umapData, loading, error } = useGeneStore();
+    const { setDataset,umapDataList, loading, error } = useGeneStore();
 
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");
@@ -181,25 +181,18 @@ function GeneView() {
                         </>
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
-                    ) : umapData ? (
+                    ) : Object.keys(umapDataList).length > 0 ? (
                         <div className={`umap-plot-container ${plotClass}`}>
-                              {selectedGenes.length > 0 ?
-                                  selectedGenes.map((gene, index) => (
-                                    <div key={index} className="umap-plot-item">
-                                        <div className="plot-wrapper">
-                                            <UmapPlot gene={gene} data={umapData} />
-                                        </div>
+                            {Object.entries(umapDataList).map(([gene, umap_data]) => (
+                                <div key={gene} className="umap-plot-item">
+                                    <div className="plot-wrapper">
+                                        <UmapPlot gene={gene} data={umap_data} />
                                     </div>
-                                    )) :
-                                  <div className="umap-plot-item">
-                                        <div className="plot-wrapper">
-                                            <UmapPlot gene={""} data={umapData} />
-                                        </div>
-                                    </div>
-                              }
-                            </div>
+                                </div>
+                            ))}
+                        </div>
                     ) : (
-                        <Typography variant="h6">Select Samples & Genes to load plots</Typography>
+                        <Typography variant="h6">Select Samples or Genes to load plots</Typography>
                     )}
                 </div>
             </div>
