@@ -3,7 +3,7 @@ import React from "react";
 import EChartScatter from "./EChartScatter.jsx";
 
 const UmapPlot = ({gene, data }) => {
-  return <EChartScatter gene={gene} data={data} />;
+  return <EChartScatter gene={gene} data={data} group={"MajorCellTypes"} />;
 };
 
 export default UmapPlot;
