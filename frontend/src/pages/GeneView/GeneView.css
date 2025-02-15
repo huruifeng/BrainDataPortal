@@ -10,9 +10,15 @@
     margin: 8px 24px;
 }
 
+/*.plot-content {*/
+/*    display: flex;*/
+/*    height: 100vh;*/
+/*}*/
+
 .plot-content {
-    display: flex;
-    height: 100vh;
+  flex-grow: 1; /* Allows dynamic height adjustment */
+  display: flex;
+  flex-direction: column;
 }
 
 .plot-main {
@@ -30,11 +36,12 @@
     padding: 16px;
 }
 
+
 .umap-plot-container {
   display: grid;
-  grid-gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(0, 1fr)); /* Flexible columns */
+  grid-gap: 2px 4px; /* Space between plots */
   width: 100%;
-  height: 100%;
   box-sizing: border-box;
   justify-content: center;
 }
@@ -56,22 +63,35 @@
   grid-template-columns: repeat(3, 1fr); /* First row has 3 */
 }
 
+/* Maximum of 3 plots per row */
+@media (min-width: 600px) {
+  .umap-plot-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+@media (min-width: 900px) {
+  .umap-plot-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1200px) {
+  .umap-plot-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .umap-plot-item {
-  aspect-ratio: 1 / 1; /* Ensures it's always a square */
+  aspect-ratio: 1 / 1; /* Maintain square shape */
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  position: relative;
   width: 100%;
 }
 
 .plot-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   display: flex;
@@ -83,6 +103,7 @@
   width: 100%;
   height: 100%;
 }
+
 
 
 

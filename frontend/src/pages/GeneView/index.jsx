@@ -85,7 +85,7 @@ function GeneView() {
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
-    const plotClass = selectedGenes.length === 1
+    const plotClass = selectedGenes.length <= 1
         ? "single-plot" : selectedGenes.length === 2
             ? "two-plots" : selectedGenes.length === 3
                 ? "three-plots" : "four-plots";
@@ -183,13 +183,20 @@ function GeneView() {
                         <Typography color="error">{error}</Typography>
                     ) : umapData ? (
                         <div className={`umap-plot-container ${plotClass}`}>
-                              {selectedGenes.map((gene, index) => (
-                                <div key={index} className="umap-plot-item">
-                                    <div className="plot-wrapper">
-                                        <UmapPlot data={umapData} />
+                              {selectedGenes.length > 0 ?
+                                  selectedGenes.map((gene, index) => (
+                                    <div key={index} className="umap-plot-item">
+                                        <div className="plot-wrapper">
+                                            <UmapPlot data={umapData} />
+                                        </div>
                                     </div>
-                                </div>
-                              ))}
+                                    )) :
+                                  <div className="umap-plot-item">
+                                        <div className="plot-wrapper">
+                                            <UmapPlot data={umapData} />
+                                        </div>
+                                    </div>
+                              }
                             </div>
                     ) : (
                         <Typography variant="h6">Select Samples & Genes to load plots</Typography>
