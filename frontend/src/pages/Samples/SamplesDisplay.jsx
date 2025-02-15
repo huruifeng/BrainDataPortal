@@ -126,7 +126,7 @@ const SamplesDisplay = ({ dataRecords}) => {
                                         <TableCell>{record.brain_region}</TableCell>
                                         <TableCell>{record.region_level_1}</TableCell>
                                         <TableCell>{record.data_type}</TableCell>
-                                        <TableCell><Link to={`/geneview/${record.dataset_id}?sample=${record.sample_id}`}>View UMAP</Link></TableCell>
+                                        <TableCell><Link to={`/geneview/${record.dataset_id}?sample=${record.sample_id}`}>UMAP</Link></TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
