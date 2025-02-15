@@ -17,9 +17,9 @@ function jsonToQueryString(json) {
     return params.toString();
 }
 
-export const getUmapData = async (samples, genes) => {
+export const getUmapData = async (dataset, samples, genes) => {
     try {
-        const response = await axios.get(`${API_URL}/getumapdata`, {params: {samples:samples,genes:genes}});
+        const response = await axios.get(`${API_URL}/getumapdata`, {params: {dataset:dataset,samples:samples,genes:genes}});
         return response;
     } catch (error) {
         console.error("Error reading umap data:", error);

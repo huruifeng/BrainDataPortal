@@ -13,14 +13,15 @@ async def read_root():
 
 @router.get("/getumapdata")
 async def getumapdata(request:Request):
-    samples = request.query_params.getlist("samples")
-    genes = request.query_params.getlist("genes")
-    print(request)
-    if not samples or not genes:
-        raise HTTPException(status_code=400, detail="Sample_id or gene_id is empty")
-    response = get_umap_data(samples, genes)
+    print("getumapdata() called================")
+    dataset = request.query_params.get("dataset")
+    samples = request.query_params.getlist("samples[]")
+    genes = request.query_params.getlist("genes[]")
+
+    response = get_umap_data(dataset,samples, genes)
+    # print (response)
     if not response:
-        raise HTTPException(status_code=404, detail="Sample table is empty")
+        raise HTTPException(status_code=404, detail="Error in getting UMAP matrix.")
     return response
 
 @router.get("/getallgenes")

@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { Typography, Box, Divider, CircularProgress, Autocomplete, Chip, TextField } from "@mui/material";
+import {
+    Typography,
+    Box,
+    Divider,
+    CircularProgress,
+    Autocomplete,
+    Chip,
+    TextField,
+    Button,
+    LinearProgress
+} from "@mui/material";
+import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import { useParams, useSearchParams } from "react-router-dom";
 
 import useGeneStore from "../../store/GeneStore.js";
@@ -26,7 +37,8 @@ function GeneView() {
 
     const geneOptions = geneList.map((gene) => gene);
 
-    const { selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes, umapData, loading, error } = useGeneStore();
+    const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useGeneStore();
+    const { setDataset, umapData, loading, error } = useGeneStore();
 
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");
@@ -34,6 +46,9 @@ function GeneView() {
     useEffect(() => {
         const initialSelectedSamples = initialSamples.length ? initialSamples : [];
         const initialSelectedGenes = initialGenes.length ? initialGenes : [];
+
+        console.log("Dataset:", datasetId, "Selected Genes:", initialSelectedGenes, "Selected Samples:", initialSelectedSamples);
+        setDataset(datasetId);
 
         useGeneStore.setState({
             selectedSamples: initialSelectedSamples,
@@ -63,7 +78,17 @@ function GeneView() {
         updateQueryParams(newValue, selectedSamples); // Pass the new value instead of old state
     };
 
-    console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
+    // click the button to fetch umap data
+    const handleLoadPlot = () => {
+        setDataset(datasetId)
+         useGeneStore.getState().fetchUmapData();
+    }
+
+    // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
+    const plotClass = selectedGenes.length === 1
+        ? "single-plot" : selectedGenes.length === 2
+            ? "two-plots" : selectedGenes.length === 3
+                ? "three-plots" : "four-plots";
 
     return (
         <div className="plot-page-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -136,15 +161,36 @@ function GeneView() {
                         }
                         renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard" style={{ margin: "10px 0px" }} />}
                     />
+
+                    {/* a button to fetch data and a loading indicator*/}
+                    <Box sx={{ display: "flex", justifyContent: "center", margin: "10px 0px" }}>
+                        <Button variant="outlined" endIcon={<ScatterPlotIcon />} disabled={loading} onClick={handleLoadPlot}>Load plots</Button>
+                    </Box>
+
                 </div>
                 {/* Left UMAP Plot Area (80%) */}
                 <div className="plot-main">
                     {loading ? (
-                        <CircularProgress />
+                        <>
+                           <Box sx={{ width: '100%'}}>
+                              <LinearProgress />
+                            </Box>
+                            {/*<Box sx={{ display: "flex", justifyContent: "center",paddingTop: "100px" }}>*/}
+                            {/*    <CircularProgress />*/}
+                            {/*</Box>*/}
+                        </>
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : umapData ? (
-                        <UmapPlot data={umapData} />
+                        <div className={`umap-plot-container ${plotClass}`}>
+                              {selectedGenes.map((gene, index) => (
+                                <div key={index} className="umap-plot-item">
+                                    <div className="plot-wrapper">
+                                        <UmapPlot data={umapData} />
+                                    </div>
+                                </div>
+                              ))}
+                            </div>
                     ) : (
                         <Typography variant="h6">Select Samples & Genes to load plots</Typography>
                     )}

@@ -2,35 +2,41 @@ import { create } from "zustand";
 import {getUmapData} from "../api/api.js";
 
 const useGeneStore = create((set, get) => ({
-  selectedSamples: [],
-  selectedGenes: [],
-  umapData: null, // Store API response data
-  loading: false,
-  error: null,
+    dataSet: null,
+    selectedSamples: [],
+    selectedGenes: [],
+    umapData: null, // Store API response data
+    metaData: null,
+    loading: false,
+    error: null,
 
-  setSelectedSamples: async (samples) => {
-    set({ selectedSamples: samples });
-    await get().fetchUmapData();
-  },
+    setDataset: async (dataset) => {
+        set({ dataSet: dataset });
+    },
+    setSelectedSamples: async (samples) => {
+        set({ selectedSamples: samples });
+    },
 
-  setSelectedGenes: async (genes) => {
-    set({ selectedGenes: genes });
-    await get().fetchUmapData();
-  },
+    setSelectedGenes: async (genes) => {
+        set({ selectedGenes: genes });
+    },
 
-  fetchUmapData: async () => {
-    const { selectedSamples, selectedGenes } = get();
-    if (selectedSamples.length === 0 || selectedGenes.length === 0) return;
+    fetchUmapData: async () => {
+        const { dataSet, selectedSamples, selectedGenes } = get();
+        if(!dataSet){
+            set({ error: "No dataset selected", loading: false });
+            return;
+        }
 
-    set({ loading: true, error: null });
+        set({ loading: true, error: null });
 
-    try {
-      const response = await getUmapData(selectedSamples, selectedGenes);
-      set({ umapData: response.data, loading: false });
-    } catch (error) {
-      set({ error: "Failed to fetch UMAP data", loading: false });
-    }
-  },
+        try {
+            const response = await getUmapData(dataSet,selectedSamples, selectedGenes);
+            set({ umapData: response.data, loading: false });
+        } catch (error) {
+            set({ error: "Failed to fetch UMAP data:"+error, loading: false });
+        }
+    },
 }));
 
 export default useGeneStore;
