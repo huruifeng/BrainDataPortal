@@ -32,6 +32,8 @@ const useGeneStore = create((set, get) => ({
 
         try {
             if (!selectedGenes.length) {
+                // Clear the umapDataList
+                get().umapDataList = {};
                 // if no gene selected, assign a value "all"
                const response = await getUmapData(dataSet,selectedSamples, ["all"]);
                get().umapDataList["all"] = response.data;

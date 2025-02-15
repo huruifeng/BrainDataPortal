@@ -70,6 +70,9 @@ function GeneView() {
     const handleSampleChange = (event, newValue) => {
         setSelectedSamples(newValue);
         updateQueryParams(selectedGenes, newValue); // Pass the new value instead of old state
+        // if there is sample change, clear the umapDataList
+        useGeneStore.getState().umapDataList = {};
+
     };
 
     /** Handles gene selection change */
@@ -85,9 +88,9 @@ function GeneView() {
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
-    const plotClass = selectedGenes.length <= 1
-        ? "single-plot" : selectedGenes.length === 2
-            ? "two-plots" : selectedGenes.length === 3
+    const plotClass = Object.keys(umapDataList).length <= 1
+        ? "single-plot" : Object.keys(umapDataList).length === 2
+            ? "two-plots" : Object.keys(umapDataList).length === 3
                 ? "three-plots" : "four-plots";
 
     return (
@@ -154,6 +157,7 @@ function GeneView() {
                                             const newSamples = selectedSamples.filter(s => s !== option);
                                             setSelectedSamples(newSamples);
                                             updateQueryParams(selectedGenes, newSamples);
+                                            useGeneStore.getState().umapDataList = {};
                                         }}
                                     />
                                 );
@@ -192,7 +196,7 @@ function GeneView() {
                             ))}
                         </div>
                     ) : (
-                        <Typography variant="h6">Select Samples or Genes to load plots</Typography>
+                        <Typography variant="h6">Click the button to load plots</Typography>
                     )}
                 </div>
             </div>
