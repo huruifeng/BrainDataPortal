@@ -12,15 +12,20 @@ const UmapPlot = ({gene, data }) => {
     }));
 
  var options = {
-  xAxis: {},
-  yAxis: {},
-  series: [
-    {
-      symbolSize: 3,
-      data:scatterData,
-      type: 'scatter'
-    }
-  ]
+      title: {
+        text: gene==="all" ? "UMAP" : gene,
+        left: 'center',
+        top: 0
+      },
+      xAxis: {},
+      yAxis: {},
+      series: [
+        {
+          symbolSize: 3,
+          data:scatterData,
+          type: 'scatter'
+        }
+      ]
 };
 
   return <ReactECharts option={options} style={{ width: "100%", height: "100%" }} autoResize={true} />;
