@@ -68,10 +68,11 @@ def get_umap_echart(dataset, samples, genes):
             with open(gene_expr_file, 'r') as f:
                 cell_expr = json.load(f)
                 data_df[gene] = data_df.index.map(cell_expr).fillna(0)
-                colors = assign_colors_continuous(data_df[gene], cmap_name="Reds")
-                data_df[gene] = data_df[gene].astype(str)
-                data_df.loc[:,gene] = colors
+                # colors = assign_colors_continuous(data_df[gene], cmap_name="Reds")
+                # data_df[gene] = data_df[gene].astype(str)
+                # data_df.loc[:,gene] = colors
         data_df = data_df.loc[:, ["UMAP_1", "UMAP_2"]+genes]
+
     else:
         color_map = assign_colors_group(data_df['CellSubtypes'])
 

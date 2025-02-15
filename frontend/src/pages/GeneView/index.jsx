@@ -47,7 +47,7 @@ function GeneView() {
         const initialSelectedSamples = initialSamples.length ? initialSamples : [];
         const initialSelectedGenes = initialGenes.length ? initialGenes : [];
 
-        console.log("Dataset:", datasetId, "Selected Genes:", initialSelectedGenes, "Selected Samples:", initialSelectedSamples);
+        // console.log("Dataset:", datasetId, "Selected Genes:", initialSelectedGenes, "Selected Samples:", initialSelectedSamples);
         setDataset(datasetId);
 
         useGeneStore.setState({
