@@ -188,15 +188,27 @@ function GeneView() {
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : Object.keys(umapDataList).length > 0 ? (
-                            <div className={`umap-plot-container ${plotClass}`}>
+                        <>
+                            <div className={`umap-container ${plotClass}`}>
                                 {Object.entries(umapDataList).map(([gene, umap_data]) => (
-                                    <div key={gene} className="umap-plot-item">
-                                        <div className="plot-wrapper">
+                                    <div key={gene} className="umap-item">
+                                        <div className="umap-wrapper">
+                                            <UmapPlot gene={gene} data={umap_data} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className={`violin-container`}>
+                                {Object.entries(umapDataList).map(([gene, umap_data]) => (
+                                    <div key={gene} className="violin-item">
+                                        <div className="violin-wrapper">
                                             <ViolinPlot gene={gene} data={umap_data} />
                                         </div>
                                     </div>
                                 ))}
                             </div>
+                        </>
 
                     ) : (
                         <Typography variant="h6">Click the button to load plots</Typography>

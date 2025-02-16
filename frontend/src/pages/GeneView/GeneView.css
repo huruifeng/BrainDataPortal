@@ -47,8 +47,8 @@
 
 /* Left Panel (Fixed Width) */
 .plot-panel {
-  width: 20%;
-  min-width: 250px;
+  min-width: 25%;
+  /*min-width: 250px;*/
   padding: 10px;
   background-color: #f8f9fa;
   border-right: 1px solid #ddd;
@@ -60,14 +60,14 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: 0;
+  padding: 10px;
   overflow: hidden;
   align-items: center;
 }
 
 
 /*=======================================*/
-.umap-plot-container {
+.umap-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(0, 1fr)); /* Flexible columns */
   grid-gap: 2px 4px; /* Space between plots */
@@ -76,42 +76,41 @@
 }
 
 /* Dynamically adjust the number of columns */
-.umap-plot-container.single-plot {
+.umap-container.single-plot {
   grid-template-columns: 1fr;
   width: 70%;
-  height: 70%;
 }
 
-.umap-plot-container.two-plots {
+.umap-container.two-plots {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.umap-plot-container.three-plots {
+.umap-container.three-plots {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.umap-plot-container.four-plots {
+.umap-container.four-plots {
   grid-template-columns: repeat(3, 1fr); /* First row has 3 */
 }
 
 /* Maximum of 3 plots per row */
 @media (min-width: 600px) {
-  .umap-plot-container {
+  .umap-container {
     grid-template-columns: repeat(1, 1fr);
   }
 }
 @media (min-width: 900px) {
-  .umap-plot-container {
+  .umap-container {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 @media (min-width: 1200px) {
-  .umap-plot-container {
+  .umap-container {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-.umap-plot-item {
+.umap-item {
   aspect-ratio: 1 / 1; /* Maintain square shape */
   background-color: #f0f0f0;
   border: 1px solid #ddd;
@@ -122,7 +121,7 @@
   width: 100%;
 }
 
-.plot-wrapper {
+.umap-wrapper {
   width: 100%;
   height: 100%;
   display: flex;
@@ -130,13 +129,30 @@
   align-items: center;
 }
 
-.plot-wrapper > * {
+.umap-wrapper > * {
   width: 100%;
   height: 100%;
 }
 
 
+/*=======================================*!*/
+.violin-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center plots */
+    align-items: center;
+    margin-top: 20px;
+}
 
+.violin-item {
+    width: 100%;
+    max-width: 100%;
+}
+
+.violin-wrapper {
+    width: 100%;
+}
 
 
 
