@@ -16,6 +16,8 @@ import { useParams, useSearchParams } from "react-router-dom";
 import useGeneStore from "../../store/GeneStore.js";
 import useDataStore from "../../store/DataStore.js";
 import UmapPlot from "./UmapPlot.jsx";
+import ViolinPlot from "./ViolinPlot.jsx";
+
 import "./GeneView.css";
 
 function GeneView() {
@@ -186,15 +188,16 @@ function GeneView() {
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : Object.keys(umapDataList).length > 0 ? (
-                        <div className={`umap-plot-container ${plotClass}`}>
-                            {Object.entries(umapDataList).map(([gene, umap_data]) => (
-                                <div key={gene} className="umap-plot-item">
-                                    <div className="plot-wrapper">
-                                        <UmapPlot gene={gene} data={umap_data} />
+                            <div className={`umap-plot-container ${plotClass}`}>
+                                {Object.entries(umapDataList).map(([gene, umap_data]) => (
+                                    <div key={gene} className="umap-plot-item">
+                                        <div className="plot-wrapper">
+                                            <ViolinPlot gene={gene} data={umap_data} />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+
                     ) : (
                         <Typography variant="h6">Click the button to load plots</Typography>
                     )}

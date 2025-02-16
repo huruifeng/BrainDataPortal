@@ -1,56 +1,6 @@
 import os
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-import numpy as np
 import pandas as pd
 import json
-
-def assign_colors_group(groups):
-    """
-    Assigns distinct colors to dots based on their belonging groups.
-    Ensures 'Other' is always gray.
-
-    Parameters:
-    groups (list): A list of group labels.
-
-    Returns:
-    dict: A dictionary mapping each group to a HEX color.
-    """
-    unique_groups = list(set(groups))
-
-    # Ensure 'Other' is assigned gray
-    if "Other" in unique_groups:
-        unique_groups.remove("Other")
-
-    num_groups = len(unique_groups)  # Update num_groups after removing "Other"
-
-    # Use a colormap for distinct colors
-    cmap = plt.get_cmap("tab10" if num_groups <= 10 else "tab20")
-    colors = {group: mcolors.to_hex(cmap(i / max(1, num_groups))) for i, group in enumerate(unique_groups)}
-
-    # Assign gray to 'Other'
-    colors["Other"] = "#80808080"
-
-    return colors
-
-
-def assign_colors_continuous(values, cmap_name="viridis"):
-    """
-    Assigns colors in HEX format based on continuous values.
-
-    Parameters:
-    values (list or np.array): A list or array of continuous values.
-    cmap_name (str): Name of the colormap to use, like "viridis","Reds", "Purples".
-
-    Returns:
-    list: A list of HEX color codes corresponding to the input values.
-    """
-    values = np.array(values)
-    norm = plt.Normalize(vmin=values.min(), vmax=values.max())  # Normalize values
-    cmap = plt.get_cmap(cmap_name)  # Get colormap
-    colors = [mcolors.to_hex(cmap(norm(v))) for v in values]  # Convert to HEX
-
-    return colors  # Map values to colors
 
 
 def get_umap_echart(dataset, samples, genes):
@@ -69,12 +19,9 @@ def get_umap_echart(dataset, samples, genes):
             with open(gene_expr_file, 'r') as f:
                 cell_expr = json.load(f)
                 data_df[gene] = data_df.index.map(cell_expr).fillna(0)
-        data_df = data_df.loc[:, ["UMAP_1", "UMAP_2"]+genes]
+        data_df = data_df.loc[:, ["UMAP_1", "UMAP_2","MajorCellTypes"]+genes]
 
     else:
-        ## plot cell groups, color by cell groups
-        # color_map = assign_colors_group(data_df['CellSubtypes'])
-        # data_df['color'] = data_df['CellSubtypes'].map(color_map)
         data_df = data_df.loc[:, ["UMAP_1", "UMAP_2", "MajorCellTypes"]]
 
     results =  data_df.to_dict(orient="records")
