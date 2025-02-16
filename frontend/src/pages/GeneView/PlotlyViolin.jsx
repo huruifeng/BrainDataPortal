@@ -3,6 +3,7 @@ import Plot from "react-plotly.js";
 import { groupBy } from "lodash";
 
 const PlotlyViolin = ({ gene, data, group }) => {
+  if(gene==="all") return null;
   const groupedData = groupBy(data, group);
   const xCategories = Object.keys(groupedData);
 

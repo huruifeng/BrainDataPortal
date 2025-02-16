@@ -4,6 +4,8 @@ import { groupBy, min, max } from "lodash";
 import * as d3 from "d3";
 
 const EChartViolin = ({ gene, data, group }) => {
+    if(gene==="all") return null;
+
   const groupedData = groupBy(data, group);
   const xCategories = Object.keys(groupedData);
 
