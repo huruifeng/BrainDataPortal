@@ -16,7 +16,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import useGeneStore from "../../store/GeneStore.js";
 import useDataStore from "../../store/DataStore.js";
 import UmapPlot from "./UmapPlot.jsx";
-import ViolinPlot from "./ViolinPlot.jsx";
+import {ViolinPlot,StackedViolinPlot} from "./ViolinPlot.jsx";
 
 import "./GeneView.css";
 
@@ -214,7 +214,7 @@ function GeneView() {
                             <div className={`violin-container`}>
                                 <div key='stacked_violin' className="violin-item">
                                     <div className="violin-wrapper">
-                                        <ViolinPlot gene={"stacked_violin"} data={umapDataList} />
+                                        <StackedViolinPlot gene={"stacked_violin"} data={umapDataList} />
                                     </div>
                                 </div>
                             </div>

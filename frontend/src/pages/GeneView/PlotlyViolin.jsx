@@ -5,6 +5,7 @@ import { groupBy } from "lodash";
 const PlotlyViolin = ({ gene, data, group }) => {
   if(gene==="all") return null;
   const groupedData = groupBy(data, group);
+  console.log(groupedData)
   const xCategories = Object.keys(groupedData);
 
   const traces = xCategories.map((cellType) => ({
