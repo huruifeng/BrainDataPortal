@@ -4,19 +4,6 @@ const BASE_URL = "http://localhost:8000"; // Replace with your backend URL
 
 const API_URL = `${BASE_URL}/api`;
 
-function jsonToQueryString(json) {
-    const params = new URLSearchParams();
-
-    for (const [key, value] of Object.entries(json)) {
-      if (Array.isArray(value)) {
-        value.forEach(val => params.append(key, val));
-      } else {
-        params.append(key, value);
-      }
-    }
-    return params.toString();
-}
-
 export const getUmapData = async (dataset, samples, genes) => {
     try {
         const response = await axios.get(`${API_URL}/getumapdata`, {params: {dataset:dataset,samples:samples,genes:genes}});

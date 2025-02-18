@@ -11,7 +11,7 @@ const PlotlyViolin = ({ gene, data, group }) => {
     type: "violin",
     name: cellType,
     y: groupedData[cellType].map((d) => d[gene]),
-    box: { visible: true }, // Show box plot inside violin
+    box: { visible: false }, // Show box plot inside violin
     meanline: { visible: true }, // Show mean line
     points: false, // Show all data points
     jitter: 0.3, // Spread out points for visibility

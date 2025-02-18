@@ -199,14 +199,24 @@ function GeneView() {
                                 ))}
                             </div>
 
+                            {/*plot the violin plot individually for each gene*/}
+                            {/*<div className={`violin-container`}>*/}
+                            {/*    {Object.entries(umapDataList).map(([gene, umap_data]) => (*/}
+                            {/*        <div key={gene} className="violin-item">*/}
+                            {/*            <div className="violin-wrapper">*/}
+                            {/*                <ViolinPlot gene={gene} data={umap_data} />*/}
+                            {/*            </div>*/}
+                            {/*        </div>*/}
+                            {/*    ))}*/}
+                            {/*</div>*/}
+
+                            {/*plot the stacked violin plot*/}
                             <div className={`violin-container`}>
-                                {Object.entries(umapDataList).map(([gene, umap_data]) => (
-                                    <div key={gene} className="violin-item">
-                                        <div className="violin-wrapper">
-                                            <ViolinPlot gene={gene} data={umap_data} />
-                                        </div>
+                                <div key='stacked_violin' className="violin-item">
+                                    <div className="violin-wrapper">
+                                        <ViolinPlot gene={"stacked_violin"} data={umapDataList} />
                                     </div>
-                                ))}
+                                </div>
                             </div>
                         </>
 

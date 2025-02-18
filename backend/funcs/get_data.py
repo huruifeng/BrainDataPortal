@@ -20,7 +20,6 @@ def get_umap_echart(dataset, samples, genes):
                 cell_expr = json.load(f)
                 data_df[gene] = data_df.index.map(cell_expr).fillna(0)
         data_df = data_df.loc[:, ["UMAP_1", "UMAP_2","MajorCellTypes"]+genes]
-
     else:
         data_df = data_df.loc[:, ["UMAP_1", "UMAP_2", "MajorCellTypes"]]
 
