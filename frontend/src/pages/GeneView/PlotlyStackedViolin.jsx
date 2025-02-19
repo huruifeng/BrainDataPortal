@@ -43,16 +43,19 @@ const PlotlyStackedViolin = ({data, group}) => {
     // Create subplot layout
     const createLayout = () => {
         const rows = genes.length;
+        const totalHeight = 100 * rows + 50; // Dynamically adjust height
         const layout = {
             grid: {rows, columns: 1, pattern: 'independent',},
-            height: `${150 * rows + 80}px`, // Adjust height based on number of genes
+            height: totalHeight, // Adjust height based on number of genes
             title: 'Stacked Violin Plot',
-            margin: { t: 5, b: 80, l: 50, r: 50 }, // Reduce white space
+            margin: { t: 5, b: 50, l: 50, r: 50 }, // Reduce white space
             annotations: [],
         };
 
         genes.forEach((gene, index) => {
-            const yPos = 1 - (index / rows) - 0.5 / rows; // Position annotation on the left of each row
+            const rowHeightFraction = 1 / rows;
+            const yMin = 1 - (index + 1) * rowHeightFraction;
+            const yMax = 1 - index * rowHeightFraction;
 
             layout[`xaxis${index + 1}`] = {
                 title: index === genes.length - 1 ? 'Cell Type' : '',
@@ -64,11 +67,11 @@ const PlotlyStackedViolin = ({data, group}) => {
             layout[`yaxis${index + 1}`] = {
                 title: { text: gene, font: { size: 12 } },
                 automargin: true, // Prevent axis labels from being cut off
-                domain: [1 - (index + 1) / rows, 1 - index / rows], // Reduce space between rows
+                domain: [yMin, yMax], // Reduce space between rows
             };
             layout.annotations.push({
                 x: -0.2, // Position to the left of y-axis
-                y: yPos,
+                y: (yMin + yMax) / 2,
                 text: gene,
                 showarrow: false,
                 xref: "paper",
