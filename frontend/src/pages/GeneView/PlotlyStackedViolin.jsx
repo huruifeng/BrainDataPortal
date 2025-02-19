@@ -45,7 +45,7 @@ const PlotlyStackedViolin = ({data, group}) => {
         const rows = genes.length;
         const layout = {
             grid: {rows, columns: 1, pattern: 'independent',},
-            height: `${100 * rows + 80}px`, // Adjust height based on number of genes
+            height: `${150 * rows + 80}px`, // Adjust height based on number of genes
             title: 'Stacked Violin Plot',
             margin: { t: 5, b: 80, l: 50, r: 50 }, // Reduce white space
             annotations: [],
