@@ -33,6 +33,7 @@ const PlotlyStackedViolin = ({data, group}) => {
                     scalemode: "count",
                     line: { width: 1 },
                     jitter: 0.3,
+                    // fillcolor: 'rgba(50, 100, 250, 0.5)',
                 };
             });
             return traces;
@@ -44,21 +45,37 @@ const PlotlyStackedViolin = ({data, group}) => {
         const rows = genes.length;
         const layout = {
             grid: {rows, columns: 1, pattern: 'independent',},
-            height: `${200 * rows + 80}px`, // Adjust height based on number of genes
+            height: `${100 * rows + 80}px`, // Adjust height based on number of genes
             title: 'Stacked Violin Plot',
             margin: { t: 5, b: 80, l: 50, r: 50 }, // Reduce white space
+            annotations: [],
         };
 
         genes.forEach((gene, index) => {
+            const yPos = 1 - (index / rows) - 0.5 / rows; // Position annotation on the left of each row
+
             layout[`xaxis${index + 1}`] = {
                 title: index === genes.length - 1 ? 'Cell Type' : '',
                 range: [-0.5, xCategories.length - 0.5],
                 showticklabels: index === genes.length - 1,
+                automargin: true,
+                type: "category",
             };
             layout[`yaxis${index + 1}`] = {
-                title: gene,
-                titlefont: { size: 10 },
+                title: { text: gene, font: { size: 12 } },
+                automargin: true, // Prevent axis labels from being cut off
+                domain: [1 - (index + 1) / rows, 1 - index / rows], // Reduce space between rows
             };
+            layout.annotations.push({
+                x: -0.2, // Position to the left of y-axis
+                y: yPos,
+                text: gene,
+                showarrow: false,
+                xref: "paper",
+                yref: "paper",
+                font: { size: 12, color: "black" },
+                align: "right",
+              });
         });
 
         return layout;

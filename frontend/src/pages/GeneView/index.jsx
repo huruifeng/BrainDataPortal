@@ -211,7 +211,7 @@ function GeneView() {
                             {/*</div>*/}
 
                             {/*plot the stacked violin plot*/}
-                            <div className={`violin-container`}>
+                            <div className={`violin-container`} style={{ marginTop: "20px", marginBottom: "20px", minHeight: `${Object.keys(umapDataList).length*100 + 80}px` }}>
                                 <div key='stacked_violin' className="violin-item">
                                     <div className="violin-wrapper">
                                         <StackedViolinPlot gene={"stacked_violin"} data={umapDataList} />
