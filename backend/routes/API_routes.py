@@ -18,7 +18,7 @@ async def getumapdata(request:Request):
     samples = request.query_params.getlist("samples[]")
     genes = request.query_params.getlist("genes[]")
 
-    response = get_umap_echart(dataset,samples, genes)
+    response = get_umap_chart(dataset,samples, genes)
     # print (response)
     if not response:
         raise HTTPException(status_code=404, detail="Error in getting UMAP matrix.")
@@ -27,9 +27,13 @@ async def getumapdata(request:Request):
 @router.get("/getallgenes")
 async def getallgenes(request:Request):
     dataset = request.query_params.get("dataset_id")
-    response = get_all_genes(dataset)
-    if not response:
-        raise HTTPException(status_code=404, detail="Gene list file is missing")
+    genes = get_all_genes(dataset)
+    meta = get_meta_names(dataset)
+
+    if not genes:
+        raise HTTPException(status_code=404, detail="Gene list file or meta file is missing")
+
+    response = {"genes": genes, "meta": meta}
     return response
 
 @router.get("/getdata/{data_id}")

@@ -6,7 +6,6 @@ const useGeneStore = create((set, get) => ({
     selectedSamples: [],
     selectedGenes: [],
     umapDataList: {},// Store API response data
-    metaData: null,
     loading: false,
     error: null,
 

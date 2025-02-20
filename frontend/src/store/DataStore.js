@@ -13,7 +13,10 @@ const useDataStore = create((set) => ({
     datasetfetchStatus: null,
 
     geneList: [],
+    metaData: [],
     genefetchStatus: null,
+
+
 
     fetchDataTable: async (dataset_id="all") => {
         try {
@@ -85,18 +88,18 @@ const useDataStore = create((set) => ({
             // console.log(response);
             if(response.status === 200){
                 const data = await response.data;
-                await set({ geneList: data, genefetchStatus: "success" });
+                await set({ geneList: data.genes, metaData: data.meta, genefetchStatus: "success" });
                 // toast.success("Sample loaded successfully!");
             }else{
                 console.error("Error fetching data:", response.data);
-                await set({ geneList: [], genefetchStatus: "failed" });
-                 toast.error("Failed to fetch gene list.");
+                await set({ geneList: [], metaData: [], genefetchStatus: "failed" });
+                 toast.error("Failed to fetch gene list and metadata.");
             }
 
         } catch (error) {
             console.error("Error fetching data:", error);
-            await set({ geneList: [], genefetchStatus: "error" });
-            toast.error("Error while fetching gene list.");
+            await set({ geneList: [],metaData: [], genefetchStatus: "error" });
+            toast.error("Error while fetching gene list and metadata.");
         }
     }
 

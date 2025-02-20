@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 
-def get_umap_echart(dataset, samples, genes):
+def get_umap_chart(dataset, samples, genes):
     umap_embeddings_file = os.path.join("backend","datasets",dataset, 'umap_embeddings_with_meta_100k.csv')
     data_df = pd.read_csv(umap_embeddings_file, index_col=0, header=0)
     ## Cell,UMAP_1,UMAP_2,sample_id,case,sex,age,seurat_clusters,MajorCellTypes,CellSubtypes
@@ -39,4 +39,23 @@ def get_all_genes(dataset):
         return data
     else:
         print(genes_file + " not found")
+        return 0
+
+def get_meta_names(dataset):
+    if dataset == "all":
+        return 0
+    else:
+        meta_file = os.path.join("backend","datasets",dataset,'metadata_lite.csv')
+
+    if os.path.exists(meta_file):
+        with open(meta_file, 'r') as f:
+            data_df = pd.read_csv(meta_file, index_col=0, header=0)
+            data = data_df.columns.tolist()
+        if "sample_id" in data: data.remove("sample_id")
+        if "cell_id" in data: data.remove("cell_id")
+        if "spot_id" in data: data.remove("spot_id")
+
+        return data
+    else:
+        print( "Meta file not found")
         return 0
