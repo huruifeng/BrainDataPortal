@@ -82,7 +82,7 @@ const useDataStore = create((set) => ({
         }
     },
 
-    fetchGeneList: async (dataset_id="all") => {
+    fetchGeneMeta: async (dataset_id="all") => {
         try {
             const response = await getAllGenes_get(dataset_id);
             // console.log(response);

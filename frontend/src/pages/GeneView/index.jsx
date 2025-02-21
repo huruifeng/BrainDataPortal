@@ -28,10 +28,10 @@ function GeneView() {
     const initialGenes = queryParams.getAll("gene");
     const initialSamples = queryParams.getAll("sample");
 
-    const { sampleRecords, fetchSampleData, geneList, fetchGeneList } = useDataStore();
+    const { sampleRecords, fetchSampleData, geneList, metaData, fetchGeneMeta } = useDataStore();
     useEffect(() => {
         fetchSampleData({ dataset_id: datasetId });
-        fetchGeneList(datasetId);
+        fetchGeneMeta(datasetId);
     }, [fetchSampleData]);
 
     const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
