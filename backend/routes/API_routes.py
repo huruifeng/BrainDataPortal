@@ -24,14 +24,17 @@ async def getumapdata(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting UMAP matrix.")
     return response
 
-@router.get("/getallgenes")
-async def getallgenes(request:Request):
+@router.get("/getgenemeta")
+async def getallgenemeta(request:Request):
     dataset = request.query_params.get("dataset_id")
     genes = get_all_genes(dataset)
     meta = get_meta_names(dataset)
 
-    if not genes:
-        raise HTTPException(status_code=404, detail="Gene list file or meta file is missing")
+    if "Error" in genes:
+        raise HTTPException(status_code=404, detail="Gene list file is missing")
+
+    if "Error" in meta:
+        raise HTTPException(status_code=404, detail="Dataset not specified or Meta file is missing")
 
     response = {"genes": genes, "meta": meta}
     return response

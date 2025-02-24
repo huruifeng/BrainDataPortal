@@ -8,7 +8,7 @@ import {
     Chip,
     TextField,
     Button,
-    LinearProgress
+    LinearProgress, InputLabel, FormControl, Select, MenuItem
 } from "@mui/material";
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import { useParams, useSearchParams } from "react-router-dom";
@@ -76,6 +76,9 @@ function GeneView() {
         useGeneStore.getState().umapDataList = {};
 
     };
+
+    const {grouping, setGrouping} = useState(metaData[0]);
+    const {coloring, setColoring} = useState(metaData[0]);
 
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
@@ -170,8 +173,58 @@ function GeneView() {
 
                     {/* a button to fetch data and a loading indicator*/}
                     <Box sx={{ display: "flex", justifyContent: "center", margin: "10px 0px" }}>
-                        <Button variant="outlined" endIcon={<ScatterPlotIcon />} disabled={loading} onClick={handleLoadPlot}>Load plots</Button>
+                        <Button variant="outlined" endIcon={<ScatterPlotIcon />} disabled={loading} onClick={handleLoadPlot}>
+                             {loading ? "Loading plots..." : "Load Plots"}
+                        </Button>
                     </Box>
+
+                    <Divider sx={{mt: 4}} />
+                    <Typography variant="subtitle1">Change plotting options:</Typography>
+
+                     {/*a dropdown to select the options on how to color the plot*/}
+                    <Box sx={{ display: "flex", justifyContent: "start", margin: "10px 0px" }}>
+                        <FormControl variant="standard" sx={{ width: "100%" }}>
+                            <InputLabel id="coloring-label">Coloring</InputLabel>
+                            <Select
+                                labelId="coloring-label"
+                                id="coloring-select"
+                                value={coloring}
+                                onChange={(event) => setColoring(event.target.value)}
+                                label="Coloring"
+                                size="small"
+                                variant="standard"
+                            >
+                                {metaData.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
+
+                    {/*a dropdown to select the options on how to group the data*/}
+                    <Box sx={{ display: "flex", justifyContent: "start", margin: "10px 0px" }}>
+                        <FormControl variant="standard" sx={{ width: "100%" }}>
+                            <InputLabel id="grouping-label">Grouping</InputLabel>
+                            <Select
+                                labelId="grouping-label"
+                                id="grouping-select"
+                                value={grouping}
+                                onChange={(event) => setGrouping(event.target.value)}
+                                label="Grouping"
+                                size="small"
+                                variant="standard"
+                            >
+                                {metaData.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
+
 
                 </div>
                 {/* Left UMAP Plot Area (80%) */}

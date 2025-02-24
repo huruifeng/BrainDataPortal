@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import { toast } from "react-toastify";
-import {getAllGenes_get, getData_get, getDataset_get, getSample_get} from "../api/api.js";
+import {getGeneMeta_get, getData_get, getDataset_get, getSample_get} from "../api/api.js";
 
 const useDataStore = create((set) => ({
     dataRecords: [],
@@ -15,7 +15,6 @@ const useDataStore = create((set) => ({
     geneList: [],
     metaData: [],
     genefetchStatus: null,
-
 
 
     fetchDataTable: async (dataset_id="all") => {
@@ -84,7 +83,7 @@ const useDataStore = create((set) => ({
 
     fetchGeneMeta: async (dataset_id="all") => {
         try {
-            const response = await getAllGenes_get(dataset_id);
+            const response = await getGeneMeta_get(dataset_id);
             // console.log(response);
             if(response.status === 200){
                 const data = await response.data;

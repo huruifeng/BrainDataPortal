@@ -14,9 +14,9 @@ export const getUmapData = async (dataset, samples, genes) => {
     }
 }
 
-export const getAllGenes_get = async (dataset_id="all") => {
+export const getGeneMeta_get = async (dataset_id="all") => {
     try {
-        const response = await axios.get(`${API_URL}/getallgenes`, {params: {dataset_id: dataset_id}});
+        const response = await axios.get(`${API_URL}/getgenemeta`, {params: {dataset_id: dataset_id}});
         return response;
     } catch (error) {
         console.error("Error reading gene records:", error);

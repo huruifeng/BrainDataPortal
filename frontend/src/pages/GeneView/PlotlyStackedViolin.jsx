@@ -1,10 +1,8 @@
-import React from 'react';
 import Plot from 'react-plotly.js';
 import {groupBy} from "lodash";
 
 const PlotlyStackedViolin = ({gene, data, group}) => {
     if (gene === "all") return null;
-    if (gene === "stacked_violin") return null;
     if (!data || data.length === 0) return <p>No data available</p>;
     const expressionData = {};
     const genes = Object.keys(data);
