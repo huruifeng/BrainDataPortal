@@ -77,8 +77,6 @@ function GeneView() {
 
     };
 
-    const {grouping, setGrouping} = useState(metaData[0]);
-    const {coloring, setColoring} = useState(metaData[0]);
 
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
@@ -90,6 +88,16 @@ function GeneView() {
     const handleLoadPlot = () => {
         setDataset(datasetId)
          useGeneStore.getState().fetchUmapData();
+    }
+
+    const {grouping, setGrouping} = useState(metaData[0]);
+    const handleGroupingChange = (event) => {
+        setGrouping(event.target.value);
+    }
+
+     const {coloring, setColoring} = useState(metaData[0]);
+    const handleColoringChange = (event) => {
+        setColoring(event.target.value);
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
@@ -184,13 +192,12 @@ function GeneView() {
                      {/*a dropdown to select the options on how to color the plot*/}
                     <Box sx={{ display: "flex", justifyContent: "start", margin: "10px 0px" }}>
                         <FormControl variant="standard" sx={{ width: "100%" }}>
-                            <InputLabel id="coloring-label">Coloring</InputLabel>
+                            <InputLabel id="coloring-label">UMAP coloring</InputLabel>
                             <Select
                                 labelId="coloring-label"
                                 id="coloring-select"
                                 value={coloring}
-                                onChange={(event) => setColoring(event.target.value)}
-                                label="Coloring"
+                                onChange={handleColoringChange}
                                 size="small"
                                 variant="standard"
                             >
@@ -206,13 +213,12 @@ function GeneView() {
                     {/*a dropdown to select the options on how to group the data*/}
                     <Box sx={{ display: "flex", justifyContent: "start", margin: "10px 0px" }}>
                         <FormControl variant="standard" sx={{ width: "100%" }}>
-                            <InputLabel id="grouping-label">Grouping</InputLabel>
+                            <InputLabel id="grouping-label">Gene grouping</InputLabel>
                             <Select
                                 labelId="grouping-label"
                                 id="grouping-select"
                                 value={grouping}
-                                onChange={(event) => setGrouping(event.target.value)}
-                                label="Grouping"
+                                onChange={handleGroupingChange}
                                 size="small"
                                 variant="standard"
                             >
