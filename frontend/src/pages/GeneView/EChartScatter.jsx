@@ -1,6 +1,6 @@
 import ReactECharts from "echarts-for-react";
 import React from "react";
-const EChartScatter = ({gene, data, group}) => {
+const EChartScatter = ({gene, data, color, group}) => {
 
     if (!data || data.length === 0) return <p>No data available</p>;
     var options = {};

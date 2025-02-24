@@ -16,7 +16,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import useGeneStore from "../../store/GeneStore.js";
 import useDataStore from "../../store/DataStore.js";
 import UmapPlot from "./UmapPlot.jsx";
-import {ViolinPlot,StackedViolinPlot} from "./ViolinPlot.jsx";
+import {PlotlyViolinPlot,EChartViolinPlot,StackedViolinPlot} from "./ViolinPlot.jsx";
 
 import "./GeneView.css";
 
@@ -27,6 +27,11 @@ function GeneView() {
     const [queryParams, setQueryParams] = useSearchParams();
     const initialGenes = queryParams.getAll("gene");
     const initialSamples = queryParams.getAll("sample");
+    const initialColoring = queryParams.get("color") ?? null;
+    const initialGrouping = queryParams.get("group") ?? null;
+
+    const [coloring, setColoring] = useState(initialColoring);
+    const [grouping, setGrouping] = useState(initialGrouping);
 
     const { sampleRecords, fetchSampleData, geneList, metaData, fetchGeneMeta } = useDataStore();
     useEffect(() => {
@@ -61,10 +66,12 @@ function GeneView() {
     }, []);
 
     /** Updates the query parameters in the URL */
-    const updateQueryParams = (genes, samples) => {
+    const updateQueryParams = (genes, samples, color=null, group=null) => {
         const newParams = new URLSearchParams();
         genes.forEach((gene) => newParams.append("gene", gene));
         samples.forEach((sample) => newParams.append("sample", sample));
+        if(color) newParams.append("color", color);
+        if(group) newParams.append("group", group);
         setQueryParams(newParams);
     };
 
@@ -76,7 +83,6 @@ function GeneView() {
         useGeneStore.getState().umapDataList = {};
 
     };
-
 
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
@@ -90,14 +96,17 @@ function GeneView() {
          useGeneStore.getState().fetchUmapData();
     }
 
-    const {grouping, setGrouping} = useState(metaData[0]);
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value);
+        updateQueryParams(selectedGenes, selectedSamples, coloring, event.target.value);
+
     }
 
-     const {coloring, setColoring} = useState(metaData[0]);
+
     const handleColoringChange = (event) => {
         setColoring(event.target.value);
+        updateQueryParams(selectedGenes, selectedSamples, event.target.value, grouping);
+
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
@@ -252,18 +261,18 @@ function GeneView() {
                                 {Object.entries(umapDataList).map(([gene, umap_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            <UmapPlot gene={gene} data={umap_data} />
+                                            <UmapPlot gene={gene} data={umap_data} color={coloring} group={grouping} />
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {/*plot the violin plot individually for each gene*/}
+                            {/*/!*plot the violin plot individually for each gene*!/*/}
                             {/*<div className={`violin-container`}>*/}
                             {/*    {Object.entries(umapDataList).map(([gene, umap_data]) => (*/}
                             {/*        <div key={gene} className="violin-item">*/}
                             {/*            <div className="violin-wrapper">*/}
-                            {/*                <ViolinPlot gene={gene} data={umap_data} />*/}
+                            {/*                <PlotlyViolinPlot gene={gene} data={umap_data} color={coloring} group={grouping} />*/}
                             {/*            </div>*/}
                             {/*        </div>*/}
                             {/*    ))}*/}
@@ -273,7 +282,7 @@ function GeneView() {
                             <div className={`violin-container`}>
                                 <div key='stacked_violin' className="violin-item">
                                     <div className="violin-wrapper">
-                                        <StackedViolinPlot gene={"stacked_violin"} data={umapDataList} />
+                                        <StackedViolinPlot gene={"stacked_violin"} data={umapDataList} color={coloring} group={grouping} />
                                     </div>
                                 </div>
                             </div>

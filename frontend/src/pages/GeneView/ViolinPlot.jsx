@@ -4,15 +4,15 @@ import EChartViolin from "./EChartViolin.jsx";
 import PlotlyViolin from "./PlotlyViolin.jsx";
 import PlotlyStackedViolin from "./PlotlyStackedViolin.jsx";
 
-export const ViolinPlot = ({gene, data }) => {
-  return <PlotlyViolin  gene={gene} data={data} group={"MajorCellTypes"}/>;
+export const PlotlyViolinPlot = ({gene, data, color, group }) => {
+  return <PlotlyViolin  gene={gene} data={data} color={color} group={"MajorCellTypes"}/>;
 };
 
 
-export const StackedViolinPlot = ({gene, data }) => {
-  return <PlotlyStackedViolin  gene={gene} data={data} group={"MajorCellTypes"} />;
+export const StackedViolinPlot = ({gene, data, color, group }) => {
+  return <PlotlyStackedViolin  gene={gene} data={data} color={color} group={"MajorCellTypes"} />;
 };
 
-export const EChartViolinPlot = ({gene, data }) => {
-  return <EChartViolin  data={data} group={"MajorCellTypes"} />;
+export const EChartViolinPlot = ({gene, data, color, group }) => {
+  return <EChartViolin gene={gene} data={data} color={color} group={"MajorCellTypes"} />;
 };

@@ -3,7 +3,7 @@ import ReactECharts from "echarts-for-react";
 import { groupBy, min, max } from "lodash";
 import * as d3 from "d3";
 
-const EChartViolin = ({ gene, data, group }) => {
+const EChartViolin = ({ gene, data, color, group }) => {
     if(gene==="all") return null;
 
   const groupedData = groupBy(data, group);
@@ -26,7 +26,7 @@ const EChartViolin = ({ gene, data, group }) => {
 
   // KDE parameters
   const bandwidth = 0.2;
-  const maxViolinWidth = 0.5;
+  const maxViolinWidth = 0.3;
   const kdeThresholds = d3.range(
     globalMin - bandwidth,
     globalMax + bandwidth,
@@ -71,6 +71,7 @@ const EChartViolin = ({ gene, data, group }) => {
         shape: { points: polygon.map(([x, y]) => api.coord([x, y])) },
         style: api.style({
           fill: api.visual("color"),
+          stroke: api.visual("color"),
           opacity: 0.6,
         }),
       }),

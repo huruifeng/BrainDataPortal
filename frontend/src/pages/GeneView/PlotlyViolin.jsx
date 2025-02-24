@@ -2,7 +2,7 @@ import React from "react";
 import Plot from "react-plotly.js";
 import { groupBy } from "lodash";
 
-const PlotlyViolin = ({ gene, data, group }) => {
+const PlotlyViolin = ({ gene, data,color, group }) => {
   if(gene==="all") return null;
   const groupedData = groupBy(data, group);
   console.log(groupedData)
