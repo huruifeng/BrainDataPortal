@@ -104,7 +104,7 @@ def get_all_genes(dataset):
         print(genes_file + " not found")
         return "Error: Gene list file not found"
 
-def get_meta_names(dataset):
+def get_meta_data(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
@@ -112,10 +112,7 @@ def get_meta_names(dataset):
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=0, header=0)
-            data = data_df.columns.tolist()
-        if "sample_id" in data: data.remove("sample_id")
-        if "cell_id" in data: data.remove("cell_id")
-        if "spot_id" in data: data.remove("spot_id")
-        return data
+            data = data_df.to_dict(orient="records")
+            return data
     else:
         return "Error: Meta file not found"

@@ -30,7 +30,7 @@ async def getumapdata(request:Request):
 async def getallgenemeta(request:Request):
     dataset = request.query_params.get("dataset_id")
     genes = get_all_genes(dataset)
-    meta = get_meta_names(dataset)
+    meta = get_meta_data(dataset)
 
     if "Error" in genes:
         raise HTTPException(status_code=404, detail="Gene list file is missing")
