@@ -99,11 +99,13 @@ function GeneView() {
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, coloring, event.target.value);
+        useGeneStore.getState().umapDataList = {};
     }
 
     const handleColoringChange = (event) => {
         setColoring(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, event.target.value, grouping);
+        useGeneStore.getState().umapDataList = {};
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);

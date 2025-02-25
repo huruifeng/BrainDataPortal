@@ -39,6 +39,12 @@ const useGeneStore = create((set, get) => ({
 
         set({ loading: true, error: null });
 
+        if(color!==get().currentColor || group!==get().currentGroup){
+            get().umapDataList = {};
+            get().currentColor = color;
+            get().currentGroup = group;
+        }
+
         try {
             if (!selectedGenes.length) {
                 // Clear the umapDataList
