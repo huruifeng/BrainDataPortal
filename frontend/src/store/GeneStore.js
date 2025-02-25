@@ -8,6 +8,8 @@ const useGeneStore = create((set, get) => ({
     umapDataList: {},// Store API response data
     loading: false,
     error: null,
+    // currentGroup: {value: "MajorCellTypes", type: "Categorical"},
+    // currentColor: {value: "MajorCellTypes", type: "Categorical"},
     currentGroup: "MajorCellTypes",
     currentColor: "MajorCellTypes",
 
@@ -22,12 +24,11 @@ const useGeneStore = create((set, get) => ({
         set({ selectedGenes: genes });
     },
 
-    setCurrentGroup: async (group) => {
-        set({ currentGroup: group });
-    },
-
     setCurrentColor: async (color) => {
         set({ currentColor: color });
+    },
+    setCurrentGroup: async (group) => {
+        set({ currentGroup: group });
     },
 
     fetchUmapData: async (color,group) => {
@@ -51,12 +52,12 @@ const useGeneStore = create((set, get) => ({
                 get().umapDataList = {};
                 // if no gene selected, assign a value "all"
                const response = await getUmapData(dataSet,selectedSamples, ["all"],color,group);
-               get().umapDataList["all"] = response.data;
+               get().umapDataList["all"] = response.data.main_data;
             }else{
                 for (var gene of selectedGenes) {
                     if(!get().umapDataList[gene]){
                         const response = await getUmapData(dataSet,selectedSamples, [gene],color,group);
-                        get().umapDataList[gene] = response.data;
+                        get().umapDataList[gene] = response.data.main_data;
                     }
                 }
                 // remove gene item if it is not selected

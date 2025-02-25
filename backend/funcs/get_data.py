@@ -2,6 +2,21 @@ import os
 import pandas as pd
 import json
 
+# Function to check if a column is continuous or categorical
+def is_continuous(series, threshold=0.05):
+    """
+    Determines if a column is continuous based on its unique value ratio.
+    A column is considered categorical if the unique values are below a threshold.
+    """
+    unique_ratio = series.nunique() / len(series)  # Unique values ratio
+    if series.dtype in ['float64', 'float32']:  # Floats are usually continuous
+        return True
+    elif series.dtype in ['object', 'category']:  # Strings are categorical
+        return False
+    else:  # Integers: check unique value ratio
+        return unique_ratio > threshold  # More unique values → continuous
+
+
 
 def get_umap_data(dataset, samples, genes, color=None, group=None):
     print("get_umap_data() called================")
@@ -25,14 +40,19 @@ def get_umap_data(dataset, samples, genes, color=None, group=None):
     else:
         col_ls = ["UMAP_1", "UMAP_2"]
 
+    color_type = 'Categorical'
+    group_type = 'Categorical'
     if color and color in data_df.columns.tolist():
         col_ls.append(color)
+        color_type = 'Continuous' if is_continuous(data_df[color]) else 'Categorical'
+        group_type = color_type
     if group and group!=color and group in data_df.columns.tolist():
         col_ls.append(group)
+        group_type = 'Continuous' if is_continuous(data_df[group]) else 'Categorical'
 
     data_df = data_df.loc[:, col_ls]
     results =  data_df.to_dict(orient="records")
-    return results
+    return {"main_data": results, "group_type": group_type, "color_type": color_type}
 
 
 def get_all_genes(dataset):
