@@ -3,24 +3,59 @@ import pandas as pd
 import json
 
 # Function to check if a column is continuous or categorical
-def is_continuous(series, threshold=0.05):
-    """
-    Determines if a column is continuous based on its unique value ratio.
-    A column is considered categorical if the unique values are below a threshold.
-    """
-    unique_ratio = series.nunique() / len(series)  # Unique values ratio
-    if series.dtype in ['float64', 'float32']:  # Floats are usually continuous
-        return True
-    elif series.dtype in ['object', 'category']:  # Strings are categorical
-        return False
-    else:  # Integers: check unique value ratio
-        return unique_ratio > threshold  # More unique values → continuous
+from pandas.api.types import (
+    is_bool_dtype,
+    is_float_dtype,
+    is_integer_dtype,
+    is_object_dtype,
+    CategoricalDtype
+)
 
+def is_continuous(series, ratio_threshold=0.05, unique_abs_threshold=10):
+    """Improved version handling edge cases."""
+    """
+    # Test with your DataFrame
+    df = pd.DataFrame({
+        'A': [1.1, 2.3, 3.4, 4.5],  # Continuous (float, high uniqueness)
+        'B': ['cat', 'dog', 'mouse', 'cat'],  # Categorical (object)
+        'C': [1, 2, 3, 4],  # Continuous (integer, high uniqueness)
+        'D': [1, 1, 2, 2],  # Categorical (integer, low uniqueness)
+        'E': [1.0, 1.0, 2.0, 2.0],  # Categorical (float, low uniqueness)
+        'F': [True, False, True, False]  # Categorical (boolean)
+    })
+    
+    for col in df.columns:
+        result = "Continuous" if is_continuous(df[col]) else "Categorical"
+        print(f"Column '{col}': {result}")
+    """
+    # Handle categorical types first (including explicit category dtype)
+    if isinstance(series.dtype, CategoricalDtype):
+        return False
+
+    # Handle booleans explicitly
+    if is_bool_dtype(series):
+        return False
+
+    # Handle numeric types with threshold checks
+    if is_float_dtype(series) or is_integer_dtype(series):
+        nunique = series.nunique()
+        total = len(series)
+        return (
+                nunique > unique_abs_threshold and
+                (nunique / total) > ratio_threshold
+        )
+
+    # Handle object/string types (always categorical)
+    if is_object_dtype(series):
+        return False
+
+    # Default for other types (datetime, etc.)
+    return False
 
 
 def get_umap_data(dataset, samples, genes, color=None, group=None):
-    print("get_umap_data() called================")
-    print(dataset, samples, genes, color, group)
+    # print("get_umap_data() called================")
+    # print(dataset, samples, genes, color, group)
     umap_embeddings_file = os.path.join("backend","datasets",dataset, 'umap_embeddings_with_meta_100k.csv')
     data_df = pd.read_csv(umap_embeddings_file, index_col=0, header=0)
     ## Cell,UMAP_1,UMAP_2,sample_id,case,sex,age,seurat_clusters,MajorCellTypes,CellSubtypes
