@@ -20,7 +20,7 @@ async def getumapdata(request:Request):
     color = request.query_params.get("color")
     group = request.query_params.get("group")
 
-    response = get_umap_chart(dataset,samples, genes, color, group)
+    response = get_umap_data(dataset,samples, genes, color, group)
     # print (response)
     if not response:
         raise HTTPException(status_code=404, detail="Error in getting UMAP matrix.")

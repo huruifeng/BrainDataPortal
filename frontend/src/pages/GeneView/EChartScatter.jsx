@@ -3,7 +3,7 @@ import React from "react";
 const EChartScatter = ({gene, data, color, group}) => {
 
     if (!data || data.length === 0) return <p>No data available</p>;
-    const gene_expr = gene + "_expr"
+    const gene_expr = gene + "_expr";
 
     var options = {};
     if (gene==="all") {

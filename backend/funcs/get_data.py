@@ -3,7 +3,9 @@ import pandas as pd
 import json
 
 
-def get_umap_chart(dataset, samples, genes, color=None, group=None):
+def get_umap_data(dataset, samples, genes, color=None, group=None):
+    print("get_umap_data() called================")
+    print(dataset, samples, genes, color, group)
     umap_embeddings_file = os.path.join("backend","datasets",dataset, 'umap_embeddings_with_meta_100k.csv')
     data_df = pd.read_csv(umap_embeddings_file, index_col=0, header=0)
     ## Cell,UMAP_1,UMAP_2,sample_id,case,sex,age,seurat_clusters,MajorCellTypes,CellSubtypes
@@ -25,7 +27,7 @@ def get_umap_chart(dataset, samples, genes, color=None, group=None):
 
     if color and color in data_df.columns.tolist():
         col_ls.append(color)
-    if group and group in data_df.columns.tolist():
+    if group and group!=color and group in data_df.columns.tolist():
         col_ls.append(group)
 
     data_df = data_df.loc[:, col_ls]
