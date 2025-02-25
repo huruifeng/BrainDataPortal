@@ -3,6 +3,8 @@ import React from "react";
 const EChartScatter = ({gene, data, color, group}) => {
 
     if (!data || data.length === 0) return <p>No data available</p>;
+    const gene_expr = gene + "_expr"
+
     var options = {};
     if (gene==="all") {
         // Step 0: Generate distinct colors for each group
@@ -51,11 +53,11 @@ const EChartScatter = ({gene, data, color, group}) => {
 
     }else{
         // Convert data to the format required by ECharts
-        const scatterData = data.map((point) => [point["UMAP_1"], point["UMAP_2"], point[gene]]);
+        const scatterData = data.map((point) => [point["UMAP_1"], point["UMAP_2"], point[gene_expr]]);
 
         // Determine min/max values for visualMap
-        const minValue = Math.min(...data.map((p) => p[gene]));
-        const maxValue = Math.max(...data.map((p) => p[gene]));
+        const minValue = Math.min(...data.map((p) => p[gene_expr]));
+        const maxValue = Math.max(...data.map((p) => p[gene_expr]));
 
         options = {
             title: {

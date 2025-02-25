@@ -16,7 +16,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import useGeneStore from "../../store/GeneStore.js";
 import useDataStore from "../../store/DataStore.js";
 import UmapPlot from "./UmapPlot.jsx";
-import {PlotlyViolinPlot,EChartViolinPlot,StackedViolinPlot} from "./ViolinPlot.jsx";
+import {PlotlyViolinPlot,StackedViolinPlot} from "./ViolinPlot.jsx";
 
 import "./GeneView.css";
 
@@ -27,8 +27,8 @@ function GeneView() {
     const [queryParams, setQueryParams] = useSearchParams();
     const initialGenes = queryParams.getAll("gene");
     const initialSamples = queryParams.getAll("sample");
-    const initialColoring = queryParams.get("color") ?? null;
-    const initialGrouping = queryParams.get("group") ?? null;
+    const initialColoring = queryParams.get("color") ?? "";
+    const initialGrouping = queryParams.get("group") ?? "";
 
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
@@ -62,7 +62,7 @@ function GeneView() {
             selectedGenes: initialSelectedGenes
         });
 
-        useGeneStore.getState().fetchUmapData(); // Fetch data once after both are set
+        useGeneStore.getState().fetchUmapData(coloring,grouping); // Fetch data once after both are set
     }, []);
 
     /** Updates the query parameters in the URL */
@@ -93,20 +93,17 @@ function GeneView() {
     // click the button to fetch umap data
     const handleLoadPlot = () => {
         setDataset(datasetId)
-         useGeneStore.getState().fetchUmapData();
+        useGeneStore.getState().fetchUmapData(coloring,grouping);
     }
 
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, coloring, event.target.value);
-
     }
-
 
     const handleColoringChange = (event) => {
         setColoring(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, event.target.value, grouping);
-
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
@@ -188,58 +185,59 @@ function GeneView() {
                         renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard" style={{ margin: "10px 0px" }} />}
                     />
 
-                    {/* a button to fetch data and a loading indicator*/}
-                    <Box sx={{ display: "flex", justifyContent: "center", margin: "10px 0px" }}>
+
+                    <Typography sx={{ marginTop: "10px", marginLeft: "20px" }}  variant="subtitle1">Change plotting options:</Typography>
+
+                     {selectedGenes.length === 0 ?
+                       // *a dropdown to select the options on how to color the plot*/
+                        <Box sx={{ display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px" }}>
+                            <FormControl variant="standard" sx={{ width: "100%" }}>
+                                <InputLabel id="coloring-label">UMAP coloring</InputLabel>
+                                <Select
+                                    labelId="coloring-label"
+                                    id="coloring-select"
+                                    value={coloring}
+                                    onChange={handleColoringChange}
+                                    size="small"
+                                    variant="standard"
+                                >
+                                    {metaData.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                     :
+                        /*a dropdown to select the options on how to group the data*/
+                        <Box sx={{ display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px" }}>
+                            <FormControl variant="standard" sx={{ width: "100%" }}>
+                                <InputLabel id="grouping-label">Gene grouping</InputLabel>
+                                <Select
+                                    labelId="grouping-label"
+                                    id="grouping-select"
+                                    value={grouping}
+                                    onChange={handleGroupingChange}
+                                    size="small"
+                                    variant="standard"
+                                >
+                                    {metaData.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                     }
+
+                     {/* a button to fetch data and a loading indicator*/}
+                    <Box sx={{ display: "flex", justifyContent: "center", margin: "20px 0px" }}>
                         <Button variant="outlined" endIcon={<ScatterPlotIcon />} disabled={loading} onClick={handleLoadPlot}>
                              {loading ? "Loading plots..." : "Load Plots"}
                         </Button>
                     </Box>
-
-                    <Divider sx={{mt: 4}} />
-                    <Typography variant="subtitle1">Change plotting options:</Typography>
-
-                     {/*a dropdown to select the options on how to color the plot*/}
-                    <Box sx={{ display: "flex", justifyContent: "start", margin: "10px 0px" }}>
-                        <FormControl variant="standard" sx={{ width: "100%" }}>
-                            <InputLabel id="coloring-label">UMAP coloring</InputLabel>
-                            <Select
-                                labelId="coloring-label"
-                                id="coloring-select"
-                                value={coloring}
-                                onChange={handleColoringChange}
-                                size="small"
-                                variant="standard"
-                            >
-                                {metaData.map((option) => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    {/*a dropdown to select the options on how to group the data*/}
-                    <Box sx={{ display: "flex", justifyContent: "start", margin: "10px 0px" }}>
-                        <FormControl variant="standard" sx={{ width: "100%" }}>
-                            <InputLabel id="grouping-label">Gene grouping</InputLabel>
-                            <Select
-                                labelId="grouping-label"
-                                id="grouping-select"
-                                value={grouping}
-                                onChange={handleGroupingChange}
-                                size="small"
-                                variant="standard"
-                            >
-                                {metaData.map((option) => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-
 
                 </div>
                 {/* Left UMAP Plot Area (80%) */}

@@ -4,6 +4,9 @@ import {groupBy} from "lodash";
 const PlotlyStackedViolin = ({gene, data,color, group}) => {
     if (gene === "all") return null;
     if (!data || data.length === 0) return <p>No data available</p>;
+
+    console.log(data)
+
     const expressionData = {};
     const genes = Object.keys(data);
     let xCategories = []
@@ -12,7 +15,7 @@ const PlotlyStackedViolin = ({gene, data,color, group}) => {
         const groupedData = groupBy(data[gene], group);
         xCategories = Object.keys(groupedData);
         xCategories.forEach((x_i) => {
-            expressionData[gene][x_i]=groupedData[x_i].map((d) => d[gene])
+            expressionData[gene][x_i]=groupedData[x_i].map((d) => d[gene + "_expr"])
         })
     });
 

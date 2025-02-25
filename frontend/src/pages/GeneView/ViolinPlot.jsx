@@ -10,7 +10,8 @@ export const PlotlyViolinPlot = ({gene, data, color, group }) => {
 
 
 export const StackedViolinPlot = ({gene, data, color, group }) => {
-  return <PlotlyStackedViolin  gene={gene} data={data} color={color} group={"MajorCellTypes"} />;
+  console.log("color:>"+color+"<  group:>"+ group+"<")
+  return <PlotlyStackedViolin  gene={gene} data={data} color={color} group={group} />;
 };
 
 export const EChartViolinPlot = ({gene, data, color, group }) => {

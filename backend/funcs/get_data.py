@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 
-def get_umap_chart(dataset, samples, genes):
+def get_umap_chart(dataset, samples, genes, color=None, group=None):
     umap_embeddings_file = os.path.join("backend","datasets",dataset, 'umap_embeddings_with_meta_100k.csv')
     data_df = pd.read_csv(umap_embeddings_file, index_col=0, header=0)
     ## Cell,UMAP_1,UMAP_2,sample_id,case,sex,age,seurat_clusters,MajorCellTypes,CellSubtypes
@@ -18,11 +18,17 @@ def get_umap_chart(dataset, samples, genes):
             gene_expr_file = os.path.join("backend","datasets",dataset, "genes",gene+".json")
             with open(gene_expr_file, 'r') as f:
                 cell_expr = json.load(f)
-                data_df[gene] = data_df.index.map(cell_expr).fillna(0)
-        data_df = data_df.loc[:, ["UMAP_1", "UMAP_2","MajorCellTypes"]+genes]
+                data_df[gene+"_expr"] = data_df.index.map(cell_expr).fillna(0)
+        col_ls = ["UMAP_1", "UMAP_2"]+[gene+"_expr" for gene in genes]
     else:
-        data_df = data_df.loc[:, ["UMAP_1", "UMAP_2", "MajorCellTypes"]]
+        col_ls = ["UMAP_1", "UMAP_2"]
 
+    if color and color in data_df.columns.tolist():
+        col_ls.append(color)
+    if group and group in data_df.columns.tolist():
+        col_ls.append(group)
+
+    data_df = data_df.loc[:, col_ls]
     results =  data_df.to_dict(orient="records")
     return results
 
