@@ -1,37 +1,40 @@
 import ReactECharts from "echarts-for-react";
-import React from "react";
-const EChartScatter = ({gene, data, color, group}) => {
+import PropTypes from "prop-types";
+import {isCategorical} from "../../utils/funcs.js";
 
-    if (!data || data.length === 0) return <p>No data available</p>;
-    const gene_expr = gene + "_expr";
+const EChartScatterPlot = ({geneData, metaData, group}) => {
+    const gene = Object.keys(geneData)[0];
+    const exprData = geneData[gene];
 
-    var options = {};
-    if (gene==="all") {
-        // Step 0: Generate distinct colors for each group
+    const createCategoryOptions = (plotData, colorGroup) => {
+        // Step 0: Group the data by 'plotGroup'
+        const groupedData = {};
+        plotData.forEach((p) => {
+            if (!groupedData[p[colorGroup]]) groupedData[p[colorGroup]] = [];
+            groupedData[p[colorGroup]].push([p["UMAP_1"], p["UMAP_2"]]);
+        });
+
+        // Step 1: Generate distinct colors for each group and create a series for each group
         const colorPalette = [
             "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
             "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
             "#00ffff", "#ffff00", "#9bed56", "#8000ff", "#0080ff", "#80ff00"
         ]; // Up to 20 unique colors
-        // Step 1: Group the data by 'group'
-        const groupedData = {};
-        data.forEach((p) => {
-            if (!groupedData[p[group]]) groupedData[p[group]] = [];
-            groupedData[p[group]].push([p["UMAP_1"], p["UMAP_2"]]);
-        });
+
+
         const groupNames = Object.keys(groupedData);
-        const series = groupNames.map((group, index) => ({
-            name: `${group}`,
+        const series = groupNames.map((group_i, index) => ({
+            name: `${group_i}`,
             type: "scatter",
-            data: groupedData[group],
+            data: groupedData[group_i],
             symbolSize: 3,
-            itemStyle: { color: colorPalette[index % colorPalette.length] }, // Cycle colors if >20 groups
+            itemStyle: {color: colorPalette[index % colorPalette.length]}, // Cycle colors if >20 groups
         }));
 
-         // Step 3: Configure ECharts options
+        // Step 3: Configure ECharts options
         options = {
             title: {
-                text: "Clustered UMAP Scatter Plot",
+                text: "UMAP Scatter Plot - " + colorGroup,
                 left: "center",
                 top: 0,
             },
@@ -44,29 +47,32 @@ const EChartScatter = ({gene, data, color, group}) => {
                 orient: "vertical",
                 right: 0,
                 top: 0,
-                data: groupNames.map(group =>  `${group}`),
+                data: groupNames.map(group_i => `${group_i}`),
             },
-            xAxis: { type: "value" },
-            yAxis: { type: "value" },
+            xAxis: {type: "value"},
+            yAxis: {type: "value"},
             series: series,
         };
 
-    }else{
+        return options;
+    }
+
+    const createContinuousOptions = (plotData, colorGroup) => {
         // Convert data to the format required by ECharts
-        const scatterData = data.map((point) => [point["UMAP_1"], point["UMAP_2"], point[gene_expr]]);
+        const scatterData = plotData.map((point) => [point["UMAP_1"], point["UMAP_2"], point[colorGroup]]);
 
         // Determine min/max values for visualMap
-        const minValue = Math.min(...data.map((p) => p[gene_expr]));
-        const maxValue = Math.max(...data.map((p) => p[gene_expr]));
+        const minValue = Math.min(...scatterData.map((p) => p[colorGroup]));
+        const maxValue = Math.max(...scatterData.map((p) => p[colorGroup]));
 
         options = {
             title: {
-                text: gene,
+                text: colorGroup,
                 left: 'center',
                 top: 0
             },
-            xAxis: { type: "value" },
-            yAxis: { type: "value" },
+            xAxis: {type: "value"},
+            yAxis: {type: "value"},
             visualMap: {
                 min: minValue,
                 max: maxValue,
@@ -83,18 +89,46 @@ const EChartScatter = ({gene, data, color, group}) => {
             series: [
                 {
                     type: "scatter",
-                    symbolSize:3,
+                    symbolSize: 3,
                     data: scatterData,
                 },
             ],
         };
+
+        return options;
     }
 
-
+    var options = {};
+    if (gene === "all") {
+        //===============================
+        // In this case the expression data is not needed, just use the metaData
+        //===============================
+        const isCategoricalGroup = isCategorical(metaData.map((p) => p[group]));
+        if (isCategoricalGroup) {
+            options = createCategoryOptions(metaData, group);
+        } else {
+            options = createContinuousOptions(metaData, group);
+        }
+    } else {
+        // Inside your UmapPlot component or data processing
+        const plotData = metaData.map(item => ({
+            "UMAP_1": item.UMAP_1,
+            "UMAP_2": item.UMAP_2,
+            [gene]: exprData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+            sample_id: item.sample_id  // Keep identifier if needed
+        })) || [];
+        options = createContinuousOptions(plotData, gene);
+    }
     return <ReactECharts option={options} style={{width: "100%", height: "100%"}} autoResize={true}/>;
 }
 
-export default EChartScatter
+EChartScatterPlot.propTypes = {
+    geneData: PropTypes.object.isRequired,
+    metaData: PropTypes.array.isRequired,
+    group: PropTypes.string.isRequired,
+};
+
+export default EChartScatterPlot
 
 // <ReactECharts
 //     notMerge={true}

@@ -4,10 +4,10 @@ const BASE_URL = "http://localhost:8000"; // Replace with your backend URL
 
 const API_URL = `${BASE_URL}/api`;
 
-export const getUmapData = async (dataset, samples, genes, color, group) => {
+export const getGeneExprData = async (dataset,gene) => {
     try {
-        const response = await axios.get(`${API_URL}/getumapdata`,
-            {params: {dataset:dataset,samples:samples,genes:genes,color:color,group:group}});
+        const response = await axios.get(`${API_URL}/getgeneexprdata`,
+            {params: {dataset:dataset,gene:gene}});
         return response;
     } catch (error) {
         console.error("Error reading umap data:", error);

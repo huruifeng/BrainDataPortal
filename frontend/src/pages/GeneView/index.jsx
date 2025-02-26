@@ -15,7 +15,7 @@ import {useParams, useSearchParams} from "react-router-dom";
 
 import useGeneStore from "../../store/GeneStore.js";
 import useDataStore from "../../store/DataStore.js";
-import UmapPlot from "./UmapPlot.jsx";
+import EChartScatterPlot from "./EChartScatter.jsx";
 import {PlotlyViolinPlot, StackedViolinPlot} from "./ViolinPlot.jsx";
 
 import "./GeneView.css";
@@ -36,7 +36,7 @@ function GeneView() {
     const {sampleRecords, fetchSampleData} = useDataStore();
     const {geneList, metaData, fetchGeneMeta} = useGeneStore();
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useGeneStore();
-    const {setDataset, umapDataList, loading, error} = useGeneStore();
+    const {setDataset, exprDataList, loading, error} = useGeneStore();
 
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
@@ -66,7 +66,7 @@ function GeneView() {
             selectedGenes: initialSelectedGenes
         });
 
-        useGeneStore.getState().fetchUmapData(coloring, grouping); // Fetch data once after both are set
+        useGeneStore.getState().fetchGeneExprData(); // Fetch data once after both are set
     }, []);
 
     /** Updates the query parameters in the URL */
@@ -83,8 +83,8 @@ function GeneView() {
     const handleSampleChange = (event, newValue) => {
         setSelectedSamples(newValue);
         updateQueryParams(selectedGenes, newValue); // Pass the new value instead of old state
-        // if there is sample change, clear the umapDataList
-        useGeneStore.getState().umapDataList = {};
+
+        // useGeneStore.getState().exprDataList = {};
     };
 
     /** Handles gene selection change */
@@ -96,25 +96,23 @@ function GeneView() {
     // click the button to fetch umap data
     const handleLoadPlot = () => {
         setDataset(datasetId)
-        useGeneStore.getState().fetchUmapData(coloring, grouping);
+        useGeneStore.getState().fetchGeneExprData();
     }
 
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, coloring, event.target.value);
-        useGeneStore.getState().umapDataList = {};
     }
 
     const handleColoringChange = (event) => {
         setColoring(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, event.target.value, grouping);
-        useGeneStore.getState().umapDataList = {};
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
-    const plotClass = Object.keys(umapDataList).length <= 1
-        ? "single-plot" : Object.keys(umapDataList).length === 2
-            ? "two-plots" : Object.keys(umapDataList).length === 3
+    const plotClass = Object.keys(exprDataList).length <= 1
+        ? "single-plot" : Object.keys(exprDataList).length === 2
+            ? "two-plots" : Object.keys(exprDataList).length === 3
                 ? "three-plots" : "four-plots";
 
     return (
@@ -181,19 +179,17 @@ function GeneView() {
                                             const newSamples = selectedSamples.filter(s => s !== option);
                                             setSelectedSamples(newSamples);
                                             updateQueryParams(selectedGenes, newSamples);
-                                            useGeneStore.getState().umapDataList = {};
+                                            useGeneStore.getState().exprDataList = {};
                                         }}
                                     />
                                 );
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard"
-                                                            style={{margin: "10px 0px"}}/>}
+                        renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard" style={{margin: "10px 0px"}}/>}
                     />
 
 
-                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting
-                        options:</Typography>
+                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting options:</Typography>
 
                     {selectedGenes.length === 0 ?
                         // *a dropdown to select the options on how to color the plot*/
@@ -209,11 +205,13 @@ function GeneView() {
                                     variant="standard"
                                 >
                                     {metaData && metaData.length > 0 ? (
-                                        Object.keys(metaData[0]).map((option) => (
-                                            <MenuItem key={option} value={option}>
+                                        Object.keys(metaData[0]).map((option) => {
+                                            const excludedKeys = new Set(["cs_id","sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
+                                            if (excludedKeys.has(option)) return null;
+                                            return (<MenuItem key={option} value={option}>
                                                 {option}
-                                            </MenuItem>
-                                        ))
+                                            </MenuItem>)
+                                        })
                                     ) : (
                                         <MenuItem disabled>
                                             {loading ? "Loading metadata..." : "No metadata available"}
@@ -236,11 +234,13 @@ function GeneView() {
                                     variant="standard"
                                 >
                                     {metaData && metaData.length > 0 ? (
-                                        Object.keys(metaData[0]).map((option) => (
-                                            <MenuItem key={option} value={option}>
+                                        Object.keys(metaData[0]).map((option) => {
+                                            const excludedKeys = new Set(["cs_id","sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
+                                            if (excludedKeys.has(option)) return null;
+                                            return (<MenuItem key={option} value={option}>
                                                 {option}
-                                            </MenuItem>
-                                        ))
+                                            </MenuItem>)
+                                        })
                                     ) : (
                                         <MenuItem disabled>
                                             {loading ? "Loading metadata..." : "No metadata available"}
@@ -255,7 +255,7 @@ function GeneView() {
                     <Box sx={{display: "flex", justifyContent: "center", margin: "20px 0px"}}>
                         <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading}
                                 onClick={handleLoadPlot}>
-                            {loading ? "Loading plots..." : "Load Plots"}
+                            {loading ? "Loading plots..." : "Refresh Plots"}
                         </Button>
                     </Box>
 
@@ -270,16 +270,19 @@ function GeneView() {
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
                                 <CircularProgress/>
                             </Box>
+                            <Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
+                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading data...</Typography>
+                            </Box>
                         </>
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
-                    ) : Object.keys(umapDataList).length > 0 ? (
+                    ) : Object.keys(exprDataList).length > 0 ? (
                         <>
                             <div className={`umap-container ${plotClass}`}>
-                                {Object.entries(umapDataList).map(([gene, umap_data]) => (
+                                {Object.entries(exprDataList).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            <UmapPlot gene={gene} data={umap_data} color={coloring} group={grouping}/>
+                                            {metaData && <EChartScatterPlot geneData={{gene:expr_data}} metaData={metaData} group={coloring}/>}
                                         </div>
                                     </div>
                                 ))}
@@ -287,10 +290,10 @@ function GeneView() {
 
                             {/*/!*plot the violin plot individually for each gene*!/*/}
                             {/*<div className={`violin-container`}>*/}
-                            {/*    {Object.entries(umapDataList).map(([gene, umap_data]) => (*/}
+                            {/*    {Object.entries(exprDataList).map(([gene, expr_data]) => (*/}
                             {/*        <div key={gene} className="violin-item">*/}
                             {/*            <div className="violin-wrapper">*/}
-                            {/*                <PlotlyViolinPlot gene={gene} data={umap_data} color={coloring} group={grouping} />*/}
+                            {/*                <PlotlyViolinPlot gene={gene} data={expr_data} color={coloring} group={grouping} />*/}
                             {/*            </div>*/}
                             {/*        </div>*/}
                             {/*    ))}*/}
@@ -300,15 +303,20 @@ function GeneView() {
                             <div className={`violin-container`}>
                                 <div key='stacked_violin' className="violin-item">
                                     <div className="violin-wrapper">
-                                        <StackedViolinPlot gene={"stacked_violin"} data={umapDataList} color={coloring}
-                                                           group={grouping}/>
+                                        {metaData && <StackedViolinPlot geneData={{"stackedviolin":exprDataList}} metaData={metaData} group={grouping}/> }
                                     </div>
                                 </div>
                             </div>
                         </>
 
                     ) : (
-                        <Typography variant="h6">Click the button to load plots</Typography>
+                       <div className={`umap-container single-plot`}>
+                            <div key={'all_gene'} className="umap-item">
+                                <div className="umap-wrapper">
+                                    { metaData && <EChartScatterPlot geneData={{"all":"all"}} metaData={metaData} group={coloring}/> }
+                                </div>
+                            </div>
+                       </div>
                     )}
                 </div>
             </div>

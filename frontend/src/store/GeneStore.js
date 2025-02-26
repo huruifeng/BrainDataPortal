@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import {getGeneMeta_get, getUmapData} from "../api/api.js";
+import {getGeneExprData, getGeneMeta_get} from "../api/api.js";
 import {toast} from "react-toastify";
 
 const useGeneStore = create((set, get) => ({
@@ -10,7 +10,7 @@ const useGeneStore = create((set, get) => ({
 
     selectedSamples: [],
     selectedGenes: [],
-    umapDataList: {},// Store API response data
+    exprDataList: {},// Store API response data
 
     loading: false,
     error: null,
@@ -76,44 +76,32 @@ const useGeneStore = create((set, get) => ({
         }
     },
 
-    fetchUmapData: async (color, group) => {
-        const {dataSet, selectedSamples, selectedGenes} = get();
-        if (!dataSet) {
+    fetchGeneExprData: async () => {
+        const {dataSet,selectedGenes} = get();
+        if (!dataSet || dataSet ==="all") {
             set({error: "No dataset selected", loading: false});
             return;
         }
 
         set({loading: true, error: null});
 
-        if (color !== get().currentColor || group !== get().currentGroup) {
-            get().umapDataList = {};
-            get().currentColor = color;
-            get().currentGroup = group;
-        }
-
         try {
-            if (!selectedGenes.length) {
-                // Clear the umapDataList
-                get().umapDataList = {};
-                // if no gene selected, assign a value "all"
-                const response = await getUmapData(dataSet, selectedSamples, ["all"], color, group);
-                get().umapDataList["all"] = response.data.main_data;
-            } else {
-                for (var gene of selectedGenes) {
-                    if (!get().umapDataList[gene]) {
-                        const response = await getUmapData(dataSet, selectedSamples, [gene], color, group);
-                        get().umapDataList[gene] = response.data.main_data;
-                    }
+            // Clear the exprDataList
+            get().exprDataList = {};
+            for (var gene of selectedGenes) {
+                if (!get().exprDataList[gene]) {
+                    const response = await getGeneExprData(dataSet, gene);
+                    get().exprDataList[gene] = response.data;
                 }
-                // remove gene item if it is not selected
-                for (var key in get().umapDataList) {
-                    if (!selectedGenes.includes(key)) {
-                        delete get().umapDataList[key];
-                    }
+            }
+            // remove gene item if it is not selected
+            for (var key in get().exprDataList) {
+                if (!selectedGenes.includes(key)) {
+                    delete get().exprDataList[key];
                 }
             }
 
-            set({umapDataList: get().umapDataList, loading: false});
+            set({loading: false});
 
         } catch (error) {
             set({error: "Failed to fetch UMAP data:" + error, loading: false});

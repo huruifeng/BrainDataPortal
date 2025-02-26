@@ -11,18 +11,15 @@ router = APIRouter()
 async def read_root():
     return {"Message": "Hellow World."}
 
-@router.get("/getumapdata")
-async def getumapdata(request:Request):
-    print("getumapdata() called================")
-    dataset = request.query_params.get("dataset")
-    samples = request.query_params.getlist("samples[]")
-    genes = request.query_params.getlist("genes[]")
-    color = request.query_params.get("color")
-    group = request.query_params.get("group")
+@router.get("/getgeneexprdata")
+async def getgeneexprdata(request:Request):
+    print("getgeneexprdata() called================")
+    dataset_id = request.query_params.get("dataset")
+    gene = request.query_params.get("gene")
 
-    response = get_umap_data(dataset,samples, genes, color, group)
+    response = get_gene_expr_data(dataset_id, gene)
     # print (response)
-    if not response:
+    if "Error" in response:
         raise HTTPException(status_code=404, detail="Error in getting UMAP matrix.")
     return response
 
