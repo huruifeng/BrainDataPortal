@@ -2,11 +2,11 @@ import ReactECharts from "echarts-for-react";
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
-const EChartScatterPlot = ({geneData, metaData, group}) => {
-    const gene = Object.keys(geneData)[0];
-    const exprData = geneData[gene];
+const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
 
     const createCategoryOptions = (plotData, colorGroup) => {
+        console.log("continuous");
+
         // Step 0: Group the data by 'plotGroup'
         const groupedData = {};
         plotData.forEach((p) => {
@@ -58,12 +58,14 @@ const EChartScatterPlot = ({geneData, metaData, group}) => {
     }
 
     const createContinuousOptions = (plotData, colorGroup) => {
+        console.log("continuous");
         // Convert data to the format required by ECharts
         const scatterData = plotData.map((point) => [point["UMAP_1"], point["UMAP_2"], point[colorGroup]]);
-
+        // console.log(scatterData);
         // Determine min/max values for visualMap
-        const minValue = Math.min(...scatterData.map((p) => p[colorGroup]));
-        const maxValue = Math.max(...scatterData.map((p) => p[colorGroup]));
+        const minValue = Math.min(...scatterData.map((p) => p[2]));
+        const maxValue = Math.max(...scatterData.map((p) => p[2]));
+
 
         options = {
             title: {
@@ -114,7 +116,7 @@ const EChartScatterPlot = ({geneData, metaData, group}) => {
         const plotData = metaData.map(item => ({
             "UMAP_1": item.UMAP_1,
             "UMAP_2": item.UMAP_2,
-            [gene]: exprData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+            [gene]: geneData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
             sample_id: item.sample_id  // Keep identifier if needed
         })) || [];
         options = createContinuousOptions(plotData, gene);
@@ -123,6 +125,7 @@ const EChartScatterPlot = ({geneData, metaData, group}) => {
 }
 
 EChartScatterPlot.propTypes = {
+    gene: PropTypes.string.isRequired,
     geneData: PropTypes.object.isRequired,
     metaData: PropTypes.array.isRequired,
     group: PropTypes.string.isRequired,

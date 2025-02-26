@@ -1,21 +1,23 @@
 import Plot from 'react-plotly.js';
 import {groupBy} from "lodash";
+import PropTypes from "prop-types";
+import EChartScatterPlot from "./EChartScatter.jsx";
 
-const PlotlyStackedViolin = ({gene, data,color, group}) => {
-    if (gene === "all") return null;
-    if (!data || data.length === 0) return <p>No data available</p>;
-
-    console.log(data)
-
+const PlotlyStackedViolin = ({gene, geneData, metaData, group}) => {
+    if(gene!=="stackedviolin") return null;
     const expressionData = {};
-    const genes = Object.keys(data);
+    const genes = Object.keys(geneData);
+
     let xCategories = []
     genes.forEach((gene) => {
+        const geneExpr = geneData[gene];
         expressionData[gene] = {};
-        const groupedData = groupBy(data[gene], group);
+        const groupedData = groupBy(metaData, group);
         xCategories = Object.keys(groupedData);
         xCategories.forEach((x_i) => {
-            expressionData[gene][x_i]=groupedData[x_i].map((d) => d[gene + "_expr"])
+            expressionData[gene][x_i]=groupedData[x_i].map((d) => {
+                return (geneExpr?.[d.cs_id] ?? 0)
+            })
         })
     });
 
@@ -96,5 +98,10 @@ const PlotlyStackedViolin = ({gene, data,color, group}) => {
         />
     );
 };
-
+PlotlyStackedViolin.propTypes = {
+    gene: PropTypes.string.isRequired,
+    geneData: PropTypes.object.isRequired,
+    metaData: PropTypes.array.isRequired,
+    group: PropTypes.string.isRequired,
+};
 export default PlotlyStackedViolin;

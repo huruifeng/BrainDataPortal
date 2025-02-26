@@ -16,9 +16,10 @@ import {useParams, useSearchParams} from "react-router-dom";
 import useGeneStore from "../../store/GeneStore.js";
 import useDataStore from "../../store/DataStore.js";
 import EChartScatterPlot from "./EChartScatter.jsx";
-import {PlotlyViolinPlot, StackedViolinPlot} from "./ViolinPlot.jsx";
+import PlotlyStackedViolin from "./PlotlyStackedViolin.jsx";
 
 import "./GeneView.css";
+
 
 function GeneView() {
 
@@ -284,7 +285,7 @@ function GeneView() {
                                 {Object.entries(exprDataList).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {metaData && <EChartScatterPlot geneData={{gene:expr_data}} metaData={metaData} group={coloring}/>}
+                                            {metaData && <EChartScatterPlot gene={gene} geneData={expr_data} metaData={metaData} group={coloring}/>}
                                         </div>
                                     </div>
                                 ))}
@@ -295,7 +296,7 @@ function GeneView() {
                             {/*    {Object.entries(exprDataList).map(([gene, expr_data]) => (*/}
                             {/*        <div key={gene} className="violin-item">*/}
                             {/*            <div className="violin-wrapper">*/}
-                            {/*                <PlotlyViolinPlot gene={gene} data={expr_data} color={coloring} group={grouping} />*/}
+                            {/*                <PlotlyViolinPlot gene={gene} geneData={exprDataList} metaData={metaData} group={grouping}/ />*/}
                             {/*            </div>*/}
                             {/*        </div>*/}
                             {/*    ))}*/}
@@ -305,7 +306,7 @@ function GeneView() {
                             <div className={`violin-container`}>
                                 <div key='stacked_violin' className="violin-item">
                                     <div className="violin-wrapper">
-                                        {metaData && <StackedViolinPlot geneData={{"stackedviolin":exprDataList}} metaData={metaData} group={grouping}/> }
+                                        {metaData && <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataList} metaData={metaData} group={grouping}/> }
                                     </div>
                                 </div>
                             </div>
@@ -315,7 +316,7 @@ function GeneView() {
                        <div className={`umap-container single-plot`}>
                             <div key={'all_gene'} className="umap-item">
                                 <div className="umap-wrapper">
-                                    { metaData && <EChartScatterPlot geneData={{"all":"all"}} metaData={metaData} group={coloring}/> }
+                                    { metaData && <EChartScatterPlot gene={"all"} geneData={{"all":"all"}} metaData={metaData} group={coloring}/> }
                                 </div>
                             </div>
                        </div>

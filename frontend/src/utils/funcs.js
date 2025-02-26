@@ -1,4 +1,4 @@
-export function isCategorical(arr, uniqueThreshold = 0.1) {
+export function isCategorical(arr, uniqueThreshold = 20) {
     // ======================
     // // Example usage:
     // const categoricalData = [1, 2, 1, 2, 3, 3, 3]; // Few unique integers
