@@ -12,12 +12,8 @@ const useGeneStore = create((set, get) => ({
     selectedGenes: [],
     exprDataList: {},// Store API response data
 
-    loading: false,
+    loading: true,
     error: null,
-    // currentGroup: {value: "MajorCellTypes", type: "Categorical"},
-    // currentColor: {value: "MajorCellTypes", type: "Categorical"},
-    currentGroup: "MajorCellTypes",
-    currentColor: "MajorCellTypes",
 
     setDataset: async (dataset) => {
         set({dataSet: dataset});
@@ -37,13 +33,6 @@ const useGeneStore = create((set, get) => ({
 
     setSelectedGenes: async (genes) => {
         set({selectedGenes: genes});
-    },
-
-    setCurrentColor: async (color) => {
-        set({currentColor: color});
-    },
-    setCurrentGroup: async (group) => {
-        set({currentGroup: group});
     },
 
     fetchGeneMeta: async (dataset_id = null) => {

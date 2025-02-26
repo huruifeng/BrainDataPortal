@@ -34,17 +34,19 @@ function GeneView() {
 
     // Prepare all the  data
     const {sampleRecords, fetchSampleData} = useDataStore();
-    const {geneList, metaData, fetchGeneMeta} = useGeneStore();
+    const {geneList, metaData} = useGeneStore();
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useGeneStore();
     const {setDataset, exprDataList, loading, error} = useGeneStore();
+
+
 
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
 
     useEffect(() => {
         fetchSampleData({dataset_id: datasetId});
-        fetchGeneMeta(datasetId);
-    }, [datasetId, fetchSampleData, fetchGeneMeta]);
+        useGeneStore.getState().fetchGeneMeta(datasetId);
+    }, [datasetId]);
 
     const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
     sampleOptions.unshift("all");
