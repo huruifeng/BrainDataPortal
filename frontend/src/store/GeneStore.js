@@ -62,6 +62,8 @@ const useGeneStore = create((set, get) => ({
             console.error("Error fetching data:", error);
             await set({geneList: [], metaData: [], genefetchStatus: "error"});
             toast.error("Error while fetching gene list and metadata.");
+        }finally {
+            set({ loading: false }); // Ensure loading is false after completion
         }
     },
 
@@ -69,6 +71,12 @@ const useGeneStore = create((set, get) => ({
         const {dataSet,selectedGenes} = get();
         if (!dataSet || dataSet ==="all") {
             set({error: "No dataset selected", loading: false});
+            return;
+        }
+
+        // Don't reset loading state if no genes selected
+        if (selectedGenes.length === 0) {
+            set({ exprDataList: {} }); // Clear data without affecting loading state
             return;
         }
 
@@ -94,7 +102,10 @@ const useGeneStore = create((set, get) => ({
 
         } catch (error) {
             set({error: "Failed to fetch UMAP data:" + error, loading: false});
+        } finally {
+            set({ loading: false });
         }
+
     },
 }));
 
