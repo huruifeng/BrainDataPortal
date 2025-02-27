@@ -285,7 +285,7 @@ function GeneView() {
                                 {Object.entries(exprDataList).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} metaData={metaData} group={coloring}/>}
+                                            {metaData && <EChartScatterPlot gene={gene} geneData={expr_data} metaData={metaData} group={coloring}/>}
                                         </div>
                                     </div>
                                 ))}

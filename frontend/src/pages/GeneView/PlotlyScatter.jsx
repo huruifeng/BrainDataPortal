@@ -26,7 +26,12 @@ const PlotlyScatterPlot = ({gene, geneData, metaData, group}) => {
                 size: 3,
                 symbol: 'circle',
                 opacity: 0.8,
-            }
+            },
+            hoverinfo: 'text',
+            hovertext: plotData?.map((item, index) =>
+                `Sample: ${item.sample_id}<br>
+                ${group ? `${group}: ${item[group]}` : ''}`
+            )
         }));
         return traces;
     }
@@ -39,10 +44,11 @@ const PlotlyScatterPlot = ({gene, geneData, metaData, group}) => {
             type: 'scatter',
             marker: {
                 color: colorValues,
-                colorscale: 'Viridis',
+                colorscale: ["#CCCCCCFF", "#FF0000FF"], //'Reds',
                 colorbar: {
-                    title: gene ? `${gene} Expression` : group,
-                    titleside: 'right'
+                    // title: gene ? `${gene} Expression` : group,
+                    titleside: 'right',
+                    len: 0.3
                 },
                 size: 3,
                 opacity: 0.8
@@ -50,7 +56,7 @@ const PlotlyScatterPlot = ({gene, geneData, metaData, group}) => {
             hoverinfo: 'text',
             hovertext: plotData?.map((item, index) =>
                 `Sample: ${item.sample_id}<br>
-                ${gene ? `${gene} Expr: ${colorValues[index].toFixed(2)}` : ''}
+                ${gene!=="all" ? `${gene} Expr: ${colorValues[index].toFixed(2)}` : ''}
                 ${group ? `${group}: ${item[group]}` : ''}`
             )
         }];
@@ -58,11 +64,12 @@ const PlotlyScatterPlot = ({gene, geneData, metaData, group}) => {
     }
 
     let traces = [];
+    let isCategoricalGroup = false;
     if (gene === "all") {
         //===============================
         // In this case the expression data is not needed, just use the metaData
         //===============================
-        const isCategoricalGroup = isCategorical(metaData.map((p) => p[group]));
+        isCategoricalGroup = isCategorical(metaData.map((p) => p[group]));
 
         if (isCategoricalGroup) {
             traces = createCategoryTraces(metaData, group);
@@ -86,8 +93,12 @@ const PlotlyScatterPlot = ({gene, geneData, metaData, group}) => {
     // Layout configuration
     const layout = {
         title: gene==="all" ? `UMAP Plot for ${group}` : `${gene}`,
-        showlegend: true,
-        legend: {x: 1, y: 1, orientation: 'v'},
+        showlegend: isCategoricalGroup,
+        legend: {
+            x: 1, y: 1,
+            orientation: 'v',
+            itemsizing: 'constant',
+        },
         margin: {l: 50, r: 10, b: 50, t: 10, pad: 4},
         plot_bgcolor: '#ffffff',
         paper_bgcolor: '#ffffff',
