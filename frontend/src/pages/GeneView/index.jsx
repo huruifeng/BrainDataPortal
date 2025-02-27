@@ -41,8 +41,6 @@ function GeneView() {
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useGeneStore();
     const {setDataset, exprDataList, loading, error} = useGeneStore();
 
-
-
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
 
@@ -63,7 +61,6 @@ function GeneView() {
         const initialSelectedSamples = initialSamples.length ? initialSamples : [];
         const initialSelectedGenes = initialGenes.length ? initialGenes : [];
 
-        // console.log("Dataset:", datasetId, "Selected Genes:", initialSelectedGenes, "Selected Samples:", initialSelectedSamples);
         setDataset(datasetId);
 
         useGeneStore.setState({
@@ -94,7 +91,15 @@ function GeneView() {
     const handleGeneChange = (event, newValue) => {
         setSelectedGenes(newValue);
         updateQueryParams(newValue, selectedSamples); // Pass the new value instead of old state
+        useGeneStore.getState().fetchGeneExprData();
     };
+
+    const handleGeneDelete = (delGene) => {
+        const newGenes = selectedGenes.filter(g => g !== delGene);
+        setSelectedGenes(newGenes);
+        updateQueryParams(newGenes, selectedSamples);
+        useGeneStore.getState().fetchGeneExprData();
+    }
 
     // click the button to fetch umap data
     const handleLoadPlot = () => {
@@ -148,11 +153,7 @@ function GeneView() {
                                         label={option}
                                         {...tagProps}
                                         color="primary"
-                                        onDelete={() => {
-                                            const newGenes = selectedGenes.filter(g => g !== option);
-                                            setSelectedGenes(newGenes);
-                                            updateQueryParams(newGenes, selectedSamples);
-                                        }}
+                                        onDelete={() => handleGeneDelete(option)}
                                     />
                                 );
                             })
@@ -182,17 +183,18 @@ function GeneView() {
                                             const newSamples = selectedSamples.filter(s => s !== option);
                                             setSelectedSamples(newSamples);
                                             updateQueryParams(selectedGenes, newSamples);
-                                            useGeneStore.getState().exprDataList = {};
                                         }}
                                     />
                                 );
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard" style={{margin: "10px 0px"}}/>}
+                        renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard"
+                                                            style={{margin: "10px 0px"}}/>}
                     />
 
 
-                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting options:</Typography>
+                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting
+                        options:</Typography>
 
                     {selectedGenes.length === 0 ?
                         // *a dropdown to select the options on how to color the plot*/
@@ -209,7 +211,7 @@ function GeneView() {
                                 >
                                     {metaData && metaData.length > 0 ? (
                                         Object.keys(metaData[0]).map((option) => {
-                                            const excludedKeys = new Set(["cs_id","sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
+                                            const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
                                             if (excludedKeys.has(option)) return null;
                                             return (<MenuItem key={option} value={option}>
                                                 {option}
@@ -238,7 +240,7 @@ function GeneView() {
                                 >
                                     {metaData && metaData.length > 0 ? (
                                         Object.keys(metaData[0]).map((option) => {
-                                            const excludedKeys = new Set(["cs_id","sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
+                                            const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
                                             if (excludedKeys.has(option)) return null;
                                             return (<MenuItem key={option} value={option}>
                                                 {option}
@@ -274,7 +276,8 @@ function GeneView() {
                                 <CircularProgress/>
                             </Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
-                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading data...</Typography>
+                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading
+                                    data...</Typography>
                             </Box>
                         </>
                     ) : error ? (
@@ -285,19 +288,23 @@ function GeneView() {
                                 {Object.entries(exprDataList).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {metaData && <EChartScatterPlot gene={gene} geneData={expr_data} metaData={metaData} group={coloring}/>}
+                                            {metaData && <EChartScatterPlot gene={gene} geneData={expr_data}
+                                                                            sampleData={selectedSamples}
+                                                                            metaData={metaData} group={coloring}/>}
+                                            {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {Object.keys(exprDataList).length >= 1 && <Divider sx={{marginTop: "10px"}} flexItem>Gene Expression Plots</Divider>}
+                            {Object.keys(exprDataList).length >= 1 &&
+                                <Divider sx={{marginTop: "10px"}} flexItem>Gene Expression Plots</Divider>}
                             {/*plot the violin plot individually for each gene*/}
                             {/*<div className={`violin-container`}>*/}
                             {/*    {Object.entries(exprDataList).map(([gene, expr_data]) => (*/}
                             {/*        <div key={gene} className="violin-item">*/}
                             {/*            <div className="violin-wrapper">*/}
-                            {/*                <PlotlyViolinPlot gene={gene} geneData={expr_data} metaData={metaData} group={grouping} />*/}
+                            {/*                <PlotlyViolinPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={grouping} />*/}
                             {/*            </div>*/}
                             {/*        </div>*/}
                             {/*    ))}*/}
@@ -307,20 +314,26 @@ function GeneView() {
                             <div className={`violin-container`}>
                                 <div key='stacked_violin' className="violin-item">
                                     <div className="violin-wrapper">
-                                        {metaData && <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataList} metaData={metaData} group={grouping}/> }
+                                        {metaData && <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataList}
+                                                                          sampleData={selectedSamples}
+                                                                          metaData={metaData} group={grouping}/>}
                                     </div>
                                 </div>
                             </div>
                         </>
 
                     ) : (
-                       <div className={`umap-container single-plot`}>
+                        <div className={`umap-container single-plot`}>
                             <div key={'all_gene'} className="umap-item">
                                 <div className="umap-wrapper">
-                                    { metaData && <EChartScatterPlot gene={"all"} geneData={{"all":"all"}} metaData={metaData} group={coloring}/> }
+                                    {metaData && <EChartScatterPlot gene={"all"} geneData={{"all": "all"}}
+                                                                    sampleData={selectedSamples} metaData={metaData}
+                                                                    group={coloring}/>}
+                                    {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}
+
                                 </div>
                             </div>
-                       </div>
+                        </div>
                     )}
                 </div>
             </div>

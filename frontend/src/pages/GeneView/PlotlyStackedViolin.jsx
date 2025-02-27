@@ -1,10 +1,12 @@
 import Plot from 'react-plotly.js';
 import {groupBy} from "lodash";
 import PropTypes from "prop-types";
-import EChartScatterPlot from "./EChartScatter.jsx";
 
-const PlotlyStackedViolin = ({gene, geneData, metaData, group}) => {
-    if(gene!=="stackedviolin") return null;
+const PlotlyStackedViolin = ({gene, geneData, sampleData, metaData, group}) => {
+    if (sampleData.length >= 1 && !sampleData.includes("all")) {
+        metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
+    }
+    if (gene !== "stackedviolin") return null;
     const expressionData = {};
     const genes = Object.keys(geneData);
 
@@ -15,7 +17,7 @@ const PlotlyStackedViolin = ({gene, geneData, metaData, group}) => {
         const groupedData = groupBy(metaData, group);
         xCategories = Object.keys(groupedData);
         xCategories.forEach((x_i) => {
-            expressionData[gene][x_i]=groupedData[x_i].map((d) => {
+            expressionData[gene][x_i] = groupedData[x_i].map((d) => {
                 return (geneExpr?.[d.cs_id] ?? 0)
             })
         })
@@ -30,14 +32,14 @@ const PlotlyStackedViolin = ({gene, geneData, metaData, group}) => {
                     y: expressionData[gene][x_i],
                     type: 'violin',
                     name: `${gene} - ${x_i}`,
-                    box: { visible: false },
+                    box: {visible: false},
                     points: false, // Show all data points
-                    meanline: { visible: true },
+                    meanline: {visible: true},
                     showlegend: false,
                     xaxis: `x${geneIndex + 1}`,
                     yaxis: `y${geneIndex + 1}`,
                     scalemode: "count",
-                    line: { width: 1 },
+                    line: {width: 1},
                     jitter: 0.3,
                     // fillcolor: 'rgba(50, 100, 250, 0.5)',
                 };
@@ -54,7 +56,7 @@ const PlotlyStackedViolin = ({gene, geneData, metaData, group}) => {
             grid: {rows, columns: 1, pattern: 'independent',},
             height: totalHeight, // Adjust height based on number of genes
             title: 'Stacked Violin Plot',
-            margin: { t: 5, b: 50, l: 50, r: 50 }, // Reduce white space
+            margin: {t: 5, b: 50, l: 50, r: 50}, // Reduce white space
             annotations: [],
         };
 
@@ -71,7 +73,7 @@ const PlotlyStackedViolin = ({gene, geneData, metaData, group}) => {
                 type: "category",
             };
             layout[`yaxis${index + 1}`] = {
-                title: { text: gene, font: { size: 12 } },
+                title: {text: gene, font: {size: 12}},
                 automargin: true, // Prevent axis labels from being cut off
                 domain: [yMin, yMax], // Reduce space between rows
             };
@@ -82,9 +84,9 @@ const PlotlyStackedViolin = ({gene, geneData, metaData, group}) => {
                 showarrow: false,
                 xref: "paper",
                 yref: "paper",
-                font: { size: 12, color: "black" },
+                font: {size: 12, color: "black"},
                 align: "right",
-              });
+            });
         });
 
         return layout;
@@ -94,13 +96,14 @@ const PlotlyStackedViolin = ({gene, geneData, metaData, group}) => {
         <Plot
             data={createTraces()}
             layout={createLayout()}
-            style={{ width: '100%', height: '100%' }}
+            style={{width: '100%', height: '100%'}}
         />
     );
 };
 PlotlyStackedViolin.propTypes = {
     gene: PropTypes.string.isRequired,
     geneData: PropTypes.object.isRequired,
+    sampleData: PropTypes.array.isRequired,
     metaData: PropTypes.array.isRequired,
     group: PropTypes.string.isRequired,
 };

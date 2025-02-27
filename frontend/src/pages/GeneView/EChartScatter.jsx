@@ -2,10 +2,13 @@ import ReactECharts from "echarts-for-react";
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
-const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
-
+const EChartScatterPlot = ({gene, geneData, sampleData, metaData, group}) => {
+    // console.log("gene: ", gene);
+    if(sampleData.length >= 1 && !sampleData.includes("all")) {
+        metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
+    }
     const createCategoryOptions = (plotData, colorGroup) => {
-        console.log("Categorical");
+        // console.log("Categorical");
 
         // Step 0: Group the data by 'plotGroup'
         const groupedData = {};
@@ -56,7 +59,7 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
     }
 
     const createContinuousOptions = (plotData, colorGroup) => {
-        console.log("continuous");
+        // console.log("continuous");
         // Convert data to the format required by ECharts
         const scatterData = plotData.map((point) => [point["UMAP_1"], point["UMAP_2"], point[colorGroup]]);
         // console.log(scatterData);
@@ -130,6 +133,7 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
 EChartScatterPlot.propTypes = {
     gene: PropTypes.string.isRequired,
     geneData: PropTypes.object.isRequired,
+    sampleData: PropTypes.array.isRequired,
     metaData: PropTypes.array.isRequired,
     group: PropTypes.string.isRequired,
 };

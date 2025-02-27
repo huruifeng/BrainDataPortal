@@ -4,7 +4,10 @@ import PropTypes from "prop-types";
 import {groupBy} from "lodash";
 
 
-const PlotlyScatterPlot = ({gene, geneData, metaData, group}) => {
+const PlotlyScatterPlot = ({gene, geneData, sampleData, metaData, group}) => {
+     if(sampleData.length >= 1 && !sampleData.includes("all")) {
+        metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
+    }
     const createCategoryTraces = (plotData, colorGroup) => {
         // Generate distinct colors for each group and create a series for each group
         const colorPalette = [
@@ -125,6 +128,7 @@ const PlotlyScatterPlot = ({gene, geneData, metaData, group}) => {
 PlotlyScatterPlot.propTypes = {
     gene: PropTypes.string.isRequired,
     geneData: PropTypes.object.isRequired,
+    sampleData: PropTypes.array.isRequired,
     metaData: PropTypes.array.isRequired,
     group: PropTypes.string.isRequired,
 };
