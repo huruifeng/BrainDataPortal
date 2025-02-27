@@ -36,6 +36,7 @@ function App() {
                     pauseOnHover
                     theme="light"
                     transition={Bounce}
+                    width={400}
              />
              {/* Main Content (grows dynamically) */}
              <div style={{ flex: 1 }}>

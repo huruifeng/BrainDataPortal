@@ -85,7 +85,7 @@ def get_meta_data(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_meta_100k.csv')
+    meta_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_meta_100k_1.csv')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=None, header=0)

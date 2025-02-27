@@ -25,17 +25,21 @@ async def getgeneexprdata(request:Request):
 
 @router.get("/getgenemeta")
 async def getallgenemeta(request:Request):
+    print("getallgenemeta() called================")
     dataset = request.query_params.get("dataset_id")
     genes = get_all_genes(dataset)
+    # print(len(genes))
     meta = get_meta_data(dataset)
+    # print(meta)
 
     if "Error" in genes:
-        raise HTTPException(status_code=404, detail="Gene list file is missing")
+        raise HTTPException(status_code=404, detail=genes)
 
     if "Error" in meta:
-        raise HTTPException(status_code=404, detail="Dataset not specified or Meta file is missing")
+        raise HTTPException(status_code=404, detail=meta)
 
     response = {"genes": genes, "meta": meta}
+
     return response
 
 @router.get("/getdata/{data_id}")

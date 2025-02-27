@@ -53,15 +53,16 @@ const useGeneStore = create((set, get) => ({
                 await set({geneList: data.genes, metaData: data.meta, genemetaStatus: "success"});
 
             } else {
-                console.error("Error fetching data:", response.data);
+                console.error("Error fetching data:", response.message);
                 await set({geneList: [], metaData: [], genefetchStatus: "failed"});
-                toast.error("Failed to fetch gene list and metadata.");
+                toast.error(response.message);
             }
 
         } catch (error) {
             console.error("Error fetching data:", error);
             await set({geneList: [], metaData: [], genefetchStatus: "error"});
             toast.error("Error while fetching gene list and metadata.");
+            set({loading: false, error: "Error while fetching gene list and metadata."});
         }finally {
             set({ loading: false }); // Ensure loading is false after completion
         }
