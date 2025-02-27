@@ -7,7 +7,9 @@ import {groupBy} from "lodash";
 const PlotlyScatterPlot = ({gene, geneData, sampleData, metaData, group}) => {
      if(sampleData.length >= 1 && !sampleData.includes("all")) {
         metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
-    }
+     }
+     if(metaData.length === 0) return "Sample not found in the MetaData";
+
     const createCategoryTraces = (plotData, colorGroup) => {
         // Generate distinct colors for each group and create a series for each group
         const colorPalette = [

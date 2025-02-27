@@ -7,6 +7,8 @@ const EChartScatterPlot = ({gene, geneData, sampleData, metaData, group}) => {
     if(sampleData.length >= 1 && !sampleData.includes("all")) {
         metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
     }
+    if(metaData.length === 0) return "Sample not found in the MetaData";
+
     const createCategoryOptions = (plotData, colorGroup) => {
         // console.log("Categorical");
 

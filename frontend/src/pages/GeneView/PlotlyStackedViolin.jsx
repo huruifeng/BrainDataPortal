@@ -6,6 +6,8 @@ const PlotlyStackedViolin = ({gene, geneData, sampleData, metaData, group}) => {
     if (sampleData.length >= 1 && !sampleData.includes("all")) {
         metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
     }
+    if(metaData.length === 0) return "Sample not found in the MetaData";
+
     if (gene !== "stackedviolin") return null;
     const expressionData = {};
     const genes = Object.keys(geneData);

@@ -1,4 +1,3 @@
-import React from "react";
 import ReactECharts from "echarts-for-react";
 import {groupBy} from "lodash";
 import * as d3 from "d3";
@@ -8,6 +7,8 @@ const EChartViolin = ({gene, geneData, sampleData, metaData, group}) => {
     if (sampleData.length >= 1 && !sampleData.includes("all")) {
         metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
     }
+    if(metaData.length === 0) return "Sample not found in the MetaData";
+
     if (gene === "all") return null;
 
     const groupedData = groupBy(metaData, group);
