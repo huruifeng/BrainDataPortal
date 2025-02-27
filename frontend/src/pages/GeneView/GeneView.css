@@ -78,7 +78,7 @@
 /* Dynamically adjust the number of columns */
 .umap-container.single-plot {
     grid-template-columns: 1fr;
-    width: 70%;
+    width: 60%;
 }
 
 .umap-container.two-plots {
@@ -144,7 +144,7 @@
     flex-wrap: wrap;
     justify-content: center; /* Center plots */
     align-items: center;
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 .violin-item {

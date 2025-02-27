@@ -5,7 +5,7 @@ import {isCategorical} from "../../utils/funcs.js";
 const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
 
     const createCategoryOptions = (plotData, colorGroup) => {
-        console.log("continuous");
+        console.log("Categorical");
 
         // Step 0: Group the data by 'plotGroup'
         const groupedData = {};
@@ -112,7 +112,7 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
             options = createContinuousOptions(metaData, group);
         }
     } else {
-        // Inside your UmapPlot component or data processing
+        // data processing
         const plotData = metaData.map(item => ({
             "UMAP_1": item.UMAP_1,
             "UMAP_2": item.UMAP_2,

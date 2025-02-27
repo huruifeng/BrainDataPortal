@@ -2,16 +2,16 @@ import React from "react";
 import Plot from "react-plotly.js";
 import { groupBy } from "lodash";
 
-const PlotlyViolin = ({ gene, data,color, group }) => {
+const PlotlyViolinPlot = ({ gene, geneData, metaData, group }) => {
   if(gene==="all") return null;
-  const groupedData = groupBy(data, group);
-  console.log(groupedData)
+  const groupedData = groupBy(metaData, group);
+
   const xCategories = Object.keys(groupedData);
 
   const traces = xCategories.map((cellType) => ({
     type: "violin",
     name: cellType,
-    y: groupedData[cellType].map((d) => d[gene]),
+    y: groupedData[cellType].map((d) => { return geneData[d.cs_id] ?? 0 }),
     box: { visible: false }, // Show box plot inside violin
     meanline: { visible: true }, // Show mean line
     points: false, // Show all data points
@@ -38,4 +38,4 @@ const PlotlyViolin = ({ gene, data,color, group }) => {
   return <Plot data={traces} layout={layout} style={{ width: "100%", height: "200px" }} />;
 };
 
-export default PlotlyViolin;
+export default PlotlyViolinPlot;
