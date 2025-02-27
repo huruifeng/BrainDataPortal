@@ -32,7 +32,7 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
         }));
 
         // Step 3: Configure ECharts options
-        options = {
+        return {
             title: {
                 text: "UMAP Scatter Plot - " + colorGroup,
                 left: "center",
@@ -53,8 +53,6 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
             yAxis: {type: "value"},
             series: series,
         };
-
-        return options;
     }
 
     const createContinuousOptions = (plotData, colorGroup) => {
@@ -67,7 +65,7 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
         const maxValue = Math.max(...scatterData.map((p) => p[2]));
 
 
-        options = {
+        return {
             title: {
                 text: colorGroup,
                 left: 'center',
@@ -88,6 +86,7 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
                     color: ["#CCCCCCFF", "#FF0000FF"], // Color gradient from low to high
                 },
             },
+            legend: { show: false },
             series: [
                 {
                     type: "scatter",
@@ -96,8 +95,6 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
                 },
             ],
         };
-
-        return options;
     }
 
     var options = {};
@@ -121,7 +118,13 @@ const EChartScatterPlot = ({gene, geneData, metaData, group}) => {
         })) || [];
         options = createContinuousOptions(plotData, gene);
     }
-    return <ReactECharts option={options} style={{width: "100%", height: "100%"}} autoResize={true}/>;
+    return <ReactECharts
+        key={`${gene}-${group}`}
+        option={options}
+        notMerge={true} lazyUpdate={true} theme="light"
+        // showLoading={true}
+        style={{width: "100%", height: "100%"}}
+        autoResize={true}/>;
 }
 
 EChartScatterPlot.propTypes = {
@@ -133,6 +136,8 @@ EChartScatterPlot.propTypes = {
 
 export default EChartScatterPlot
 
+// https://www.npmjs.com/package/echarts-for-react
+// https://github.com/hustcc/echarts-for-react?tab=readme-ov-file
 // <ReactECharts
 //     notMerge={true}
 //     lazyUpdate={true}

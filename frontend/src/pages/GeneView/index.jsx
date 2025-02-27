@@ -144,7 +144,7 @@ function GeneView() {
                                 const {key, ...tagProps} = getTagProps({index});
                                 return (
                                     <Chip
-                                        key={option}
+                                        key={`${key}-${option}`}
                                         label={option}
                                         {...tagProps}
                                         color="primary"
@@ -174,7 +174,7 @@ function GeneView() {
                                 const {key, ...tagProps} = getTagProps({index});
                                 return (
                                     <Chip
-                                        key={option}
+                                        key={`${key}-${option}`}
                                         label={option}
                                         {...tagProps}
                                         color="primary"
@@ -317,7 +317,7 @@ function GeneView() {
                        <div className={`umap-container single-plot`}>
                             <div key={'all_gene'} className="umap-item">
                                 <div className="umap-wrapper">
-                                    { metaData && <PlotlyScatterPlot gene={"all"} geneData={{"all":"all"}} metaData={metaData} group={coloring}/> }
+                                    { metaData && <EChartScatterPlot gene={"all"} geneData={{"all":"all"}} metaData={metaData} group={coloring}/> }
                                 </div>
                             </div>
                        </div>

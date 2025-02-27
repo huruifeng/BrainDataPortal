@@ -92,16 +92,24 @@ const PlotlyScatterPlot = ({gene, geneData, metaData, group}) => {
 
     // Layout configuration
     const layout = {
-        title: gene==="all" ? `UMAP Plot for ${group}` : `${gene}`,
+        title: {
+            text: gene==="all" ? `UMAP Plot for ${group}` : `${gene}`,
+            font: {
+                size: 18,
+                weight: 'bold'
+            },
+            pad: { t: 10, b: 10 },
+            automargin: true
+        },
         showlegend: isCategoricalGroup,
         legend: {
             x: 1, y: 1,
             orientation: 'v',
             itemsizing: 'constant',
         },
-        margin: {l: 50, r: 10, b: 50, t: 10, pad: 4},
-        plot_bgcolor: '#ffffff',
-        paper_bgcolor: '#ffffff',
+        margin: {l: 50, r: 10, b: 50, t: 20, pad: 4},
+        plot_bgcolor: '#f0f0f0',
+        paper_bgcolor: '#f0f0f0',
         autosize: true
     };
 
