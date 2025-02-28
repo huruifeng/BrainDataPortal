@@ -128,7 +128,12 @@ const DatasetDisplay = ({ dataRecords}) => {
                                         <TableCell>{record.n_samples}</TableCell>
                                         <TableCell>{record.brain_regions}</TableCell>
                                         <TableCell>{record.assay}</TableCell>
-                                        <TableCell><Link to={`/geneview/${record.dataset_id}?sample=all`}>UMAP</Link></TableCell>
+                                        <TableCell>
+                                            <Box sx={{display: "flex", gap: "10px"}}>
+                                                <Link to={`/geneview/${record.dataset_id}?sample=all`}>UMAP</Link>
+                                                {record.assay === "VisiumST" && <Link to={`/visiumview/${record.dataset_id}`}>Visium</Link>}
+                                            </Box>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -147,8 +152,9 @@ const DatasetDisplay = ({ dataRecords}) => {
                                     <Box><b># Samples:</b> {record.n_samples}</Box>
                                     <Box><b>Assay type:</b> {record.assay}</Box>
                                   </Box>
-                                <Box sx={{fontSize: "14px", padding: "8px 0"}}>
-                                    <Link to={`/geneview/${record.dataset_id}?sample=all`}>View UMAP</Link>
+                                <Box sx={{fontSize: "14px", padding: "8px 0", display: "flex", gap: "8px"}}>
+                                    <Link to={`/geneview/${record.dataset_id}?sample=all`}>UMAP</Link>
+                                    {record.assay === "VisiumST" && <Link to={`/visiumview/${record.dataset_id}`}>Visium</Link>}
                                 </Box>
 
                             </Box>

@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/")
 async def read_root():
-    return {"Message": "Hellow World."}
+    return {"Message": "Hello API."}
 
 @router.get("/getgeneexprdata")
 async def getgeneexprdata(request:Request):

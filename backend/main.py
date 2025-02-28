@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.db import create_db_and_tables
-from backend.routes import db_routes, API_routes
+from backend.routes import db_routes, API_routes, visium_routes
+
 app = FastAPI()
 
 app.add_middleware(
@@ -23,6 +24,7 @@ async def root():
 
 app.include_router(db_routes.router, prefix="/db")
 app.include_router(API_routes.router, prefix="/api")
+app.include_router(visium_routes.router, prefix="/visium")
 
 if __name__ == "__main__":
     import uvicorn

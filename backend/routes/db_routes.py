@@ -7,6 +7,10 @@ from backend.db import engine
 
 router = APIRouter()
 
+@router.get("/")
+async def read_root():
+    return {"Message": "Hello DB."}
+
 @router.get("/import_csv/{table}", tags=["db"])
 async def import_csv(table: str):
     empty_data_lst = [None, "none","Null","null","na", np.nan, "Unknown","unknown","NaN","nan","N/A"]
