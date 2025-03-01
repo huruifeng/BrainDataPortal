@@ -1,10 +1,10 @@
 import {create} from "zustand";
-import {getGeneExprData, getGeneMeta_get} from "../api/api.js";
+import {getGeneExprData, getGeneMeta} from "../api/api.js";
 import {toast} from "react-toastify";
 
 const useGeneStore = create((set, get) => ({
     dataSet: null,
-    metaData: null,
+    metaData: [],
     geneList: [],
     genemetaStatus: null,
 
@@ -45,7 +45,7 @@ const useGeneStore = create((set, get) => ({
         }
 
         try {
-            const response = await getGeneMeta_get(dataset_id);
+            const response = await getGeneMeta(dataset_id,"sc");
             // toast.success("Data loaded successfully!");
             // console.log(response);
             if (response.status === 200) {

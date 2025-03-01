@@ -15,9 +15,10 @@ export const getGeneExprData = async (dataset,gene) => {
     }
 }
 
-export const getGeneMeta_get = async (dataset_id="all") => {
+export const getGeneMeta = async (dataset_id="all",dataset_type="all") => {
     try {
-        const response = await axios.get(`${API_URL}/getgenemeta`, {params: {dataset_id: dataset_id}});
+        const response = await axios.get(`${API_URL}/getgenemeta`,
+            {params: {dataset_id: dataset_id, dataset_type: dataset_type}});
         return response;
     } catch (error) {
         console.error("Error reading gene/meta records:", error);

@@ -8,14 +8,13 @@ import {
     TextField,
     LinearProgress,
     CircularProgress,
-    Autocomplete, FormControl, InputLabel, Select, MenuItem,
+    Autocomplete,
 } from "@mui/material";
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import {useParams, useSearchParams} from "react-router-dom";
 
 
 import "./VisiumView.css";
-import useDataStore from "../../store/DataStore.js";
 import useVisiumStore from "../../store/VisiumStore.js";
 import EChartFeaturePlot from "./VisiumPlot.jsx";
 
@@ -33,24 +32,12 @@ function VisiumView() {
 
 
     // Prepare all the  data
-    const {sampleRecords, fetchSampleData} = useDataStore();
     const {geneList, metaData} = useVisiumStore();
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useVisiumStore();
     const {setDataset, exprDataList, imageDataList, loading, error} = useVisiumStore();
 
-    const [metaFeature, setMetaFeature] = useState(initialMetas);
-
-    useEffect(() => {
-        fetchSampleData({dataset_id: datasetId});
-        useVisiumStore.getState().fetchGeneMeta(datasetId);
-    }, [datasetId]);
-
-    const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
-    const geneOptions = geneList.map((gene) => gene);
-    const metaOptions =  Object.keys(metaData[0]).map((meta) => meta);
-
-    const [geneSearchText, setGeneSearchText] = useState("");
-    const [sampleSearchText, setSampleSearchText] = useState("");
+    const [selectedMetaFeatures, setSelectedMetaFeatures] = useState(initialMetas);
+    const [selectedFeatures, setSelectedFeatures] = useState([...initialMetas, ...initialGenes]);
 
     useEffect(() => {
         const initialSelectedSamples = initialSamples.length ? initialSamples : [];
@@ -65,7 +52,22 @@ function VisiumView() {
 
         useVisiumStore.getState().fetchGeneExprData(); // Fetch data once after both are set
         useVisiumStore.getState().fetchImageData();
-    }, []);
+        useVisiumStore.getState().fetchGeneMeta(datasetId);
+    }, [datasetId]);
+
+
+    // const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
+    const geneOptions = geneList.map((gene) => gene);
+    const sampleOptions = metaData ? [...new Set(metaData.map(row => row.sample_id))] : [];
+    const metaOptions = metaData ? Object.keys(metaData[0] || {}).map((option) => {
+        const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
+        return excludedKeys.has(option) ? null : option;
+    }).filter(Boolean) : [];
+
+    const [geneSearchText, setGeneSearchText] = useState("");
+    const [sampleSearchText, setSampleSearchText] = useState("");
+    const [metaSearchText, setMetaSearchText] = useState("");
+
 
     /** Updates the query parameters in the URL */
     const updateQueryParams = (genes, samples, metas = []) => {
@@ -80,14 +82,16 @@ function VisiumView() {
     /** Handles sample selection change */
     const handleSampleChange = (event, newValue) => {
         setSelectedSamples(newValue);
-        updateQueryParams(selectedGenes, newValue); // Pass the new value instead of old state
+        updateQueryParams(selectedGenes, newValue);
+        useVisiumStore.getState().fetchImageData();
     };
 
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
         setSelectedGenes(newValue);
-        updateQueryParams(newValue, selectedSamples); // Pass the new value instead of old state
+        updateQueryParams(newValue, selectedSamples);
         useVisiumStore.getState().fetchGeneExprData();
+        setSelectedFeatures([...selectedFeatures, ...newValue]);
     };
 
     const handleGeneDelete = (delGene) => {
@@ -95,11 +99,19 @@ function VisiumView() {
         setSelectedGenes(newGenes);
         updateQueryParams(newGenes, selectedSamples);
         useVisiumStore.getState().fetchGeneExprData();
+        setSelectedFeatures([...selectedFeatures, ...newGenes]);
     }
 
-     const handleMetaFeatureChange = (event) => {
-        setMetaFeature(event.target.value);
-        updateQueryParams(selectedGenes, selectedSamples, event.target.value);
+    const handleMetaFeatureChange = (event, newValue) => {
+        setSelectedMetaFeatures(newValue);
+        updateQueryParams(selectedGenes, selectedSamples, newValue);
+        setSelectedFeatures([...selectedFeatures, ...newValue]);
+    }
+    const handleMetaDelete = (delMeta) => {
+        const newMetas = selectedMetaFeatures.filter(m => m !== delMeta);
+        setSelectedMetaFeatures(newMetas);
+        updateQueryParams(selectedGenes, selectedSamples, newMetas);
+        setSelectedFeatures([...selectedFeatures, ...newMetas]);
     }
 
     // click the button to fetch umap data
@@ -131,7 +143,7 @@ function VisiumView() {
                     <Autocomplete
                         multiple
                         size="small"
-                        options={sampleOptions}
+                        options={sampleOptions || []}
                         value={selectedSamples}
                         onChange={handleSampleChange}
                         inputValue={sampleSearchText}
@@ -160,7 +172,7 @@ function VisiumView() {
 
                     <Typography sx={{marginTop: "10px"}} variant="subtitle1">Select features:</Typography>
 
-                     {/* Gene Selection with Fuzzy Search & Chips */}
+                    {/* Gene Selection with Fuzzy Search & Chips */}
                     <Autocomplete
                         sx={{marginLeft: "20px"}}
                         multiple
@@ -187,16 +199,16 @@ function VisiumView() {
                         renderInput={(params) => <TextField {...params} label="Search Gene" variant="standard"/>}
                     />
 
-                    {/* Gene Selection with Fuzzy Search & Chips */}
+                    {/* meta selection with Fuzzy Search & Chips */}
                     <Autocomplete
                         sx={{marginLeft: "20px"}}
                         multiple
                         size="small"
-                        options={geneOptions}
-                        value={metaFeature}
-                        onChange={handleGeneChange}
-                        inputValue={geneSearchText}
-                        onInputChange={(event, newInputValue) => setGeneSearchText(newInputValue)}
+                        options={metaOptions || []}
+                        value={selectedMetaFeatures}
+                        onChange={handleMetaFeatureChange}
+                        inputValue={metaSearchText}
+                        onInputChange={(event, newInputValue) => setMetaSearchText(newInputValue)}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => {
                                 const {key, ...tagProps} = getTagProps({index});
@@ -206,14 +218,14 @@ function VisiumView() {
                                         label={option}
                                         {...tagProps}
                                         color="primary"
-                                        onDelete={() => handleGeneDelete(option)}
+                                        onDelete={() => handleMetaDelete(option)}
                                     />
                                 );
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Select meta feature" variant="standard"/>}
+                        renderInput={(params) => <TextField {...params} label="Select meta feature"
+                                                            variant="standard"/>}
                     />
-
 
 
                     {/* a button to fetch data and a loading indicator*/}
@@ -237,27 +249,39 @@ function VisiumView() {
                             </Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
                                 <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading
-                                    samples and Metadata...</Typography>
+                                    sample list and metadata...</Typography>
                             </Box>
                         </>
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : (
                         <div className={`visium-container ${plotClass}`}>
-                            {Object.keys(imageDataList).length <1 ? (
+                            {Object.keys(imageDataList).length < 1 ? (
                                 <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
                                     <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">
                                         No sample selected for visualization</Typography>
                                 </Box>
-                            ): Object.entries(imageDataList).map(([sample_i, visiumData_i]) => (
+                            ) : Object.entries(imageDataList).map(([sample_i, visiumData_i]) => (
                                 <div key={sample_i} className="sample-container">
-                                    {Object.entries(exprDataList).map(([gene, expr_data]) => (
-                                        <div key={gene} className="visium-item">
-                                            {metaData && <EChartFeaturePlot visumData={visiumData_i} geneData={expr_data} metaData={metaData}/>}
-                                        </div>
-                                    ))}
+                                    {selectedFeatures.length > 0 ?
+                                        selectedFeatures.map(feature => {
+                                            return (
+                                                <EChartFeaturePlot
+                                                    key={sample_i + feature}
+                                                    visiumData={visiumData_i}
+                                                    geneData={exprDataList}
+                                                    metaData={metaData}
+                                                    feature={feature}
+                                                />
+                                            )
+                                        })
+                                        : <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
+                                            <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">
+                                                No feature selected for visualization</Typography>
+                                        </Box>
+                                    }
                                 </div>
-                                ))
+                            ))
                             }
                         </div>
                     )}

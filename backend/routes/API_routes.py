@@ -27,9 +27,14 @@ async def getgeneexprdata(request:Request):
 async def getallgenemeta(request:Request):
     print("getallgenemeta() called================")
     dataset = request.query_params.get("dataset_id")
+    dataset_type = request.query_params.get("dataset_type")
     genes = get_all_genes(dataset)
     # print(len(genes))
-    meta = get_meta_data(dataset)
+    if dataset_type == "visium":
+        drop_cols = ["UMAP_1", "UMAP_2"]
+    else:
+        drop_cols = None
+    meta = get_meta_data(dataset, drop_cols=drop_cols)
     # print(meta)
 
     if "Error" in genes:

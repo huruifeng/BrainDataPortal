@@ -20,14 +20,17 @@ async def read_root():
 async def getimagedata(request:Request):
     print("getimagedata() called================")
     dataset_id = request.query_params.get("dataset")
-    slice_sample = request.query_params.get("sample")
+    sample = request.query_params.get("sample")
+    print(dataset_id, sample)
+    results = get_visium_image_data(dataset_id, sample)
 
-    coordinates, scales = get_visium_image_data(dataset_id, slice_sample)
+    if "Error" in results:
+        raise HTTPException(status_code=404, detail=results)
 
-    image_file = os.path.join("backend","datasets",dataset_id,'images',slice_sample+".png")
+    image_file = os.path.join("backend","datasets",dataset_id,'images',sample+".png")
     image = FileResponse(image_file, media_type="image/png", filename="sliceImage.png")
 
-    response = {"coordinates": coordinates, "scales": scales, "image": image}
+    response = {"coordinates": results["coordinates"], "scales": results["scales"], "image": image}
     if "Error" in response:
         raise HTTPException(status_code=404, detail="Error in getting UMAP matrix.")
     return response

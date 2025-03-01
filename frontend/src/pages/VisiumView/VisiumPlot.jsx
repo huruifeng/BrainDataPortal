@@ -2,13 +2,17 @@ import {useState} from 'react';
 import ReactECharts from 'echarts-for-react';
 import PropTypes from "prop-types";
 
-const EChartFeaturePlot = ({visumData, geneData, metaData}) => {
-    console.log("EChartFeaturePlot");
+const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
+    console.log("feature: ", feature);
+    console.log("visiumData: ", visiumData);
+    console.log("geneData: ", geneData);
+    console.log("metaData: ", metaData);
+
     const [options, setOptions] = useState({});
 
-    const coordinates = visumData.coordinates;
-    const scaleFactors = visumData.scaleFactors;
-    const imgBlob = visumData.sliceImage;
+    const coordinates = visiumData.coordinates;
+    const scaleFactors = visiumData.scaleFactors;
+    const imgBlob = visiumData.sliceImage;
 
     const imgUrl = URL.createObjectURL(imgBlob);
     // Create an Image object to get the image dimensions
@@ -111,9 +115,10 @@ const EChartFeaturePlot = ({visumData, geneData, metaData}) => {
 };
 
 EChartFeaturePlot.propTypes = {
-    visumData: PropTypes.object.isRequired,
+    visiumData: PropTypes.object.isRequired,
     geneData: PropTypes.object.isRequired,
     metaData: PropTypes.array.isRequired,
+    feature: PropTypes.string.isRequired,
 };
 
 export default EChartFeaturePlot;

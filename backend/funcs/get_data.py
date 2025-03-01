@@ -61,9 +61,7 @@ def get_visium_image_data(dataset, sample):
         with open(scales_file, 'r') as f:
             scales = json.load(f)
 
-        # print(coordinates)
-        # print(scales)
 
-        return coordinates, scales
+        return {"coordinates": coordinates, "scales": scales}
     else:
         return "Error: Image file not found"
