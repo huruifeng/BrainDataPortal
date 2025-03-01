@@ -45,6 +45,7 @@ function VisiumView() {
         const initialSelectedGenes = initialGenes.length ? initialGenes : [];
 
         setDataset(datasetId);
+        useVisiumStore.getState().fetchGeneMeta(datasetId);
 
         useVisiumStore.setState({
             selectedSamples: initialSelectedSamples,
@@ -53,7 +54,7 @@ function VisiumView() {
 
         useVisiumStore.getState().fetchGeneExprData(); // Fetch data once after both are set
         useVisiumStore.getState().fetchImageData();
-        useVisiumStore.getState().fetchGeneMeta(datasetId);
+
     }, [datasetId]);
 
 
@@ -258,25 +259,32 @@ function VisiumView() {
                     ) : (
                         <div className={`visium-container ${plotClass}`}>
                             {Object.keys(imageDataList).length < 1 ? (
-                                <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
+                                <Box className="no-sample">
                                     <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">
                                         No sample selected for visualization</Typography>
                                 </Box>
                             ) : Object.entries(imageDataList).map(([sample_i, visiumData_i]) => (
-                                <div key={sample_i} className="sample-container">
-                                    {selectedFeatures.length > 0 ?
-                                        selectedFeatures.map(feature => {
-                                            return (
+                                <div key={sample_i} className="sample-row">
+                                    <div className="sample-label">
+                                        <Typography variant="subtitle1">{sample_i}</Typography>
+                                    </div>
+                                    {selectedFeatures.length > 0 ? (
+                                        selectedFeatures.map(feature => (
+                                            <div key={`${sample_i}-${feature}`} className="feature-plot">
+
                                                 <EChartFeaturePlot
                                                     key={sample_i + feature}
                                                     visiumData={visiumData_i}
                                                     geneData={exprDataList}
-                                                    metaData={metaData}
+                                                    metaData={metaData || []}
                                                     feature={feature}
                                                 />
-                                            )
-                                        })
-                                        : <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
+                                                <Typography variant="caption" display="block" align="center">
+                                                    {feature}
+                                                </Typography>
+                                            </div>
+                                        ))
+                                    ): <Box className="no-feature">
                                             <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">
                                                 No feature selected for visualization</Typography>
                                         </Box>

@@ -4,9 +4,9 @@ import PropTypes from "prop-types";
 
 const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     console.log("feature: ", feature);
-    console.log("metaData: ", metaData);
-    console.log("geneData: ", geneData);
-    console.log("visiumData: ", visiumData);
+    // console.log("metaData: ", metaData);
+    // console.log("geneData: ", geneData);
+    // console.log("visiumData: ", visiumData);
 
     const coordinates = visiumData.coordinates;
     const scaleFactors = visiumData.scales;
@@ -15,15 +15,14 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     const imgUrl = URL.createObjectURL(imgBlob);
 
     let featuredData = {};
-    const isMetaFeature = Object.keys(metaData[0]).includes(feature);
+    const isMetaFeature = Object.keys(metaData?.[0] || []).includes(feature);
+
     if (isMetaFeature) {
         metaData.forEach((item) => {
             featuredData[item.cs_id] = item[feature];
         });
     } else {
-        geneData.forEach((item) => {
-            featuredData[item.cs_id] = item[feature];
-        });
+        featuredData = geneData;
     }
 
     const containerRef = useRef(null);
@@ -61,12 +60,18 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             }))
             .filter(entry => typeof entry.value === 'number');
 
+            // console.log("validEntries: ", validEntries);
+
             if (validEntries.length === 0) return;
 
             // Calculate min/max for color scaling
             const values = validEntries.map(entry => entry.value);
             const min = Math.min(...values);
             const max = Math.max(...values);
+
+            console.log("min: ", min);
+            console.log("max: ", max);
+
 
             // Color interpolation function (blue to red)
             const getColor = (value) => {
@@ -81,7 +86,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                 const y = spot.imagerow * scaleFactors.hires * scaleY;
 
                 ctx.beginPath();
-                ctx.arc(x, y, 3, 0, 2 * Math.PI); // Fixed radius of 3px
+                ctx.arc(x, y, 10, 0, 2 * Math.PI); // Fixed radius of 3px
                 ctx.fillStyle = getColor(spot.value);
                 ctx.fill();
             });

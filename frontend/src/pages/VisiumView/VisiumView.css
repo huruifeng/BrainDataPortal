@@ -67,8 +67,35 @@
 
 
 /*=======================================*/
+/* VisiumView.css */
+
 .visium-container {
+    overflow-x: auto;
+    padding: 8px;
+}
+
+.sample-row {
     display: flex;
-    flex-direction: column;
-    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 16px;
+}
+
+.sample-label {
+    min-width: 100px;
+    padding-right: 16px;
+}
+
+.feature-plot {
+    margin-right: 16px;
+}
+
+/* For messages when no samples or features are selected */
+.no-sample,
+.no-feature {
+    display: flex;
+    justify-content: center;
+    padding-top: 100px;
 }

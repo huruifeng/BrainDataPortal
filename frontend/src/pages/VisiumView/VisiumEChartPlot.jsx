@@ -34,7 +34,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     // Fetch gene expression data from the backend
     let featuredData = {};
     const isGene = Object.keys(geneData).includes(feature);
-    const isMetaFeature = Object.keys(metaData[0]).includes(feature);
+    const isMetaFeature = Object.keys(metaData?.[0] || []).includes(feature);
     if (isGene) {
         featuredData = geneData;
     } else if (isMetaFeature) {
@@ -116,7 +116,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             coordinateSystem: 'cartesian2d',
             data: scatterData,
             // Adjust symbolSize using the spot.radius (multiplied by a factor for visibility)
-            symbolSize: spotRadius * 50,
+            symbolSize: spotRadius * 660,
             z: 2,
             itemStyle: {
                 borderColor: '#fff',
