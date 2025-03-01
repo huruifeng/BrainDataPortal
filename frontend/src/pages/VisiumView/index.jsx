@@ -17,6 +17,7 @@ import {useParams, useSearchParams} from "react-router-dom";
 import "./VisiumView.css";
 import useVisiumStore from "../../store/VisiumStore.js";
 import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
+import EChartFeaturePlot2 from "./VisiumEChartPlot2.jsx";
 import FeaturePlot from "./VisiumCanvasPlot.jsx";
 
 
@@ -277,18 +278,18 @@ function VisiumView() {
                                     <div className="features-container">
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
-                                                <div key={`${sample_i}-${feature}`} className="feature-plot">
-                                                    <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
-                                                    <Typography variant="caption" display="block" align="center">
-                                                        {feature}
-                                                    </Typography>
-                                                </div>
-                                                // <div key={`${sample_i}-${feature}`} className="feature-plot-echart">
-                                                //     <EChartFeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
+                                                // <div key={`${sample_i}-${feature}`} className="feature-plot">
+                                                //     <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
                                                 //     <Typography variant="caption" display="block" align="center">
                                                 //         {feature}
                                                 //     </Typography>
                                                 // </div>
+                                                <div key={`${sample_i}-${feature}`} className="feature-plot-echart">
+                                                    <EChartFeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
+                                                    <Typography variant="caption" display="block" align="center">
+                                                        {feature}
+                                                    </Typography>
+                                                </div>
                                             ))
                                         ) : (
                                             <Box className="no-feature">

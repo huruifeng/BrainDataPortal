@@ -37,6 +37,11 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             const displayedWidth = img.offsetWidth;
             const displayedHeight = img.offsetHeight;
 
+            console.log("naturalWidth: ", naturalWidth);
+            console.log("naturalHeight: ", naturalHeight);
+            console.log("displayedWidth: ", displayedWidth);
+            console.log("displayedHeight: ", displayedHeight);
+
             if (!naturalWidth || !naturalHeight) return;
 
             const scaleX = displayedWidth / naturalWidth;
@@ -57,7 +62,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                 value: featuredData[spot.cs_id] ?? 0
             }))
             // .filter(spot => spot.value !== undefined);
-            console.log("validEntries: ", validEntries);
+            // console.log("validEntries: ", validEntries);
 
             if (validEntries.length === 0) return;
 

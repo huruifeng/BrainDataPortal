@@ -111,6 +111,7 @@
 }
 
 .feature-plot-echart {
+    width: 100%;
     min-width: 320px;
     flex: 1;
     position: relative;
