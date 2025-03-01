@@ -105,7 +105,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     }, [coordinates, scaleFactors, featuredData, imgBlob]);
 
     return (
-        <div ref={containerRef} style={{position: 'relative', width: '100%', height: '100%'}}>
+        <div ref={containerRef} style={{position: 'relative', width: '100%'}}>
             <img
                 ref={imgRef}
                 src={imgUrl}
