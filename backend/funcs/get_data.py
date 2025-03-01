@@ -46,7 +46,7 @@ def get_meta_data(dataset, drop_cols=None):
         return "Error: Meta file not found"
 
 
-def get_visium_image_data(dataset, sample):
+def get_visium_coordinates(dataset, sample):
     if dataset == "all":
         return "Error: Dataset is not specified."
 

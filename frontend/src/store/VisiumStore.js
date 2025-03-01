@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import {getGeneExprData, getGeneMeta} from "../api/api.js";
-import {getImageData} from "../api/visium.js";
+import {getCoordinates, getImage} from "../api/visium.js";
 import {toast} from "react-toastify";
 
 const useVisiumStore = create((set, get) => ({
@@ -126,8 +126,13 @@ const useVisiumStore = create((set, get) => ({
             get().imageDataList = {};
             for (var sample of selectedSamples) {
                 if (!get().imageDataList[sample]) {
-                    const response = await getImageData(dataSet, sample);
-                    get().imageDataList[sample] = response.data;
+                    const coor_response = await getCoordinates(dataSet, sample);
+                    const img_response = await getImage(dataSet, sample);
+                    get().imageDataList[sample] = {
+                        coordinates: coor_response.data.coordinates,
+                        scales: coor_response.data.scales,
+                        image: img_response.data
+                    };
                 }
             }
             // remove gene item if it is not selected

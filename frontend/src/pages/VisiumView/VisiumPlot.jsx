@@ -1,90 +1,90 @@
-import {useState} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
 import PropTypes from "prop-types";
 
-const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
-    console.log("feature: ", feature);
-    console.log("visiumData: ", visiumData);
-    console.log("geneData: ", geneData);
-    console.log("metaData: ", metaData);
+const EChartFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
+    const [options, setOptions] = useState(null);
+    const imgUrlRef = useRef(null);
 
-    const [options, setOptions] = useState({});
+    useEffect(() => {
+        if (!visiumData || !geneData) return;
 
-    const coordinates = visiumData.coordinates;
-    const scaleFactors = visiumData.scaleFactors;
-    const imgBlob = visiumData.sliceImage;
 
-    const imgUrl = URL.createObjectURL(imgBlob);
-    // Create an Image object to get the image dimensions
-    const img = new Image();
-    img.src = imgUrl;
-    img.crossOrigin = 'Anonymous';
-    img.onload = () => {
-        // Use the "spot" scaling factor to convert spot coordinates to image pixel space
-        const scale = scaleFactors.spot;
+        const coordinates = visiumData.coordinates;
+        const scaleFactors = visiumData.scales;
+        const sliceImage = visiumData.image;
+        const imgBlob = sliceImage;
+        const imgUrl = URL.createObjectURL(imgBlob);
+        imgUrlRef.current = imgUrl;
 
-        // Build an array of data points: each is [x, y, expression]
-        const dataPoints = coordinates.map(spot => {
-            const spotId = spot.cs_id;
-            const expr = geneData[spotId] || 0;
-            // Multiply raw imagecol and imagerow by the scale factor
-            return [spot.imagecol * scale, spot.imagerow * scale, expr];
-        });
+        const img = new Image();
+        img.src = imgUrl;
+        img.crossOrigin = 'Anonymous';
 
-        // Determine the min and max expression values for the visualMap
-        const exprValues = dataPoints.map(d => d[2]);
-        const minExpr = Math.min(...exprValues);
-        const maxExpr = Math.max(...exprValues);
+        const handleImageLoad = () => {
+            const scale = scaleFactors.spot; // Changed from 'spot' to 'hires' based on your data structure
 
-        // Configure the ECharts option
-        const chartOption = {
-            tooltip: {
-                trigger: 'item',
-                formatter: params => {
-                    return `X: ${params.data[0]}<br/>Y: ${params.data[1]}<br/>Expression: ${params.data[2]}`;
+            const dataPoints = coordinates.map(spot => {
+                // Fetch gene expression data from the backend
+                let colorValues = {};
+                const isGene = Object.keys(geneData).includes(feature);
+                const isMetaFeature = Object.keys(metaData[0]).includes(feature);
+                if (isGene) {
+                    colorValues = geneData;
+                } else if (isMetaFeature) {
+                    colorValues = metaData.reduce((acc, meta) => {
+                        acc[meta.cs_id] = meta[feature];
+                        return acc;
+                    }, {});
+                } else {
+                    colorValues = {};
                 }
-            },
-            xAxis: {
-                min: 0,
-                max: img.width,
-                show: false
-            },
-            yAxis: {
-                min: 0,
-                max: img.height,
-                inverse: true, // reverse the y-axis to match image coordinates
-                show: false
-            },
-            visualMap: {
-                min: minExpr,
-                max: maxExpr,
-                orient: 'vertical',
-                left: 'left',
-                top: 'middle',
-                inRange: {
-                    // You can customize the color gradient as needed
-                    color: ['blue', 'green', 'yellow', 'red']
+
+                const expr = colorValues[spot.cs_id] ?? 0;
+                return [
+                    spot.imagecol * scale,
+                    spot.imagerow * scale,
+                    expr
+                ];
+            });
+
+            const exprValues = dataPoints.map(d => d[2]);
+            const minExpr = Math.min(...exprValues);
+            const maxExpr = Math.max(...exprValues);
+
+            setOptions({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: params =>
+                        `X: ${params.data[0].toFixed(1)}<br/>
+                         Y: ${params.data[1].toFixed(1)}<br/>
+                         Expression: ${params.data[2].toFixed(2)}`
                 },
-                text: ['High', 'Low'],
-                calculable: true
-            },
-            series: [
-                {
+                xAxis: { min: 0, max: img.width, show: false },
+                yAxis: { min: 0, max: img.height, inverse: true, show: false },
+                visualMap: {
+                    min: minExpr,
+                    max: maxExpr,
+                    orient: 'vertical',
+                    left: 'left',
+                    top: 'middle',
+                    inRange: { color: ['#2b73af', '#64b5f6', '#b3e5fc', '#ffeb3b', '#ff5722'] },
+                    text: ['High', 'Low'],
+                    calculable: true
+                },
+                series: [{
                     type: 'scatter',
-                    symbolSize: 10, // Adjust spot size as needed
+                    symbolSize: 12,
                     data: dataPoints,
                     itemStyle: {
                         borderColor: '#fff',
                         borderWidth: 1
                     }
-                }
-            ],
-            // Use the graphic component to display the background image
-            graphic: [
-                {
+                }],
+                graphic: [{
                     type: 'image',
                     id: 'background',
-                    z: -1, // Render behind the scatter series
+                    z: -1,
                     left: 0,
                     top: 0,
                     style: {
@@ -92,33 +92,58 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                         width: img.width,
                         height: img.height
                     }
-                }
-            ]
+                }]
+            });
         };
 
-        // Set the option to render the chart
-        setOptions(chartOption);
-        // Optionally, revoke the object URL if no longer needed
-        URL.revokeObjectURL(imgUrl);
+        img.addEventListener('load', handleImageLoad);
 
-    }
+        // Cleanup
+        return () => {
+            img.removeEventListener('load', handleImageLoad);
+            if (imgUrlRef.current) {
+                URL.revokeObjectURL(imgUrlRef.current);
+            }
+        };
+    }, [visiumData, geneData]);
 
     return (
-        <div>
-            {!options ? (
-                <p>Loading...</p>
+        <div style={{ height: '100%', width: '100%' }}>
+            {options ? (
+                <ReactECharts
+                    option={options}
+                    style={{ height: '600px', width: '100%' }}
+                    opts={{ renderer: 'svg' }} // Better for crisp images
+                />
             ) : (
-                <ReactECharts option={options} style={{height: '600px', width: '100%'}}/>
+                <div style={{
+                    height: '600px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: '#666'
+                }}>
+                    Loading visualization...
+                </div>
             )}
         </div>
     );
 };
 
 EChartFeaturePlot.propTypes = {
-    visiumData: PropTypes.object.isRequired,
+    visiumData: PropTypes.shape({
+        coordinates: PropTypes.array.isRequired,
+        scales: PropTypes.object.isRequired,
+        image: PropTypes.instanceOf(Blob).isRequired
+    }).isRequired,
     geneData: PropTypes.object.isRequired,
-    metaData: PropTypes.array.isRequired,
-    feature: PropTypes.string.isRequired,
+    metaData: PropTypes.array,
+    feature: PropTypes.string
+};
+
+EChartFeaturePlot.defaultProps = {
+    metaData: [],
+    feature: ''
 };
 
 export default EChartFeaturePlot;
