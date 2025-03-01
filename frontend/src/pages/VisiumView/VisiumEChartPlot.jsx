@@ -48,8 +48,8 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     // Transform visiumData: scale coordinates and attach the feature value.
     const scatterData = coordinates.map(item => {
         // Compute x,y coordinates (note: imagecol is x and imagerow is y)
-        const x = item.imagecol * scaleFactors.lowres;
-        const y = item.imagerow * scaleFactors.lowres;
+        const y = item.imagecol * scaleFactors.lowres;
+        const x = item.imagerow * scaleFactors.lowres;
         // Get the nCount_Spatial value for the current spot (default to 0 if missing)
         const featureValue = featuredData[item.cs_id] || 0;
         return {
@@ -129,8 +129,11 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         <div style={{ height: '100%', width: '100%' }}>
             {option ? (
                 <ReactECharts
+                    key={`${feature}`}
                     option={option}
-                    style={{ height: '600px', width: '100%' }}
+                    notMerge={true} lazyUpdate={true} theme="light"
+                    style={{ height: '400px', width: '100%' }}
+                    autoResize={true}
                     opts={{ renderer: 'svg' }} // Better for crisp images
                 />
             ) : (

@@ -1,17 +1,15 @@
-import React, {useEffect, useRef, useState} from 'react';
-import * as d3 from 'd3';
+import React, {useEffect, useRef} from 'react';
 import PropTypes from "prop-types";
 
 const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
-    console.log("feature: ", feature);
+    // console.log("feature: ", feature);
     // console.log("metaData: ", metaData);
     // console.log("geneData: ", geneData);
     // console.log("visiumData: ", visiumData);
 
     const coordinates = visiumData.coordinates;
     const scaleFactors = visiumData.scales;
-    const sliceImage = visiumData.image;
-    const imgBlob = sliceImage;
+    const imgBlob = visiumData.image;
     const imgUrl = URL.createObjectURL(imgBlob);
 
     let featuredData = {};
@@ -82,11 +80,11 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
             // Calculate spot positions and draw
             validEntries.forEach(spot => {
-                const x = spot.imagecol * scaleFactors.hires * scaleX;
-                const y = spot.imagerow * scaleFactors.hires * scaleY;
+                const y = spot.imagecol * scaleX * scaleFactors.lowres;
+                const x = spot.imagerow * scaleY *scaleFactors.lowres;
 
                 ctx.beginPath();
-                ctx.arc(x, y, 10, 0, 2 * Math.PI); // Fixed radius of 3px
+                ctx.arc(x, y, 3, 0, 2 * Math.PI); // Fixed radius of 3px
                 ctx.fillStyle = getColor(spot.value);
                 ctx.fill();
             });

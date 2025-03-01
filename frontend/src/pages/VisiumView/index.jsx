@@ -38,7 +38,7 @@ function VisiumView() {
     const {setDataset, exprDataList, imageDataList, loading, error} = useVisiumStore();
 
     const [selectedMetaFeatures, setSelectedMetaFeatures] = useState(initialMetas);
-    const [selectedFeatures, setSelectedFeatures] = useState([...initialMetas, ...initialGenes]);
+    // const [selectedFeatures, setSelectedFeatures] = useState([...new Set([...initialMetas, ...initialGenes])]);
 
     useEffect(() => {
         const initialSelectedSamples = initialSamples.length ? initialSamples : [];
@@ -93,7 +93,8 @@ function VisiumView() {
         setSelectedGenes(newValue);
         updateQueryParams(newValue, selectedSamples);
         useVisiumStore.getState().fetchGeneExprData();
-        setSelectedFeatures([...selectedFeatures, ...newValue]);
+
+        // setSelectedFeatures(prev => [...new Set([...prev, ...newValue])]);
     };
 
     const handleGeneDelete = (delGene) => {
@@ -101,19 +102,22 @@ function VisiumView() {
         setSelectedGenes(newGenes);
         updateQueryParams(newGenes, selectedSamples);
         useVisiumStore.getState().fetchGeneExprData();
-        setSelectedFeatures([...selectedFeatures, ...newGenes]);
+
+        // setSelectedFeatures(prev => [...new Set([...prev, ...newGenes])]);
     }
 
     const handleMetaFeatureChange = (event, newValue) => {
         setSelectedMetaFeatures(newValue);
         updateQueryParams(selectedGenes, selectedSamples, newValue);
-        setSelectedFeatures([...selectedFeatures, ...newValue]);
+
+        // setSelectedFeatures(prev => [...new Set([...prev, ...newValue])]);
     }
     const handleMetaDelete = (delMeta) => {
         const newMetas = selectedMetaFeatures.filter(m => m !== delMeta);
         setSelectedMetaFeatures(newMetas);
         updateQueryParams(selectedGenes, selectedSamples, newMetas);
-        setSelectedFeatures([...selectedFeatures, ...newMetas]);
+
+        // setSelectedFeatures(prev => [...new Set([...prev, ...newMetas])]);
     }
 
     // click the button to fetch umap data
@@ -122,12 +126,8 @@ function VisiumView() {
         useVisiumStore.getState().fetchGeneExprData();
         useVisiumStore.getState().fetchImageData();
     }
-
-    // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
-    const plotClass = Object.keys(exprDataList).length <= 1
-        ? "single-plot" : Object.keys(exprDataList).length === 2
-            ? "two-plots" : Object.keys(exprDataList).length === 3
-                ? "three-plots" : "four-plots";
+    const selectedFeatures = [...new Set([...selectedGenes, ...selectedMetaFeatures])];
+    // console.log(selectedFeatures);
 
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
@@ -257,41 +257,46 @@ function VisiumView() {
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : (
-                        <div className={`visium-container ${plotClass}`}>
+                        <div className="visium-container">
                             {Object.keys(imageDataList).length < 1 ? (
                                 <Box className="no-sample">
-                                    <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">
-                                        No sample selected for visualization</Typography>
+                                    <Typography sx={{color: "text.secondary"}} variant="h5">
+                                        No sample selected for visualization
+                                    </Typography>
                                 </Box>
                             ) : Object.entries(imageDataList).map(([sample_i, visiumData_i]) => (
                                 <div key={sample_i} className="sample-row">
+                                    {/* Sample Label */}
                                     <div className="sample-label">
-                                        <Typography variant="subtitle1">{sample_i}</Typography>
+                                        <Typography variant="subtitle1" align="center" sx={{mb: 1}}>
+                                            Sample: {sample_i}
+                                        </Typography>
                                     </div>
-                                    {selectedFeatures.length > 0 ? (
-                                        selectedFeatures.map(feature => (
-                                            <div key={`${sample_i}-${feature}`} className="feature-plot">
 
-                                                <EChartFeaturePlot
-                                                    key={sample_i + feature}
-                                                    visiumData={visiumData_i}
-                                                    geneData={exprDataList}
-                                                    metaData={metaData || []}
-                                                    feature={feature}
-                                                />
-                                                <Typography variant="caption" display="block" align="center">
-                                                    {feature}
+                                    {/* Features Container */}
+                                    <div className="features-container">
+                                        {selectedFeatures.length > 0 ? (
+                                            selectedFeatures.map(feature => (
+                                                <div key={`${sample_i}-${feature}`} className="feature-plot">
+                                                    {/* Plot Container */}
+                                                    {/*<EChartFeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>*/}
+                                                    <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
+                                                    <Typography variant="caption" display="block" align="center">
+                                                        {feature}
+                                                    </Typography>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <Box className="no-feature">
+                                                <Typography sx={{color: "text.secondary"}} variant="h5">
+                                                    No feature selected for visualization
                                                 </Typography>
-                                            </div>
-                                        ))
-                                    ): <Box className="no-feature">
-                                            <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">
-                                                No feature selected for visualization</Typography>
-                                        </Box>
-                                    }
+                                            </Box>
+                                        )}
+                                    </div>
+                                    <Divider/>
                                 </div>
-                            ))
-                            }
+                            ))}
                         </div>
                     )}
                 </div>
