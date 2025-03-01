@@ -8,108 +8,120 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     console.log("geneData: ", geneData);
     console.log("visiumData: ", visiumData);
 
+    const coordinates = visiumData.coordinates;
+    const scaleFactors = visiumData.scales;
+    const sliceImage = visiumData.image;
+    const imgBlob = sliceImage;
+    const imgUrl = URL.createObjectURL(imgBlob);
+
+    let featuredData = {};
+    const isMetaFeature = Object.keys(metaData[0]).includes(feature);
+    if (isMetaFeature) {
+        metaData.forEach((item) => {
+            featuredData[item.cs_id] = item[feature];
+        });
+    } else {
+        geneData.forEach((item) => {
+            featuredData[item.cs_id] = item[feature];
+        });
+    }
+
+    const containerRef = useRef(null);
+    const imgRef = useRef(null);
     const canvasRef = useRef(null);
-    const [data, setData] = useState(null);
 
     useEffect(() => {
-        async function loadData() {
-            try {
-                // Fetch coordinates from the backend
-                const coordinates = await visiumData.coordinates;
-                const scaleFactors = await visiumData.scales;
+        const img = imgRef.current;
+        if (!img) return;
 
-                // Fetch gene expression data from the backend
-                const colorValues = {};
-                const isGene = Object.keys(geneData).includes(feature);
-                const isMetaFeature = Object.keys(metaData[0]).includes(feature);
-                if (isGene) {
-                    const colorValues = geneData;
-                    setData({coordinates, scaleFactors, colorValues});
-                } else if (isMetaFeature) {
-                    const colorValues = metaData.reduce((acc, meta) => {
-                        acc[meta.cs_id] = meta[feature];
-                        return acc;
-                    }, {});
-                    setData({coordinates, scaleFactors, colorValues});
-                } else {
-                    setData({coordinates, scaleFactors, colorValues: {}});
-                }
+        const redraw = () => {
+            const naturalWidth = img.naturalWidth;
+            const naturalHeight = img.naturalHeight;
+            const displayedWidth = img.offsetWidth;
+            const displayedHeight = img.offsetHeight;
 
-                // Fetch the H&E image from the backend as a blob
-                const imgResponse = await visiumData.image;
-                const imgBlob = await imgResponse.blob();
-                const imgUrl = URL.createObjectURL(imgBlob);
+            if (!naturalWidth || !naturalHeight) return;
 
-                // Create an Image element
-                const img = new Image();
-                img.src = imgUrl;
-                img.crossOrigin = "Anonymous";
-                img.onload = () => {
-                    setData({coordinates, scaleFactors, colorValues, image: img});
-                    // Clean up the object URL after the image has loaded
-                    URL.revokeObjectURL(imgUrl);
-                };
-            } catch (error) {
-                console.error("Error loading data:", error);
-            }
+            const scaleX = displayedWidth / naturalWidth;
+            const scaleY = displayedHeight / naturalHeight;
+
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+
+            canvas.width = displayedWidth;
+            canvas.height = displayedHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Get valid data values
+            const validEntries = coordinates
+            .map(spot => ({
+                ...spot,
+                value: featuredData[spot.cs_id]
+            }))
+            .filter(entry => typeof entry.value === 'number');
+
+            if (validEntries.length === 0) return;
+
+            // Calculate min/max for color scaling
+            const values = validEntries.map(entry => entry.value);
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+
+            // Color interpolation function (blue to red)
+            const getColor = (value) => {
+                const ratio = (value - min) / (max - min || 1);
+                const hue = 240 - (ratio * 240); // 240 (blue) to 0 (red)
+                return `hsl(${hue}, 100%, 50%)`;
+            };
+
+            // Calculate spot positions and draw
+            validEntries.forEach(spot => {
+                const x = spot.imagecol * scaleFactors.hires * scaleX;
+                const y = spot.imagerow * scaleFactors.hires * scaleY;
+
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, 2 * Math.PI); // Fixed radius of 3px
+                ctx.fillStyle = getColor(spot.value);
+                ctx.fill();
+            });
+        };
+
+        img.addEventListener('load', redraw);
+
+        // Handle container resize
+        const resizeObserver = new ResizeObserver(redraw);
+        if (containerRef.current) {
+            resizeObserver.observe(containerRef.current);
         }
 
-        loadData();
-    }, []);
-
-    useEffect(() => {
-        if (!data || !canvasRef.current) return;
-
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-
-        // Set canvas dimensions to match the loaded image
-        canvas.width = data.image.width;
-        canvas.height = data.image.height;
-
-        // Draw the H&E background image
-        ctx.drawImage(data.image, 0, 0);
-
-        // Use the "spot" scaling factor (adjust if needed, e.g., use "hires")
-        const scale = data.scaleFactors.spot;
-
-        // Get expression range to define a color scale
-        const exprValues = Object.values(data.colorValues);
-        const minExpr = Math.min(...exprValues);
-        const maxExpr = Math.max(...exprValues);
-
-        // Create a d3 color scale using Viridis
-        const colorScale = d3.scaleSequential(d3.interpolateViridis)
-        .domain([minExpr, maxExpr]);
-
-        // Assume coordinates is an array of spot objects with keys:
-        // spot_id, imagecol, and imagerow.
-        data.coordinates.forEach(spot => {
-            const spotId = spot.spot_id;
-            const expr = data.colorValues[spotId] || 0;
-
-            // Convert the spot's coordinates using the scale factor
-            const x = spot.imagecol * scale;
-            const y = spot.imagerow * scale;
-
-            // Draw a circle for the spot
-            ctx.beginPath();
-            ctx.arc(x, y, 10, 0, 2 * Math.PI); // radius set to 10 (adjust as needed)
-            ctx.fillStyle = colorScale(expr);
-            ctx.fill();
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        });
-    }, [data]);
+        return () => {
+            img.removeEventListener('load', redraw);
+            resizeObserver.disconnect();
+        };
+    }, [coordinates, scaleFactors, featuredData, imgBlob]);
 
     return (
-        <div>
-            {!data ? (
-                <p>Loading...</p>
-            ) : (
-                <canvas ref={canvasRef} style={{border: '1px solid #ccc'}}/>
-            )}
+        <div ref={containerRef} style={{position: 'relative', width: '100%', height: '100%'}}>
+            <img
+                ref={imgRef}
+                src={imgUrl}
+                style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block' // Remove extra space under image
+                }}
+                alt="Spatial tissue"
+            />
+            <canvas
+                ref={canvasRef}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    pointerEvents: 'none' // Allow interactions with underlying elements
+                }}
+            />
         </div>
     );
 };
