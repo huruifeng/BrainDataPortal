@@ -54,11 +54,10 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             const validEntries = coordinates
             .map(spot => ({
                 ...spot,
-                value: featuredData[spot.cs_id]
+                value: featuredData[spot.cs_id] ?? 0
             }))
-            .filter(entry => typeof entry.value === 'number');
-
-            // console.log("validEntries: ", validEntries);
+            // .filter(spot => spot.value !== undefined);
+            console.log("validEntries: ", validEntries);
 
             if (validEntries.length === 0) return;
 
@@ -82,9 +81,10 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             validEntries.forEach(spot => {
                 const y = spot.imagecol * scaleX * scaleFactors.lowres;
                 const x = spot.imagerow * scaleY *scaleFactors.lowres;
+                const radius = 2.5 * scaleX
 
                 ctx.beginPath();
-                ctx.arc(x, y, 3, 0, 2 * Math.PI); // Fixed radius of 3px
+                ctx.arc(x, y, radius, 0, 2 * Math.PI); // Fixed radius of 3px
                 ctx.fillStyle = getColor(spot.value);
                 ctx.fill();
             });

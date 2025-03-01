@@ -1,19 +1,21 @@
-import {useState, useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import ReactECharts from 'echarts-for-react';
 import PropTypes from "prop-types";
 
 const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
+    const chartRef = useRef(null);
+
     const scaleFactors = visiumData.scales;
     const coordinates = visiumData.coordinates;
-    const spotRadius = scaleFactors?.['spot.radius'] || 5;
-    const sliceImage = visiumData.image;
-    const imageBlob = sliceImage;
+    const imageBlob = visiumData.image;
 
-    // State to store the image URL and dimensions.
+    // State for responsive dimensions
+    const [containerSize, setContainerSize] = useState({width: 400, height: 400});
+    const [imgAspectRatio, setImgAspectRatio] = useState(1);
+
+
+    // Create image URL and calculate aspect ratio
     const [imageUrl, setImageUrl] = useState('');
-    const [imgDimensions, setImgDimensions] = useState({width: 1000, height: 800});
-
-    // Create a URL from the blob and load the image to get its dimensions.
     useEffect(() => {
         if (imageBlob) {
             const url = URL.createObjectURL(imageBlob);
@@ -22,14 +24,29 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             const img = new Image();
             img.src = url;
             img.onload = () => {
-                setImgDimensions({width: img.width, height: img.height});
+                const ar = img.height / img.width;
+                setImgAspectRatio(ar);
             };
-
-            return () => {
-                URL.revokeObjectURL(url);
-            };
+            return () => URL.revokeObjectURL(url);
         }
     }, [imageBlob]);
+
+    // Responsive container sizing
+    useEffect(() => {
+        const updateSize = () => {
+            if (chartRef.current) {
+                const {width} = chartRef.current.ele.getBoundingClientRect();
+                setContainerSize({
+                    width,
+                    height: width * imgAspectRatio
+                });
+            }
+        };
+
+        updateSize();
+        window.addEventListener('resize', updateSize);
+        return () => window.removeEventListener('resize', updateSize);
+    }, [imgAspectRatio]);
 
     // Fetch gene expression data from the backend
     let featuredData = {};
@@ -47,7 +64,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
     // Transform visiumData: scale coordinates and attach the feature value.
     const scatterData = coordinates.map(item => {
-        // Compute x,y coordinates (note: imagecol is x and imagerow is y)
+        // Compute x,y coordinates (note: imagerow is x and imagecol is y)
         const y = item.imagecol * scaleFactors.lowres;
         const x = item.imagerow * scaleFactors.lowres;
         // Get the nCount_Spatial value for the current spot (default to 0 if missing)
@@ -84,29 +101,26 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                 color: ['blue', 'green', 'yellow', 'red']
             }
         },
-        // Hide axes since we're displaying an image
         xAxis: {
             show: false,
             min: 0,
-            max: imgDimensions.width
+            max: containerSize.width
         },
         yAxis: {
             show: false,
             min: 0,
-            max: imgDimensions.height,
-            // Invert y-axis so that the origin (0,0) is at the top-left corner
+            max: containerSize.height,
             inverse: true
         },
         // The graphic component is used to render the background image.
         graphic: [{
             type: 'image',
-            id: 'background',
             left: 0,
             top: 0,
             style: {
                 image: imageUrl,
-                width: imgDimensions.width,
-                height: imgDimensions.height
+                width: '100%',
+                height: '100%'
             },
             z: 1
         }],
@@ -116,7 +130,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             coordinateSystem: 'cartesian2d',
             data: scatterData,
             // Adjust symbolSize using the spot.radius (multiplied by a factor for visibility)
-            symbolSize: spotRadius * 660,
+             symbolSize: 12 * (containerSize.width / 1000),
             z: 2,
             itemStyle: {
                 borderColor: '#fff',
@@ -126,31 +140,35 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     };
 
     return (
-        <div style={{ height: '100%', width: '100%' }}>
-            {option ? (
+        <div style={{
+            width: '100%',
+            height: '100%',
+            minWidth: '200px',
+            position: 'relative'
+        }}>
+            <div style={{
+                paddingTop: `${imgAspectRatio * 100}%`,
+                position: 'relative'
+            }}>
                 <ReactECharts
-                    key={`${feature}`}
+                    ref={chartRef}
                     option={option}
-                    notMerge={true} lazyUpdate={true} theme="light"
-                    style={{ height: '400px', width: '100%' }}
-                    autoResize={true}
-                    opts={{ renderer: 'svg' }} // Better for crisp images
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%'
+                    }}
+                    opts={{
+                        renderer: 'svg',
+                        width: containerSize.width,
+                        height: containerSize.height
+                    }}
                 />
-            ) : (
-                <div style={{
-                    height: '600px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    color: '#666'
-                }}>
-                    Loading visualization...
-                </div>
-            )}
+            </div>
         </div>
     );
-
-
 };
 
 EChartFeaturePlot.propTypes = {

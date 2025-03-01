@@ -110,6 +110,16 @@
     overflow: hidden;
 }
 
+.feature-plot-echart {
+    min-width: 320px;
+    flex: 1;
+    position: relative;
+    background: #f8f8f8;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
 .no-feature, .no-sample {
     width: 100%;
     display: flex;
