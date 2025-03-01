@@ -14,7 +14,6 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
     // State management
     const [naturalDimensions, setNaturalDimensions] = useState({width: 0, height: 0});
-    const [displayDimensions, setDisplayDimensions] = useState({width: 0, height: 0});
     const [displayScale, setDisplayScale] = useState(1);
     const [imageUrl, setImageUrl] = useState('');
 
@@ -149,7 +148,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             type: 'scatter',
             coordinateSystem: 'cartesian2d',
             data: scatterData,
-            symbolSize:  3 * displayScale,
+            symbolSize:  5 * displayScale,
             itemStyle: {
                 borderColor: '#fff',
                 borderWidth: 1 * displayScale

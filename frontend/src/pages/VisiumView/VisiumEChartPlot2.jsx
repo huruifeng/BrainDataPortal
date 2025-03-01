@@ -63,6 +63,13 @@ const EChartFeaturePlot2 = ({visiumData, geneData, metaData, feature}) => {
 
     // ECharts configuration
     const option = {
+         grid: {
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            containLabel: false
+        },
         tooltip: {
             trigger: 'item',
             formatter: params => `ID: ${params.name}<br/>${feature}: ${params.value[2]}`
@@ -93,7 +100,7 @@ const EChartFeaturePlot2 = ({visiumData, geneData, metaData, feature}) => {
             type: 'scatter',
             coordinateSystem: 'cartesian2d',
             data: scatterData,
-            symbolSize: 12,
+            symbolSize: 5,
             itemStyle: { borderColor: '#fff', borderWidth: 1 }
         }]
     };

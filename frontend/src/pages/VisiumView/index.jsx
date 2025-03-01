@@ -17,7 +17,6 @@ import {useParams, useSearchParams} from "react-router-dom";
 import "./VisiumView.css";
 import useVisiumStore from "../../store/VisiumStore.js";
 import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
-import EChartFeaturePlot2 from "./VisiumEChartPlot2.jsx";
 import FeaturePlot from "./VisiumCanvasPlot.jsx";
 
 
