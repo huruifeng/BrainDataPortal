@@ -81,17 +81,6 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         return data;
     }, [geneData, metaData, feature]);
 
-    // Generate scatter data with proper scaling
-    const scatterData = useMemo(() => {
-        return coordinates.map(item => ({
-            name: item.cs_id,
-            value: [
-                item.imagerow * lowres, // X
-                item.imagecol * lowres, // Y
-                featuredData[item.cs_id] || 0  // Value
-            ]
-        }));
-    }, [coordinates, hires, displayScale, featuredData]);
 
     const colorPalette = [
         "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
@@ -100,44 +89,55 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     ]; // Up to 20 unique colors
 
     // Calculate value range for visual mapping
-    const {minFeature, maxFeature,featureValues,featureType} = useMemo(() => {
+    const {minFeature, maxFeature, isCat} = useMemo(() => {
         const values = Object.values(featuredData);
         if (isCategorical(values)) {
             return {
                 minFeature: 0,
                 maxFeature: values.length - 1,
-                featureValues: values,
-                featureType: "categorical"
+                isCat: true
             };
-        }else {
+        } else {
             return {
                 minFeature: Math.min(...values),
                 maxFeature: Math.max(...values),
-                featureValues: values,
-                featureType: "continuous"
+                isCat: false
             };
         }
     }, [featuredData]);
 
-    const mySeries = [];
-    if(featureType === "categorical") {
+    // Generate scatter data with proper scaling
+    const scatterData = useMemo(() => {
+        return coordinates.map(item => ({
+            name: item.cs_id,
+            value: [
+                item.imagerow * lowres, // X
+                item.imagecol * lowres, // Y
+                featuredData[item.cs_id] ?? (isCat ? "Other" : 0)  // Value
+            ]
+        }));
+    }, [coordinates, hires, displayScale, featuredData]);
+
+    let mySeries = [];
+    if (isCat) {
         const groupedData = {};
         scatterData.forEach((p) => {
-            if (!groupedData[p.name]) {
-                groupedData[p.name] = [];
+            if (!groupedData[p["value"][2]]) {
+                groupedData[p["value"][2]] = [];
             }
-            groupedData[p.name].push(p);
+            groupedData[p["value"][2]].push(p);
         });
-
+        console.log("groupedData: ", groupedData);
         const groupNames = Object.keys(groupedData);
-        groupNames.forEach((group_i, index) => {
-            mySeries.push({
+        mySeries = groupNames.map((group_i, index) => {
+            return {
+                name: `${group_i}`,
                 type: 'scatter',
                 coordinateSystem: 'cartesian2d',
                 data: groupedData[group_i],
-                symbolSize: 5 * displayScale,
+                symbolSize: 6 * displayScale,
                 itemStyle: {
-                    borderColor: colorPalette[index % colorPalette.length],
+                    borderColor: '#fff',
                     borderWidth: 0 * displayScale,
                     color: colorPalette[index % colorPalette.length]
                 },
@@ -148,14 +148,14 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                     }
                 },
                 z: 2
-            });
+            };
         })
-    }else{
+    } else {
         mySeries.push({
             type: 'scatter',
             coordinateSystem: 'cartesian2d',
             data: scatterData,
-            symbolSize: 5 * displayScale,
+            symbolSize: 6 * displayScale,
             itemStyle: {
                 borderColor: '#fff',
                 borderWidth: 0 * displayScale
@@ -195,22 +195,23 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             formatter: params =>
                 `ID: ${params.name}<br/>${feature}: ${params.value[2]}`
         },
-        ...(featureType === "categorical" ? {} : {
-            visualMap: {
-                min: minFeature,
-                max: maxFeature,
-                calculable: true,
-                orient: 'horizontal',
-                left: 'center',
-                bottom: 10,
-                inRange: {
-                    // color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-                    color: ['#5d4ea8', '#58b2ac', '#fcfeba', "#f6804b", '#9e0341']
-                }
-            }
-        }),
         series: mySeries
     }), [scatterData, displayScale, imageUrl, minFeature, maxFeature, feature, naturalDimensions]);
+
+    if (!isCat) {
+        option.visualMap = {
+            min: minFeature,
+            max: maxFeature,
+            calculable: true,
+            orient: 'horizontal',
+            left: 'center',
+            bottom: 10,
+            inRange: {
+                // color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                color: ['#5d4ea8', '#58b2ac', '#fcfeba', "#f6804b", '#9e0341']
+            }
+        }
+    }
 
     return (
         <div

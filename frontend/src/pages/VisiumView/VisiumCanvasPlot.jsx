@@ -23,7 +23,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     } else {
         featuredData = geneData;
     }
-    console.log("featuredData: ", featuredData);
+    // console.log("featuredData: ", featuredData);
     const colorPalette = [
         "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
         "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
@@ -70,13 +70,13 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             // Calculate min/max for color scaling
             const values = validEntries.map(entry => entry.value);
             const uniqueValues = [...new Set(values)];
-            console.log("uniqueValues: ", uniqueValues);
+            // console.log("uniqueValues: ", uniqueValues);
 
             let min = 0;
             let max = 0;
             let colorMap = {};
             const isCat = isCategorical(values);
-            console.log("isCat: ", isCat);
+            // console.log("isCat: ", isCat);
             if (isCat && isMetaFeature) {
                 colorMap = new Map();
                 uniqueValues.forEach((value, index) => {
@@ -87,8 +87,8 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                 max = Math.max(...values);
             }
 
-            console.log("colorMap: ", colorMap);
-            console.log("validEntries: ", validEntries);
+            // console.log("colorMap: ", colorMap);
+            // console.log("validEntries: ", validEntries);
 
             // Color interpolation function (blue to red)
             const getColor = (value) => {
