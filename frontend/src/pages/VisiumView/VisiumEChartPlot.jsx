@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState, useCallback, useMemo} from 'react';
 import ReactECharts from 'echarts-for-react';
 import PropTypes from "prop-types";
-import {isCategorical} from "../../utils/funcs.js";
+import {calculateMinMax, isCategorical} from "../../utils/funcs.js";
 
 const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     const containerRef = useRef(null);
@@ -89,22 +89,20 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     ]; // Up to 20 unique colors
 
     // Calculate value range for visual mapping
-    const {minFeature, maxFeature, isCat} = useMemo(() => {
-        const values = Object.values(featuredData);
-        if (isCategorical(values)) {
-            return {
-                minFeature: 0,
-                maxFeature: values.length - 1,
-                isCat: true
-            };
-        } else {
-            return {
-                minFeature: Math.min(...values),
-                maxFeature: Math.max(...values),
-                isCat: false
-            };
-        }
-    }, [featuredData]);
+    let minFeature = 0;
+    let maxFeature = 0;
+    let isCat = false;
+
+    const values = Object.values(featuredData);
+    if (isCategorical(values)) {
+        minFeature = 0;
+        maxFeature = new Set(values).size - 1;
+        isCat = true;
+    } else {
+        [minFeature, maxFeature] = calculateMinMax(values);
+        isCat = false;
+    }
+
 
     // Generate scatter data with proper scaling
     const scatterData = useMemo(() => {

@@ -281,12 +281,12 @@ function VisiumView() {
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
                                                 <>
-                                                <div key={`${sample_i}-${feature}`} className="feature-plot">
-                                                    {metaData && <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>}
-                                                    <Typography variant="caption" display="block" align="center">
-                                                        {feature}
-                                                    </Typography>
-                                                </div>
+                                                {/*<div key={`${sample_i}-${feature}`} className="feature-plot">*/}
+                                                {/*    {metaData && <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>}*/}
+                                                {/*    <Typography variant="caption" display="block" align="center">*/}
+                                                {/*        {feature}*/}
+                                                {/*    </Typography>*/}
+                                                {/*</div>*/}
                                                 <div key={`${sample_i}-${feature}-echart`} className="feature-plot-echart">
                                                     <EChartFeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
                                                     <Typography variant="caption" display="block" align="center">

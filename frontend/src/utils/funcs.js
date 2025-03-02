@@ -35,3 +35,21 @@ export function isCategorical(arr, uniqueThreshold = 20) {
     return isFewUniques && allIntegers;
 }
 
+
+// Safe calculation for min/max
+export const calculateMinMax = (arr) => {
+  if (arr.length === 0) return [0, 0];
+
+  let min = Infinity;
+  let max = -Infinity;
+
+  for (const val of arr) {
+    if (typeof val === 'number' && !isNaN(val)) {
+      if (val < min) min = val;
+      if (val > max) max = val;
+    }
+  }
+
+  return [min === Infinity ? 0 : min, max === -Infinity ? 0 : max];
+};
+
