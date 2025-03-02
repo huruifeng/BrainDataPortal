@@ -17,12 +17,15 @@ export function isCategorical(arr, uniqueThreshold = 20) {
     const allNonNumeric = arr.every(x => typeof x !== 'number');
     if (allNonNumeric) return true; // Definitely categorical
 
+    const hasStrings = arr.some(x => typeof x === 'string');
+    if (hasStrings) return true;
+
     // Check unique values for numeric arrays
     const uniqueValues = new Set(arr).size;
     let isFewUniques = false
-    if(uniqueThreshold < 1 ){
+    if (uniqueThreshold < 1) {
         isFewUniques = uniqueValues / arr.length <= uniqueThreshold;
-    }else{
+    } else {
         isFewUniques = uniqueValues <= uniqueThreshold;
     }
 

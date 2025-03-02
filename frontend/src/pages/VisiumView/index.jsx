@@ -281,7 +281,7 @@ function VisiumView() {
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
                                                 <div key={`${sample_i}-${feature}`} className="feature-plot">
-                                                    <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
+                                                    {metaData && <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>}
                                                     <Typography variant="caption" display="block" align="center">
                                                         {feature}
                                                     </Typography>

@@ -69,18 +69,20 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
             // Calculate min/max for color scaling
             const values = validEntries.map(entry => entry.value);
+            const uniqueValues = [...new Set(values)];
+            console.log("uniqueValues: ", uniqueValues);
+
             let min = 0;
             let max = 0;
             let colorMap = {};
             const isCat = isCategorical(values);
-            if(isCat && isMetaFeature){
-                const uniqueValues = [...new Set(values)];
-                console.log("uniqueValues: ", uniqueValues);
+            console.log("isCat: ", isCat);
+            if (isCat && isMetaFeature) {
                 colorMap = new Map();
                 uniqueValues.forEach((value, index) => {
                     colorMap.set(value, colorPalette[index % colorPalette.length]);
                 });
-            }else{
+            } else {
                 min = Math.min(...values);
                 max = Math.max(...values);
             }
@@ -98,7 +100,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             // Calculate spot positions and draw
             validEntries.forEach(spot => {
                 const y = spot.imagecol * scaleX * scaleFactors.lowres;
-                const x = spot.imagerow * scaleY *scaleFactors.lowres;
+                const x = spot.imagerow * scaleY * scaleFactors.lowres;
                 const radius = 2.5 * scaleX
 
                 ctx.beginPath();
