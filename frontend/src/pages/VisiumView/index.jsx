@@ -128,7 +128,10 @@ function VisiumView() {
     }
     const selectedFeatures = [...new Set([...selectedGenes, ...selectedMetaFeatures])];
     // console.log(selectedFeatures);
-
+    const plotClass = Object.keys(selectedFeatures).length <= 1
+        ? "single-plot" : Object.keys(selectedFeatures).length === 2
+            ? "two-plots" : Object.keys(selectedFeatures).length === 3
+                ? "three-plots" : "four-plots";
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
@@ -274,21 +277,21 @@ function VisiumView() {
                                     </div>
 
                                     {/* Features Container */}
-                                    <div className="features-container">
+                                    <div className={`features-container ${plotClass}`}>
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
-                                                // <div key={`${sample_i}-${feature}`} className="feature-plot">
-                                                //     <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
-                                                //     <Typography variant="caption" display="block" align="center">
-                                                //         {feature}
-                                                //     </Typography>
-                                                // </div>
-                                                <div key={`${sample_i}-${feature}`} className="feature-plot-echart">
-                                                    <EChartFeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
+                                                <div key={`${sample_i}-${feature}`} className="feature-plot">
+                                                    <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
                                                     <Typography variant="caption" display="block" align="center">
                                                         {feature}
                                                     </Typography>
                                                 </div>
+                                                // <div key={`${sample_i}-${feature}`} className="feature-plot-echart">
+                                                //     <EChartFeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
+                                                //     <Typography variant="caption" display="block" align="center">
+                                                //         {feature}
+                                                //     </Typography>
+                                                // </div>
                                             ))
                                         ) : (
                                             <Box className="no-feature">

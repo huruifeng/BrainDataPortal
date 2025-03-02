@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import PropTypes from "prop-types";
+import {isCategorical} from "../../utils/funcs.js";
 
 const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     // console.log("feature: ", feature);
@@ -22,6 +23,12 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     } else {
         featuredData = geneData;
     }
+    console.log("featuredData: ", featuredData);
+    const colorPalette = [
+        "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
+        "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
+        "#00ffff", "#ffff00", "#9bed56", "#8000ff", "#0080ff", "#80ff00"
+    ]; // Up to 20 unique colors
 
     const containerRef = useRef(null);
     const imgRef = useRef(null);
@@ -37,11 +44,6 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             const displayedWidth = img.offsetWidth;
             const displayedHeight = img.offsetHeight;
 
-            console.log("naturalWidth: ", naturalWidth);
-            console.log("naturalHeight: ", naturalHeight);
-            console.log("displayedWidth: ", displayedWidth);
-            console.log("displayedHeight: ", displayedHeight);
-
             if (!naturalWidth || !naturalHeight) return;
 
             const scaleX = displayedWidth / naturalWidth;
@@ -56,8 +58,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Get valid data values
-            const validEntries = coordinates
-            .map(spot => ({
+            const validEntries = coordinates.map(spot => ({
                 ...spot,
                 value: featuredData[spot.cs_id] ?? 0
             }))
@@ -68,12 +69,24 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
             // Calculate min/max for color scaling
             const values = validEntries.map(entry => entry.value);
-            const min = Math.min(...values);
-            const max = Math.max(...values);
+            let min = 0;
+            let max = 0;
+            let colorMap = {};
+            const isCat = isCategorical(values);
+            if(isCat && isMetaFeature){
+                const uniqueValues = [...new Set(values)];
+                console.log("uniqueValues: ", uniqueValues);
+                colorMap = new Map();
+                uniqueValues.forEach((value, index) => {
+                    colorMap.set(value, colorPalette[index % colorPalette.length]);
+                });
+            }else{
+                min = Math.min(...values);
+                max = Math.max(...values);
+            }
 
-            console.log("min: ", min);
-            console.log("max: ", max);
-
+            console.log("colorMap: ", colorMap);
+            console.log("validEntries: ", validEntries);
 
             // Color interpolation function (blue to red)
             const getColor = (value) => {
@@ -90,7 +103,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, 2 * Math.PI); // Fixed radius of 3px
-                ctx.fillStyle = getColor(spot.value);
+                ctx.fillStyle = isCat && isMetaFeature ? colorMap.get(spot.value) : getColor(spot.value);
                 ctx.fill();
             });
         };
