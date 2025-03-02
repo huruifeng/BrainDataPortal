@@ -51,10 +51,10 @@ function App() {
                       <Route path="/samples" element={<Navigate to="/samples/all" replace />} />
                       <Route path="/samples/:dataset_id" element={<SamplesPage />} />
 
-                      <Route path="/geneview" element={<Navigate to="/geneview/all" replace />} />
+                      <Route path="/geneview" element={<Navigate to="/datasets" replace />} />
                       <Route path="/geneview/:dataset_id" element={<GeneView />} />
 
-                      <Route path="/visiumview" element={<Navigate to="/visiumview/all" replace />} />
+                      <Route path="/visiumview" element={<Navigate to="/datasets" replace />} />
                       <Route path="/visiumview/:dataset_id" element={<VisiumView />} />
 
                       <Route path="/login" element={<Login />} />
