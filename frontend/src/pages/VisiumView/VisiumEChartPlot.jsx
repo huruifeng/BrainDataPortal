@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState, useCallback, useMemo} from 'react';
 import ReactECharts from 'echarts-for-react';
 import PropTypes from "prop-types";
+import {isCategorical} from "../../utils/funcs.js";
 
 const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     const containerRef = useRef(null);
@@ -9,8 +10,8 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     const [version, setVersion] = useState(0);
 
     // Destructure required data
-    const { coordinates, scales, image } = visiumData;
-    const { hires, lowres} = scales;
+    const {coordinates, scales, image} = visiumData;
+    const {hires, lowres} = scales;
 
     // State management
     const [naturalDimensions, setNaturalDimensions] = useState({width: 0, height: 0});
@@ -43,8 +44,8 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         const containerWidth = containerRef.current.offsetWidth;
         const scale = containerWidth / naturalDimensions.width;
 
-        console.log("scale: ", scale);
-        console.log("containerWidth: ", containerWidth);
+        // console.log("scale: ", scale);
+        // console.log("containerWidth: ", containerWidth);
 
         if (scale !== displayScale) {
             setDisplayScale(scale);
@@ -85,54 +86,99 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         return coordinates.map(item => ({
             name: item.cs_id,
             value: [
-                item.imagerow * lowres , // X
-                item.imagecol * lowres , // Y
-                featuredData[item.cs_id] || 0         // Value
+                item.imagerow * lowres, // X
+                item.imagecol * lowres, // Y
+                featuredData[item.cs_id] || 0  // Value
             ]
         }));
     }, [coordinates, hires, displayScale, featuredData]);
 
+    const colorPalette = [
+        "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
+        "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
+        "#00ffff", "#ffff00", "#9bed56", "#8000ff", "#0080ff", "#80ff00"
+    ]; // Up to 20 unique colors
+
     // Calculate value range for visual mapping
-    const { minFeature, maxFeature } = useMemo(() => {
-        const values = Object.values(featuredData).filter(Number.isFinite);
-        return {
-            minFeature: Math.min(...values),
-            maxFeature: Math.max(...values)
-        };
+    const {minFeature, maxFeature,featureValues,featureType} = useMemo(() => {
+        const values = Object.values(featuredData);
+        if (isCategorical(values)) {
+            return {
+                minFeature: 0,
+                maxFeature: values.length - 1,
+                featureValues: values,
+                featureType: "categorical"
+            };
+        }else {
+            return {
+                minFeature: Math.min(...values),
+                maxFeature: Math.max(...values),
+                featureValues: values,
+                featureType: "continuous"
+            };
+        }
     }, [featuredData]);
+
+    const mySeries = [];
+    if(featureType === "categorical") {
+        const groupedData = {};
+        scatterData.forEach((p) => {
+            if (!groupedData[p.name]) {
+                groupedData[p.name] = [];
+            }
+            groupedData[p.name].push(p);
+        });
+
+        const groupNames = Object.keys(groupedData);
+        groupNames.forEach((group_i, index) => {
+            mySeries.push({
+                type: 'scatter',
+                coordinateSystem: 'cartesian2d',
+                data: groupedData[group_i],
+                symbolSize: 5 * displayScale,
+                itemStyle: {
+                    borderColor: colorPalette[index % colorPalette.length],
+                    borderWidth: 0 * displayScale,
+                    color: colorPalette[index % colorPalette.length]
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                z: 2
+            });
+        })
+    }else{
+        mySeries.push({
+            type: 'scatter',
+            coordinateSystem: 'cartesian2d',
+            data: scatterData,
+            symbolSize: 5 * displayScale,
+            itemStyle: {
+                borderColor: '#fff',
+                borderWidth: 0 * displayScale
+            },
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            },
+            z: 2
+        });
+    }
 
     // ECharts configuration
     const option = useMemo(() => ({
-        grid: {
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            containLabel: false
-        },
-        tooltip: {
-            trigger: 'item',
-            formatter: params =>
-                `ID: ${params.name}<br/>${feature}: ${params.value[2].toFixed(2)}`
-        },
-        visualMap: {
-            min: minFeature,
-            max: maxFeature,
-            calculable: true,
-            orient: 'horizontal',
-            left: 'center',
-            bottom: 10,
-            inRange: {
-                color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-            }
-        },
-        xAxis: { show: true, min: 0, max: naturalDimensions.width },
-        yAxis: {
-            show: true,
-            min: 0,
-            max: naturalDimensions.height,
-            inverse: true
-        },
+        // =====================
+        // !!!!! This grid configuration is very important !!!!!
+        // The grid configuration aligns the scatter plot with the image
+        // =====================
+        grid: {top: 0, left: 0, right: 0, bottom: 0, containLabel: false},
+        xAxis: {show: false, min: 0, max: naturalDimensions.width},
+        yAxis: {show: false, min: 0, max: naturalDimensions.height, inverse: true},
         graphic: [{
             type: 'image',
             left: 0,
@@ -144,23 +190,26 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             },
             z: 0
         }],
-        series: [{
-            type: 'scatter',
-            coordinateSystem: 'cartesian2d',
-            data: scatterData,
-            symbolSize:  5 * displayScale,
-            itemStyle: {
-                borderColor: '#fff',
-                borderWidth: 1 * displayScale
-            },
-            emphasis: {
-                itemStyle: {
-                    shadowBlur: 10,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+        tooltip: {
+            trigger: 'item',
+            formatter: params =>
+                `ID: ${params.name}<br/>${feature}: ${params.value[2]}`
+        },
+        ...(featureType === "categorical" ? {} : {
+            visualMap: {
+                min: minFeature,
+                max: maxFeature,
+                calculable: true,
+                orient: 'horizontal',
+                left: 'center',
+                bottom: 10,
+                inRange: {
+                    // color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                    color: ['#5d4ea8', '#58b2ac', '#fcfeba', "#f6804b", '#9e0341']
                 }
-            },
-            z: 2
-        }]
+            }
+        }),
+        series: mySeries
     }), [scatterData, displayScale, imageUrl, minFeature, maxFeature, feature, naturalDimensions]);
 
     return (
