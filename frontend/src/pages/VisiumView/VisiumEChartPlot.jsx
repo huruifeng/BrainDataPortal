@@ -222,7 +222,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             }}
         >
             <ReactECharts
-                key={`chart-${version}`}
+                key={`chart-${feature}-${version}`}
                 ref={chartRef}
                 option={option}
                 style={{
