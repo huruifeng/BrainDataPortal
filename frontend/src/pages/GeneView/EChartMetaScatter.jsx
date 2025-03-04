@@ -22,10 +22,26 @@ const EChartMetaScatter = ({gene, geneData, sampleData, metaData, group}) => {
             top: 0
         },
         xAxis: {
-            name: group
+            name: group,
+            nameLocation: 'middle',
+            nameGap: 30,
+            nameTextStyle: {
+              fontSize: 16
+            },
+            splitLine: {
+                show: true
+            }
         },
         yAxis: {
-            name: "Expression"
+            name: "Expression",
+            nameLocation: 'middle',
+            nameGap: 30,
+            nameTextStyle: {
+                fontSize: 16
+            },
+            splitLine: {
+                show: true
+            }
         },
         series: [
             {
