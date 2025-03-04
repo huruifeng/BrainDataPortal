@@ -16,8 +16,8 @@ async def read_root():
 NOTE: 
 Here is the order to import the CSV data into the database
 1. study
-2. dataset
-3. protocol
+2. protocol
+3. dataset
 4. subject
 5. clinpath
 6. sample
@@ -37,17 +37,6 @@ async def import_csv(table: str):
             print(e)
             return {"success": False, "message": str(e)}
 
-    elif table == "dataset":
-        try:
-            df = pd.read_csv("backend/files/Dataset.csv", thousands=',')
-            df['id'] = [uuid.uuid4() for _ in range(len(df))]
-            df.replace(empty_data_lst, "NA", inplace=True)
-            df.to_sql(table, engine, if_exists="append", index=False)
-            return {"success": True, "message": "Dataset data imported successfully"}
-        except Exception as e:
-            print(e)
-            return {"success": False, "message": str(e)}
-
     elif table == "protocol":
         try:
             df = pd.read_csv("backend/files/Protocol.csv", thousands=',')
@@ -55,6 +44,17 @@ async def import_csv(table: str):
             df.replace(empty_data_lst, "NA", inplace=True)
             df.to_sql(table, engine, if_exists="append", index=False)
             return {"success": True, "message": "Protocol data was imported successfully"}
+        except Exception as e:
+            print(e)
+            return {"success": False, "message": str(e)}
+
+    elif table == "dataset":
+        try:
+            df = pd.read_csv("backend/files/Dataset.csv", thousands=',')
+            df['id'] = [uuid.uuid4() for _ in range(len(df))]
+            df.replace(empty_data_lst, "NA", inplace=True)
+            df.to_sql(table, engine, if_exists="append", index=False)
+            return {"success": True, "message": "Dataset data imported successfully"}
         except Exception as e:
             print(e)
             return {"success": False, "message": str(e)}
