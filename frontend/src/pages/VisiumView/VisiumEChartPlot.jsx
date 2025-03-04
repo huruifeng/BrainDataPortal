@@ -125,7 +125,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             }
             groupedData[p["value"][2]].push(p);
         });
-        console.log("groupedData: ", groupedData);
+        // console.log("groupedData: ", groupedData);
         const groupNames = Object.keys(groupedData);
         mySeries = groupNames.map((group_i, index) => {
             return {

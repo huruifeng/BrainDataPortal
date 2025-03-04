@@ -136,7 +136,7 @@ function VisiumView() {
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
             <Box className="title-row">
-                <Typography variant="h6">Exploration of Gene Expression</Typography>
+                <Typography variant="h6">Exploration of VisiumST Data Features</Typography>
             </Box>
             <Divider/>
             <div className="plot-content">

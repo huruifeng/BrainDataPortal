@@ -15,10 +15,17 @@ import {useParams, useSearchParams} from "react-router-dom";
 
 import useGeneStore from "../../store/GeneStore.js";
 import useDataStore from "../../store/DataStore.js";
+
 import EChartScatterPlot from "./EChartScatter.jsx";
+import EChartMetaScatter from "./EChartMetaScatter.jsx";
+
+import PlotlyScatterPlot from "./PlotlyScatter.jsx";
+
 import PlotlyViolinPlot from "./PlotlyViolin.jsx";
 import PlotlyStackedViolin from "./PlotlyStackedViolin.jsx";
-import PlotlyScatterPlot from "./PlotlyScatter.jsx";
+
+import {isCategorical} from "../../utils/funcs.js";
+
 
 import "./GeneView.css";
 
@@ -122,6 +129,13 @@ function GeneView() {
         ? "single-plot" : Object.keys(exprDataList).length === 2
             ? "two-plots" : Object.keys(exprDataList).length === 3
                 ? "three-plots" : "four-plots";
+
+
+    const metaValues = metaData.map((meta) => meta[grouping]);
+    let isCat = false;
+    if (isCategorical(metaValues)) {
+        isCat = true;
+    }
 
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
@@ -284,6 +298,7 @@ function GeneView() {
                         <Typography color="error">{error}</Typography>
                     ) : Object.keys(exprDataList).length > 0 ? (
                         <>
+                            <Divider sx={{marginTop: "10px"}} >UMAP Plots</Divider>
                             <div className={`umap-container ${plotClass}`}>
                                 {Object.entries(exprDataList).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
@@ -311,15 +326,31 @@ function GeneView() {
                             {/*</div>*/}
 
                             {/*plot the stacked violin plot*/}
-                            <div className={`violin-container`}>
-                                <div key='stacked_violin' className="violin-item">
-                                    <div className="violin-wrapper">
-                                        {metaData && <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataList}
-                                                                          sampleData={selectedSamples}
-                                                                          metaData={metaData} group={grouping}/>}
+                            {isCat ?
+                                <div id="stacked_violin_div" className={`violin-container`}>
+                                    <div key='stacked_violin' className="violin-item">
+                                        <div className="violin-wrapper">
+                                            {metaData &&
+                                                <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataList}
+                                                                     sampleData={selectedSamples} metaData={metaData}
+                                                                     group={grouping}/>}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                :
+                                <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>
+                                    {Object.entries(exprDataList).map(([gene, expr_data]) => (
+                                        <div key={gene} className="umap-item">
+                                            <div className="umap-wrapper">
+                                                {metaData && <EChartMetaScatter gene={gene} geneData={expr_data}
+                                                                                sampleData={selectedSamples}
+                                                                                metaData={metaData} group={grouping}/>}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            }
+
                         </>
 
                     ) : (
