@@ -70,7 +70,7 @@ def get_umapembedding(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    umap_file = os.path.join("backend","datasets",dataset,'umap_embedding_100k.csv')
+    umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_100k.csv')
     if os.path.exists(umap_file):
         with open(umap_file, 'r') as f:
             data_df = pd.read_csv(umap_file, index_col=None, header=0)
@@ -95,7 +95,7 @@ def get_all_metadata(dataset, drop_cols=None):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'meta_100k.csv')
+    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_100k.csv')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=None, header=0)

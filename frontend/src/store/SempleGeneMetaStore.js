@@ -57,7 +57,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     fetchGeneList: async (dataset_id = null, query_str = "AB") => {
         if (!dataset_id) {
-            set({error: "No dataset selected", loading: false});
+            set({error: "fetchGeneList: No dataset selected", loading: false});
             return;
         }
 
@@ -85,7 +85,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     fetchSampleList: async (dataset_id = null, query_str = "all") => {
         if (!dataset_id) {
-            set({error: "No dataset selected", loading: false});
+            set({error: "fetchSampleList: No dataset selected", loading: false});
             return;
         }
 
@@ -113,7 +113,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     fetchMetaList: async (dataset_id = null, query_str = "all") => {
         if (!dataset_id) {
-            set({error: "No dataset selected", loading: false});
+            set({error: "fetchMetaList: No dataset selected", loading: false});
             return;
         }
         try {
@@ -141,7 +141,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
     fetchSampleMetaData: async (dataset_id = null) => {
         const {selectedSamples} = get();
         if (!dataset_id || dataset_id === "all") {
-            set({error: "No dataset selected", loading: false});
+            set({error: "fetchSampleMetaData: No dataset selected", loading: false});
             return;
         }
 
@@ -179,9 +179,8 @@ const useSampleGeneMetaStore = create((set, get) => ({
     },
 
     fetchAllMetaData: async (dataset_id) => {
-        const {dataSet} = get();
-        if (!dataSet || dataSet === "all") {
-            set({error: "No dataset selected", loading: false});
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchAllMetaData: No dataset selected", loading: false});
             return;
         }
         try {
@@ -206,7 +205,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     fetchUMAPData: async (dataset_id) => {
         if (!dataset_id || dataset_id === "all") {
-            set({error: "No dataset selected", loading: false});
+            set({error: "fetchUMAPData: No dataset selected", loading: false});
             return;
         }
         set({loading: true, error: null});
@@ -231,10 +230,10 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
-    fetchExprData: async () => {
+    fetchExprData: async (dataset_id) => {
         const {dataSet, selectedGenes} = get();
         if (!dataSet || dataSet === "all") {
-            set({error: "No dataset selected", loading: false});
+            set({error: "fetchExprData: No dataset selected", loading: false});
             return;
         }
 
@@ -265,7 +264,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
             set({loading: false});
 
         } catch (error) {
-            set({error: "Failed to fetch UMAP data:" + error, loading: false});
+            set({error: "Failed to fetch expr data:" + error, loading: false});
         } finally {
             set({loading: false});
         }
@@ -275,7 +274,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
     fetchImageData: async () => {
         const {dataSet, selectedSamples} = get();
         if (!dataSet || dataSet === "all") {
-            set({error: "No dataset selected", loading: false});
+            set({error: "fetchImageData: No dataset selected", loading: false});
             return;
         }
 

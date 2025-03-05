@@ -81,8 +81,8 @@ function GeneView() {
             selectedSamples: initialSelectedSamples,
             selectedGenes: initialSelectedGenes
         });
-        fetchExprData();
-        fetchAllMetaData();
+        fetchExprData(datasetId);
+        fetchAllMetaData(datasetId);
     }, []);
 
     /** Updates the query parameters in the URL */
