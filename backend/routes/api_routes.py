@@ -99,7 +99,7 @@ async def getallmetadata(request:Request):
     metadata = get_all_metadata(dataset, drop_cols=drop_cols)
 
     if "Error" in metadata:
-        raise HTTPException(status_code=404, detail=meta)
+        raise HTTPException(status_code=404, detail=metadata)
 
     return metadata
 

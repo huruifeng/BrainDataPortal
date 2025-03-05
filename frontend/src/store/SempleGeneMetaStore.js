@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import {getGeneList, getSampleList, getMetaList} from "../api/api.js";
+import {getGeneList, getSampleList, getMetaList,getUMAPData} from "../api/api.js";
 import {getSampleMetaData, getAllMetaData, getExprData} from "../api/api.js";
 import {getCoordinates, getImage} from "../api/visium.js";
 import {toast} from "react-toastify";
@@ -14,11 +14,11 @@ const useSampleGeneMetaStore = create((set, get) => ({
     umapData: [],
 
     selectedSamples: [],
-    imageDataList: {},
-    metaDataList: {},
+    imageDataDict: {},
+    metaDataDict: {},
 
     selectedGenes: [],
-    exprDataList: {},
+    exprDataDict: {},
 
     loading: true,
     error: null,
@@ -39,12 +39,12 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({allMetaData: meta});
     },
 
-    setMetaDataList: async (meta) => {
-        set({metaDataList: meta});
+    setMetaDataDict: async (meta) => {
+        set({metaDataDict: meta});
     },
 
-    setExprDataList: async (expr) => {
-        set({exprDataList: expr});
+    setExprDataDict: async (expr) => {
+        set({exprDataDict: expr});
     },
 
     setSelectedSamples: async (samples) => {
@@ -147,24 +147,24 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
         // Don't reset loading state if no genes selected
         if (selectedSamples.length === 0) {
-            set({metaDataList: {}}); // Clear data without affecting loading state
+            set({metaDataDict: {}}); // Clear data without affecting loading state
             return;
         }
 
         set({loading: true, error: null});
 
         try {
-            get().metaDataList = {};
+            get().metaDataDict = {};
             for (var sample of selectedSamples) {
-                if (!get().metaDataList[sample]) {
+                if (!get().metaDataDict[sample]) {
                     const response = await getSampleMetaData(dataset_id, sample);
-                    get().metaDataList[sample] = response.data;
+                    get().metaDataDict[sample] = response.data;
                 }
             }
             // remove item if it is not selected
-            for (var key in get().metaDataList) {
+            for (var key in get().metaDataDict) {
                 if (!selectedSamples.includes(key)) {
-                    delete get().metaDataList[key];
+                    delete get().metaDataDict[key];
                 }
             }
 
@@ -204,16 +204,15 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     },
 
-    fetchUMAPData: async () => {
-        const {dataSet} = get();
-        if (!dataSet || dataSet === "all") {
+    fetchUMAPData: async (dataset_id) => {
+        if (!dataset_id || dataset_id === "all") {
             set({error: "No dataset selected", loading: false});
             return;
         }
         set({loading: true, error: null});
 
         try {
-            const response = await getUMAPData(dataSet);
+            const response = await getUMAPData(dataset_id);
             if (response.status === 200) {
                 const data = await response.data;
                 await set({umapData: data});
@@ -241,25 +240,25 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
         // Don't reset loading state if no genes selected
         if (selectedGenes.length === 0) {
-            set({exprDataList: {}}); // Clear data without affecting loading state
+            set({exprDataDict: {}}); // Clear data without affecting loading state
             return;
         }
 
         set({loading: true, error: null});
 
         try {
-            // Clear the exprDataList
-            get().exprDataList = {};
+            // Clear the exprDataDict
+            get().exprDataDict = {};
             for (var gene of selectedGenes) {
-                if (!get().exprDataList[gene]) {
+                if (!get().exprDataDict[gene]) {
                     const response = await getExprData(dataSet, gene);
-                    get().exprDataList[gene] = response.data;
+                    get().exprDataDict[gene] = response.data;
                 }
             }
             // remove gene item if it is not selected
-            for (var key in get().exprDataList) {
+            for (var key in get().exprDataDict) {
                 if (!selectedGenes.includes(key)) {
-                    delete get().exprDataList[key];
+                    delete get().exprDataDict[key];
                 }
             }
 
@@ -283,13 +282,13 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({loading: true, error: null});
 
         try {
-            // Clear the exprDataList
-            get().imageDataList = {};
+            // Clear imageDataDict
+            get().imageDataDict = {};
             for (var sample of selectedSamples) {
-                if (!get().imageDataList[sample]) {
+                if (!get().imageDataDict[sample]) {
                     const coor_response = await getCoordinates(dataSet, sample);
                     const img_response = await getImage(dataSet, sample);
-                    get().imageDataList[sample] = {
+                    get().imageDataDict[sample] = {
                         coordinates: coor_response.data.coordinates,
                         scales: coor_response.data.scales,
                         image: img_response.data
@@ -297,9 +296,9 @@ const useSampleGeneMetaStore = create((set, get) => ({
                 }
             }
             // remove gene item if it is not selected
-            for (var key in get().imageDataList) {
+            for (var key in get().imageDataDict) {
                 if (!selectedSamples.includes(key)) {
-                    delete get().imageDataList[key];
+                    delete get().imageDataDict[key];
                 }
             }
 
