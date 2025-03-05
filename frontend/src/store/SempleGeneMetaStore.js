@@ -1,0 +1,316 @@
+import {create} from "zustand";
+import {getGeneList, getSampleList, getMetaList} from "../api/api.js";
+import {getSampleMetaData, getAllMetaData, getExprData} from "../api/api.js";
+import {getCoordinates, getImage} from "../api/visium.js";
+import {toast} from "react-toastify";
+
+const useSampleGeneMetaStore = create((set, get) => ({
+    dataSet: null,
+    geneList: [],
+    sampleList: [],
+    metaList: [],
+    allMetaData: [],
+
+    umapData: [],
+
+    selectedSamples: [],
+    imageDataList: {},
+    metaDataList: {},
+
+    selectedGenes: [],
+    exprDataList: {},
+
+    loading: true,
+    error: null,
+
+    setDataset: async (dataset) => {
+        set({dataSet: dataset});
+    },
+
+    setGeneList: async (genes) => {
+        set({geneList: genes});
+    },
+
+    setSampleList: async (samples) => {
+        set({sampleList: samples});
+    },
+
+    setAllMetaData: async (meta) => {
+        set({allMetaData: meta});
+    },
+
+    setMetaDataList: async (meta) => {
+        set({metaDataList: meta});
+    },
+
+    setExprDataList: async (expr) => {
+        set({exprDataList: expr});
+    },
+
+    setSelectedSamples: async (samples) => {
+        set({selectedSamples: samples});
+    },
+
+    setSelectedGenes: async (genes) => {
+        set({selectedGenes: genes});
+    },
+
+    fetchGeneList: async (dataset_id = null, query_str = "AB") => {
+        if (!dataset_id) {
+            set({error: "No dataset selected", loading: false});
+            return;
+        }
+
+        try {
+            const response = await getGeneList(dataset_id, query_str);
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({geneList: data});
+
+            } else {
+                console.error("Error fetching gene list:", response.message);
+                await set({geneList: []});
+                toast.error(response.message);
+            }
+
+        } catch (error) {
+            console.error("Error fetching gene list:", error);
+            await set({geneList: []});
+            toast.error("Error while fetching gene list.");
+            set({loading: false, error: "Error while fetching gene list."});
+        } finally {
+            set({loading: false}); // Ensure loading is false after completion
+        }
+    },
+
+    fetchSampleList: async (dataset_id = null, query_str = "all") => {
+        if (!dataset_id) {
+            set({error: "No dataset selected", loading: false});
+            return;
+        }
+
+        try {
+            const response = await getSampleList(dataset_id, query_str);
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({sampleList: data});
+
+            } else {
+                console.error("Error fetching sample list:", response.message);
+                await set({sampleList: []});
+                toast.error(response.message);
+            }
+
+        } catch (error) {
+            console.error("Error fetching gene list:", error);
+            await set({sampleList: []});
+            toast.error("Error while fetching sample list.");
+            set({loading: false, error: "Error while fetching sample list."});
+        } finally {
+            set({loading: false}); // Ensure loading is false after completion
+        }
+    },
+
+    fetchMetaList: async (dataset_id = null, query_str = "all") => {
+        if (!dataset_id) {
+            set({error: "No dataset selected", loading: false});
+            return;
+        }
+        try {
+            const response = await getMetaList(dataset_id, query_str);
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({metaList: data});
+
+            } else {
+                console.error("Error fetching meta list:", response.message);
+                await set({metaList: []});
+                toast.error(response.message);
+            }
+
+        } catch (error) {
+            console.error("Error fetching meta list:", error);
+            await set({metaList: []});
+            toast.error("Error while fetching meta list.");
+            set({loading: false, error: "Error while fetching meta list."});
+        } finally {
+            set({loading: false}); // Ensure loading is false after completion
+        }
+    },
+
+    fetchSampleMetaData: async (dataset_id = null) => {
+        const {selectedSamples} = get();
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "No dataset selected", loading: false});
+            return;
+        }
+
+        // Don't reset loading state if no genes selected
+        if (selectedSamples.length === 0) {
+            set({metaDataList: {}}); // Clear data without affecting loading state
+            return;
+        }
+
+        set({loading: true, error: null});
+
+        try {
+            get().metaDataList = {};
+            for (var sample of selectedSamples) {
+                if (!get().metaDataList[sample]) {
+                    const response = await getSampleMetaData(dataset_id, sample);
+                    get().metaDataList[sample] = response.data;
+                }
+            }
+            // remove item if it is not selected
+            for (var key in get().metaDataList) {
+                if (!selectedSamples.includes(key)) {
+                    delete get().metaDataList[key];
+                }
+            }
+
+            set({loading: false});
+
+        } catch (error) {
+            set({error: "Failed to fetch UMAP data:" + error, loading: false});
+        } finally {
+            set({loading: false});
+        }
+
+    },
+
+    fetchAllMetaData: async (dataset_id) => {
+        const {dataSet} = get();
+        if (!dataSet || dataSet === "all") {
+            set({error: "No dataset selected", loading: false});
+            return;
+        }
+        try {
+            const response = await getAllMetaData(dataset_id, "sc");
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({allMetaData: data});
+            } else {
+                console.error("Error fetching all meta data:", response.message);
+                await set({allMetaData: []});
+                toast.error(response.message);
+            }
+            set({loading: false});
+
+        } catch (error) {
+            set({error: "Failed to fetch all meta data:" + error, loading: false});
+        } finally {
+            set({loading: false});
+        }
+
+    },
+
+    fetchUMAPData: async () => {
+        const {dataSet} = get();
+        if (!dataSet || dataSet === "all") {
+            set({error: "No dataset selected", loading: false});
+            return;
+        }
+        set({loading: true, error: null});
+
+        try {
+            const response = await getUMAPData(dataSet);
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({umapData: data});
+            } else {
+                console.error("Error fetching UMAP data:", response.message);
+                await set({umapData: []});
+                toast.error(response.message);
+            }
+
+            set({loading: false});
+
+        } catch (error) {
+            set({error: "Failed to fetch UMAP data:" + error, loading: false});
+        } finally {
+            set({loading: false});
+        }
+    },
+
+    fetchExprData: async () => {
+        const {dataSet, selectedGenes} = get();
+        if (!dataSet || dataSet === "all") {
+            set({error: "No dataset selected", loading: false});
+            return;
+        }
+
+        // Don't reset loading state if no genes selected
+        if (selectedGenes.length === 0) {
+            set({exprDataList: {}}); // Clear data without affecting loading state
+            return;
+        }
+
+        set({loading: true, error: null});
+
+        try {
+            // Clear the exprDataList
+            get().exprDataList = {};
+            for (var gene of selectedGenes) {
+                if (!get().exprDataList[gene]) {
+                    const response = await getExprData(dataSet, gene);
+                    get().exprDataList[gene] = response.data;
+                }
+            }
+            // remove gene item if it is not selected
+            for (var key in get().exprDataList) {
+                if (!selectedGenes.includes(key)) {
+                    delete get().exprDataList[key];
+                }
+            }
+
+            set({loading: false});
+
+        } catch (error) {
+            set({error: "Failed to fetch UMAP data:" + error, loading: false});
+        } finally {
+            set({loading: false});
+        }
+
+    },
+
+    fetchImageData: async () => {
+        const {dataSet, selectedSamples} = get();
+        if (!dataSet || dataSet === "all") {
+            set({error: "No dataset selected", loading: false});
+            return;
+        }
+
+        set({loading: true, error: null});
+
+        try {
+            // Clear the exprDataList
+            get().imageDataList = {};
+            for (var sample of selectedSamples) {
+                if (!get().imageDataList[sample]) {
+                    const coor_response = await getCoordinates(dataSet, sample);
+                    const img_response = await getImage(dataSet, sample);
+                    get().imageDataList[sample] = {
+                        coordinates: coor_response.data.coordinates,
+                        scales: coor_response.data.scales,
+                        image: img_response.data
+                    };
+                }
+            }
+            // remove gene item if it is not selected
+            for (var key in get().imageDataList) {
+                if (!selectedSamples.includes(key)) {
+                    delete get().imageDataList[key];
+                }
+            }
+
+            set({loading: false});
+
+        } catch (error) {
+            set({error: "Failed to fetch VisiumST data:" + error, loading: false});
+        }
+    },
+
+
+}));
+
+export default useSampleGeneMetaStore;

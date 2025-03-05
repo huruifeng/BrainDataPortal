@@ -15,8 +15,7 @@ def get_gene_expr_data(dataset, gene):
 
     return cell_expr
 
-
-def get_all_genes(dataset):
+def get_gene_list(dataset, query_str="AB"):
     if dataset == "all":
         genes_file = os.path.join("backend","datasets", 'gene_list.json')
     else:
@@ -25,16 +24,78 @@ def get_all_genes(dataset):
     if os.path.exists(genes_file):
         with open(genes_file, 'r') as f:
             data = json.load(f)
-        return data
+        if query_str =="all":
+            return data
+        else:
+            return [gene for gene in data if gene.lower().startswith(query_str.lower())]
     else:
         print(genes_file + " not found")
         return "Error: Gene list file not found"
 
-def get_meta_data(dataset, drop_cols=None):
+def get_sample_list(dataset, query_str="all"):
+    if dataset == "all":
+        return "Error: Sample dataset not specified."
+    else:
+        sample_file = os.path.join("backend","datasets",dataset,'sample_list.json')
+
+    if os.path.exists(sample_file):
+        with open(sample_file, 'r') as f:
+            data = json.load(f)
+        if query_str =="all" or query_str == "":
+            return data
+        else:
+            return [sample for sample in data if sample.lower().startswith(query_str.lower())]
+    else:
+        print(sample_file + " not found")
+        return "Error: Gene list file not found"
+
+def get_meta_list(dataset, query_str="all"):
+    if dataset == "all":
+        return "Error: Sample dataset not specified."
+    else:
+        meta_file = os.path.join("backend","datasets",dataset,'meta_list.json')
+
+    if os.path.exists(meta_file):
+        with open(meta_file, 'r') as f:
+            data = json.load(f)
+        if query_str =="all" or query_str == "":
+            return data
+        else:
+            return [meta for meta in data if meta.lower().startswith(query_str.lower())]
+    else:
+        print(meta_file + " not found")
+        return "Error: Gene list file not found"
+
+def get_umapembedding(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_meta_100k.csv')
+    umap_file = os.path.join("backend","datasets",dataset,'umap_embedding_100k.csv')
+    if os.path.exists(umap_file):
+        with open(umap_file, 'r') as f:
+            data_df = pd.read_csv(umap_file, index_col=None, header=0)
+            data = data_df.to_dict(orient="records")
+            return data
+    else:
+        return "Error: UMAP file not found"
+
+def get_sample_metadata(dataset, sample,meta):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+
+    meta_file = os.path.join("backend","datasets",dataset,'metas_100k', sample, meta+'.json')
+    if os.path.exists(meta_file):
+        with open(meta_file, 'r') as f:
+            data = json.load(f)
+            return data
+    else:
+        return f"Error: Meta file not found: {sample} - {meta}"
+
+def get_all_metadata(dataset, drop_cols=None):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+
+    meta_file = os.path.join("backend","datasets",dataset,'meta_100k.csv')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=None, header=0)
@@ -44,7 +105,6 @@ def get_meta_data(dataset, drop_cols=None):
             return data
     else:
         return "Error: Meta file not found"
-
 
 def get_visium_coordinates(dataset, sample):
     if dataset == "all":

@@ -10,11 +10,10 @@ import {
     Button,
     LinearProgress, InputLabel, FormControl, Select, MenuItem
 } from "@mui/material";
+import "./GeneView.css";
+
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import {useParams, useSearchParams} from "react-router-dom";
-
-import useGeneStore from "../../store/GeneStore.js";
-import useDataStore from "../../store/DataStore.js";
 
 import EChartScatterPlot from "./EChartScatter.jsx";
 import EChartMetaScatter from "./EChartMetaScatter.jsx";
@@ -26,8 +25,7 @@ import PlotlyStackedViolin from "./PlotlyStackedViolin.jsx";
 
 import {isCategorical} from "../../utils/funcs.js";
 
-
-import "./GeneView.css";
+import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
 
 function GeneView() {
@@ -43,20 +41,21 @@ function GeneView() {
     const initialGrouping = queryParams.get("group") ?? "";
 
     // Prepare all the  data
-    const {sampleRecords, fetchSampleData} = useDataStore();
-    const {geneList, metaData} = useGeneStore();
-    const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useGeneStore();
-    const {setDataset, exprDataList, loading, error} = useGeneStore();
+    const {setDataset, geneList, fetchGeneList, sampleList, fetchSampleList, metaList, fetchMetaList} = useSampleGeneMetaStore();
+    const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore();
+    const {metaDataList, exprDataList, fetchSampleMetaData, fetchExprData} = useSampleGeneMetaStore();
+    const {allMetaData, loading, error} = useGeneStore();
 
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
 
     useEffect(() => {
-        fetchSampleData({dataset_id: datasetId});
-        useGeneStore.getState().fetchGeneMeta(datasetId);
+        fetchSampleList(datasetId);
+        fetchGeneList(datasetId);
+        fetchMetaList(datasetId);
     }, [datasetId]);
 
-    const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
+    const sampleOptions = sampleList.map((sample) => sample.sample_id);
     sampleOptions.unshift("all");
 
     const geneOptions = geneList.map((gene) => gene);
