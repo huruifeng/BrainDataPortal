@@ -70,7 +70,7 @@ def get_umapembedding(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_100k.csv')
+    umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_sample_id_100k.csv')
     if os.path.exists(umap_file):
         data_df = pd.read_csv(umap_file, index_col=0, header=0)
         data = data_df.to_dict(orient="index")
@@ -88,9 +88,6 @@ def get_sample_metadata(dataset, samples,meta):
         if(len(samples) > 0 and samples[0] != "all"):
             data_df = data_df.loc[data_df["sample_id"].isin(samples),:]
         # print(data_df.shape)
-        if meta=="":
-            data = {cs_id:1 for cs_id in data_df.index.to_list()}
-            return data
         data = data_df[meta].to_dict()
         return data
     else:

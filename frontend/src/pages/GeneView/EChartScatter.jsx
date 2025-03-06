@@ -2,8 +2,19 @@ import ReactECharts from "echarts-for-react";
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
-const EChartScatterPlot = ({gene, umapData, exprData, metaData, group}) => {
+function filterBySampleId(obj, sampleList) {
+  const sampleSet = new Set(sampleList);
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key, entry]) => sampleSet.has(entry.sample_id)
+  ));
+}
+
+const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, group}) => {
     if (Object.keys(umapData).length === 0) return "UMAP data is loading...";
+
+    if (sampleList.length >= 1 && !sampleList.includes("all")) {
+        umapData = filterBySampleId(umapData, sampleList);
+    }
 
     const createCategoryOptions = (plotData, colorGroup) => {
         // console.log("Categorical");
@@ -104,13 +115,12 @@ const EChartScatterPlot = ({gene, umapData, exprData, metaData, group}) => {
         // In this case the expression data is not needed, just use the metaData
         //===============================
         metaData = metaData ?? {}
-        const plotData = Object.entries(umapData).map(([cs_id, item]) => {
-            if(metaData?.[cs_id] === undefined || Object.keys(metaData).length === 0){
-                return ({"UMAP_1": item.UMAP_1, "UMAP_2": item.UMAP_2, [group]: 0})
-            }else{
-                return ({"UMAP_1": item.UMAP_1, "UMAP_2": item.UMAP_2, [group]: metaData[cs_id]})
-            }
-        })
+        const plotData = Object.entries(umapData).map(([cs_id, item]) => ({
+            "UMAP_1": item.UMAP_1,
+            "UMAP_2": item.UMAP_2,
+            [group]: metaData?.[cs_id] ?? 0,
+        }))
+
 
         const isCategoricalGroup = isCategorical(Object.values(metaData).map((p) => p[group]));
         if (isCategoricalGroup) {
@@ -140,6 +150,7 @@ export default EChartScatterPlot
 
 EChartScatterPlot.propTypes = {
     gene: PropTypes.string.isRequired,
+    sampleList: PropTypes.array.isRequired,
     umapData: PropTypes.object.isRequired,
     exprData: PropTypes.object.isRequired,
     metaData: PropTypes.object.isRequired,

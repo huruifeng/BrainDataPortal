@@ -100,17 +100,24 @@ function GeneView() {
         fetchMetaData(datasetId, coloring);
     };
 
+    const handleSampleDelete = (delSample) => {
+        const newSamples = selectedSamples.filter(s => s !== delSample);
+        setSelectedSamples(newSamples);
+        updateQueryParams(selectedGenes, newSamples);
+        fetchMetaData(datasetId, coloring);
+    }
+
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
         setSelectedGenes(newValue);
-        updateQueryParams(newValue, selectedSamples); // Pass the new value instead of old state
+        updateQueryParams(newValue, selectedSamples, coloring, grouping); // Pass the new value instead of old state
         fetchExprData();
     };
 
     const handleGeneDelete = (delGene) => {
         const newGenes = selectedGenes.filter(g => g !== delGene);
         setSelectedGenes(newGenes);
-        updateQueryParams(newGenes, selectedSamples);
+        updateQueryParams(newGenes, selectedSamples, coloring, grouping);
         fetchExprData();
     }
 
@@ -200,11 +207,7 @@ function GeneView() {
                                         label={option}
                                         {...tagProps}
                                         color="primary"
-                                        onDelete={() => {
-                                            const newSamples = selectedSamples.filter(s => s !== option);
-                                            setSelectedSamples(newSamples);
-                                            updateQueryParams(selectedGenes, newSamples);
-                                        }}
+                                        onDelete={() => handleSampleDelete(option)}
                                     />
                                 );
                             })
@@ -366,7 +369,7 @@ function GeneView() {
                             <div key={'all_gene'} className="umap-item">
                                 <div className="umap-wrapper">
                                     {umapData &&
-                                        <EChartScatterPlot gene={"all"} umapData={umapData}
+                                        <EChartScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData}
                                                            exprData={{"all": "all"}} metaData={metaData}
                                                            group={coloring}/>}
                                     {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}

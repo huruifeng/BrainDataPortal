@@ -1,15 +1,14 @@
 import { Box, Typography } from "@mui/material";
-import { People, LocationOn, Description, InsertDriveFile, HourglassEmpty, Science } from "@mui/icons-material";
+import {People, Description, InsertDriveFile, Science, Biotech} from "@mui/icons-material";
 import "./StatBar.css";
 
 const StatBar = () => {
 
     const stats = [
       { icon: <People />, value: "86", label: "Datasets" },
-      { icon: <LocationOn />, value: "69", label: "Primary Sites" },
-      { icon: <Description />, value: "44,736", label: "Cases" },
+      { icon: <Description />, value: "44,736", label: "Samples" },
       { icon: <InsertDriveFile />, value: "1,027,517", label: "Files" },
-      { icon: <HourglassEmpty />, value: "22,534", label: "Genes" },
+      { icon: <Biotech />, value: "22,534", label: "Assays" },
       { icon: <Science />, value: "2,940,240", label: "Mutations" },
     ];
 

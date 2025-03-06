@@ -156,7 +156,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({loading: true, error: null});
 
         if(meta===null || meta === "") {
-           set({metaData: {}, loading: false});
+           set({metaData: {},loading: false});
            return;
         }
 
