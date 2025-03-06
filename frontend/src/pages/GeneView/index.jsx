@@ -49,19 +49,30 @@ function GeneView() {
         umapData, fetchUMAPData
     } = useSampleGeneMetaStore();
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore();
-    const {metaDataDict, fetchSampleMetaData, exprDataDict, fetchExprData} = useSampleGeneMetaStore();
-    const {allMetaData, fetchAllMetaData, loading, error} = useSampleGeneMetaStore();
+    const {metaData, fetchMetaData, exprDataDict, fetchExprData} = useSampleGeneMetaStore();
+    const {loading, error} = useSampleGeneMetaStore();
 
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
 
     useEffect(() => {
         setDataset(datasetId);
+        fetchUMAPData(datasetId);
         fetchSampleList(datasetId);
         fetchGeneList(datasetId);
         fetchMetaList(datasetId);
-        fetchUMAPData(datasetId);
+
+        const initialSelectedSamples = initialSamples.length ? initialSamples : [];
+        const initialSelectedGenes = initialGenes.length ? initialGenes : [];
+
+        useSampleGeneMetaStore.setState({
+            selectedSamples: initialSelectedSamples,
+            selectedGenes: initialSelectedGenes
+        });
+        fetchExprData(datasetId);
+
     }, [datasetId]);
+
 
     const sampleOptions = sampleList.map((sample) => sample.sample_id);
     sampleOptions.unshift("all");
@@ -70,20 +81,6 @@ function GeneView() {
 
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");
-
-    useEffect(() => {
-        const initialSelectedSamples = initialSamples.length ? initialSamples : [];
-        const initialSelectedGenes = initialGenes.length ? initialGenes : [];
-
-        setDataset(datasetId);
-
-        useSampleGeneMetaStore.setState({
-            selectedSamples: initialSelectedSamples,
-            selectedGenes: initialSelectedGenes
-        });
-        fetchExprData(datasetId);
-        fetchAllMetaData(datasetId);
-    }, []);
 
     /** Updates the query parameters in the URL */
     const updateQueryParams = (genes, samples, color = null, group = null) => {
@@ -99,6 +96,7 @@ function GeneView() {
     const handleSampleChange = (event, newValue) => {
         setSelectedSamples(newValue);
         updateQueryParams(selectedGenes, newValue); // Pass the new value instead of old state
+        fetchMetaData(datasetId, coloring);
     };
 
     /** Handles gene selection change */
@@ -129,6 +127,7 @@ function GeneView() {
     const handleColoringChange = (event) => {
         setColoring(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, event.target.value, grouping);
+        fetchMetaData(datasetId, event.target.value);
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
@@ -138,8 +137,8 @@ function GeneView() {
                 ? "three-plots" : "four-plots";
 
 
-    const metaValues = allMetaData.map((meta) => meta[grouping]);
-    let isCat = false;
+    const metaValues = Object.values(metaData);
+    let isCat = true;
     if (isCategorical(metaValues)) {
         isCat = true;
     }
@@ -310,7 +309,7 @@ function GeneView() {
                                 {Object.entries(exprDataDict).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {allMetaData && <EChartScatterPlot gene={gene} geneData={expr_data}
+                                            {umapData && <EChartScatterPlot gene={gene} geneData={expr_data}
                                                                             sampleData={selectedSamples}
                                                                             metaData={allMetaData} group={coloring}/>}
                                             {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}
@@ -337,7 +336,7 @@ function GeneView() {
                                 <div id="stacked_violin_div" className={`violin-container`}>
                                     <div key='stacked_violin' className="violin-item">
                                         <div className="violin-wrapper">
-                                            {allMetaData &&
+                                            {umapData &&
                                                 <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataDict}
                                                                      sampleData={selectedSamples} metaData={allMetaData}
                                                                      group={grouping}/>}
@@ -349,9 +348,10 @@ function GeneView() {
                                     {Object.entries(exprDataDict).map(([gene, expr_data]) => (
                                         <div key={gene} className="umap-item">
                                             <div className="umap-wrapper">
-                                                {allMetaData && <EChartMetaScatter gene={gene} geneData={expr_data}
-                                                                                sampleData={selectedSamples}
-                                                                                metaData={allMetaData} group={grouping}/>}
+                                                {umapData && <EChartMetaScatter gene={gene} geneData={expr_data}
+                                                                                   sampleData={selectedSamples}
+                                                                                   metaData={allMetaData}
+                                                                                   group={grouping}/>}
                                             </div>
                                         </div>
                                     ))}
@@ -364,9 +364,10 @@ function GeneView() {
                         <div className={`umap-container single-plot`}>
                             <div key={'all_gene'} className="umap-item">
                                 <div className="umap-wrapper">
-                                    {umapData && <EChartScatterPlot gene={"all"} geneData={{"all": "all"}}
-                                                                    sampleData={selectedSamples} metaData={allMetaData}
-                                                                    group={coloring}/>}
+                                    {umapData &&
+                                        <EChartScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData}
+                                                           exprdata={{"all": "all"}} metaData={allMetaData}
+                                                           group={coloring}/>}
                                     {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}
 
                                 </div>

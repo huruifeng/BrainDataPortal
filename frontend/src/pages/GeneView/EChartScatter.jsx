@@ -2,12 +2,13 @@ import ReactECharts from "echarts-for-react";
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
-const EChartScatterPlot = ({gene, geneData, sampleData, metaData, group}) => {
-    // console.log("gene: ", gene);
-    if(sampleData.length >= 1 && !sampleData.includes("all")) {
-        metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
+const EChartScatterPlot = ({gene, sampleList,umapData, exprData, allMetaData, group}) => {
+    console.log("all: ", allMetaData);
+    console.log("umapData: ", umapData);
+    if(umapData.length === 0) return "UMAP data is loading...";
+    if(sampleList.length >= 1 && !sampleList.includes("all")) {
+        umapData = umapData.filter((point) => umapData.includes(point.sample_id));
     }
-    if(metaData.length === 0) return "Sample not found in the MetaData";
 
     const createCategoryOptions = (plotData, colorGroup) => {
         // console.log("Categorical");
@@ -107,18 +108,25 @@ const EChartScatterPlot = ({gene, geneData, sampleData, metaData, group}) => {
         //===============================
         // In this case the expression data is not needed, just use the metaData
         //===============================
-        const isCategoricalGroup = isCategorical(metaData.map((p) => p[group]));
+        allMetaData = allMetaData ?? {}
+        const plotData = umapData.map(item => ({
+            "UMAP_1": item.UMAP_1,
+            "UMAP_2": item.UMAP_2,
+            [group]: allMetaData?.[item.cs_id]?.[group] ?? 0,
+            sample_id: item.sample_id  // Keep identifier if needed
+        }))
+        const isCategoricalGroup = isCategorical(Object.values(allMetaData).map((p) => p[group]));
         if (isCategoricalGroup) {
-            options = createCategoryOptions(metaData, group);
+            options = createCategoryOptions(plotData, group);
         } else {
-            options = createContinuousOptions(metaData, group);
+            options = createContinuousOptions(plotData, group);
         }
     } else {
         // data processing
-        const plotData = metaData.map(item => ({
+        const plotData = umapData.map(item => ({
             "UMAP_1": item.UMAP_1,
             "UMAP_2": item.UMAP_2,
-            [gene]: geneData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+            [gene]: exprData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
             sample_id: item.sample_id  // Keep identifier if needed
         })) || [];
         options = createContinuousOptions(plotData, gene);
@@ -132,15 +140,14 @@ const EChartScatterPlot = ({gene, geneData, sampleData, metaData, group}) => {
         autoResize={true}/>;
 }
 
+export default EChartScatterPlot
+
 EChartScatterPlot.propTypes = {
     gene: PropTypes.string.isRequired,
-    geneData: PropTypes.object.isRequired,
-    sampleData: PropTypes.array.isRequired,
+    sampleList: PropTypes.array.isRequired,
     metaData: PropTypes.array.isRequired,
     group: PropTypes.string.isRequired,
-};
-
-export default EChartScatterPlot
+}
 
 // https://www.npmjs.com/package/echarts-for-react
 // https://github.com/hustcc/echarts-for-react?tab=readme-ov-file

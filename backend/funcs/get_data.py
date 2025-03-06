@@ -72,24 +72,25 @@ def get_umapembedding(dataset):
 
     umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_100k.csv')
     if os.path.exists(umap_file):
-        with open(umap_file, 'r') as f:
-            data_df = pd.read_csv(umap_file, index_col=None, header=0)
-            data = data_df.to_dict(orient="records")
-            return data
+        data_df = pd.read_csv(umap_file, index_col=0, header=0)
+        data = data_df.to_dict(orient="index")
+        return data
     else:
         return "Error: UMAP file not found"
 
-def get_sample_metadata(dataset, sample,meta):
+def get_sample_metadata(dataset, samples,meta):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'metas_100k', sample, meta+'.json')
+    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_100k.csv')
     if os.path.exists(meta_file):
-        with open(meta_file, 'r') as f:
-            data = json.load(f)
-            return data
+        data_df = pd.read_csv(meta_file, index_col=0, header=0)
+        data_df = data_df.loc[data_df["sample_id"].isin(samples),:]
+        data_df = data_df.loc[:,[meta]]
+        data = data_df.to_dict(orient="dict")[meta]
+        return data
     else:
-        return f"Error: Meta file not found: {sample} - {meta}"
+        return f"Error: Meta file not found."
 
 def get_all_metadata(dataset, drop_cols=None):
     if dataset == "all":
@@ -98,10 +99,10 @@ def get_all_metadata(dataset, drop_cols=None):
     meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_100k.csv')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
-            data_df = pd.read_csv(meta_file, index_col=None, header=0)
+            data_df = pd.read_csv(meta_file, index_col=0, header=0)
             if drop_cols is not None:
                 data_df = data_df.drop(drop_cols, axis=1)
-            data = data_df.to_dict(orient="records")
+            data = data_df.to_dict(orient="index")
             return data
     else:
         return "Error: Meta file not found"
@@ -115,8 +116,8 @@ def get_visium_coordinates(dataset, sample):
 
     if os.path.exists(coordinates_file) and os.path.exists(scales_file):
         with open(coordinates_file, 'r') as f:
-            coordinates_df = pd.read_csv(coordinates_file, index_col=None, header=0)
-            coordinates= coordinates_df.to_dict(orient="records")
+            coordinates_df = pd.read_csv(coordinates_file, index_col=0, header=0)
+            coordinates= coordinates_df.to_dict(orient="index")
 
         with open(scales_file, 'r') as f:
             scales = json.load(f)

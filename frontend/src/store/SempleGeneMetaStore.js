@@ -1,6 +1,6 @@
 import {create} from "zustand";
-import {getGeneList, getSampleList, getMetaList,getUMAPData} from "../api/api.js";
-import {getSampleMetaData, getAllMetaData, getExprData} from "../api/api.js";
+import {getGeneList, getSampleList, getMetaList, getUMAPData, getAllMetaData} from "../api/api.js";
+import {getSampleMetaData, getExprData} from "../api/api.js";
 import {getCoordinates, getImage} from "../api/visium.js";
 import {toast} from "react-toastify";
 
@@ -9,13 +9,14 @@ const useSampleGeneMetaStore = create((set, get) => ({
     geneList: [],
     sampleList: [],
     metaList: [],
-    allMetaData: [],
 
-    umapData: [],
+    umapData: {},
 
     selectedSamples: [],
     imageDataDict: {},
-    metaDataDict: {},
+
+    allMetaData: {},
+    metaData: {},
 
     selectedGenes: [],
     exprDataDict: {},
@@ -138,7 +139,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
-    fetchSampleMetaData: async (dataset_id = null) => {
+    fetchMetaData: async (dataset_id = null, meta = null) => {
         const {selectedSamples} = get();
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchSampleMetaData: No dataset selected", loading: false});
@@ -147,27 +148,19 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
         // Don't reset loading state if no genes selected
         if (selectedSamples.length === 0) {
-            set({metaDataDict: {}}); // Clear data without affecting loading state
+            set({metaData: []}); // Clear data without affecting loading state
             return;
         }
 
         set({loading: true, error: null});
 
-        try {
-            get().metaDataDict = {};
-            for (var sample of selectedSamples) {
-                if (!get().metaDataDict[sample]) {
-                    const response = await getSampleMetaData(dataset_id, sample);
-                    get().metaDataDict[sample] = response.data;
-                }
-            }
-            // remove item if it is not selected
-            for (var key in get().metaDataDict) {
-                if (!selectedSamples.includes(key)) {
-                    delete get().metaDataDict[key];
-                }
-            }
+        if (selectedSamples.length >= 1 && selectedSamples.includes("all")) {
+            set({selectedSamples: ["all"]});
+        }
 
+        try {
+            const response = await getSampleMetaData(dataset_id, selectedSamples, meta);
+            get().metaData = response.data;
             set({loading: false});
 
         } catch (error) {
@@ -178,25 +171,21 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     },
 
-    fetchAllMetaData: async (dataset_id) => {
+    fetchAllMetaData: async (dataset_id = null) => {
         if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchAllMetaData: No dataset selected", loading: false});
+            set({error: "fetchSampleMetaData: No dataset selected", loading: false});
             return;
         }
+
+        set({loading: true, error: null});
+
         try {
-            const response = await getAllMetaData(dataset_id, "sc");
-            if (response.status === 200) {
-                const data = await response.data;
-                await set({allMetaData: data});
-            } else {
-                console.error("Error fetching all meta data:", response.message);
-                await set({allMetaData: []});
-                toast.error(response.message);
-            }
+            const response = await getAllMetaData(dataset_id);
+            get().allMetaData = response.data;
             set({loading: false});
 
         } catch (error) {
-            set({error: "Failed to fetch all meta data:" + error, loading: false});
+            set({error: "Failed to fetch UMAP data:" + error, loading: false});
         } finally {
             set({loading: false});
         }
@@ -246,8 +235,6 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({loading: true, error: null});
 
         try {
-            // Clear the exprDataDict
-            get().exprDataDict = {};
             for (var gene of selectedGenes) {
                 if (!get().exprDataDict[gene]) {
                     const response = await getExprData(dataSet, gene);
