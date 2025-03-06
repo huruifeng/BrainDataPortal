@@ -2,13 +2,8 @@ import ReactECharts from "echarts-for-react";
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
-const EChartScatterPlot = ({gene, sampleList,umapData, exprData, allMetaData, group}) => {
-    console.log("all: ", allMetaData);
-    console.log("umapData: ", umapData);
-    if(umapData.length === 0) return "UMAP data is loading...";
-    if(sampleList.length >= 1 && !sampleList.includes("all")) {
-        umapData = umapData.filter((point) => umapData.includes(point.sample_id));
-    }
+const EChartScatterPlot = ({gene,umapData, exprData, metaData, group}) => {
+    if(Object.keys(umapData).length === 0) return "UMAP data is loading...";
 
     const createCategoryOptions = (plotData, colorGroup) => {
         // console.log("Categorical");
@@ -108,14 +103,21 @@ const EChartScatterPlot = ({gene, sampleList,umapData, exprData, allMetaData, gr
         //===============================
         // In this case the expression data is not needed, just use the metaData
         //===============================
-        allMetaData = allMetaData ?? {}
-        const plotData = umapData.map(item => ({
+        metaData = metaData ?? {}
+        const plotData = Object.entries(umapData).map(([cs_id, item]) => ({
             "UMAP_1": item.UMAP_1,
             "UMAP_2": item.UMAP_2,
-            [group]: allMetaData?.[item.cs_id]?.[group] ?? 0,
+            [group]: metaData?.[cs_id] ?? 0,
+        }))
+
+        Object.entries(umapData).map(item => ({
+            "UMAP_1": item.UMAP_1,
+            "UMAP_2": item.UMAP_2,
+            [group]: metaData?.[item.cs_id]?.[group] ?? 0,
             sample_id: item.sample_id  // Keep identifier if needed
         }))
-        const isCategoricalGroup = isCategorical(Object.values(allMetaData).map((p) => p[group]));
+
+        const isCategoricalGroup = isCategorical(Object.values(metaData).map((p) => p[group]));
         if (isCategoricalGroup) {
             options = createCategoryOptions(plotData, group);
         } else {
@@ -127,7 +129,6 @@ const EChartScatterPlot = ({gene, sampleList,umapData, exprData, allMetaData, gr
             "UMAP_1": item.UMAP_1,
             "UMAP_2": item.UMAP_2,
             [gene]: exprData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
-            sample_id: item.sample_id  // Keep identifier if needed
         })) || [];
         options = createContinuousOptions(plotData, gene);
     }
@@ -144,8 +145,9 @@ export default EChartScatterPlot
 
 EChartScatterPlot.propTypes = {
     gene: PropTypes.string.isRequired,
-    sampleList: PropTypes.array.isRequired,
-    metaData: PropTypes.array.isRequired,
+    umapData: PropTypes.object.isRequired,
+    exprData: PropTypes.object.isRequired,
+    metaData: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
 }
 

@@ -36,7 +36,7 @@ function GeneView() {
 
     const [queryParams, setQueryParams] = useSearchParams();
     const initialGenes = queryParams.getAll("gene");
-    const initialSamples = queryParams.getAll("sample");
+    const initialSamples = queryParams.getAll("sample") ?? ["all"];
     const initialColoring = queryParams.get("color") ?? "";
     const initialGrouping = queryParams.get("group") ?? "";
 
@@ -62,7 +62,7 @@ function GeneView() {
         fetchGeneList(datasetId);
         fetchMetaList(datasetId);
 
-        const initialSelectedSamples = initialSamples.length ? initialSamples : [];
+        const initialSelectedSamples = initialSamples.length ? initialSamples : ["all"];
         const initialSelectedGenes = initialGenes.length ? initialGenes : [];
 
         useSampleGeneMetaStore.setState({
@@ -70,6 +70,7 @@ function GeneView() {
             selectedGenes: initialSelectedGenes
         });
         fetchExprData(datasetId);
+        fetchMetaData(datasetId, coloring);
 
     }, [datasetId]);
 
@@ -311,7 +312,7 @@ function GeneView() {
                                         <div className="umap-wrapper">
                                             {umapData && <EChartScatterPlot gene={gene} geneData={expr_data}
                                                                             sampleData={selectedSamples}
-                                                                            metaData={allMetaData} group={coloring}/>}
+                                                                            metaData={metaData} group={coloring}/>}
                                             {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}
                                         </div>
                                     </div>
@@ -338,7 +339,7 @@ function GeneView() {
                                         <div className="violin-wrapper">
                                             {umapData &&
                                                 <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataDict}
-                                                                     sampleData={selectedSamples} metaData={allMetaData}
+                                                                     sampleData={selectedSamples} metaData={metaData}
                                                                      group={grouping}/>}
                                         </div>
                                     </div>
@@ -350,7 +351,7 @@ function GeneView() {
                                             <div className="umap-wrapper">
                                                 {umapData && <EChartMetaScatter gene={gene} geneData={expr_data}
                                                                                    sampleData={selectedSamples}
-                                                                                   metaData={allMetaData}
+                                                                                   metaData={metaData}
                                                                                    group={grouping}/>}
                                             </div>
                                         </div>
@@ -365,8 +366,8 @@ function GeneView() {
                             <div key={'all_gene'} className="umap-item">
                                 <div className="umap-wrapper">
                                     {umapData &&
-                                        <EChartScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData}
-                                                           exprdata={{"all": "all"}} metaData={allMetaData}
+                                        <EChartScatterPlot gene={"all"} umapData={umapData}
+                                                           exprData={{"all": "all"}} metaData={metaData}
                                                            group={coloring}/>}
                                     {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}
 

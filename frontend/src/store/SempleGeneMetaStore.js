@@ -142,7 +142,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
     fetchMetaData: async (dataset_id = null, meta = null) => {
         const {selectedSamples} = get();
         if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchSampleMetaData: No dataset selected", loading: false});
+            set({error: "fetchMetaData: No dataset selected", loading: false});
             return;
         }
 
@@ -157,12 +157,15 @@ const useSampleGeneMetaStore = create((set, get) => ({
         if (selectedSamples.length >= 1 && selectedSamples.includes("all")) {
             set({selectedSamples: ["all"]});
         }
+        if(meta===null || meta === "") {
+           set({metaData: []});
+           return;
+        }
 
         try {
             const response = await getSampleMetaData(dataset_id, selectedSamples, meta);
             get().metaData = response.data;
             set({loading: false});
-
         } catch (error) {
             set({error: "Failed to fetch UMAP data:" + error, loading: false});
         } finally {
