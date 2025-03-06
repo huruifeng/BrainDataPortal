@@ -141,6 +141,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     fetchMetaData: async (dataset_id = null, meta = null) => {
         const {selectedSamples} = get();
+
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchMetaData: No dataset selected", loading: false});
             return;
@@ -148,24 +149,27 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
         // Don't reset loading state if no genes selected
         if (selectedSamples.length === 0) {
-            set({metaData: {}}); // Clear data without affecting loading state
+            set({metaData: {},loading: false});
             return;
         }
 
         set({loading: true, error: null});
 
-        if (selectedSamples.length >= 1 && selectedSamples.includes("all")) {
-            set({selectedSamples: ["all"]});
-        }
         if(meta===null || meta === "") {
-           set({metaData: {}});
+           set({metaData: {}, loading: false});
            return;
         }
 
         try {
-            // console.log("samples: ", selectedSamples);
-            const response = await getSampleMetaData(dataset_id, selectedSamples, meta);
-            get().metaData = response.data;
+            console.log("samples: ", selectedSamples);
+            if (selectedSamples.length >= 1 && selectedSamples.includes("all")) {
+                const response = await getSampleMetaData(dataset_id, ["all"], meta);
+                get().metaData = response.data;
+            }else{
+                const response = await getSampleMetaData(dataset_id, selectedSamples, meta);
+                get().metaData = response.data;
+            }
+
             set({loading: false});
         } catch (error) {
             set({error: "Failed to fetch UMAP data:" + error, loading: false});

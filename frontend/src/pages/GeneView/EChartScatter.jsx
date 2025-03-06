@@ -2,8 +2,8 @@ import ReactECharts from "echarts-for-react";
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
-const EChartScatterPlot = ({gene,umapData, exprData, metaData, group}) => {
-    if(Object.keys(umapData).length === 0) return "UMAP data is loading...";
+const EChartScatterPlot = ({gene, umapData, exprData, metaData, group}) => {
+    if (Object.keys(umapData).length === 0) return "UMAP data is loading...";
 
     const createCategoryOptions = (plotData, colorGroup) => {
         // console.log("Categorical");
@@ -87,7 +87,7 @@ const EChartScatterPlot = ({gene,umapData, exprData, metaData, group}) => {
                     color: ["#CCCCCCFF", "#FF0000FF"], // Color gradient from low to high
                 },
             },
-            legend: { show: false },
+            legend: {show: false},
             series: [
                 {
                     type: "scatter",
@@ -104,18 +104,13 @@ const EChartScatterPlot = ({gene,umapData, exprData, metaData, group}) => {
         // In this case the expression data is not needed, just use the metaData
         //===============================
         metaData = metaData ?? {}
-        const plotData = Object.entries(umapData).map(([cs_id, item]) => ({
-            "UMAP_1": item.UMAP_1,
-            "UMAP_2": item.UMAP_2,
-            [group]: metaData?.[cs_id] ?? 0,
-        }))
-
-        Object.entries(umapData).map(item => ({
-            "UMAP_1": item.UMAP_1,
-            "UMAP_2": item.UMAP_2,
-            [group]: metaData?.[item.cs_id]?.[group] ?? 0,
-            sample_id: item.sample_id  // Keep identifier if needed
-        }))
+        const plotData = Object.entries(umapData).map(([cs_id, item]) => {
+            if(metaData?.[cs_id] === undefined || Object.keys(metaData).length === 0){
+                return ({"UMAP_1": item.UMAP_1, "UMAP_2": item.UMAP_2, [group]: 0})
+            }else{
+                return ({"UMAP_1": item.UMAP_1, "UMAP_2": item.UMAP_2, [group]: metaData[cs_id]})
+            }
+        })
 
         const isCategoricalGroup = isCategorical(Object.values(metaData).map((p) => p[group]));
         if (isCategoricalGroup) {

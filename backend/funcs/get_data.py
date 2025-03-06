@@ -88,6 +88,9 @@ def get_sample_metadata(dataset, samples,meta):
         if(len(samples) > 0 and samples[0] != "all"):
             data_df = data_df.loc[data_df["sample_id"].isin(samples),:]
         # print(data_df.shape)
+        if meta=="":
+            data = {cs_id:1 for cs_id in data_df.index.to_list()}
+            return data
         data = data_df[meta].to_dict()
         return data
     else:
