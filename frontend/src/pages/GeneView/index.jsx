@@ -75,10 +75,10 @@ function GeneView() {
     }, [datasetId]);
 
 
-    const sampleOptions = sampleList.map((sample) => sample.sample_id);
+    const sampleOptions = sampleList.map((sample) => sample) ?? [];
     sampleOptions.unshift("all");
 
-    const geneOptions = geneList.map((gene) => gene);
+    const geneOptions = geneList.map((gene) => gene) ?? [];
 
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");

@@ -65,8 +65,9 @@ async def getumapembedding(request:Request):
 async def getsamplemetadata(request:Request):
     print("getsamplemetadata() called================")
     dataset_id = request.query_params.get("dataset")
-    samples = request.query_params.getlist("samples")
+    samples = request.query_params.getlist("samples[]")
     meta = request.query_params.get("meta")
+    # print(samples,meta)
 
     response = get_sample_metadata(dataset_id, samples,meta)
     # print (response)

@@ -148,7 +148,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
         // Don't reset loading state if no genes selected
         if (selectedSamples.length === 0) {
-            set({metaData: []}); // Clear data without affecting loading state
+            set({metaData: {}}); // Clear data without affecting loading state
             return;
         }
 
@@ -158,11 +158,12 @@ const useSampleGeneMetaStore = create((set, get) => ({
             set({selectedSamples: ["all"]});
         }
         if(meta===null || meta === "") {
-           set({metaData: []});
+           set({metaData: {}});
            return;
         }
 
         try {
+            // console.log("samples: ", selectedSamples);
             const response = await getSampleMetaData(dataset_id, selectedSamples, meta);
             get().metaData = response.data;
             set({loading: false});
