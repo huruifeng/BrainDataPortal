@@ -313,10 +313,9 @@ function GeneView() {
                                 {Object.entries(exprDataDict).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {umapData && <EChartScatterPlot gene={gene} geneData={expr_data}
-                                                                            sampleData={selectedSamples}
-                                                                            metaData={metaData} group={coloring}/>}
-                                            {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}
+                                            {umapData && <EChartScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData}
+                                                                            exprData={expr_data} metaData={metaData}
+                                                                            group={coloring}/>}
                                         </div>
                                     </div>
                                 ))}
@@ -336,31 +335,31 @@ function GeneView() {
                             {/*</div>*/}
 
                             {/*plot the stacked violin plot*/}
-                            {isCat ?
-                                <div id="stacked_violin_div" className={`violin-container`}>
-                                    <div key='stacked_violin' className="violin-item">
-                                        <div className="violin-wrapper">
-                                            {umapData &&
-                                                <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataDict}
-                                                                     sampleData={selectedSamples} metaData={metaData}
-                                                                     group={grouping}/>}
-                                        </div>
-                                    </div>
-                                </div>
-                                :
-                                <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>
-                                    {Object.entries(exprDataDict).map(([gene, expr_data]) => (
-                                        <div key={gene} className="umap-item">
-                                            <div className="umap-wrapper">
-                                                {umapData && <EChartMetaScatter gene={gene} geneData={expr_data}
-                                                                                   sampleData={selectedSamples}
-                                                                                   metaData={metaData}
-                                                                                   group={grouping}/>}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            }
+                            {/*{isCat ?*/}
+                            {/*    <div id="stacked_violin_div" className={`violin-container`}>*/}
+                            {/*        <div key='stacked_violin' className="violin-item">*/}
+                            {/*            <div className="violin-wrapper">*/}
+                            {/*                {umapData &&*/}
+                            {/*                    <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataDict}*/}
+                            {/*                                         sampleData={selectedSamples} metaData={metaData}*/}
+                            {/*                                         group={grouping}/>}*/}
+                            {/*            </div>*/}
+                            {/*        </div>*/}
+                            {/*    </div>*/}
+                            {/*    :*/}
+                            {/*    <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>*/}
+                            {/*        {Object.entries(exprDataDict).map(([gene, expr_data]) => (*/}
+                            {/*            <div key={gene} className="umap-item">*/}
+                            {/*                <div className="umap-wrapper">*/}
+                            {/*                    {umapData && <EChartMetaScatter gene={gene} geneData={expr_data}*/}
+                            {/*                                                       sampleData={selectedSamples}*/}
+                            {/*                                                       metaData={metaData}*/}
+                            {/*                                                       group={grouping}/>}*/}
+                            {/*                </div>*/}
+                            {/*            </div>*/}
+                            {/*        ))}*/}
+                            {/*    </div>*/}
+                            {/*}*/}
 
                         </>
 
@@ -372,8 +371,6 @@ function GeneView() {
                                         <EChartScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData}
                                                            exprData={{"all": "all"}} metaData={metaData}
                                                            group={coloring}/>}
-                                    {/*{metaData && <PlotlyScatterPlot gene={gene} geneData={expr_data} sampleData={selectedSamples} metaData={metaData} group={coloring}/>}*/}
-
                                 </div>
                             </div>
                         </div>

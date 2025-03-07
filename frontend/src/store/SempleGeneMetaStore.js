@@ -161,7 +161,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
 
         try {
-            console.log("samples: ", selectedSamples);
+
             if (selectedSamples.length >= 1 && selectedSamples.includes("all")) {
                 const response = await getSampleMetaData(dataset_id, ["all"], meta);
                 get().metaData = response.data;

@@ -130,10 +130,11 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         }
     } else {
         // data processing
-        const plotData = umapData.map(item => ({
+         const plotData = Object.entries(umapData).map(([cs_id, item]) => ({
             "UMAP_1": item.UMAP_1,
             "UMAP_2": item.UMAP_2,
-            [gene]: exprData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+             [gene]: exprData?.[cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+
         })) || [];
         options = createContinuousOptions(plotData, gene);
     }
