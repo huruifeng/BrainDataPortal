@@ -1,5 +1,4 @@
 import Plot from 'react-plotly.js';
-import {groupBy} from "lodash";
 import PropTypes from "prop-types";
 
 function filterBySampleId(obj, sampleList) {
