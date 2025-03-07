@@ -11,7 +11,7 @@ export function isCategorical(arr, uniqueThreshold = 20) {
     // ======================
 
     // Edge case: Empty array
-    if (arr.length === 0) return false;
+    if (arr.length === 0) return true;
 
     // Check if all values are non-numeric
     const allNonNumeric = arr.every(x => typeof x !== 'number');

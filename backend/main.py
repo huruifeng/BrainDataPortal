@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.db import create_db_and_tables
-from backend.routes import db_routes, API_routes, visium_routes
+from backend.routes import db_routes, api_routes, visium_routes
 
 app = FastAPI()
 
@@ -23,7 +23,7 @@ async def root():
     return "Hello, Welcome to BrainDataPortal!"
 
 app.include_router(db_routes.router, prefix="/db")
-app.include_router(API_routes.router, prefix="/api")
+app.include_router(api_routes.router, prefix="/api")
 app.include_router(visium_routes.router, prefix="/visium")
 
 if __name__ == "__main__":

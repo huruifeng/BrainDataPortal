@@ -2,10 +2,8 @@ import os
 import pandas as pd
 import json
 
-def get_gene_expr_data(dataset, gene):
-    # print("get_umap_data() called================")
-    # print(dataset, samples, genes, color, group)
-    ## plot expression for each gene
+def get_expr_data(dataset, gene):
+    print("get_expr_data() called================")
     gene_expr_file = os.path.join("backend","datasets",dataset, "genes",gene+".json")
     if not os.path.exists(gene_expr_file):
         return "Error: Gene expression file not found"
@@ -15,8 +13,7 @@ def get_gene_expr_data(dataset, gene):
 
     return cell_expr
 
-
-def get_all_genes(dataset):
+def get_gene_list(dataset, query_str="AB"):
     if dataset == "all":
         genes_file = os.path.join("backend","datasets", 'gene_list.json')
     else:
@@ -25,26 +22,89 @@ def get_all_genes(dataset):
     if os.path.exists(genes_file):
         with open(genes_file, 'r') as f:
             data = json.load(f)
-        return data
+        if query_str =="all":
+            return data
+        else:
+            return [gene for gene in data if gene.lower().startswith(query_str.lower())]
     else:
         print(genes_file + " not found")
         return "Error: Gene list file not found"
 
-def get_meta_data(dataset, drop_cols=None):
+def get_sample_list(dataset, query_str="all"):
+    if dataset == "all":
+        return "Error: Sample dataset not specified."
+    else:
+        sample_file = os.path.join("backend","datasets",dataset,'sample_list.json')
+
+    if os.path.exists(sample_file):
+        with open(sample_file, 'r') as f:
+            data = json.load(f)
+        if query_str =="all" or query_str == "":
+            return data
+        else:
+            return [sample for sample in data if sample.lower().startswith(query_str.lower())]
+    else:
+        print(sample_file + " not found")
+        return "Error: Gene list file not found"
+
+def get_meta_list(dataset, query_str="all"):
+    if dataset == "all":
+        return "Error: Sample dataset not specified."
+    else:
+        meta_file = os.path.join("backend","datasets",dataset,'meta_list.json')
+
+    if os.path.exists(meta_file):
+        with open(meta_file, 'r') as f:
+            data = json.load(f)
+        if query_str =="all" or query_str == "":
+            return data
+        else:
+            return [meta for meta in data if meta.lower().startswith(query_str.lower())]
+    else:
+        print(meta_file + " not found")
+        return "Error: Gene list file not found"
+
+def get_umapembedding(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_meta_100k.csv')
+    umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_sample_id_100k.csv')
+    if os.path.exists(umap_file):
+        data_df = pd.read_csv(umap_file, index_col=None, header=0)
+        data = data_df.to_dict(orient="records")
+        return data
+    else:
+        return "Error: UMAP file not found"
+
+def get_sample_metadata(dataset, samples,meta):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+
+    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_100k.csv')
+    if os.path.exists(meta_file):
+        data_df = pd.read_csv(meta_file, index_col=0, header=0)
+        if(len(samples) > 0 and samples[0] != "all"):
+            data_df = data_df.loc[data_df["sample_id"].isin(samples),:]
+        # print(data_df.shape)
+        data = data_df[meta].to_dict()
+        return data
+    else:
+        return f"Error: Meta file not found."
+
+def get_all_metadata(dataset, drop_cols=None):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+
+    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_100k.csv')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
-            data_df = pd.read_csv(meta_file, index_col=None, header=0)
+            data_df = pd.read_csv(meta_file, index_col=0, header=0)
             if drop_cols is not None:
                 data_df = data_df.drop(drop_cols, axis=1)
-            data = data_df.to_dict(orient="records")
+            data = data_df.to_dict(orient="index")
             return data
     else:
         return "Error: Meta file not found"
-
 
 def get_visium_coordinates(dataset, sample):
     if dataset == "all":
@@ -55,8 +115,8 @@ def get_visium_coordinates(dataset, sample):
 
     if os.path.exists(coordinates_file) and os.path.exists(scales_file):
         with open(coordinates_file, 'r') as f:
-            coordinates_df = pd.read_csv(coordinates_file, index_col=None, header=0)
-            coordinates= coordinates_df.to_dict(orient="records")
+            coordinates_df = pd.read_csv(coordinates_file, index_col=0, header=0)
+            coordinates= coordinates_df.to_dict(orient="index")
 
         with open(scales_file, 'r') as f:
             scales = json.load(f)

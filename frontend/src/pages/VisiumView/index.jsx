@@ -13,12 +13,11 @@ import {
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import {useParams, useSearchParams} from "react-router-dom";
 
-
 import "./VisiumView.css";
-import useVisiumStore from "../../store/VisiumStore.js";
-import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
-import FeaturePlot from "./VisiumCanvasPlot.jsx";
 
+import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
+
+import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
 
 function VisiumView() {
 
@@ -33,35 +32,46 @@ function VisiumView() {
 
 
     // Prepare all the  data
-    const {geneList, metaData} = useVisiumStore();
-    const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useVisiumStore();
-    const {setDataset, exprDataList, imageDataList, loading, error} = useVisiumStore();
+    const {
+        setDataset,
+        geneList, fetchGeneList,
+        sampleList, fetchSampleList,
+        metaList, fetchMetaList,
+    } = useSampleGeneMetaStore();
+    const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore();
+    const {
+        exprDataDict, fetchExprData,
+        imageDataDict, fetchImageData
+    } = useSampleGeneMetaStore();
+    const {allMetaData, fetchAllMetaData, loading, error} = useSampleGeneMetaStore();
 
     const [selectedMetaFeatures, setSelectedMetaFeatures] = useState(initialMetas);
-    // const [selectedFeatures, setSelectedFeatures] = useState([...new Set([...initialMetas, ...initialGenes])]);
 
     useEffect(() => {
         const initialSelectedSamples = initialSamples.length ? initialSamples : [];
         const initialSelectedGenes = initialGenes.length ? initialGenes : [];
 
         setDataset(datasetId);
-        useVisiumStore.getState().fetchGeneMeta(datasetId);
+        fetchSampleList(datasetId);
+        fetchGeneList(datasetId);
+        fetchMetaList(datasetId);
 
-        useVisiumStore.setState({
+        useSampleGeneMetaStore.setState({
             selectedSamples: initialSelectedSamples,
             selectedGenes: initialSelectedGenes
         });
 
-        useVisiumStore.getState().fetchGeneExprData(); // Fetch data once after both are set
-        useVisiumStore.getState().fetchImageData();
+        fetchExprData(); // Fetch data once after both are set
+        fetchImageData();
+        fetchAllMetaData();
 
     }, [datasetId]);
 
 
     // const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
     const geneOptions = geneList.map((gene) => gene);
-    const sampleOptions = metaData ? [...new Set(metaData.map(row => row.sample_id))] : [];
-    const metaOptions = metaData ? Object.keys(metaData[0] || {}).map((option) => {
+    const sampleOptions = sampleList.map((sample) => sample);
+    const metaOptions = metaList ? metaList.map((option) => {
         const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
         return excludedKeys.has(option) ? null : option;
     }).filter(Boolean) : [];
@@ -85,14 +95,14 @@ function VisiumView() {
     const handleSampleChange = (event, newValue) => {
         setSelectedSamples(newValue);
         updateQueryParams(selectedGenes, newValue);
-        useVisiumStore.getState().fetchImageData();
+        fetchImageData();
     };
 
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
         setSelectedGenes(newValue);
         updateQueryParams(newValue, selectedSamples);
-        useVisiumStore.getState().fetchGeneExprData();
+        fetchExprData();
 
         // setSelectedFeatures(prev => [...new Set([...prev, ...newValue])]);
     };
@@ -101,7 +111,7 @@ function VisiumView() {
         const newGenes = selectedGenes.filter(g => g !== delGene);
         setSelectedGenes(newGenes);
         updateQueryParams(newGenes, selectedSamples);
-        useVisiumStore.getState().fetchGeneExprData();
+        fetchExprData();
 
         // setSelectedFeatures(prev => [...new Set([...prev, ...newGenes])]);
     }
@@ -123,8 +133,8 @@ function VisiumView() {
     // click the button to fetch umap data
     const handleLoadPlot = () => {
         setDataset(datasetId)
-        useVisiumStore.getState().fetchGeneExprData();
-        useVisiumStore.getState().fetchImageData();
+        fetchExprData();
+        fetchImageData();
     }
     const selectedFeatures = [...new Set([...selectedGenes, ...selectedMetaFeatures])];
     // console.log(selectedFeatures);
@@ -261,13 +271,13 @@ function VisiumView() {
                         <Typography color="error">{error}</Typography>
                     ) : (
                         <div className="visium-container">
-                            {Object.keys(imageDataList).length < 1 ? (
+                            {Object.keys(imageDataDict).length < 1 ? (
                                 <Box className="no-sample">
                                     <Typography sx={{color: "text.secondary"}} variant="h5">
                                         No sample selected for visualization
                                     </Typography>
                                 </Box>
-                            ) : Object.entries(imageDataList).map(([sample_i, visiumData_i]) => (
+                            ) : Object.entries(imageDataDict).map(([sample_i, visiumData_i]) => (
                                 <div key={sample_i} className="sample-row">
                                     {/* Sample Label */}
                                     <div className="sample-label">
@@ -281,18 +291,15 @@ function VisiumView() {
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
                                                 <>
-                                                {/*<div key={`${sample_i}-${feature}`} className="feature-plot">*/}
-                                                {/*    {metaData && <FeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>}*/}
-                                                {/*    <Typography variant="caption" display="block" align="center">*/}
-                                                {/*        {feature}*/}
-                                                {/*    </Typography>*/}
-                                                {/*</div>*/}
-                                                <div key={`${sample_i}-${feature}-echart`} className="feature-plot-echart">
-                                                    <EChartFeaturePlot visiumData={visiumData_i} geneData={exprDataList} metaData={metaData || []} feature={feature}/>
-                                                    <Typography variant="caption" display="block" align="center">
-                                                        {feature}
-                                                    </Typography>
-                                                </div>
+                                                    <div key={`${sample_i}-${feature}-echart`}
+                                                         className="feature-plot-echart">
+                                                        <EChartFeaturePlot visiumData={visiumData_i}
+                                                                           geneData={exprDataDict}
+                                                                           metaData={allMetaData || []} feature={feature}/>
+                                                        <Typography variant="caption" display="block" align="center">
+                                                            {feature}
+                                                        </Typography>
+                                                    </div>
                                                 </>
                                             ))
                                         ) : (

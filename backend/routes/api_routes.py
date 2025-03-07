@@ -11,41 +11,98 @@ router = APIRouter()
 async def read_root():
     return {"Message": "Hello API."}
 
-@router.get("/getgeneexprdata")
-async def getgeneexprdata(request:Request):
+
+@router.get("/getgenelist")
+async def getgenelist(request:Request):
+    print("getgenelist() called================")
+    dataset_id = request.query_params.get("dataset")
+    query_str = request.query_params.get("query_str")
+
+    response = get_gene_list(dataset_id, query_str)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting gene list.")
+    return response
+
+@router.get("/getsamplelist")
+async def getsamplelist(request:Request):
+    print("getsamplelist() called================")
+    dataset_id = request.query_params.get("dataset")
+    query_str = request.query_params.get("query_str")
+
+    response = get_sample_list(dataset_id, query_str)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting sample list.")
+    return response
+
+@router.get("/getmetalist")
+async def getmetalist(request:Request):
+    print("getmetalist() called================")
+    dataset_id = request.query_params.get("dataset")
+    query_str = request.query_params.get("query_str")
+
+    response = get_meta_list(dataset_id, query_str)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting Meta list.")
+    return response
+
+
+@router.get("/getumapembedding")
+async def getumapembedding(request:Request):
+    print("getumapembedding() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_umapembedding(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting Meta list.")
+    return response
+
+
+@router.get("/getsamplemetadata")
+async def getsamplemetadata(request:Request):
+    print("getsamplemetadata() called================")
+    dataset_id = request.query_params.get("dataset")
+    samples = request.query_params.getlist("samples[]")
+    meta = request.query_params.get("meta")
+    # print(samples,meta)
+
+    response = get_sample_metadata(dataset_id, samples,meta)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting sample metadata.")
+    return response
+
+@router.get("/getexprdata")
+async def getexprdata(request:Request):
     print("getgeneexprdata() called================")
     dataset_id = request.query_params.get("dataset")
     gene = request.query_params.get("gene")
 
-    response = get_gene_expr_data(dataset_id, gene)
+    response = get_expr_data(dataset_id, gene)
     # print (response)
     if "Error" in response:
-        raise HTTPException(status_code=404, detail="Error in getting UMAP matrix.")
+        raise HTTPException(status_code=404, detail="Error in getting expression data.")
     return response
 
-@router.get("/getgenemeta")
-async def getallgenemeta(request:Request):
-    print("getallgenemeta() called================")
+@router.get("/getallmetadata")
+async def getallmetadata(request:Request):
+    print("getallmetadata() called================")
     dataset = request.query_params.get("dataset_id")
     dataset_type = request.query_params.get("dataset_type")
-    genes = get_all_genes(dataset)
-    # print(len(genes))
+
     if dataset_type == "visium":
         drop_cols = ["UMAP_1", "UMAP_2"]
     else:
         drop_cols = None
-    meta = get_meta_data(dataset, drop_cols=drop_cols)
-    # print(meta)
+    metadata = get_all_metadata(dataset, drop_cols=drop_cols)
 
-    if "Error" in genes:
-        raise HTTPException(status_code=404, detail=genes)
+    if "Error" in metadata:
+        raise HTTPException(status_code=404, detail=metadata)
 
-    if "Error" in meta:
-        raise HTTPException(status_code=404, detail=meta)
-
-    response = {"genes": genes, "meta": meta}
-
-    return response
+    return metadata
 
 @router.get("/getdata/{data_id}")
 async def getdata(data_id: str | uuid.UUID, session: SessionDep):
