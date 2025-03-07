@@ -2,29 +2,57 @@ import Plot from 'react-plotly.js';
 import {groupBy} from "lodash";
 import PropTypes from "prop-types";
 
-const PlotlyStackedViolin = ({gene, geneData, sampleData, metaData, group}) => {
-    if (sampleData.length >= 1 && !sampleData.includes("all")) {
-        metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
+function filterBySampleId(obj, sampleList) {
+    const sampleSet = new Set(sampleList);
+    return Object.fromEntries(
+        Object.entries(obj).filter(([key, entry]) => sampleSet.has(entry.sample_id)
+        ));
+}
+
+const PlotlyStackedViolin = ({gene, sampleList, exprData, metaData, group}) => {
+    if (sampleList.length >= 1 && !sampleList.includes("all")) {
+        metaData = filterBySampleId(metaData, sampleList);
     }
-    if(metaData.length === 0) return "Sample not found in the MetaData";
-
+    if (metaData.length === 0) return "Sample not found in the MetaData";
     if (gene !== "stackedviolin") return null;
-    const expressionData = {};
-    const genes = Object.keys(geneData);
 
-    let xCategories = []
-    genes.forEach((gene) => {
-        const geneExpr = geneData[gene];
-        expressionData[gene] = {};
-        const groupedData = groupBy(metaData, group);
-        xCategories = Object.keys(groupedData);
-        xCategories.forEach((x_i) => {
-            expressionData[gene][x_i] = groupedData[x_i].map((d) => {
-                return (geneExpr?.[d.cs_id] ?? 0)
-            })
-        })
-    });
+    // const groupedData = Object.entries(metaData).reduce((acc, [cs_id, attrs]) => {
+    //     const key = attrs[group];  // Grouping key (e.g., celltype, sex, etc.)
+    //     (acc[key] ||= []).push(cs_id);
+    //     return acc;
+    // }, {});
+    //
+    // const expressionData = {};
+    // const genes = Object.keys(exprData);
+    // for (const gene of genes) {
+    //     const geneExpr = exprData[gene];
+    //     const geneData = (expressionData[gene] = {});
+    //
+    //     for (const [x_i, cs_ids] of Object.entries(groupedData)) {
+    //         geneData[x_i] = cs_ids.map((cs_id) => geneExpr?.[cs_id] ?? 0);
+    //     }
+    // }
 
+
+    const groupedData = {};
+    for (const [cs_id, attrs] of Object.entries(metaData)) {
+        const key = attrs[group];  // Grouping key (e.g., celltype, sex, etc.)
+        (groupedData[key] ||= []).push(cs_id);
+    }
+    const expressionData = Object.fromEntries(
+        Object.keys(exprData).map((gene) => [
+            gene,
+            Object.fromEntries(
+                Object.entries(groupedData).map(([x_i, cs_ids]) => [
+                    x_i,
+                    cs_ids.map((cs_id) => exprData[gene]?.[cs_id] ?? 0),
+                ])
+            ),
+        ])
+    );
+
+    const genes = Object.keys(exprData);
+    const xCategories = Object.keys(groupedData);
     // Create Plotly traces for each gene
     const createTraces = () => {
         return genes.map((gene, geneIndex) => {
@@ -104,9 +132,9 @@ const PlotlyStackedViolin = ({gene, geneData, sampleData, metaData, group}) => {
 };
 PlotlyStackedViolin.propTypes = {
     gene: PropTypes.string.isRequired,
-    geneData: PropTypes.object.isRequired,
-    sampleData: PropTypes.array.isRequired,
-    metaData: PropTypes.array.isRequired,
+    sampleList: PropTypes.array.isRequired,
+    exprData: PropTypes.object.isRequired,
+    metaData: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
 };
 export default PlotlyStackedViolin;

@@ -3,7 +3,6 @@ import pandas as pd
 import json
 
 def get_expr_data(dataset, gene):
-    print("get_expr_data() called================")
     gene_expr_file = os.path.join("backend","datasets",dataset, "genes",gene+".json")
     if not os.path.exists(gene_expr_file):
         return "Error: Gene expression file not found"

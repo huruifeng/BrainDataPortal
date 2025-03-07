@@ -26,6 +26,7 @@ import "./GeneView.css";
 
 
 function GeneView() {
+    const [metaLoading, setMetaLoading] = useState(false);
 
     // Get all the pre-selected values
     const {dataset_id} = useParams();
@@ -52,14 +53,19 @@ function GeneView() {
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
 
-    const [isCat, setIsCat] = useState(false);
+    const [isCat, setIsCat] = useState(true);
 
     useEffect(() => {
-        fetchUMAPData(datasetId);
 
-        fetchGeneList(datasetId);
-        fetchSampleList(datasetId);
-        fetchMetaList(datasetId);
+        // Main data fetches (control loading state)
+        const fetchPrimaryData = async () => {
+            await fetchUMAPData(datasetId);
+            await fetchGeneList(datasetId);
+            await fetchSampleList(datasetId);
+            await fetchMetaList(datasetId);
+        };
+
+        fetchPrimaryData();
 
         fetchAllMetaData(datasetId);
 
@@ -84,7 +90,6 @@ function GeneView() {
             selectedGenes: initialSelectedGenes
         });
         fetchExprData(); // Fetch data once after both are set
-        // fetchAllMetaData();
     }, []);
 
     /** Updates the query parameters in the URL */
@@ -126,9 +131,9 @@ function GeneView() {
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, coloring, event.target.value);
-        const metaValues = allMetaData.map((meta) => meta[grouping]);
-        if (isCategorical(metaValues)) {
-            setIsCat(true)
+        if (allMetaData.length > 0) {  // Only check if metadata exists
+            const metaValues = allMetaData.map((meta) => meta[event.target.value]);
+            setIsCat(isCategorical(metaValues));
         }
     }
 
@@ -365,7 +370,7 @@ function GeneView() {
                                                                     sampleList={selectedSamples}
                                                                     umapData={umapData}
                                                                     exprData={{"all": "all"}}
-                                                                    metaData={allMetaData}
+                                                                    metaData={allMetaData ?? {}}
                                                                     group={coloring}/>}
 
                                 </div>

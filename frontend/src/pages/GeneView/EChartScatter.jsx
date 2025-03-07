@@ -101,7 +101,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         const plotData = umapData.map(item => ({
             "x": item.UMAP_1,
             "y": item.UMAP_2,
-            [group]: metaData?.[item.cs_id]?.[group] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+            [group]: metaData?.[item.cs_id]?.[group] ?? "Point", // Works for both objects and arrays, returns 0 for undefined/null values
         })) || [];
 
         const isCategoricalGroup = isCategorical(Object.values(metaData).map((p) => p[group]));

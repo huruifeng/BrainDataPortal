@@ -154,25 +154,25 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
         // Don't reset loading state if no genes selected
         if (selectedSamples.length === 0) {
-            set({metaData: [],loading: false});
+            set({metaData: [], loading: false});
             return;
         }
 
         set({loading: true, error: null});
 
-        if(meta===null || meta === "") {
-           set({metaData: [],loading: false});
-           return;
+        if (meta === null || meta === "") {
+            set({metaData: [], loading: false});
+            return;
         }
 
         try {
 
             if (selectedSamples.length >= 1 && selectedSamples.includes("all")) {
                 const response = await getSampleMetaData(dataset_id, ["all"], meta);
-                get().metaData = response.data;
-            }else{
+                set({metaData: response.data});
+            } else {
                 const response = await getSampleMetaData(dataset_id, selectedSamples, meta);
-                get().metaData = response.data;
+                set({metaData: response.data});
             }
 
             set({loading: false});
@@ -184,26 +184,21 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     },
 
+    // In useSampleGeneMetaStore
     fetchAllMetaData: async (dataset_id = null) => {
         dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchSampleMetaData: No dataset selected", loading: false});
+            set({error: "fetchSampleMetaData: No dataset selected"});
             return;
         }
 
-        set({loading: true, error: null});
-
         try {
             const response = await getAllMetaData(dataset_id);
-            get().allMetaData = response.data;
-            set({loading: false});
-
+            set({allMetaData: response.data}); // Update directly without loading state
         } catch (error) {
-            set({error: "Failed to fetch UMAP data:" + error, loading: false});
-        } finally {
-            set({loading: false});
+            console.error("Failed to fetch metadata:", error);
+            set({error: "Failed to fetch metadata:" + error});
         }
-
     },
 
     fetchUMAPData: async (dataset_id) => {
@@ -236,7 +231,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     fetchExprData: async (dataset_id) => {
         const {selectedGenes} = get();
-         dataset_id = dataset_id ?? get().dataSet;
+        dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchExprData: No dataset selected", loading: false});
             return;
@@ -254,7 +249,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
             for (var gene of selectedGenes) {
                 if (!get().exprDataDict[gene]) {
                     const response = await getExprData(dataset_id, gene);
-                    get().exprDataDict[gene] = response.data;
+                    set({exprDataDict: {...get().exprDataDict, [gene]: response.data}});
                 }
             }
             // remove gene item if it is not selected
@@ -291,11 +286,17 @@ const useSampleGeneMetaStore = create((set, get) => ({
                 if (!get().imageDataDict[sample]) {
                     const coor_response = await getCoordinates(dataset_id, sample);
                     const img_response = await getImage(dataset_id, sample);
-                    get().imageDataDict[sample] = {
+                    set({imageDataDict: {...get().imageDataDict, [sample]: {
                         coordinates: coor_response.data.coordinates,
                         scales: coor_response.data.scales,
                         image: img_response.data
-                    };
+                    }}})
+
+                    // get().imageDataDict[sample] = {
+                    //     coordinates: coor_response.data.coordinates,
+                    //     scales: coor_response.data.scales,
+                    //     image: img_response.data
+                    // };
                 }
             }
             // remove gene item if it is not selected
