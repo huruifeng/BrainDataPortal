@@ -16,14 +16,9 @@ import {useParams, useSearchParams} from "react-router-dom";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
 import EChartScatterPlot from "./EChartScatter.jsx";
-import EChartMetaScatter from "./EChartMetaScatter.jsx";
-import PlotlyStackedViolin from "./PlotlyStackedViolin.jsx";
-
-import {isCategorical} from "../../utils/funcs.js";
-
+import GeneMetaPlots     from "./GenePlots.jsx";
 
 import "./GeneView.css";
-
 
 function GeneView() {
 
@@ -52,8 +47,6 @@ function GeneView() {
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
 
-    const [isCat, setIsCat] = useState(true);
-
     useEffect(() => {
 
         // Main data fetches (control loading state)
@@ -65,8 +58,6 @@ function GeneView() {
         };
 
         fetchPrimaryData();
-
-        fetchAllMetaData(datasetId);
 
     }, [datasetId]);
 
@@ -87,6 +78,9 @@ function GeneView() {
             selectedGenes: initialSelectedGenes
         });
         fetchExprData(); // Fetch data once after both are set
+
+        fetchAllMetaData(datasetId);
+
     }, []);
 
     /** Updates the query parameters in the URL */
@@ -128,10 +122,6 @@ function GeneView() {
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, coloring, event.target.value);
-        if (allMetaData.length > 0) {  // Only check if metadata exists
-            const metaValues = allMetaData.map((meta) => meta[event.target.value]);
-            setIsCat(isCategorical(metaValues));
-        }
     }
 
     const handleColoringChange = (event) => {
@@ -144,9 +134,6 @@ function GeneView() {
         ? "single-plot" : selectedGenes.length === 2
             ? "two-plots" : selectedGenes.length === 3
                 ? "three-plots" : "four-plots";
-
-
-    console.log()
 
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
@@ -331,35 +318,11 @@ function GeneView() {
                             {Object.keys(exprDataDict).length >= 1 &&
                                 <Divider sx={{marginTop: "10px"}} flexItem>Gene Expression Plots</Divider>}
 
-                            {/*plot the stacked violin plot*/}
-                            {isCat ?
-                                <div id="stacked_violin_div" className={`violin-container`}>
-                                    <div key='stacked_violin' className="violin-item">
-                                        <div className="violin-wrapper">
-                                            {allMetaData &&
-                                                <PlotlyStackedViolin gene={"stackedviolin"}
-                                                                     sampleList={selectedSamples}
-                                                                     exprData={exprDataDict}
-                                                                     metaData={allMetaData}
-                                                                     group={grouping}/>}
-                                        </div>
-                                    </div>
-                                </div>
-                                :
-                                <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>
-                                    {Object.entries(exprDataDict).map(([gene, expr_data]) => (
-                                        <div key={gene} className="umap-item">
-                                            <div className="umap-wrapper">
-                                                {allMetaData && <EChartMetaScatter gene={gene}
-                                                                                   sampleList={selectedSamples}
-                                                                                   exprData={expr_data}
-                                                                                   metaData={allMetaData}
-                                                                                   group={grouping}/>}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            }
+                            {/*gene expression/meta plot*/}
+                            {allMetaData && <GeneMetaPlots sampleList={selectedSamples}
+                                                           exprData={exprDataDict}
+                                                           metaData={allMetaData}
+                                                           group={grouping}/>}
 
                         </>
 

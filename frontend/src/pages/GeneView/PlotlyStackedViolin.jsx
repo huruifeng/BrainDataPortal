@@ -1,17 +1,8 @@
 import Plot from 'react-plotly.js';
 import PropTypes from "prop-types";
 
-function filterBySampleId(obj, sampleList) {
-    const sampleSet = new Set(sampleList);
-    return Object.fromEntries(
-        Object.entries(obj).filter(([key, entry]) => sampleSet.has(entry.sample_id)
-        ));
-}
 
-const PlotlyStackedViolin = ({gene, sampleList, exprData, metaData, group}) => {
-    if (sampleList.length >= 1 && !sampleList.includes("all")) {
-        metaData = filterBySampleId(metaData, sampleList);
-    }
+const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
     if (metaData.length === 0) return "Sample not found in the MetaData";
     if (gene !== "stackedviolin") return null;
 
@@ -121,7 +112,6 @@ const PlotlyStackedViolin = ({gene, sampleList, exprData, metaData, group}) => {
 };
 PlotlyStackedViolin.propTypes = {
     gene: PropTypes.string.isRequired,
-    sampleList: PropTypes.array.isRequired,
     exprData: PropTypes.object.isRequired,
     metaData: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
