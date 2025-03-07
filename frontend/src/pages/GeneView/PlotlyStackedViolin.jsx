@@ -16,24 +16,14 @@ const PlotlyStackedViolin = ({gene, sampleList, exprData, metaData, group}) => {
     if (metaData.length === 0) return "Sample not found in the MetaData";
     if (gene !== "stackedviolin") return null;
 
-    // const groupedData = Object.entries(metaData).reduce((acc, [cs_id, attrs]) => {
-    //     const key = attrs[group];  // Grouping key (e.g., celltype, sex, etc.)
-    //     (acc[key] ||= []).push(cs_id);
-    //     return acc;
-    // }, {});
-    //
-    // const expressionData = {};
-    // const genes = Object.keys(exprData);
-    // for (const gene of genes) {
-    //     const geneExpr = exprData[gene];
-    //     const geneData = (expressionData[gene] = {});
-    //
-    //     for (const [x_i, cs_ids] of Object.entries(groupedData)) {
-    //         geneData[x_i] = cs_ids.map((cs_id) => geneExpr?.[cs_id] ?? 0);
-    //     }
+    //Create expressionData:
+    // {
+    //      GeneX:{
+    //          groupX: [expr1, expr2, expr3,...],
+    //          groupY: [expr1, expr2, expr3,...]
+    //          },
+    //       GeneY: {...}
     // }
-
-
     const groupedData = {};
     for (const [cs_id, attrs] of Object.entries(metaData)) {
         const key = attrs[group];  // Grouping key (e.g., celltype, sex, etc.)
