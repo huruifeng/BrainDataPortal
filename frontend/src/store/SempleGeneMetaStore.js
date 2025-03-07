@@ -56,11 +56,17 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({selectedGenes: genes});
     },
 
-    fetchGeneList: async (dataset_id = null, query_str = "AB") => {
+    fetchGeneList: async (dataset_id = null, query_str = "") => {
         dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id) {
             set({error: "fetchGeneList: No dataset selected", loading: false});
             return;
+        }
+        if(query_str.length === 0) {
+            query_str = "ABC";
+        }else if (query_str.length < 3) {
+             set({geneList: []});
+             return;
         }
 
         try {

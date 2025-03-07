@@ -26,7 +26,6 @@ import "./GeneView.css";
 
 
 function GeneView() {
-    const [metaLoading, setMetaLoading] = useState(false);
 
     // Get all the pre-selected values
     const {dataset_id} = useParams();
@@ -73,8 +72,6 @@ function GeneView() {
 
     const sampleOptions = sampleList.map((sample) => sample);
     sampleOptions.unshift("all");
-
-    const geneOptions = geneList.map((gene) => gene);
 
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");
@@ -167,11 +164,15 @@ function GeneView() {
                     <Autocomplete
                         multiple
                         size="small"
-                        options={geneOptions}
+                        options={geneList}
                         value={selectedGenes}
                         onChange={handleGeneChange}
                         inputValue={geneSearchText}
-                        onInputChange={(event, newInputValue) => setGeneSearchText(newInputValue)}
+                        onInputChange={(event, newInputValue) => {
+                            fetchGeneList(datasetId, newInputValue);
+                            setGeneSearchText(newInputValue)
+                        }}
+                        noOptionsText={'Input 3 letters to search'}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => {
                                 const {key, ...tagProps} = getTagProps({index});
