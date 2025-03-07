@@ -2,19 +2,12 @@ import ReactECharts from "echarts-for-react";
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
-function filterBySampleId(obj, sampleList) {
-  const sampleSet = new Set(sampleList);
-  return Object.fromEntries(
-    Object.entries(obj).filter(([key, entry]) => sampleSet.has(entry.sample_id)
-  ));
-}
-
-const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, group}) => {
-    if (Object.keys(umapData).length === 0) return "UMAP data is loading...";
-
-    if (sampleList.length >= 1 && !sampleList.includes("all")) {
-        umapData = filterBySampleId(umapData, sampleList);
+const EChartScatterPlot = ({gene, geneData, sampleData, metaData, group}) => {
+    // console.log("gene: ", gene);
+    if(sampleData.length >= 1 && !sampleData.includes("all")) {
+        metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
     }
+    if(metaData.length === 0) return "Sample not found in the MetaData";
 
     const createCategoryOptions = (plotData, colorGroup) => {
         // console.log("Categorical");
@@ -98,7 +91,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
                     color: ["#CCCCCCFF", "#FF0000FF"], // Color gradient from low to high
                 },
             },
-            legend: {show: false},
+            legend: { show: false },
             series: [
                 {
                     type: "scatter",
@@ -114,27 +107,19 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         //===============================
         // In this case the expression data is not needed, just use the metaData
         //===============================
-        metaData = metaData ?? {}
-        const plotData = Object.entries(umapData).map(([cs_id, item]) => ({
-            "UMAP_1": item.UMAP_1,
-            "UMAP_2": item.UMAP_2,
-            [group]: metaData?.[cs_id] ?? 0,
-        }))
-
-
-        const isCategoricalGroup = isCategorical(Object.values(metaData).map((p) => p[group]));
+        const isCategoricalGroup = isCategorical(metaData.map((p) => p[group]));
         if (isCategoricalGroup) {
-            options = createCategoryOptions(plotData, group);
+            options = createCategoryOptions(metaData, group);
         } else {
-            options = createContinuousOptions(plotData, group);
+            options = createContinuousOptions(metaData, group);
         }
     } else {
         // data processing
-         const plotData = Object.entries(umapData).map(([cs_id, item]) => ({
+        const plotData = metaData.map(item => ({
             "UMAP_1": item.UMAP_1,
             "UMAP_2": item.UMAP_2,
-             [gene]: exprData?.[cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
-
+            [gene]: geneData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+            sample_id: item.sample_id  // Keep identifier if needed
         })) || [];
         options = createContinuousOptions(plotData, gene);
     }
@@ -147,16 +132,15 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         autoResize={true}/>;
 }
 
-export default EChartScatterPlot
-
 EChartScatterPlot.propTypes = {
     gene: PropTypes.string.isRequired,
-    sampleList: PropTypes.array.isRequired,
-    umapData: PropTypes.object.isRequired,
-    exprData: PropTypes.object.isRequired,
-    metaData: PropTypes.object.isRequired,
+    geneData: PropTypes.object.isRequired,
+    sampleData: PropTypes.array.isRequired,
+    metaData: PropTypes.array.isRequired,
     group: PropTypes.string.isRequired,
-}
+};
+
+export default EChartScatterPlot
 
 // https://www.npmjs.com/package/echarts-for-react
 // https://github.com/hustcc/echarts-for-react?tab=readme-ov-file

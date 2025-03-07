@@ -2,27 +2,26 @@ import Plot from 'react-plotly.js';
 import {groupBy} from "lodash";
 import PropTypes from "prop-types";
 
-const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
-    if (Object.keys(exprData).length === 0) return "Expression data is loading...";
+const PlotlyStackedViolin = ({gene, geneData, sampleData, metaData, group}) => {
+    if (sampleData.length >= 1 && !sampleData.includes("all")) {
+        metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
+    }
     if(metaData.length === 0) return "Sample not found in the MetaData";
-    console.log(exprData);
-    console.log(metaData);
-    console.log(group);
-    console.log(gene);
 
     if (gene !== "stackedviolin") return null;
     const expressionData = {};
-    const genes = Object.keys(exprData);
+    const genes = Object.keys(geneData);
 
-    let xCategories = [...new Set(Object.values(metaData))];
+    let xCategories = []
     genes.forEach((gene) => {
-        const geneExpr = exprData[gene];
+        const geneExpr = geneData[gene];
         expressionData[gene] = {};
+        const groupedData = groupBy(metaData, group);
+        xCategories = Object.keys(groupedData);
         xCategories.forEach((x_i) => {
-            expressionData[gene][x_i] = [];
-            Object.keys(metaData).forEach((cs_id) => {
-                expressionData[gene][x_i].push(geneExpr[cs_id] ?? 0);
-            });
+            expressionData[gene][x_i] = groupedData[x_i].map((d) => {
+                return (geneExpr?.[d.cs_id] ?? 0)
+            })
         })
     });
 
@@ -105,8 +104,9 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
 };
 PlotlyStackedViolin.propTypes = {
     gene: PropTypes.string.isRequired,
-    exprData: PropTypes.object.isRequired,
-    metaData: PropTypes.object.isRequired,
+    geneData: PropTypes.object.isRequired,
+    sampleData: PropTypes.array.isRequired,
+    metaData: PropTypes.array.isRequired,
     group: PropTypes.string.isRequired,
 };
 export default PlotlyStackedViolin;

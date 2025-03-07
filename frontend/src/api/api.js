@@ -1,57 +1,13 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000"; // Replace with your backend URL
-// const BASE_URL = "http://10.168.236.29:8000"; // Replace with your backend URL
+// const BASE_URL = "http://localhost:8000"; // Replace with your backend URL
+const BASE_URL = "http://10.168.236.29:8000"; // Replace with your backend URL
 
 const API_URL = `${BASE_URL}/api`;
 
-export const getGeneList = async (dataset,query_str) => {
+export const getGeneExprData = async (dataset,gene) => {
     try {
-        const response = await axios.get(`${API_URL}/getgenelist`,
-            {params: {dataset:dataset,query_str:query_str}});
-        return response;
-    } catch (error) {
-        console.error("Error reading umap data:", error);
-        throw error;
-    }
-}
-
-export const getSampleList = async (dataset,query_str) => {
-    try {
-        const response = await axios.get(`${API_URL}/getsamplelist`,
-            {params: {dataset:dataset,query_str:query_str}});
-        return response;
-    } catch (error) {
-        console.error("Error reading umap data:", error);
-        throw error;
-    }
-}
-
-export const getMetaList = async (dataset,query_str) => {
-    try {
-        const response = await axios.get(`${API_URL}/getmetalist`,
-            {params: {dataset:dataset,query_str:query_str}});
-        return response;
-    } catch (error) {
-        console.error("Error reading umap data:", error);
-        throw error;
-    }
-}
-
-export const getUMAPData = async (dataset) => {
-    try {
-        const response = await axios.get(`${API_URL}/getumapembedding`,
-            {params: {dataset:dataset}});
-        return response;
-    } catch (error) {
-        console.error("Error reading umap data:", error);
-        throw error;
-    }
-}
-
-export const getExprData = async (dataset,gene) => {
-    try {
-        const response = await axios.get(`${API_URL}/getexprdata`,
+        const response = await axios.get(`${API_URL}/getgeneexprdata`,
             {params: {dataset:dataset,gene:gene}});
         return response;
     } catch (error) {
@@ -60,20 +16,9 @@ export const getExprData = async (dataset,gene) => {
     }
 }
 
-export const getSampleMetaData = async (dataset,samples,meta) => {
+export const getGeneMeta = async (dataset_id="all",dataset_type="all") => {
     try {
-        const response = await axios.get(`${API_URL}/getsamplemetadata`,
-            {params: {dataset:dataset,samples:samples,meta:meta}});
-        return response;
-    } catch (error) {
-        console.error("Error reading umap data:", error);
-        throw error;
-    }
-}
-
-export const getAllMetaData = async (dataset_id="all",dataset_type="all") => {
-    try {
-        const response = await axios.get(`${API_URL}/getallmetadata`,
+        const response = await axios.get(`${API_URL}/getgenemeta`,
             {params: {dataset_id: dataset_id, dataset_type: dataset_type}});
         return response;
     } catch (error) {
