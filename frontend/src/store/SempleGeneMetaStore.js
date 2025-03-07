@@ -141,6 +141,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     fetchMetaData: async (dataset_id = null, meta = null) => {
         const {selectedSamples} = get();
+        dataset_id = dataset_id ?? get().dataSet;
 
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchMetaData: No dataset selected", loading: false});
@@ -228,8 +229,9 @@ const useSampleGeneMetaStore = create((set, get) => ({
     },
 
     fetchExprData: async (dataset_id) => {
-        const {dataSet, selectedGenes} = get();
-        if (!dataSet || dataSet === "all") {
+        const {selectedGenes} = get();
+         dataset_id = dataset_id ?? get().dataSet;
+        if (!dataset_id || dataset_id === "all") {
             set({error: "fetchExprData: No dataset selected", loading: false});
             return;
         }
@@ -245,7 +247,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         try {
             for (var gene of selectedGenes) {
                 if (!get().exprDataDict[gene]) {
-                    const response = await getExprData(dataSet, gene);
+                    const response = await getExprData(dataset_id, gene);
                     get().exprDataDict[gene] = response.data;
                 }
             }

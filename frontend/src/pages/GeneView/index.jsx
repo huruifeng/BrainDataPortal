@@ -70,7 +70,7 @@ function GeneView() {
             selectedGenes: initialSelectedGenes
         });
         fetchExprData(datasetId);
-        fetchMetaData(datasetId, coloring);
+        fetchMetaData(datasetId, coloring ? coloring : grouping);
 
     }, [datasetId]);
 
@@ -112,6 +112,7 @@ function GeneView() {
         setSelectedGenes(newValue);
         updateQueryParams(newValue, selectedSamples, coloring, grouping); // Pass the new value instead of old state
         fetchExprData();
+        fetchMetaData(datasetId, grouping);
     };
 
     const handleGeneDelete = (delGene) => {
@@ -119,17 +120,20 @@ function GeneView() {
         setSelectedGenes(newGenes);
         updateQueryParams(newGenes, selectedSamples, coloring, grouping);
         fetchExprData();
+        fetchMetaData(datasetId, grouping);
     }
 
     // click the button to fetch umap data
     const handleLoadPlot = () => {
         setDataset(datasetId)
         fetchExprData();
+        fetchMetaData(datasetId, grouping);
     }
 
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, coloring, event.target.value);
+         fetchMetaData(datasetId, grouping);
     }
 
     const handleColoringChange = (event) => {
@@ -335,31 +339,32 @@ function GeneView() {
                             {/*</div>*/}
 
                             {/*plot the stacked violin plot*/}
-                            {/*{isCat ?*/}
-                            {/*    <div id="stacked_violin_div" className={`violin-container`}>*/}
-                            {/*        <div key='stacked_violin' className="violin-item">*/}
-                            {/*            <div className="violin-wrapper">*/}
-                            {/*                {umapData &&*/}
-                            {/*                    <PlotlyStackedViolin gene={"stackedviolin"} geneData={exprDataDict}*/}
-                            {/*                                         sampleData={selectedSamples} metaData={metaData}*/}
-                            {/*                                         group={grouping}/>}*/}
-                            {/*            </div>*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-                            {/*    :*/}
-                            {/*    <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>*/}
-                            {/*        {Object.entries(exprDataDict).map(([gene, expr_data]) => (*/}
-                            {/*            <div key={gene} className="umap-item">*/}
-                            {/*                <div className="umap-wrapper">*/}
-                            {/*                    {umapData && <EChartMetaScatter gene={gene} geneData={expr_data}*/}
-                            {/*                                                       sampleData={selectedSamples}*/}
-                            {/*                                                       metaData={metaData}*/}
-                            {/*                                                       group={grouping}/>}*/}
-                            {/*                </div>*/}
-                            {/*            </div>*/}
-                            {/*        ))}*/}
-                            {/*    </div>*/}
-                            {/*}*/}
+                            {isCat ?
+                                <div id="stacked_violin_div" className={`violin-container`}>
+                                    <div key='stacked_violin' className="violin-item">
+                                        <div className="violin-wrapper">
+                                            {umapData &&
+                                                <PlotlyStackedViolin gene={"stackedviolin"}
+                                                                     exprData={exprDataDict}
+                                                                     metaData={metaData}
+                                                                     group={grouping}/>}
+                                        </div>
+                                    </div>
+                                </div>
+                                :
+                                <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>
+                                    {Object.entries(exprDataDict).map(([gene, expr_data]) => (
+                                        <div key={gene} className="umap-item">
+                                            <div className="umap-wrapper">
+                                                {umapData && <EChartMetaScatter gene={gene}
+                                                                                exprData={expr_data}
+                                                                                metaData={metaData}
+                                                                                group={grouping}/>}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            }
 
                         </>
 
