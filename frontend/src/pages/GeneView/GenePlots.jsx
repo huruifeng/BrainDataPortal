@@ -23,7 +23,7 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
 
     const [isCat, setIsCat] = useState(false);
 
-    const {pseudoExprDict, fetchPseudoExprData} = useSampleGeneMetaStore();
+    const {pseudoExprDict, fetchPseudoExprData, sampleMetaData, fetchSampleMetaData} = useSampleGeneMetaStore();
 
 
     if (sampleList.length >= 1 && !sampleList.includes("all")) {
@@ -37,7 +37,10 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
     useEffect(() => {
         if (exprValueType === 'pseudobulk') {
             fetchPseudoExprData();
-            exprData = pseudoExprDict;
+            // exprData = pseudoExprDict;
+
+            fetchSampleMetaData();
+            // metaData = sampleMetaData;
         }
     }, [exprValueType]);
 

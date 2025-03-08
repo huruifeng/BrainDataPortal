@@ -16,7 +16,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
     imageDataDict: {},
 
     allMetaData: {},
-    sampleMetaData: [],
+    sampleMetaData: {},
 
     selectedGenes: [],
     exprDataDict: {},
