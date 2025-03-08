@@ -16,7 +16,7 @@ import {useParams, useSearchParams} from "react-router-dom";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
 import EChartScatterPlot from "./EChartScatter.jsx";
-import GeneMetaPlots     from "./GenePlots.jsx";
+import GeneMetaPlots from "./GenePlots.jsx";
 
 import "./GeneView.css";
 
@@ -28,7 +28,7 @@ function GeneView() {
 
     const [queryParams, setQueryParams] = useSearchParams();
     const initialGenes = queryParams.getAll("gene");
-    const initialSamples = queryParams.getAll("sample");
+    const initialSamples = queryParams.getAll("sample") ?? ["all"];
     const initialColoring = queryParams.get("color") ?? "";
     const initialGrouping = queryParams.get("group") ?? "";
 
@@ -46,6 +46,8 @@ function GeneView() {
     const {loading, error} = useSampleGeneMetaStore();
     const [coloring, setColoring] = useState(initialColoring);
     const [grouping, setGrouping] = useState(initialGrouping);
+
+    const [exprValueType, setExprValueType] = useState("celllevel");
 
     useEffect(() => {
 
@@ -127,6 +129,10 @@ function GeneView() {
     const handleColoringChange = (event) => {
         setColoring(event.target.value);
         updateQueryParams(selectedGenes, selectedSamples, event.target.value, grouping);
+    }
+
+    const handleExprValueTypeChange = (event) => {
+        setExprValueType(event.target.value);
     }
 
     // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
@@ -243,6 +249,7 @@ function GeneView() {
                         </Box>
                         :
                         /*a dropdown to select the options on how to group the data*/
+                        <>
                         <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
                             <FormControl variant="standard" sx={{width: "100%"}}>
                                 <InputLabel id="grouping-label">Gene grouping</InputLabel>
@@ -270,6 +277,22 @@ function GeneView() {
                                 </Select>
                             </FormControl>
                         </Box>
+                        <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
+                            <FormControl variant="standard" sx={{width: "100%"}}>
+                                <InputLabel id="valuetype-select-label">Value type</InputLabel>
+                                <Select
+                                    labelId="valuetype-select-label"
+                                    id="valuetype-select"
+                                    value={exprValueType}
+                                    label="Value type"
+                                    onChange={handleExprValueTypeChange}
+                                >
+                                    <MenuItem value={'celllevel'}>Cell level values</MenuItem>
+                                    <MenuItem value={'pseudobulk'}>Sample level pseudobulks</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                        </>
                     }
 
                     {/* a button to fetch data and a loading indicator*/}
@@ -322,7 +345,8 @@ function GeneView() {
                             {allMetaData && <GeneMetaPlots sampleList={selectedSamples}
                                                            exprData={exprDataDict}
                                                            metaData={allMetaData}
-                                                           group={grouping}/>}
+                                                           group={grouping}
+                                                           exprValueType={exprValueType}/>}
 
                         </>
 

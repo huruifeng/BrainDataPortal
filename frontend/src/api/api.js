@@ -60,10 +60,21 @@ export const getExprData = async (dataset,gene) => {
     }
 }
 
-export const getSampleMetaData = async (dataset,samples,meta) => {
+export const getPseudoExprData = async (dataset,gene) => {
+    try {
+        const response = await axios.get(`${API_URL}/getpseudoexprdata`,
+            {params: {dataset:dataset,gene:gene}});
+        return response;
+    } catch (error) {
+        console.error("Error reading umap data:", error);
+        throw error;
+    }
+}
+
+export const getSampleMetaData = async (dataset) => {
     try {
         const response = await axios.get(`${API_URL}/getsamplemetadata`,
-            {params: {dataset:dataset,samples:samples,meta:meta}});
+            {params: {dataset:dataset}});
         return response;
     } catch (error) {
         console.error("Error reading umap data:", error);
