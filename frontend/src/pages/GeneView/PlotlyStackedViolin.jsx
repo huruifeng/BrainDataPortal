@@ -15,17 +15,17 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
     //       GeneY: {...}
     // }
     const groupedData = {};
-    for (const [cs_id, attrs] of Object.entries(metaData)) {
+    for (const [id, attrs] of Object.entries(metaData)) {
         const key = attrs[group];  // Grouping key (e.g., celltype, sex, etc.)
-        (groupedData[key] ||= []).push(cs_id);
+        (groupedData[key] ||= []).push(id);
     }
     const expressionData = Object.fromEntries(
         Object.keys(exprData).map((gene) => [
             gene,
             Object.fromEntries(
-                Object.entries(groupedData).map(([x_i, cs_ids]) => [
+                Object.entries(groupedData).map(([x_i, ids]) => [
                     x_i,
-                    cs_ids.map((cs_id) => exprData[gene]?.[cs_id] ?? 0),
+                    ids.map((id) => exprData[gene]?.[id] ?? 0),
                 ])
             ),
         ])
@@ -65,7 +65,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
         const layout = {
             grid: {rows, columns: 1, pattern: 'independent',},
             height: totalHeight, // Adjust height based on number of genes
-            title: 'Stacked Violin Plot',
+            title: 'Stacked Plot',
             margin: {t: 5, b: 50, l: 50, r: 50}, // Reduce white space
             annotations: [],
         };

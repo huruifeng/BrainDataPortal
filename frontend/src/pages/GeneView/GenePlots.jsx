@@ -1,75 +1,80 @@
 import PlotlyStackedViolin from "./PlotlyStackedViolin.jsx";
 import EChartMetaScatter from "./EChartMetaScatter.jsx";
-import {useState, useEffect} from "react";
-
+import { useState, useEffect } from "react";
 import "./GeneView.css";
-import {isCategorical} from "../../utils/funcs.js";
+import { isCategorical } from "../../utils/funcs.js";
 import PropTypes from "prop-types";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
+import { toast } from "react-toastify";
 
 function filterBySampleId(obj, sampleList) {
     const sampleSet = new Set(sampleList);
     return Object.fromEntries(
-        Object.entries(obj).filter(([key, entry]) => sampleSet.has(entry.sample_id)
-        ));
+        Object.entries(obj).filter(([key, entry]) => sampleSet.has(entry.sample_id))
+    );
 }
 
-const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) => {
-    console.log("exprValueType", exprValueType)
-
-    if (sampleList.length === 0) {
-        sampleList = ["all"];
-    }
-
-    const [isCat, setIsCat] = useState(false);
-
-    const {pseudoExprDict, fetchPseudoExprData, sampleMetaData, fetchSampleMetaData} = useSampleGeneMetaStore();
-
-
-    if (sampleList.length >= 1 && !sampleList.includes("all")) {
-        metaData = filterBySampleId(metaData, sampleList);
-    }
-
-    if (sampleList.length <= 5 && !sampleList.includes("all")) {
-        exprValueType = 'celllevel';
-    }
+const GeneMetaPlots = ({ sampleList, metaData, exprData, group, exprValueType }) => {
+    const { pseudoExprDict, fetchPseudoExprData, sampleMetaData, fetchSampleMetaData } = useSampleGeneMetaStore();
+    const [processedExprData, setProcessedExprData] = useState(exprData);
+    const [processedMetaData, setProcessedMetaData] = useState(metaData);
 
     useEffect(() => {
-        if (exprValueType === 'pseudobulk') {
-            fetchPseudoExprData();
-            // exprData = pseudoExprDict;
+        fetchPseudoExprData();
+        fetchSampleMetaData();
+    }, []);
 
-            fetchSampleMetaData();
-            // metaData = sampleMetaData;
+    useEffect(() => {
+        let newExprData = exprData;
+        let newMetaData = metaData;
+
+        let isValidPseudobulk = false;
+
+        // Handle pseudobulk validation
+        if (exprValueType === "pseudobulk") {
+            const firstSampleMeta = Object.values(sampleMetaData)[0] || {};
+            const keys = Object.keys(firstSampleMeta);
+            isValidPseudobulk = keys.includes(group);
+
+            if (!isValidPseudobulk) {
+                toast.error(`${group} is not valid for pseudobulk plots.`);
+            } else {
+                newExprData = pseudoExprDict;
+                newMetaData = sampleMetaData;
+            }
         }
-    }, [exprValueType]);
 
-    const metaValues = Object.values(metaData).map((meta) => meta[group]);
+        // Apply sample filtering only for cell-level data
+        if (!isValidPseudobulk && sampleList.length > 0 && !sampleList.includes("all")) {
+            newMetaData = filterBySampleId(newMetaData, sampleList);
+        }
 
-    useEffect(() => {
-        setIsCat(isCategorical(metaValues));
-    }, [metaValues]); // Dependency array ensures this runs only when metaValues change
+        setProcessedExprData(newExprData);
+        setProcessedMetaData(newMetaData);
+    }, [exprValueType, group, sampleMetaData, pseudoExprDict, sampleList, metaData, exprData]);
 
+    const metaValues = Object.values(processedMetaData).map((meta) => meta[group]);
+    const isCat = isCategorical(metaValues);
+    const isUsingPseudobulk = exprValueType === "pseudobulk" && processedExprData === pseudoExprDict;
 
-    const plotClass = Object.keys(exprData).length <= 1
-        ? "single-plot" : Object.keys(exprData).length === 2
-            ? "two-plots" : Object.keys(exprData).length === 3
+    const plotClass = Object.keys(processedExprData).length <= 1
+        ? "single-plot" : Object.keys(processedExprData).length === 2
+            ? "two-plots" : Object.keys(processedExprData).length === 3
                 ? "three-plots" : "four-plots";
-
 
     return (
         <>
             {isCat ? (
-                exprValueType === 'pseudobulk' ? (
+                isUsingPseudobulk ? (
                     <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>
-                        {Object.entries(exprData).map(([gene, expr_data]) => (
+                        {Object.entries(processedExprData).map(([gene, expr_data]) => (
                             <div key={gene} className="umap-item">
                                 <div className="umap-wrapper">
-                                    {metaData && (
+                                    {processedMetaData && (
                                         <EChartMetaScatter
                                             gene={gene}
                                             exprData={expr_data}
-                                            metaData={metaData}
+                                            metaData={processedMetaData}
                                             group={group}
                                         />
                                     )}
@@ -77,15 +82,15 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
                             </div>
                         ))}
                     </div>
-                ):(
+                ) : (
                     <div id="stacked_violin_div" className={`violin-container`}>
                         <div key="stacked_violin" className="violin-item">
                             <div className="violin-wrapper">
-                                {metaData && (
+                                {processedMetaData && (
                                     <PlotlyStackedViolin
                                         gene={"stackedviolin"}
-                                        exprData={exprData}
-                                        metaData={metaData}
+                                        exprData={processedExprData}
+                                        metaData={processedMetaData}
                                         group={group}
                                     />
                                 )}
@@ -95,14 +100,14 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
                 )
             ) : (
                 <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>
-                    {Object.entries(exprData).map(([gene, expr_data]) => (
+                    {Object.entries(processedExprData).map(([gene, expr_data]) => (
                         <div key={gene} className="umap-item">
                             <div className="umap-wrapper">
-                                {metaData && (
+                                {processedMetaData && (
                                     <EChartMetaScatter
                                         gene={gene}
                                         exprData={expr_data}
-                                        metaData={metaData}
+                                        metaData={processedMetaData}
                                         group={group}
                                     />
                                 )}
@@ -115,7 +120,6 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
     );
 };
 
-
 GeneMetaPlots.propTypes = {
     sampleList: PropTypes.array.isRequired,
     metaData: PropTypes.object.isRequired,
@@ -125,32 +129,3 @@ GeneMetaPlots.propTypes = {
 };
 
 export default GeneMetaPlots;
-
-// {Object.keys(allMetaData).length >= 1 && isCat ?
-// <div id="stacked_violin_div" className={`violin-container`}>
-//     <div key='stacked_violin' className="violin-item">
-//         <div className="violin-wrapper">
-//             {allMetaData &&
-//                 <PlotlyStackedViolin gene={"stackedviolin"}
-//                                      sampleList={selectedSamples}
-//                                      exprData={exprDataDict}
-//                                      metaData={allMetaData}
-//                                      group={grouping}/>}
-//         </div>
-//     </div>
-// </div>
-// :
-// <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>
-//     {Object.entries(exprDataDict).map(([gene, expr_data]) => (
-//         <div key={gene} className="umap-item">
-//             <div className="umap-wrapper">
-//                 {allMetaData && <EChartMetaScatter gene={gene}
-//                                                    sampleList={selectedSamples}
-//                                                    exprData={expr_data}
-//                                                    metaData={allMetaData}
-//                                                    group={grouping}/>}
-//             </div>
-//         </div>
-//     ))}
-// </div>
-// }
