@@ -1,11 +1,11 @@
 import PlotlyStackedViolin from "./PlotlyStackedViolin.jsx";
 import EChartMetaScatter from "./EChartMetaScatter.jsx";
-import { useState, useEffect } from "react";
+import {useEffect, useMemo} from "react";
 import "./GeneView.css";
-import { isCategorical } from "../../utils/funcs.js";
+import {isCategorical} from "../../utils/funcs.js";
 import PropTypes from "prop-types";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 
 function filterBySampleId(obj, sampleList) {
     const sampleSet = new Set(sampleList);
@@ -14,23 +14,15 @@ function filterBySampleId(obj, sampleList) {
     );
 }
 
-const GeneMetaPlots = ({ sampleList, metaData, exprData, group, exprValueType }) => {
-    const { pseudoExprDict, fetchPseudoExprData, sampleMetaData, fetchSampleMetaData } = useSampleGeneMetaStore();
-    const [processedExprData, setProcessedExprData] = useState(exprData);
-    const [processedMetaData, setProcessedMetaData] = useState(metaData);
+const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) => {
+    const {pseudoExprDict, fetchPseudoExprData, sampleMetaData, fetchSampleMetaData} = useSampleGeneMetaStore();
 
-    useEffect(() => {
-        fetchPseudoExprData();
-        fetchSampleMetaData();
-    }, []);
-
-    useEffect(() => {
+    // Calculate processed data directly using useMemo
+    const {processedExprData, processedMetaData} = useMemo(() => {
         let newExprData = exprData;
         let newMetaData = metaData;
-
         let isValidPseudobulk = false;
 
-        // Handle pseudobulk validation
         if (exprValueType === "pseudobulk") {
             const firstSampleMeta = Object.values(sampleMetaData)[0] || {};
             const keys = Object.keys(firstSampleMeta);
@@ -44,14 +36,17 @@ const GeneMetaPlots = ({ sampleList, metaData, exprData, group, exprValueType })
             }
         }
 
-        // Apply sample filtering only for cell-level data
         if (!isValidPseudobulk && sampleList.length > 0 && !sampleList.includes("all")) {
             newMetaData = filterBySampleId(newMetaData, sampleList);
         }
 
-        setProcessedExprData(newExprData);
-        setProcessedMetaData(newMetaData);
+        return {processedExprData: newExprData, processedMetaData: newMetaData};
     }, [exprValueType, group, sampleMetaData, pseudoExprDict, sampleList, metaData, exprData]);
+
+    useEffect(() => {
+        fetchPseudoExprData();
+        fetchSampleMetaData();
+    }, []);
 
     const metaValues = Object.values(processedMetaData).map((meta) => meta[group]);
     const isCat = isCategorical(metaValues);

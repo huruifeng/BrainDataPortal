@@ -33,6 +33,11 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
 
     const genes = Object.keys(exprData);
     const xCategories = Object.keys(groupedData);
+    const colorPalette = [
+            "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
+            "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
+            "#00ffff", "#ffff00", "#9bed56", "#8000ff", "#0080ff", "#80ff00"
+        ]; // Up to 20 unique colors
     // Create Plotly traces for each gene
     const createTraces = () => {
         return genes.map((gene, geneIndex) => {
@@ -49,9 +54,9 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
                     xaxis: `x${geneIndex + 1}`,
                     yaxis: `y${geneIndex + 1}`,
                     scalemode: "count",
-                    line: {width: 1},
+                    line: {width: 1, color: "black"},
                     jitter: 0.3,
-                    // fillcolor: 'rgba(50, 100, 250, 0.5)',
+                    fillcolor: colorPalette[xIndex % colorPalette.length],
                 };
             });
             return traces;
