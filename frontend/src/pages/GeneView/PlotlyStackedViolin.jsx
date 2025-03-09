@@ -2,7 +2,7 @@ import Plot from 'react-plotly.js';
 import PropTypes from "prop-types";
 
 
-const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
+const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) => {
     if (metaData.length === 0) return "Sample not found in the MetaData";
     if (gene !== "stackedviolin") return null;
 
@@ -42,8 +42,8 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
                     y: expressionData[gene][x_i],
                     type: 'violin',
                     name: `${gene} - ${x_i}`,
-                    box: {visible: false},
-                    points: false, // Show all data points
+                    box: {visible: type === "boxplot"},
+                    points: type === "boxplot", // Show all data points
                     meanline: {visible: true},
                     showlegend: false,
                     xaxis: `x${geneIndex + 1}`,
@@ -115,5 +115,6 @@ PlotlyStackedViolin.propTypes = {
     exprData: PropTypes.object.isRequired,
     metaData: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired
 };
 export default PlotlyStackedViolin;

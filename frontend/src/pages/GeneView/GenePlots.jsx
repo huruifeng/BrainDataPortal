@@ -66,21 +66,20 @@ const GeneMetaPlots = ({ sampleList, metaData, exprData, group, exprValueType })
         <>
             {isCat ? (
                 isUsingPseudobulk ? (
-                    <div id="meta_scatter_div" className={`umap-container ${plotClass}`}>
-                        {Object.entries(processedExprData).map(([gene, expr_data]) => (
-                            <div key={gene} className="umap-item">
-                                <div className="umap-wrapper">
-                                    {processedMetaData && (
-                                        <EChartMetaScatter
-                                            gene={gene}
-                                            exprData={expr_data}
-                                            metaData={processedMetaData}
-                                            group={group}
-                                        />
-                                    )}
-                                </div>
+                    <div id="stacked_violin_div" className={`violin-container`}>
+                        <div key="stacked_violin" className="violin-item">
+                            <div className="violin-wrapper">
+                                {processedMetaData && (
+                                    <PlotlyStackedViolin
+                                        gene={"stackedviolin"}
+                                        exprData={processedExprData}
+                                        metaData={processedMetaData}
+                                        group={group}
+                                        type="boxplot"
+                                    />
+                                )}
                             </div>
-                        ))}
+                        </div>
                     </div>
                 ) : (
                     <div id="stacked_violin_div" className={`violin-container`}>
@@ -92,6 +91,7 @@ const GeneMetaPlots = ({ sampleList, metaData, exprData, group, exprValueType })
                                         exprData={processedExprData}
                                         metaData={processedMetaData}
                                         group={group}
+                                        type="violin"
                                     />
                                 )}
                             </div>
