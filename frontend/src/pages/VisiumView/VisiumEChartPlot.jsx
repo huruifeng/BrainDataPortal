@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import {calculateMinMax, isCategorical} from "../../utils/funcs.js";
 
 const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
+
     const containerRef = useRef(null);
     const chartRef = useRef(null);
     const resizeObserver = useRef(null);
@@ -73,10 +74,12 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         if (Object.keys(geneData).includes(feature)) {
             return geneData[feature];
         }
-        if (metaData?.[0] && Object.keys(metaData[0]).includes(feature)) {
-            metaData.forEach(item => {
-                data[item.cs_id] = item[feature];
-            });
+
+        if (metaData) {
+            Object.entries(metaData).forEach(([id, item]) => {
+                data[id] = item[feature];
+
+            })
         }
         return data;
     }, [geneData, metaData, feature]);
@@ -106,14 +109,14 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
     // Generate scatter data with proper scaling
     const scatterData = useMemo(() => {
-        return coordinates.map(item => ({
-            name: item.cs_id,
+        return Object.entries(coordinates).map(([id, item]) => ({
+            name: id,
             value: [
                 item.imagerow * lowres, // X
                 item.imagecol * lowres, // Y
-                featuredData[item.cs_id] ?? (isCat ? "Other" : 0)  // Value
+                featuredData[id] ?? (isCat ? "Other" : 0)  // Value
             ]
-        }));
+        }))
     }, [coordinates, hires, displayScale, featuredData]);
 
     let mySeries = [];
@@ -243,13 +246,13 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
 EChartFeaturePlot.propTypes = {
     visiumData: PropTypes.shape({
-        coordinates: PropTypes.array.isRequired,
+        coordinates: PropTypes.object.isRequired,
         scales: PropTypes.object.isRequired,
         image: PropTypes.instanceOf(Blob).isRequired
     }).isRequired,
     geneData: PropTypes.object.isRequired,
-    metaData: PropTypes.array,
-    feature: PropTypes.string
+    metaData: PropTypes.object.isRequired,
+    feature: PropTypes.string.isRequired
 };
 
 

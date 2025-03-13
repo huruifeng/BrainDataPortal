@@ -141,6 +141,7 @@ function GeneView() {
             ? "two-plots" : selectedGenes.length === 3
                 ? "three-plots" : "four-plots";
 
+    const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
@@ -232,13 +233,13 @@ function GeneView() {
                                     variant="standard"
                                 >
                                     {metaList && metaList.length > 0 ? (
-                                        metaList.map((option) => {
-                                            const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
-                                            if (excludedKeys.has(option)) return null;
-                                            return (<MenuItem key={option} value={option}>
+                                        metaList
+                                        .filter(option => !excludedKeys.has(option)) // Remove excluded keys first
+                                        .map(option => (
+                                            <MenuItem key={option} value={option}>
                                                 {option}
-                                            </MenuItem>)
-                                        })
+                                            </MenuItem>
+                                        ))
                                     ) : (
                                         <MenuItem disabled>
                                             {loading ? "Loading metadata..." : "No metadata available"}
@@ -250,48 +251,58 @@ function GeneView() {
                         :
                         /*a dropdown to select the options on how to group the data*/
                         <>
-                        <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
-                            <FormControl variant="standard" sx={{width: "100%"}}>
-                                <InputLabel id="grouping-label">Gene grouping</InputLabel>
-                                <Select
-                                    labelId="grouping-label"
-                                    id="grouping-select"
-                                    value={grouping}
-                                    onChange={handleGroupingChange}
-                                    size="small"
-                                    variant="standard"
-                                >
-                                    {metaList && metaList.length > 0 ? (
-                                        metaList.map((option) => {
-                                            const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
-                                            if (excludedKeys.has(option)) return null;
-                                            return (<MenuItem key={option} value={option}>
-                                                {option}
-                                            </MenuItem>)
-                                        })
-                                    ) : (
-                                        <MenuItem disabled>
-                                            {loading ? "Loading metadata..." : "No metadata available"}
-                                        </MenuItem>
-                                    )}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                        <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
-                            <FormControl variant="standard" sx={{width: "100%"}}>
-                                <InputLabel id="valuetype-select-label">Value type</InputLabel>
-                                <Select
-                                    labelId="valuetype-select-label"
-                                    id="valuetype-select"
-                                    value={exprValueType}
-                                    label="Value type"
-                                    onChange={handleExprValueTypeChange}
-                                >
-                                    <MenuItem value={'celllevel'}>Cell level values</MenuItem>
-                                    <MenuItem value={'pseudobulk'}>Sample level pseudobulks</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Box>
+                            <Box sx={{
+                                display: "flex",
+                                justifyContent: "start",
+                                marginBottom: "10px",
+                                marginLeft: "20px"
+                            }}>
+                                <FormControl variant="standard" sx={{width: "100%"}}>
+                                    <InputLabel id="grouping-label">Gene grouping</InputLabel>
+                                    <Select
+                                        labelId="grouping-label"
+                                        id="grouping-select"
+                                        value={grouping}
+                                        onChange={handleGroupingChange}
+                                        size="small"
+                                        variant="standard"
+                                    >
+                                        {metaList && metaList.length > 0 ? (
+                                            metaList.map((option) => {
+                                                const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
+                                                if (excludedKeys.has(option)) return null;
+                                                return (<MenuItem key={option} value={option}>
+                                                    {option}
+                                                </MenuItem>)
+                                            })
+                                        ) : (
+                                            <MenuItem disabled>
+                                                {loading ? "Loading metadata..." : "No metadata available"}
+                                            </MenuItem>
+                                        )}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                            <Box sx={{
+                                display: "flex",
+                                justifyContent: "start",
+                                marginBottom: "10px",
+                                marginLeft: "20px"
+                            }}>
+                                <FormControl variant="standard" sx={{width: "100%"}}>
+                                    <InputLabel id="valuetype-select-label">Value type</InputLabel>
+                                    <Select
+                                        labelId="valuetype-select-label"
+                                        id="valuetype-select"
+                                        value={exprValueType}
+                                        label="Value type"
+                                        onChange={handleExprValueTypeChange}
+                                    >
+                                        <MenuItem value={'celllevel'}>Cell level values</MenuItem>
+                                        <MenuItem value={'pseudobulk'}>Sample level pseudobulks</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Box>
                         </>
                     }
 
@@ -304,7 +315,8 @@ function GeneView() {
                     </Box>
 
                 </div>
-                {/* Left UMAP Plot Area (80%) */}
+                {/* Left UMAP Plot Area (80%) */
+                }
                 <div className="plot-main">
                     {loading ? (
                         <>
@@ -368,7 +380,8 @@ function GeneView() {
                 </div>
             </div>
         </div>
-    );
+    )
+        ;
 }
 
 export default GeneView;
