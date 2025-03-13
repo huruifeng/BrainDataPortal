@@ -41,9 +41,10 @@ function VisiumView() {
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore();
     const {
         exprDataDict, fetchExprData,
+        sampleMetaDict, fetchMetaDataOfSample,
         imageDataDict, fetchImageData
     } = useSampleGeneMetaStore();
-    const {allMetaData, fetchAllMetaData, loading, error} = useSampleGeneMetaStore();
+    const {loading, error} = useSampleGeneMetaStore();
 
     const [selectedMetaFeatures, setSelectedMetaFeatures] = useState(initialMetas);
 
@@ -63,7 +64,8 @@ function VisiumView() {
 
         fetchExprData(); // Fetch data once after both are set
         fetchImageData();
-        fetchAllMetaData(datasetId);
+        fetchMetaDataOfSample();
+        // fetchAllMetaData(datasetId);
 
     }, [datasetId]);
 
@@ -90,6 +92,7 @@ function VisiumView() {
         setSelectedSamples(newValue);
         updateQueryParams(selectedGenes, newValue);
         fetchImageData();
+        fetchMetaDataOfSample();
     };
 
     /** Handles gene selection change */
@@ -121,6 +124,7 @@ function VisiumView() {
         setDataset(datasetId)
         fetchExprData();
         fetchImageData();
+        fetchMetaDataOfSample();
     }
     const selectedFeatures = [...new Set([...selectedGenes, ...selectedMetaFeatures])];
     // console.log(selectedFeatures);
@@ -164,6 +168,8 @@ function VisiumView() {
                                             const newSamples = selectedSamples.filter(s => s !== option);
                                             setSelectedSamples(newSamples);
                                             updateQueryParams(selectedGenes, newSamples);
+                                            fetchImageData();
+                                            fetchMetaDataOfSample();
                                         }}
                                     />
                                 );
@@ -284,9 +290,9 @@ function VisiumView() {
                                                 <>
                                                     <div key={`${sample_i}-${feature}-echart`}
                                                          className="feature-plot-echart">
-                                                        {allMetaData && <EChartFeaturePlot visiumData={visiumData_i}
+                                                        {sampleMetaDict[sample_i] && <EChartFeaturePlot visiumData={visiumData_i}
                                                                            geneData={exprDataDict}
-                                                                           metaData={allMetaData || {}}
+                                                                           metaData={sampleMetaDict[sample_i] || {}}
                                                                            feature={feature}/>}
                                                         <Typography variant="caption" display="block" align="center">
                                                             {feature}

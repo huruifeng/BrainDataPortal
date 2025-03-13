@@ -81,6 +81,22 @@ def get_sample_metadata(dataset, samples=["all"], meta="all"):
     else:
         return f"Error: Meta file not found."
 
+def get_metadata_of_sample(dataset, sample="all", meta="all"):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+
+    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite.csv')
+    if os.path.exists(meta_file):
+        data_df = pd.read_csv(meta_file, index_col=0, header=0)
+        if(sample != "all"):
+            data_df = data_df.loc[data_df["sample_id"] == sample,:]
+        if(meta != "all"):
+            data_df = data_df[meta]
+        data = data_df.to_dict(orient="index")
+        return data
+    else:
+        return f"Error: Meta file not found."
+
 def get_all_metadata(dataset, drop_cols=None):
     if dataset == "all":
         return "Error: Dataset is not specified."

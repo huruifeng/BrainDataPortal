@@ -101,12 +101,24 @@ async def getallmetadata(request:Request):
 
     return metadata
 
-@router.get("/getsamplemetadata")
-async def getsamplemetadata(request:Request):
-    print("getsamplemetadata() called================")
+@router.get("/getallsamplemetadata")
+async def getallsamplemetadata(request:Request):
+    print("getallsamplemetadata() called================")
     dataset_id = request.query_params.get("dataset")
 
     response = get_sample_metadata(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting sample metadata.")
+    return response
+
+@router.get("/getmetadataofsample")
+async def getmetadataofsample(request:Request):
+    print("getmetadataofsample() called================")
+    dataset_id = request.query_params.get("dataset")
+    sample = request.query_params.get("sample")
+
+    response = get_metadata_of_sample(dataset_id, sample)
     # print (response)
     if "Error" in response:
         raise HTTPException(status_code=404, detail="Error in getting sample metadata.")

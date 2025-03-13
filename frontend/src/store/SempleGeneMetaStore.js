@@ -1,6 +1,6 @@
 import {create} from "zustand";
-import {getGeneList, getSampleList, getMetaList, getUMAPData, getAllMetaData} from "../api/api.js";
-import {getSampleMetaData, getExprData, getPseudoExprData} from "../api/api.js";
+import {getGeneList, getSampleList, getMetaList, getUMAPData, getAllMetaData, getMetaDataOfSample} from "../api/api.js";
+import {getAllSampleMetaData, getExprData, getPseudoExprData} from "../api/api.js";
 import {getCoordinates, getImage} from "../api/visium.js";
 import {toast} from "react-toastify";
 
@@ -16,7 +16,8 @@ const useSampleGeneMetaStore = create((set, get) => ({
     imageDataDict: {},
 
     allMetaData: {},
-    sampleMetaData: {},
+    allSampleMetaData: {},
+    sampleMetaDict: {},
 
     selectedGenes: [],
     exprDataDict: {},
@@ -41,8 +42,12 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({allMetaData: meta});
     },
 
-    setSampleMetaData: async (meta) => {
-        set({sampleMetaData: meta});
+    setAllBulkMetaData: async (meta) => {
+        set({allBulkMetaData: meta});
+    },
+
+    setSampleMetaDict: async (meta) => {
+        set({sampleMetaDict: meta});
     },
 
     setExprDataDict: async (expr) => {
@@ -149,28 +154,58 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
-    fetchSampleMetaData: async (dataset_id = null) => {
+    fetchMetaDataOfSample: async (dataset_id = null) => {
         dataset_id = dataset_id ?? get().dataSet;
+        const {selectedSamples} = get();
 
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchSampleMetaData: No dataset selected", loading: false});
             return;
         }
 
+        // Don't reset loading state if no genes selected
+        if (selectedSamples.length === 0) {
+            set({sampleMetaDict: {}}); // Clear data without affecting loading state
+            return;
+        }
+
         try {
-            const response = await getSampleMetaData(dataset_id);
-            set({sampleMetaData: response.data});
+            for (var sample of selectedSamples) {
+                if (!get().sampleMetaDict[sample]) {
+                    const response = await getMetaDataOfSample(dataset_id, sample);
+                    set({sampleMetaDict: {...get().sampleMetaDict, [sample]: response.data}});
+                }
+            }
         } catch (error) {
             set({error: "Failed to fetch sample meta data:" + error, loading: false});
         }
 
     },
 
+    fetchAllSampleMetaData: async (dataset_id = null) => {
+        dataset_id = dataset_id ?? get().dataSet;
+
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchAllSampleMetaData: No dataset selected", loading: false});
+            return;
+        }
+
+        try {
+            const response = await getAllSampleMetaData(dataset_id);
+            set({allSampleMetaData: response.data});
+        } catch (error) {
+            set({error: "Failed to fetch sample meta data:" + error, loading: false});
+        }
+
+
+    },
+
+
     // In useSampleGeneMetaStore
     fetchAllMetaData: async (dataset_id = null) => {
         dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchSampleMetaData: No dataset selected"});
+            set({error: "fetchAllMetaData: No dataset selected"});
             return;
         }
 
@@ -294,8 +329,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({loading: true, error: null});
 
         try {
-            // Clear imageDataDict
-            get().imageDataDict = {};
+            // get().imageDataDict = {};
             for (var sample of selectedSamples) {
                 if (!get().imageDataDict[sample]) {
                     const coor_response = await getCoordinates(dataset_id, sample);
