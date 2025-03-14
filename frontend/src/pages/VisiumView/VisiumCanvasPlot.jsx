@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
@@ -13,17 +13,23 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     const imgBlob = visiumData.image;
     const imgUrl = URL.createObjectURL(imgBlob);
 
-    let featuredData = {};
-    const isMetaFeature = Object.keys(metaData?.[0] || []).includes(feature);
+    // Process feature data
+    const featuredData = useMemo(() => {
+        const data = {};
+        if (Object.keys(geneData).includes(feature)) {
+            return geneData[feature];
+        }
 
-    if (isMetaFeature) {
-        metaData.forEach((item) => {
-            featuredData[item.cs_id] = item[feature];
-        });
-    } else {
-        featuredData = geneData;
-    }
+        if (metaData) {
+            Object.entries(metaData).forEach(([id, item]) => {
+                data[id] = item[feature];
+
+            })
+        }
+        return data;
+    }, [geneData, metaData, feature]);
     // console.log("featuredData: ", featuredData);
+
     const colorPalette = [
         "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
         "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
@@ -77,7 +83,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             let colorMap = {};
             const isCat = isCategorical(values);
             // console.log("isCat: ", isCat);
-            if (isCat && isMetaFeature) {
+            if (isCat) {
                 colorMap = new Map();
                 uniqueValues.forEach((value, index) => {
                     colorMap.set(value, colorPalette[index % colorPalette.length]);
@@ -105,7 +111,7 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, 2 * Math.PI); // Fixed radius of 3px
-                ctx.fillStyle = isCat && isMetaFeature ? colorMap.get(spot.value) : getColor(spot.value);
+                ctx.fillStyle = isCat ? colorMap.get(spot.value) : getColor(spot.value);
                 ctx.fill();
             });
         };
