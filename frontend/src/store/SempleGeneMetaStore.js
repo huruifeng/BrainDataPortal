@@ -1,6 +1,6 @@
 import {create} from "zustand";
-import {getGeneList, getSampleList, getMetaList, getUMAPData, getAllMetaData} from "../api/api.js";
-import {getSampleMetaData, getExprData} from "../api/api.js";
+import {getGeneList, getSampleList, getMetaList, getUMAPData, getAllMetaData, getMetaDataOfSample} from "../api/api.js";
+import {getAllSampleMetaData, getExprData, getPseudoExprData} from "../api/api.js";
 import {getCoordinates, getImage} from "../api/visium.js";
 import {toast} from "react-toastify";
 
@@ -10,16 +10,18 @@ const useSampleGeneMetaStore = create((set, get) => ({
     sampleList: [],
     metaList: [],
 
-    umapData: {},
+    umapData: [],
 
     selectedSamples: [],
     imageDataDict: {},
 
     allMetaData: {},
-    metaData: {},
+    allSampleMetaData: {},
+    sampleMetaDict: {},
 
     selectedGenes: [],
     exprDataDict: {},
+    pseudoExprDict: {},
 
     loading: true,
     error: null,
@@ -40,8 +42,12 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({allMetaData: meta});
     },
 
-    setMetaDataDict: async (meta) => {
-        set({metaDataDict: meta});
+    setAllBulkMetaData: async (meta) => {
+        set({allBulkMetaData: meta});
+    },
+
+    setSampleMetaDict: async (meta) => {
+        set({sampleMetaDict: meta});
     },
 
     setExprDataDict: async (expr) => {
@@ -56,9 +62,16 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({selectedGenes: genes});
     },
 
-    fetchGeneList: async (dataset_id = null, query_str = "AB") => {
+    fetchGeneList: async (dataset_id = null, query_str = "") => {
+        dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id) {
             set({error: "fetchGeneList: No dataset selected", loading: false});
+            return;
+        }
+        if (query_str.length === 0) {
+            query_str = "ABC";
+        } else if (query_str.length < 3) {
+            set({geneList: []});
             return;
         }
 
@@ -85,6 +98,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
     },
 
     fetchSampleList: async (dataset_id = null, query_str = "all") => {
+        dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id) {
             set({error: "fetchSampleList: No dataset selected", loading: false});
             return;
@@ -113,6 +127,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
     },
 
     fetchMetaList: async (dataset_id = null, query_str = "all") => {
+        dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id) {
             set({error: "fetchMetaList: No dataset selected", loading: false});
             return;
@@ -139,69 +154,72 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
-    fetchMetaData: async (dataset_id = null, meta = null) => {
-        const {selectedSamples} = get();
+    fetchMetaDataOfSample: async (dataset_id = null) => {
         dataset_id = dataset_id ?? get().dataSet;
+        const {selectedSamples} = get();
 
-        if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchMetaData: No dataset selected", loading: false});
-            return;
-        }
-
-        // Don't reset loading state if no genes selected
-        if (selectedSamples.length === 0) {
-            set({metaData: {},loading: false});
-            return;
-        }
-
-        set({loading: true, error: null});
-
-        if(meta===null || meta === "") {
-           set({metaData: {},loading: false});
-           return;
-        }
-
-        try {
-
-            if (selectedSamples.length >= 1 && selectedSamples.includes("all")) {
-                const response = await getSampleMetaData(dataset_id, ["all"], meta);
-                get().metaData = response.data;
-            }else{
-                const response = await getSampleMetaData(dataset_id, selectedSamples, meta);
-                get().metaData = response.data;
-            }
-
-            set({loading: false});
-        } catch (error) {
-            set({error: "Failed to fetch UMAP data:" + error, loading: false});
-        } finally {
-            set({loading: false});
-        }
-
-    },
-
-    fetchAllMetaData: async (dataset_id = null) => {
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchSampleMetaData: No dataset selected", loading: false});
             return;
         }
 
-        set({loading: true, error: null});
+        // Don't reset loading state if no genes selected
+        if (selectedSamples.length === 0) {
+            set({sampleMetaDict: {}}); // Clear data without affecting loading state
+            return;
+        }
 
         try {
-            const response = await getAllMetaData(dataset_id);
-            get().allMetaData = response.data;
-            set({loading: false});
-
+            for (var sample of selectedSamples) {
+                if (!get().sampleMetaDict[sample]) {
+                    const response = await getMetaDataOfSample(dataset_id, sample);
+                    set({sampleMetaDict: {...get().sampleMetaDict, [sample]: response.data}});
+                }
+            }
         } catch (error) {
-            set({error: "Failed to fetch UMAP data:" + error, loading: false});
-        } finally {
-            set({loading: false});
+            set({error: "Failed to fetch sample meta data:" + error, loading: false});
         }
 
     },
 
+    fetchAllSampleMetaData: async (dataset_id = null) => {
+        dataset_id = dataset_id ?? get().dataSet;
+
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchAllSampleMetaData: No dataset selected", loading: false});
+            return;
+        }
+
+        try {
+            const response = await getAllSampleMetaData(dataset_id);
+            set({allSampleMetaData: response.data});
+        } catch (error) {
+            set({error: "Failed to fetch sample meta data:" + error, loading: false});
+        }
+
+
+    },
+
+
+    // In useSampleGeneMetaStore
+    fetchAllMetaData: async (dataset_id = null) => {
+        dataset_id = dataset_id ?? get().dataSet;
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchAllMetaData: No dataset selected"});
+            return;
+        }
+
+        try {
+            const response = await getAllMetaData(dataset_id);
+            set({allMetaData: response.data}); // Update directly without loading state
+        } catch (error) {
+            console.error("Failed to fetch metadata:", error);
+            set({error: "Failed to fetch all metadata:" + error});
+        }
+    },
+
     fetchUMAPData: async (dataset_id) => {
+        dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchUMAPData: No dataset selected", loading: false});
             return;
@@ -230,7 +248,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     fetchExprData: async (dataset_id) => {
         const {selectedGenes} = get();
-         dataset_id = dataset_id ?? get().dataSet;
+        dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchExprData: No dataset selected", loading: false});
             return;
@@ -248,7 +266,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
             for (var gene of selectedGenes) {
                 if (!get().exprDataDict[gene]) {
                     const response = await getExprData(dataset_id, gene);
-                    get().exprDataDict[gene] = response.data;
+                    set({exprDataDict: {...get().exprDataDict, [gene]: response.data}});
                 }
             }
             // remove gene item if it is not selected
@@ -268,9 +286,42 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     },
 
-    fetchImageData: async () => {
-        const {dataSet, selectedSamples} = get();
-        if (!dataSet || dataSet === "all") {
+    fetchPseudoExprData: async (dataset_id) => {
+        dataset_id = dataset_id ?? get().dataSet;
+        const {selectedGenes} = get();
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchPseudoExprData: No dataset selected", loading: false});
+            return;
+        }
+
+        set({loading: true, error: null});
+
+        try {
+            for (var gene of selectedGenes) {
+                if (!get().pseudoExprDict[gene]) {
+                    const response = await getPseudoExprData(dataset_id, gene);
+                    set({pseudoExprDict: {...get().pseudoExprDict, [gene]: response.data}});
+                }
+            }
+            // remove gene item if it is not selected
+            for (var key in get().pseudoExprDict) {
+                if (!selectedGenes.includes(key)) {
+                    delete get().pseudoExprDict[key];
+                }
+            }
+
+            set({loading: false});
+        } catch (error) {
+            set({error: "Failed to fetch pseudo expr data:" + error, loading: false});
+        } finally {
+            set({loading: false});
+        }
+    },
+
+    fetchImageData: async (dataset_id) => {
+        dataset_id = dataset_id ?? get().dataSet;
+        const {selectedSamples} = get();
+        if (!dataset_id || dataset_id === "all") {
             set({error: "fetchImageData: No dataset selected", loading: false});
             return;
         }
@@ -278,17 +329,26 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({loading: true, error: null});
 
         try {
-            // Clear imageDataDict
-            get().imageDataDict = {};
+            // get().imageDataDict = {};
             for (var sample of selectedSamples) {
                 if (!get().imageDataDict[sample]) {
-                    const coor_response = await getCoordinates(dataSet, sample);
-                    const img_response = await getImage(dataSet, sample);
-                    get().imageDataDict[sample] = {
-                        coordinates: coor_response.data.coordinates,
-                        scales: coor_response.data.scales,
-                        image: img_response.data
-                    };
+                    const coor_response = await getCoordinates(dataset_id, sample);
+                    const img_response = await getImage(dataset_id, sample);
+                    set({
+                        imageDataDict: {
+                            ...get().imageDataDict, [sample]: {
+                                coordinates: coor_response.data.coordinates,
+                                scales: coor_response.data.scales,
+                                image: img_response.data
+                            }
+                        }
+                    })
+
+                    // get().imageDataDict[sample] = {
+                    //     coordinates: coor_response.data.coordinates,
+                    //     scales: coor_response.data.scales,
+                    //     image: img_response.data
+                    // };
                 }
             }
             // remove gene item if it is not selected

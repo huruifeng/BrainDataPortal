@@ -1,4 +1,5 @@
 ## BrainDataPortal
+#### (Load all the meta data when first load the page)
 
 - This is project designed for the brain data analysis and visualization.
 - The data assays include: scRNAseq, scATACseq, ChIPseq, Spatial Transcriptomics and other omics data.
@@ -24,4 +25,18 @@
 
    ```npm run dev```
 6. Use the frontend.
+
+   - Navigate to http://localhost:5173
+   - Use the navigation bar to navigate to different pages.
+
+### Demo page
+[//]: # ([BrainDataPortal]&#40;https://braindataportal.vercel.app/&#41;)
+#### Home Page
+![Home Page](demo/home.png)
+
+#### Single Cell UMAP clustering
+![UMAP Page](demo/sc_page.png)
+
+#### Spatial Transcriptomics
+![VisiumST Page](demo/Visium_page.png)
 

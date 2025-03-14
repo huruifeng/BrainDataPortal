@@ -1,17 +1,13 @@
 import ReactECharts from "echarts-for-react";
 import PropTypes from "prop-types";
 
-const EChartMetaScatter = ({gene, geneData, sampleData, metaData, group}) => {
-    // console.log("gene: ", gene);
-    if (sampleData.length >= 1 && !sampleData.includes("all")) {
-        metaData = metaData.filter((meta) => sampleData.includes(meta.sample_id));
-    }
+const EChartMetaScatter = ({gene, exprData, metaData, group}) => {
 
-    if (metaData.length === 0) return "Sample not found in the MetaData";
+    if (Object.keys(metaData).length === 0) return "Sample not found in the MetaData";
 
-    const scatterData = metaData.map((meta) => {
-        return [meta[group], geneData[meta.cs_id] ?? 0];
-    });
+    const scatterData = Object.entries(metaData).map(([key, meta]) => {
+        return [meta[group], exprData?.[key] ?? 0];
+    })
 
     // console.log("scatterData: ", scatterData);
 
@@ -63,9 +59,8 @@ const EChartMetaScatter = ({gene, geneData, sampleData, metaData, group}) => {
 
 EChartMetaScatter.propTypes = {
     gene: PropTypes.string.isRequired,
-    geneData: PropTypes.object.isRequired,
-    sampleData: PropTypes.array.isRequired,
-    metaData: PropTypes.array.isRequired,
+    exprData: PropTypes.object.isRequired,
+    metaData: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
 };
 

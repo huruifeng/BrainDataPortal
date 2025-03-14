@@ -2,19 +2,6 @@ import os
 import pandas as pd
 import json
 
-def get_gene_expr_data(dataset, gene):
-    # print("get_umap_data() called================")
-    # print(dataset, samples, genes, color, group)
-    ## plot expression for each gene
-    gene_expr_file = os.path.join("backend","datasets",dataset, "genes",gene+".json")
-    if not os.path.exists(gene_expr_file):
-        return "Error: Gene expression file not found"
-
-    with open(gene_expr_file, 'r') as f:
-        cell_expr = json.load(f)
-
-    return cell_expr
-
 def get_gene_list(dataset, query_str="AB"):
     if dataset == "all":
         genes_file = os.path.join("backend","datasets", 'gene_list.json')
@@ -72,23 +59,40 @@ def get_umapembedding(dataset):
 
     umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_sample_id_100k.csv')
     if os.path.exists(umap_file):
-        data_df = pd.read_csv(umap_file, index_col=0, header=0)
-        data = data_df.to_dict(orient="index")
+        data_df = pd.read_csv(umap_file, index_col=None, header=0)
+        data = data_df.to_dict(orient="records")
         return data
     else:
         return "Error: UMAP file not found"
 
-def get_sample_metadata(dataset, samples,meta):
+def get_sample_metadata(dataset, samples=["all"], meta="all"):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_100k.csv')
+    meta_file = os.path.join("backend","datasets",dataset,'sample_metadata.csv')
     if os.path.exists(meta_file):
         data_df = pd.read_csv(meta_file, index_col=0, header=0)
         if(len(samples) > 0 and samples[0] != "all"):
-            data_df = data_df.loc[data_df["sample_id"].isin(samples),:]
-        # print(data_df.shape)
-        data = data_df[meta].to_dict()
+            data_df = data_df.loc[samples,:]
+        if(meta != "all"):
+            data_df = data_df[meta]
+        data = data_df.to_dict(orient="index")
+        return data
+    else:
+        return f"Error: Meta file not found."
+
+def get_metadata_of_sample(dataset, sample="all", meta="all"):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+
+    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite.csv')
+    if os.path.exists(meta_file):
+        data_df = pd.read_csv(meta_file, index_col=0, header=0)
+        if(sample != "all"):
+            data_df = data_df.loc[data_df["sample_id"] == sample,:]
+        if(meta != "all"):
+            data_df = data_df[meta]
+        data = data_df.to_dict(orient="index")
         return data
     else:
         return f"Error: Meta file not found."
@@ -107,6 +111,26 @@ def get_all_metadata(dataset, drop_cols=None):
             return data
     else:
         return "Error: Meta file not found"
+
+def get_expr_data(dataset, gene):
+    gene_expr_file = os.path.join("backend","datasets",dataset, "genes",gene+".json")
+    if not os.path.exists(gene_expr_file):
+        return "Error: Gene expression file not found"
+
+    with open(gene_expr_file, 'r') as f:
+        cell_expr = json.load(f)
+
+    return cell_expr
+
+def get_pseudoexpr_data(dataset, gene):
+    gene_expr_file = os.path.join("backend","datasets",dataset, "gene_pseudobulk",gene+".json")
+    if not os.path.exists(gene_expr_file):
+        return "Error: Pseudobulk expression file not found"
+
+    with open(gene_expr_file, 'r') as f:
+        sample_expr = json.load(f)
+
+    return sample_expr
 
 def get_visium_coordinates(dataset, sample):
     if dataset == "all":

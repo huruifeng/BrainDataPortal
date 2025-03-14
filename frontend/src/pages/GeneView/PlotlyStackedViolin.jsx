@@ -1,31 +1,43 @@
 import Plot from 'react-plotly.js';
-import {groupBy} from "lodash";
 import PropTypes from "prop-types";
 
-const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
-    if (Object.keys(exprData).length === 0) return "Expression data is loading...";
-    if(metaData.length === 0) return "Sample not found in the MetaData";
-    console.log(exprData);
-    console.log(metaData);
-    console.log(group);
-    console.log(gene);
 
+const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) => {
+    if (metaData.length === 0) return "Sample not found in the MetaData";
     if (gene !== "stackedviolin") return null;
-    const expressionData = {};
+
+    //Create expressionData:
+    // {
+    //      GeneX:{
+    //          groupX: [expr1, expr2, expr3,...],
+    //          groupY: [expr1, expr2, expr3,...]
+    //          },
+    //       GeneY: {...}
+    // }
+    const groupedData = {};
+    for (const [id, attrs] of Object.entries(metaData)) {
+        const key = attrs[group];  // Grouping key (e.g., celltype, sex, etc.)
+        (groupedData[key] ||= []).push(id);
+    }
+    const expressionData = Object.fromEntries(
+        Object.keys(exprData).map((gene) => [
+            gene,
+            Object.fromEntries(
+                Object.entries(groupedData).map(([x_i, ids]) => [
+                    x_i,
+                    ids.map((id) => exprData[gene]?.[id] ?? 0),
+                ])
+            ),
+        ])
+    );
+
     const genes = Object.keys(exprData);
-
-    let xCategories = [...new Set(Object.values(metaData))];
-    genes.forEach((gene) => {
-        const geneExpr = exprData[gene];
-        expressionData[gene] = {};
-        xCategories.forEach((x_i) => {
-            expressionData[gene][x_i] = [];
-            Object.keys(metaData).forEach((cs_id) => {
-                expressionData[gene][x_i].push(geneExpr[cs_id] ?? 0);
-            });
-        })
-    });
-
+    const xCategories = Object.keys(groupedData);
+    const colorPalette = [
+            "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
+            "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
+            "#00ffff", "#ffff00", "#9bed56", "#8000ff", "#0080ff", "#80ff00"
+        ]; // Up to 20 unique colors
     // Create Plotly traces for each gene
     const createTraces = () => {
         return genes.map((gene, geneIndex) => {
@@ -35,16 +47,16 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
                     y: expressionData[gene][x_i],
                     type: 'violin',
                     name: `${gene} - ${x_i}`,
-                    box: {visible: false},
-                    points: false, // Show all data points
+                    box: {visible: type === "boxplot"},
+                    points: type === "boxplot", // Show all data points
                     meanline: {visible: true},
                     showlegend: false,
                     xaxis: `x${geneIndex + 1}`,
                     yaxis: `y${geneIndex + 1}`,
                     scalemode: "count",
-                    line: {width: 1},
+                    line: {width: 1, color: "black"},
                     jitter: 0.3,
-                    // fillcolor: 'rgba(50, 100, 250, 0.5)',
+                    fillcolor: colorPalette[xIndex % colorPalette.length],
                 };
             });
             return traces;
@@ -58,7 +70,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group}) => {
         const layout = {
             grid: {rows, columns: 1, pattern: 'independent',},
             height: totalHeight, // Adjust height based on number of genes
-            title: 'Stacked Violin Plot',
+            title: 'Stacked Plot',
             margin: {t: 5, b: 50, l: 50, r: 50}, // Reduce white space
             annotations: [],
         };
@@ -108,5 +120,6 @@ PlotlyStackedViolin.propTypes = {
     exprData: PropTypes.object.isRequired,
     metaData: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired
 };
 export default PlotlyStackedViolin;

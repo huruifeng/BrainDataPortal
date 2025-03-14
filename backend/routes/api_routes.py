@@ -60,28 +60,25 @@ async def getumapembedding(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting Meta list.")
     return response
 
-
-@router.get("/getsamplemetadata")
-async def getsamplemetadata(request:Request):
-    print("getsamplemetadata() called================")
-    dataset_id = request.query_params.get("dataset")
-    samples = request.query_params.getlist("samples[]")
-    meta = request.query_params.get("meta")
-    # print(samples,meta)
-
-    response = get_sample_metadata(dataset_id, samples,meta)
-    # print (response)
-    if "Error" in response:
-        raise HTTPException(status_code=404, detail="Error in getting sample metadata.")
-    return response
-
 @router.get("/getexprdata")
 async def getexprdata(request:Request):
     print("getgeneexprdata() called================")
     dataset_id = request.query_params.get("dataset")
     gene = request.query_params.get("gene")
 
-    response = get_gene_expr_data(dataset_id, gene)
+    response = get_expr_data(dataset_id, gene)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting expression data.")
+    return response
+
+@router.get("/getpseudoexprdata")
+async def getpseudoexprdata(request:Request):
+    print("getpseudoexprdata() called================")
+    dataset_id = request.query_params.get("dataset")
+    gene = request.query_params.get("gene")
+
+    response = get_pseudoexpr_data(dataset_id, gene)
     # print (response)
     if "Error" in response:
         raise HTTPException(status_code=404, detail="Error in getting expression data.")
@@ -103,6 +100,29 @@ async def getallmetadata(request:Request):
         raise HTTPException(status_code=404, detail=metadata)
 
     return metadata
+
+@router.get("/getallsamplemetadata")
+async def getallsamplemetadata(request:Request):
+    print("getallsamplemetadata() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_sample_metadata(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting sample metadata.")
+    return response
+
+@router.get("/getmetadataofsample")
+async def getmetadataofsample(request:Request):
+    print("getmetadataofsample() called================")
+    dataset_id = request.query_params.get("dataset")
+    sample = request.query_params.get("sample")
+
+    response = get_metadata_of_sample(dataset_id, sample)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting sample metadata.")
+    return response
 
 @router.get("/getdata/{data_id}")
 async def getdata(data_id: str | uuid.UUID, session: SessionDep):

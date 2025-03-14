@@ -18,8 +18,6 @@ import "./VisiumView.css";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
 import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
-import FeaturePlot from "./VisiumCanvasPlot.jsx";
-
 
 function VisiumView() {
 
@@ -42,11 +40,11 @@ function VisiumView() {
     } = useSampleGeneMetaStore();
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore();
     const {
-        metaDataDict, fetchSampleMetaData,
         exprDataDict, fetchExprData,
+        sampleMetaDict, fetchMetaDataOfSample,
         imageDataDict, fetchImageData
     } = useSampleGeneMetaStore();
-    const {allMetaData, fetchAllMetaData, loading, error} = useSampleGeneMetaStore();
+    const {loading, error} = useSampleGeneMetaStore();
 
     const [selectedMetaFeatures, setSelectedMetaFeatures] = useState(initialMetas);
 
@@ -66,18 +64,13 @@ function VisiumView() {
 
         fetchExprData(); // Fetch data once after both are set
         fetchImageData();
-        fetchAllMetaData();
+        fetchMetaDataOfSample();
+        // fetchAllMetaData(datasetId);
 
     }, [datasetId]);
 
-
-    // const sampleOptions = sampleRecords.map((sample) => sample.sample_id);
-    const geneOptions = geneList.map((gene) => gene);
-    const sampleOptions = sampleList.map((sample) => sample);
-    const metaOptions = metaList ? metaList.map((option) => {
-        const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
-        return excludedKeys.has(option) ? null : option;
-    }).filter(Boolean) : [];
+    const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
+    const metaOptions = metaList ? metaList.filter(option => !excludedKeys.has(option)): [];
 
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");
@@ -99,6 +92,7 @@ function VisiumView() {
         setSelectedSamples(newValue);
         updateQueryParams(selectedGenes, newValue);
         fetchImageData();
+        fetchMetaDataOfSample();
     };
 
     /** Handles gene selection change */
@@ -106,8 +100,6 @@ function VisiumView() {
         setSelectedGenes(newValue);
         updateQueryParams(newValue, selectedSamples);
         fetchExprData();
-
-        // setSelectedFeatures(prev => [...new Set([...prev, ...newValue])]);
     };
 
     const handleGeneDelete = (delGene) => {
@@ -115,22 +107,16 @@ function VisiumView() {
         setSelectedGenes(newGenes);
         updateQueryParams(newGenes, selectedSamples);
         fetchExprData();
-
-        // setSelectedFeatures(prev => [...new Set([...prev, ...newGenes])]);
     }
 
     const handleMetaFeatureChange = (event, newValue) => {
         setSelectedMetaFeatures(newValue);
         updateQueryParams(selectedGenes, selectedSamples, newValue);
-
-        // setSelectedFeatures(prev => [...new Set([...prev, ...newValue])]);
     }
     const handleMetaDelete = (delMeta) => {
         const newMetas = selectedMetaFeatures.filter(m => m !== delMeta);
         setSelectedMetaFeatures(newMetas);
         updateQueryParams(selectedGenes, selectedSamples, newMetas);
-
-        // setSelectedFeatures(prev => [...new Set([...prev, ...newMetas])]);
     }
 
     // click the button to fetch umap data
@@ -138,6 +124,7 @@ function VisiumView() {
         setDataset(datasetId)
         fetchExprData();
         fetchImageData();
+        fetchMetaDataOfSample();
     }
     const selectedFeatures = [...new Set([...selectedGenes, ...selectedMetaFeatures])];
     // console.log(selectedFeatures);
@@ -145,6 +132,8 @@ function VisiumView() {
         ? "single-plot" : Object.keys(selectedFeatures).length === 2
             ? "two-plots" : Object.keys(selectedFeatures).length === 3
                 ? "three-plots" : "four-plots";
+
+    console.log("metaOptions", metaOptions);
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
@@ -161,7 +150,7 @@ function VisiumView() {
                     <Autocomplete
                         multiple
                         size="small"
-                        options={sampleOptions || []}
+                        options={sampleList || []}
                         value={selectedSamples}
                         onChange={handleSampleChange}
                         inputValue={sampleSearchText}
@@ -179,12 +168,14 @@ function VisiumView() {
                                             const newSamples = selectedSamples.filter(s => s !== option);
                                             setSelectedSamples(newSamples);
                                             updateQueryParams(selectedGenes, newSamples);
+                                            fetchImageData();
+                                            fetchMetaDataOfSample();
                                         }}
                                     />
                                 );
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard"
+                        renderInput={(params) => <TextField {...params} label="Select sample" variant="standard"
                                                             style={{margin: "10px 0px"}}/>}
                     />
 
@@ -195,11 +186,14 @@ function VisiumView() {
                         sx={{marginLeft: "20px"}}
                         multiple
                         size="small"
-                        options={geneOptions}
+                        options={geneList}
                         value={selectedGenes}
                         onChange={handleGeneChange}
                         inputValue={geneSearchText}
-                        onInputChange={(event, newInputValue) => setGeneSearchText(newInputValue)}
+                        onInputChange={(event, newInputValue) => {
+                            fetchGeneList(datasetId, newInputValue);
+                            setGeneSearchText(newInputValue)
+                        }}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => {
                                 const {key, ...tagProps} = getTagProps({index});
@@ -214,7 +208,7 @@ function VisiumView() {
                                 );
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Search Gene" variant="standard"/>}
+                        renderInput={(params) => <TextField {...params} label="Search gene" variant="standard"/>}
                     />
 
                     {/* meta selection with Fuzzy Search & Chips */}
@@ -274,13 +268,13 @@ function VisiumView() {
                         <Typography color="error">{error}</Typography>
                     ) : (
                         <div className="visium-container">
-                            {Object.keys(metaDataDict).length < 1 ? (
+                            {Object.keys(imageDataDict).length < 1 ? (
                                 <Box className="no-sample">
                                     <Typography sx={{color: "text.secondary"}} variant="h5">
                                         No sample selected for visualization
                                     </Typography>
                                 </Box>
-                            ) : Object.entries(metaDataDict).map(([sample_i, visiumData_i]) => (
+                            ) : Object.entries(imageDataDict).map(([sample_i, visiumData_i]) => (
                                 <div key={sample_i} className="sample-row">
                                     {/* Sample Label */}
                                     <div className="sample-label">
@@ -294,17 +288,12 @@ function VisiumView() {
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
                                                 <>
-                                                    {/*<div key={`${sample_i}-${feature}`} className="feature-plot">*/}
-                                                    {/*    {metaData && <FeaturePlot visiumData={visiumData_i} geneData={exprDataDict} metaData={metaData || []} feature={feature}/>}*/}
-                                                    {/*    <Typography variant="caption" display="block" align="center">*/}
-                                                    {/*        {feature}*/}
-                                                    {/*    </Typography>*/}
-                                                    {/*</div>*/}
                                                     <div key={`${sample_i}-${feature}-echart`}
                                                          className="feature-plot-echart">
-                                                        <EChartFeaturePlot visiumData={visiumData_i}
+                                                        {sampleMetaDict[sample_i] && <EChartFeaturePlot visiumData={visiumData_i}
                                                                            geneData={exprDataDict}
-                                                                           metaData={metaData || []} feature={feature}/>
+                                                                           metaData={sampleMetaDict[sample_i] || {}}
+                                                                           feature={feature}/>}
                                                         <Typography variant="caption" display="block" align="center">
                                                             {feature}
                                                         </Typography>
