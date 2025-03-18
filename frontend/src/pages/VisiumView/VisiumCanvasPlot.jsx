@@ -1,12 +1,8 @@
-import React, {useEffect, useMemo, useRef} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
-const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
-    // console.log("feature: ", feature);
-    // console.log("metaData: ", metaData);
-    // console.log("geneData: ", geneData);
-    // console.log("visiumData: ", visiumData);
+const CanvasFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
     const coordinates = visiumData.coordinates;
     const scaleFactors = visiumData.scales;
@@ -64,9 +60,9 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Get valid data values
-            const validEntries = coordinates.map(spot => ({
+            const validEntries =  Object.entries(coordinates).map(([id,spot]) => ({
                 ...spot,
-                value: featuredData[spot.cs_id] ?? 0
+                value: featuredData[id] ?? 0
             }))
             // .filter(spot => spot.value !== undefined);
             // console.log("validEntries: ", validEntries);
@@ -93,8 +89,6 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                 max = Math.max(...values);
             }
 
-            // console.log("colorMap: ", colorMap);
-            // console.log("validEntries: ", validEntries);
 
             // Color interpolation function (blue to red)
             const getColor = (value) => {
@@ -154,10 +148,10 @@ const FeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         </div>
     );
 };
-FeaturePlot.propTypes = {
+CanvasFeaturePlot.propTypes = {
     visiumData: PropTypes.object.isRequired,
     geneData: PropTypes.object.isRequired,
-    metaData: PropTypes.array.isRequired,
+    metaData: PropTypes.object.isRequired,
     feature: PropTypes.string.isRequired,
 };
-export default FeaturePlot;
+export default CanvasFeaturePlot;

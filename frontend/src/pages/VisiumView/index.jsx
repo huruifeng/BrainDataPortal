@@ -18,6 +18,7 @@ import "./VisiumView.css";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
 import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
+import CanvasFeaturePlot from "./VisiumCanvasPlot.jsx";
 
 function VisiumView() {
 
@@ -133,7 +134,7 @@ function VisiumView() {
             ? "two-plots" : Object.keys(selectedFeatures).length === 3
                 ? "three-plots" : "four-plots";
 
-    console.log("metaOptions", metaOptions);
+
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
@@ -250,7 +251,7 @@ function VisiumView() {
 
                 </div>
                 {/* Left UMAP Plot Area (80%) */}
-                <div className="plot-main">
+                <div className="plot-main" >
                     {loading ? (
                         <>
                             <Box sx={{width: '100%'}}>
