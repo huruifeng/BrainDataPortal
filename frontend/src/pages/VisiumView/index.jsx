@@ -19,6 +19,7 @@ import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
 import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
 import CanvasFeaturePlot from "./VisiumCanvasPlot.jsx";
+import PlotlyFeaturePlot from "./VisiumPlotlyPlot.jsx";
 
 function VisiumView() {
 
@@ -289,9 +290,8 @@ function VisiumView() {
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
                                                 <>
-                                                    <div key={`${sample_i}-${feature}-echart`}
-                                                         className="feature-plot-echart">
-                                                        {sampleMetaDict[sample_i] && <EChartFeaturePlot visiumData={visiumData_i}
+                                                    <div key={`${sample_i}-${feature}-echart`} className="feature-plot-echart">
+                                                        {sampleMetaDict[sample_i] && <PlotlyFeaturePlot visiumData={visiumData_i}
                                                                            geneData={exprDataDict}
                                                                            metaData={sampleMetaDict[sample_i] || {}}
                                                                            feature={feature}/>}
