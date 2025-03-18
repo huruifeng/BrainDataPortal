@@ -279,18 +279,18 @@ function VisiumView() {
                             ) : Object.entries(imageDataDict).map(([sample_i, visiumData_i]) => (
                                 <div key={sample_i} className="sample-row">
                                     {/* Sample Label */}
-                                    <div className="sample-label">
+                                    <div key={`${sample_i}-label`} className="sample-label">
                                         <Typography variant="subtitle1" align="center" sx={{mb: 1}}>
                                             Sample: {sample_i}
                                         </Typography>
                                     </div>
 
                                     {/* Features Container */}
-                                    <div className={`features-container ${plotClass}`}>
+                                    <div key={`${sample_i}-features`} className={`features-container ${plotClass}`}>
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
                                                 <>
-                                                    <div key={`${sample_i}-${feature}-echart`} className="feature-plot-echart">
+                                                    <div key={`${sample_i}-${feature}-chart`} className="feature-plot-echart">
                                                         {sampleMetaDict[sample_i] && <PlotlyFeaturePlot visiumData={visiumData_i}
                                                                            geneData={exprDataDict}
                                                                            metaData={sampleMetaDict[sample_i] || {}}
