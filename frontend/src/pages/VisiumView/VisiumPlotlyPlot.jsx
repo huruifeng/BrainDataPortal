@@ -1,18 +1,18 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import {useEffect, useRef, useState, useCallback, useMemo} from "react";
 import Plot from "react-plotly.js";
 import Plotly from "plotly.js-dist";
 import PropTypes from "prop-types";
-import { calculateMinMax, isCategorical } from "../../utils/funcs.js";
+import {calculateMinMax, isCategorical} from "../../utils/funcs.js";
 
-const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
+const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     const containerRef = useRef(null);
     const [imageUrl, setImageUrl] = useState("");
-    const [naturalDimensions, setNaturalDimensions] = useState({ width: 0, height: 0 });
+    const [naturalDimensions, setNaturalDimensions] = useState({width: 0, height: 0});
     const [displayScale, setDisplayScale] = useState(1);
 
     // Destructure visium data
-    const { coordinates, scales, image } = visiumData;
-    const { lowres } = scales;
+    const {coordinates, scales, image} = visiumData;
+    const {lowres} = scales; // only use lowres value
 
     // Load image and extract dimensions
     useEffect(() => {
@@ -22,7 +22,7 @@ const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
 
         const img = new Image();
         img.onload = () => {
-            setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+            setNaturalDimensions({width: img.naturalWidth, height: img.naturalHeight});
         };
         img.src = url;
 
@@ -85,7 +85,7 @@ const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
         if (isCat) {
             const groups = {};
             scatterData.forEach((p) => {
-                if (!groups[p.value]) groups[p.value] = { x: [], y: [], text: [] };
+                if (!groups[p.value]) groups[p.value] = {x: [], y: [], text: []};
                 groups[p.value].x.push(p.x);
                 groups[p.value].y.push(p.y);
                 groups[p.value].text.push(`${feature}: ${p.value}`);
@@ -98,7 +98,7 @@ const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
                 mode: "markers",
                 type: "scatter",
                 name: `${group}`,
-                marker: { size: 6 * displayScale, color: colorPalette[i % colorPalette.length] }
+                marker: {size: 6 * displayScale, color: colorPalette[i % colorPalette.length]}
             }));
         } else {
             return [{
@@ -140,11 +140,11 @@ const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
     const layout = useMemo(() => ({
         title: feature,
         showlegend: isCat,
-        automrgin: true,
+        // automrgin: true,
         autosize: true,
         scrollZoom: true,
-        xaxis: { showgrid: false, zeroline: false, visible: false, range: [0, naturalDimensions.width] },
-        yaxis: { showgrid: false, zeroline: false, visible: false, range: [naturalDimensions.height, 0] },
+        xaxis: {showgrid: false, zeroline: false, visible: false, range: [0, naturalDimensions.width], autornange: false},
+        yaxis: {showgrid: false, zeroline: false, visible: false, range: [naturalDimensions.height, 0], autorange: false},
         images: imageUrl ? [{
             source: imageUrl,
             x: 0, y: 0,
@@ -153,17 +153,33 @@ const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
             layer: "below",
             sizing: 'stretch',
         }] : [],
-        margin: { l: 0, r: 0, t: 0, b: 0 },
-        legend: { orientation: "v", x: 0.9, y: 0.8, itemsizing: "constant" }
+        margin: {l: 0, r: 0, t: 0, b: 0},
+        legend: {orientation: "v", x: 0.9, y: 0.8, itemsizing: "constant",bgcolor: "rgba(0,0,0,0)"},
     }), [imageUrl, naturalDimensions, feature]);
 
     const resetZoom = (gd) => {
+         // Get the container size
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+
+        // Set zoom-out level to fit the container
+        const xRange = [0, containerWidth];
+        const yRange = [containerHeight, 0];
+
+        const { width, height } = naturalDimensions;
+        console.log("Container size:",containerWidth, containerHeight);
+        console.log("Natural dimensions:",width, height);
+
+        console.log(displayScale)
 
         // Apply new range with relayout
         Plotly.relayout(gd, {
-        "xaxis.autorange": true,
-        "yaxis.autorange": "reversed"
-    });
+            'xaxis.range': xRange,
+            'yaxis.range': yRange,
+            // 'images[0].sizex': containerWidth,
+            // 'images[0].sizey': containerHeight
+        });
+
     };
 
     return (
@@ -176,10 +192,11 @@ const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
                 data={traces}
                 layout={layout}
                 useResizeHandler
-                style={{ width: "100%", height: "100%" }}
+                style={{width: "100%", height: "100%"}}
                 config={{
                     responsive: true,  // Makes it adapt to screen size
                     displaylogo: false, // Removes the Plotly logo
+                    doubleClick: false,
                     toImageButtonOptions: {
                         name: "Save as PNG",
                         format: 'png', // one of png, svg, jpeg, webp
@@ -189,6 +206,8 @@ const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
                     modeBarButtonsToRemove: [
                         "autoScale2d", // Remove auto scale
                         "resetScale2d", // Remove reset axis
+                        "select2d", // Remove 2D selection
+                        "lasso2d", // Remove Lasso selection
                     ],
                     modeBarButtonsToAdd: [
                         [
@@ -196,7 +215,7 @@ const PlotlyFeaturePlot = ({ visiumData, geneData, metaData, feature }) => {
                                 name: "Save as SVG",
                                 icon: Plotly.Icons.disk,
                                 click: function (gd) {
-                                    Plotly.downloadImage(gd, { format: "svg", filename: `svg-${feature}` });
+                                    Plotly.downloadImage(gd, {format: "svg", filename: `svg-${feature}`});
                                 },
                             },
                             {
