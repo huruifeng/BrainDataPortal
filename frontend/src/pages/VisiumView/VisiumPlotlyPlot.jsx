@@ -166,11 +166,11 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         const xRange = [0, containerWidth];
         const yRange = [containerHeight, 0];
 
-        const { width, height } = naturalDimensions;
-        console.log("Container size:",containerWidth, containerHeight);
-        console.log("Natural dimensions:",width, height);
-
-        console.log(displayScale)
+        // const { width, height } = naturalDimensions;
+        // console.log("Container size:",containerWidth, containerHeight);
+        // console.log("Natural dimensions:",width, height);
+        //
+        // console.log(displayScale)
 
         // Apply new range with relayout
         Plotly.relayout(gd, {

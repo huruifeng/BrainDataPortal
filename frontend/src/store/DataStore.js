@@ -55,7 +55,7 @@ const useDataStore = create((set) => ({
         }
     },
 
-    fetchDatasetTable: async () => {
+    fetchDatasetList: async () => {
         try {
             const response = await getDataset_get();
             // console.log(response);

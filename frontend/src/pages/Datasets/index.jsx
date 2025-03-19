@@ -7,10 +7,10 @@ import "./DatasetPage.css";
 import useDataStore from "../../store/DataStore.js";
 
 const DatasetsPage = () => {
-    const {datasetRecords,fetchDatasetTable} = useDataStore();
+    const {datasetRecords,fetchDatasetList} = useDataStore();
     useEffect(() => {
-        fetchDatasetTable()
-    }, [fetchDatasetTable]);
+        fetchDatasetList()
+    }, [fetchDatasetList]);
 
     return (
         <div className="data-page-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
