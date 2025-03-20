@@ -40,7 +40,7 @@ const SamplesDisplay = ({ dataRecords}) => {
             item.tissue.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.brain_region.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.region_level_1.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.sample_data_type.toLowerCase().includes(searchQuery.toLowerCase())
+            item.data_type.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Pagination logic: Get only the records for the current page

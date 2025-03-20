@@ -2,7 +2,7 @@ import {useEffect, useState} from "react"
 import {
     Typography, Box, Divider, Chip, IconButton, Paper,
     TextField, CircularProgress, Autocomplete, Tooltip,
-    FormControl, InputLabel, Select, MenuItem,
+    FormControl, Select, MenuItem,
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import DeleteIcon from "@mui/icons-material/Delete"
@@ -13,6 +13,15 @@ import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
 import useDataStore from "../../store/DataStore.js"
 import {toast} from "react-toastify"
 import PlotlyFeaturePlot from "../VisiumView/VisiumPlotlyPlot.jsx"
+
+function getDatasetType(datasetRecords, datasetId) {
+    for (const dataset of datasetRecords) {
+        if (dataset.dataset_id === datasetId) {
+            return dataset.assay;
+        }
+    }
+    return undefined;
+}
 
 function XDatasetsView() {
     const [queryParams, setQueryParams] = useSearchParams()
@@ -36,7 +45,7 @@ function XDatasetsView() {
     ])
 
     // Store access
-    const {datasetRecords, fetchDatasetList, getDatasetType} = useDataStore()
+    const {datasetRecords, fetchDatasetList} = useDataStore()
     const {geneList, fetchGeneList, sampleList, fetchSampleList, metaList, fetchMetaList} = useSampleGeneMetaStore()
     const {setDataset, loading, error} = useSampleGeneMetaStore()
     const {
@@ -239,11 +248,11 @@ function XDatasetsView() {
     const getEffectivePlotType = (datasetId, userSelectedType) => {
         if (!datasetId) return null
 
-        const datasetType = getDatasetType(datasetId)
+        const datasetType = getDatasetType(datasetRecords, datasetId)
 
         if (userSelectedType === "auto") {
             // Auto-select based on datast type
-            return datasetType === "VisiumST" ?  "visium" : "umap"
+            return datasetType === "VisiumST" ? "visium" : "umap"
         }
 
         return userSelectedType
@@ -252,11 +261,16 @@ function XDatasetsView() {
     // Calculate column width based on number of datasets
     const getColumnWidth = () => {
         switch (datasets.length) {
-            case 1:return "100%"
-            case 2:return "50%"
-            case 3:return "33.33%"
-            case 4:return "25%"
-            default:return "50%" // Default to 50% for two columns
+            case 1:
+                return "100%"
+            case 2:
+                return "50%"
+            case 3:
+                return "33.33%"
+            case 4:
+                return "25%"
+            default:
+                return "50%" // Default to 50% for two columns
         }
     }
 
@@ -264,12 +278,13 @@ function XDatasetsView() {
     const getAvailablePlotTypes = (datasetId) => {
         if (!datasetId) return ["auto"]
 
-        const datasetType = getDatasetType(datasetId)
+        const datasetType = getDatasetType(datasetRecords,datasetId)
 
         if (datasetType === "VisiumST") {
-            return ["auto", "umap", "visium", "both"]
+            // return ["auto","umap", "visium", "both"]
+            return ["umap", "visium"]
         } else {
-            return ["auto", "umap"]
+            return ["umap"]
         }
     }
 
@@ -325,22 +340,23 @@ function XDatasetsView() {
                                 <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1,}}>
                                     <Typography variant="subtitle1">Dataset {index + 1}: </Typography>
                                     {/* Dataset Selection */}
-                                    <Autocomplete
-                                        size="small"
+                                    <Autocomplete size="small"
                                         options={datasetRecords.map((d) => d.dataset_id) || []}
                                         value={dataset.id}
                                         onChange={(event, newValue) => handleDatasetChange(index, newValue)}
-                                        sx={{flex: 1, pr:2, pl:2,
-                                            "& .MuiInputBase-root": {height: "32px",},
+                                        sx={{
+                                            flex: 1, pr: 2, pl: 2,
+                                            "& .MuiInputBase-root": {height: "30px",},
                                             "& .MuiAutocomplete-input": {padding: "2px 4px !important",},
                                         }}
                                         renderInput={(params) => (
-                                            <TextField {...params} placeholder="Select dataset" variant="standard" />
+                                            <TextField {...params} placeholder="Select dataset" variant="standard"/>
                                         )}
                                     />
                                     <Box>
                                         {datasets.length > 1 && (
-                                            <IconButton size="small" color="error" onClick={() => handleRemoveDataset(index)}>
+                                            <IconButton size="small" color="error"
+                                                        onClick={() => handleRemoveDataset(index)}>
                                                 <DeleteIcon fontSize="small"/>
                                             </IconButton>
                                         )}
@@ -353,78 +369,102 @@ function XDatasetsView() {
                                     </Box>
                                 </Box>
 
-                                {/* Sample Selection */}
-                                <Autocomplete
-                                    size="small"
-                                    sx={{flex: 1,
-                                        "& .MuiInputBase-root": {height: "32px",marginTop: "0px"},
-                                        "& .MuiAutocomplete-input": {padding: "2px 4px !important",},
-                                        "& .MuiFormLabel-root": {transform: "translate(0px,5px) scale(1)", webkitTransform: "translate(0px,5px) scale(1)",},
-                                    }}
-                                    options={sampleList || []}
-                                    value={dataset.sample}
-                                    onChange={(event, newValue) => handleSampleChange(index, newValue)}
-                                    disabled={!dataset.id}
-                                    renderInput={(params) => (
-                                        <TextField {...params} label="Select sample" variant="standard"/>
-                                    )}
-                                />
-
-                                {/* Plot Type Selection */}
-                                <FormControl fullWidth margin="dense" size="small" disabled={!dataset.id}>
-                                    <Select
-                                        value={dataset.plotType}
-                                        label="Plot Type"
-                                        variant="standard"
+                                {/* Sample Selection Row */}
+                                <Box sx={{display: "flex", alignItems: "center", mb: 1}}>
+                                    <Typography variant="subtitle1" sx={{minWidth: "80px"}}>Sample:{" "}</Typography>
+                                    <Autocomplete size="small"
                                         sx={{
-                                            height: "32px",
-                                            "& .MuiSelect-select": {padding: "2px 8px",},
+                                            flex: 1,
+                                            "& .MuiInputBase-root": {height: "30px", marginTop: "0px"},
+                                            "& .MuiAutocomplete-input": {padding: "2px 4px !important"},
                                         }}
-                                        onChange={(e) => handlePlotTypeChange(index, e.target.value)}
-                                    >
-                                        {getAvailablePlotTypes(dataset.id).map((type) => (
-                                            <MenuItem key={type} value={type}>
-                                                {type === "auto" ? "UMAP" : type === "umap" ? "UMAP" : type === "visium" ? "Visium" : "Both UMAP & Visium"}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                        options={sampleList || []}
+                                        value={dataset.sample}
+                                        onChange={(event, newValue) => handleSampleChange(index, newValue)}
+                                        disabled={!dataset.id}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                placeholder="Select sample"
+                                                variant="standard"
+                                                InputLabelProps={{shrink: false}}
+                                            />
+                                        )}
+                                    />
+                                </Box>
+
+                                {/* Plot Type Selection Row */}
+                                <Box sx={{display: "flex", alignItems: "center", mb: 1}}>
+                                    <Typography variant="subtitle1" sx={{minWidth: "80px"}}>Plot Type:{" "}</Typography>
+                                    <FormControl fullWidth size="small" disabled={!dataset.id} sx={{flex: 1}}>
+                                        <Select
+                                            value={dataset.plotType}
+                                            displayEmpty
+                                            variant="standard"
+                                            sx={{
+                                                height: "30px",
+                                                "& .MuiSelect-select": {padding: "2px 8px"},
+                                            }}
+                                            onChange={(e) => handlePlotTypeChange(index, e.target.value)}
+                                        >
+                                            {getAvailablePlotTypes(dataset.id).map((type) => (
+                                                <MenuItem key={type} value={type}>
+                                                    {type === "auto" ? "Auto" : type === "umap" ? "UMAP" : type === "visium" ? "Visium" : "Both UMAP & Visium"}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
 
                                 {/* Feature Selection */}
-                                <Autocomplete
-                                    multiple
-                                    size="small"
-                                    sx={{flex: 1,
-                                        "& .MuiInputBase-root": {height: "32px",marginTop: "0px"},
-                                        "& .MuiAutocomplete-input": {padding: "2px 4px !important",},
-                                        "& .MuiFormLabel-root": {transform: "translate(0px,5px) scale(1)",},
-                                    }}
-                                    options={getAvailableFeaturesForDataset()}
-                                    value={dataset.features}
-                                    onChange={(event, newValue) => handleFeaturesChange(index, newValue)}
-                                    disabled={!dataset.id}
-                                    renderTags={(value, getTagProps) =>
-                                        value.map((option, i) => {
-                                            const {key, ...tagProps} = getTagProps({index: i})
-                                            return (
-                                                <Chip
-                                                    key={`${key}-${option}`}
-                                                    label={option}
-                                                    {...tagProps}
-                                                    color="primary"
-                                                    size="small"
-                                                    onDelete={() => {
-                                                        const newFeatures = dataset.features.filter((f) => f !== option)
-                                                        handleFeaturesChange(index, newFeatures)
-                                                    }}
-                                                />
-                                            )
-                                        })
-                                    }
-                                    renderInput={(params) => (
-                                        <TextField {...params} label="Select features" variant="standard" />
-                                    )}
-                                />
+                                {/* Feature Selection Row */}
+                                <Box sx={{display: "flex", alignItems: "flex-start", mb: 1}}>
+                                    <Typography variant="subtitle1" sx={{minWidth: "80px", mt: 0.5}}>
+                                        Features:{" "}
+                                    </Typography>
+                                    <Autocomplete
+                                        multiple
+                                        size="small"
+                                        sx={{
+                                            flex: 1,
+                                            "& .MuiInputBase-root": {
+                                                minHeight: "32px",
+                                                marginTop: "0px",
+                                            },
+                                            "& .MuiAutocomplete-input": {padding: "2px 4px !important"},
+                                        }}
+                                        options={getAvailableFeaturesForDataset()}
+                                        value={dataset.features}
+                                        onChange={(event, newValue) => handleFeaturesChange(index, newValue)}
+                                        disabled={!dataset.id}
+                                        renderTags={(value, getTagProps) =>
+                                            value.map((option, i) => {
+                                                const {key, ...tagProps} = getTagProps({index: i})
+                                                return (
+                                                    <Chip
+                                                        key={`${key}-${option}`}
+                                                        label={option}
+                                                        {...tagProps}
+                                                        color="primary"
+                                                        size="small"
+                                                        onDelete={() => {
+                                                            const newFeatures = dataset.features.filter((f) => f !== option)
+                                                            handleFeaturesChange(index, newFeatures)
+                                                        }}
+                                                    />
+                                                )
+                                            })
+                                        }
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                placeholder="Select features"
+                                                variant="standard"
+                                                InputLabelProps={{shrink: false}}
+                                            />
+                                        )}
+                                    />
+                                </Box>
                             </Paper>
 
                             {/* Feature Plots */}
@@ -432,15 +472,15 @@ function XDatasetsView() {
                                 {/* Dataset-specific loading indicator */}
                                 {dataset.isLoading && (
                                     <Box sx={{
-                                            position: "absolute",
-                                            top: 0, left: 0, right: 0, bottom: 0,
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            backgroundColor: "rgba(255, 255, 255, 0.7)",
-                                            zIndex: 10,
-                                        }}
+                                        position: "absolute",
+                                        top: 0, left: 0, right: 0, bottom: 0,
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor: "rgba(255, 255, 255, 0.7)",
+                                        zIndex: 10,
+                                    }}
                                     >
                                         <CircularProgress/>
                                         <Typography variant="body2" sx={{mt: 2}}>
@@ -462,19 +502,36 @@ function XDatasetsView() {
 
                                                     {/* UMAP Plot */}
                                                     {(effectivePlotType === "umap" || effectivePlotType === "both") && (
-                                                        <Box sx={{height: 250, mb: effectivePlotType === "both" ? 2 : 0,}}>
-                                                            <Typography variant="caption" sx={{display: "block", mb: 1}}>
+                                                        <Box sx={{
+                                                            height: 250,
+                                                            mb: effectivePlotType === "both" ? 2 : 0,
+                                                        }}>
+                                                            <Typography variant="caption"
+                                                                        sx={{display: "block", mb: 1}}>
                                                                 UMAP View
                                                             </Typography>
                                                             {imageDataDict[dataset.sample] && sampleMetaDict[dataset.sample] ? (
                                                                 <div>
                                                                     {/* Replace with your actual UMAP component */}
-                                                                    <Box sx={{height: 220, bgcolor: "#f0f0f0", display: "flex", justifyContent: "center", alignItems: "center",}}>
+                                                                    <Box sx={{
+                                                                        height: 220,
+                                                                        bgcolor: "#f0f0f0",
+                                                                        display: "flex",
+                                                                        justifyContent: "center",
+                                                                        alignItems: "center",
+                                                                    }}>
                                                                         UMAP Plot for {feature}
                                                                     </Box>
                                                                 </div>
                                                             ) : (
-                                                                <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                                                <Box sx={{
+                                                                    display: "flex",
+                                                                    justifyContent: "center",
+                                                                    alignItems: "center",
+                                                                    height: "100%",
+                                                                    bgcolor: "#f5f5f5",
+                                                                    borderRadius: 1,
+                                                                }}>
                                                                     <Typography variant="body2" color="text.secondary">
                                                                         No UMAP data available
                                                                     </Typography>
@@ -486,7 +543,8 @@ function XDatasetsView() {
                                                     {/* Visium Plot */}
                                                     {(effectivePlotType === "visium" || effectivePlotType === "both") && (
                                                         <Box sx={{height: 250}}>
-                                                            <Typography variant="caption" sx={{display: "block", mb: 1}}>
+                                                            <Typography variant="caption"
+                                                                        sx={{display: "block", mb: 1}}>
                                                                 Visium View
                                                             </Typography>
                                                             {imageDataDict[dataset.sample] && sampleMetaDict[dataset.sample] ? (
@@ -497,7 +555,14 @@ function XDatasetsView() {
                                                                     feature={feature}
                                                                 />
                                                             ) : (
-                                                                <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                                                <Box sx={{
+                                                                    display: "flex",
+                                                                    justifyContent: "center",
+                                                                    alignItems: "center",
+                                                                    height: "100%",
+                                                                    bgcolor: "#f5f5f5",
+                                                                    borderRadius: 1,
+                                                                }}>
                                                                     <Typography variant="body2" color="text.secondary">
                                                                         No Visium data available
                                                                     </Typography>
@@ -509,14 +574,28 @@ function XDatasetsView() {
                                             )
                                         })
                                     ) : (
-                                        <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: 200, bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                        <Box sx={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            height: 200,
+                                            bgcolor: "#f5f5f5",
+                                            borderRadius: 1,
+                                        }}>
                                             <Typography variant="body1" color="text.secondary">
                                                 No features selected
                                             </Typography>
                                         </Box>
                                     )
                                 ) : (
-                                    <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: 200, bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                    <Box sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        height: 200,
+                                        bgcolor: "#f5f5f5",
+                                        borderRadius: 1,
+                                    }}>
                                         <Typography variant="body1" color="text.secondary">
                                             {dataset.id ? "Select a sample" : "Select a dataset"}
                                         </Typography>
