@@ -679,7 +679,7 @@ function XDatasetsView() {
                                             )}
                                         />
                                         <Box>
-                                            {datasets.length > 1 && (
+                                            {datasets.length > 2 && (
                                                 <IconButton size="small" color="error"
                                                             onClick={() => handleRemoveDataset(index)}>
                                                     <DeleteIcon fontSize="small"/>
