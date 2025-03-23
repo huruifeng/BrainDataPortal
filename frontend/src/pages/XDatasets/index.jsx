@@ -75,10 +75,7 @@ function XDatasetsView() {
     const {
         fetchGeneList, fetchSampleList, fetchMetaList,
         setDataset, loading, error,
-        fetchUMAPData, fetchAllMetaData,
-        exprDataDict, fetchExprData,
-        sampleMetaDict, fetchMetaDataOfSample,
-        imageDataDict, fetchImageData,
+        fetchUMAPData, fetchAllMetaData, fetchExprData,fetchMetaDataOfSample, fetchImageData,
     } = useSampleGeneMetaStore()
 
     // Load initial data
@@ -865,37 +862,26 @@ function XDatasetsView() {
 
                                                 return (
                                                     <Paper key={`${dataset.id}-${feature}`} sx={{p: 1}}>
-                                                        <Typography variant="body2" sx={{
-                                                            mb: 1,
-                                                            fontWeight: "bold"
-                                                        }}>{feature}</Typography>
+                                                        <Typography variant="body2" sx={{mb: 1, fontWeight: "bold"}}>{feature}</Typography>
 
                                                         {/* UMAP Plot */}
                                                         {(effectivePlotType === "umap" || effectivePlotType === "both") && (
                                                             <Box className="feature-plot">
                                                                 {/*<Typography variant="caption" sx={{display: "block", mb: 1}}>UMAP View</Typography>*/}
-                                                                {imageDataDict[dataset.sample] && sampleMetaDict[dataset.sample] ? (
+                                                                {plotData &&
+                                                                plotData[dataset.id] &&
+                                                                plotData[dataset.id]["umapdata"] &&
+                                                                plotData[dataset.id]["exprdict"] &&
+                                                                plotData[dataset.id]["allmetadata"]? (
                                                                     <div>
                                                                         {/* Replace with your actual UMAP component */}
-                                                                        <Box sx={{
-                                                                            display: "flex",
-                                                                            justifyContent: "center",
-                                                                            alignItems: "center",
-                                                                        }}>
+                                                                        <Box sx={{display: "flex", justifyContent: "center", alignItems: "center",}}>
                                                                             UMAP Plot for {feature}
                                                                         </Box>
                                                                     </div>
                                                                 ) : (
-                                                                    <Box sx={{
-                                                                        display: "flex",
-                                                                        justifyContent: "center",
-                                                                        alignItems: "center",
-                                                                        height: "100%",
-                                                                        borderRadius: 1,
-                                                                    }}>
-                                                                        <Typography variant="body2"
-                                                                                    color="text.secondary">No UMAP data
-                                                                            available</Typography>
+                                                                    <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", borderRadius: 1,}}>
+                                                                        <Typography variant="body2" color="text.secondary">No UMAP data available</Typography>
                                                                     </Box>
                                                                 )}
                                                             </Box>
@@ -905,11 +891,16 @@ function XDatasetsView() {
                                                         {(effectivePlotType === "visium" || effectivePlotType === "both") && (
                                                             <Box className="feature-plot">
                                                                 {/*<Typography variant="caption" sx={{display: "block", mb: 1}}>Visium View</Typography>*/}
-                                                                {imageDataDict[dataset.sample] && sampleMetaDict[dataset.sample] ? (
+                                                                {plotData &&
+                                                                plotData[dataset.id] &&
+                                                                plotData[dataset.id]["imagedict"] &&
+                                                                plotData[dataset.id]["imagedict"][dataset.sample] &&
+                                                                plotData[dataset.id]["metadict"] &&
+                                                                plotData[dataset.id]["metadict"][dataset.sample] ? (
                                                                     <PlotlyFeaturePlot
-                                                                        visiumData={imageDataDict[dataset.sample]}
-                                                                        geneData={exprDataDict}
-                                                                        metaData={sampleMetaDict[dataset.sample] || {}}
+                                                                        visiumData={plotData[dataset.id]["imagedict"][dataset.sample]}
+                                                                        geneData={plotData[dataset.id]["exprdict"]}
+                                                                        metaData={plotData[dataset.id]["metadict"][dataset.sample] || {}}
                                                                         feature={feature}
                                                                     />
                                                                 ) : (

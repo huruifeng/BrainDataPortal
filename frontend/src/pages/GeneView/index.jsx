@@ -1,13 +1,7 @@
 import {useEffect, useState} from "react";
 import {
-    Typography,
-    Box,
-    Divider,
-    CircularProgress,
-    Autocomplete,
-    Chip,
-    TextField,
-    Button,
+    Typography, Box, Divider, CircularProgress, Autocomplete,
+    Chip, TextField, Button,
     LinearProgress, InputLabel, FormControl, Select, MenuItem
 } from "@mui/material";
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
@@ -211,13 +205,11 @@ function GeneView() {
                                 );
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard"
-                                                            style={{margin: "10px 0px"}}/>}
+                        renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard" style={{margin: "10px 0px"}}/>}
                     />
 
 
-                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting
-                        options:</Typography>
+                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting options:</Typography>
 
                     {selectedGenes.length === 0 ?
                         // *a dropdown to select the options on how to color the plot*/
@@ -235,15 +227,9 @@ function GeneView() {
                                     {metaList && metaList.length > 0 ? (
                                         metaList
                                         .filter(option => !excludedKeys.has(option)) // Remove excluded keys first
-                                        .map(option => (
-                                            <MenuItem key={option} value={option}>
-                                                {option}
-                                            </MenuItem>
-                                        ))
+                                        .map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))
                                     ) : (
-                                        <MenuItem disabled>
-                                            {loading ? "Loading metadata..." : "No metadata available"}
-                                        </MenuItem>
+                                        <MenuItem disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>
                                     )}
                                 </Select>
                             </FormControl>
@@ -251,12 +237,7 @@ function GeneView() {
                         :
                         /*a dropdown to select the options on how to group the data*/
                         <>
-                            <Box sx={{
-                                display: "flex",
-                                justifyContent: "start",
-                                marginBottom: "10px",
-                                marginLeft: "20px"
-                            }}>
+                            <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
                                     <InputLabel id="grouping-label">Gene grouping</InputLabel>
                                     <Select
@@ -271,24 +252,15 @@ function GeneView() {
                                             metaList.map((option) => {
                                                 const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
                                                 if (excludedKeys.has(option)) return null;
-                                                return (<MenuItem key={option} value={option}>
-                                                    {option}
-                                                </MenuItem>)
+                                                return (<MenuItem key={option} value={option}>{option}</MenuItem>)
                                             })
                                         ) : (
-                                            <MenuItem disabled>
-                                                {loading ? "Loading metadata..." : "No metadata available"}
-                                            </MenuItem>
+                                            <MenuItem disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>
                                         )}
                                     </Select>
                                 </FormControl>
                             </Box>
-                            <Box sx={{
-                                display: "flex",
-                                justifyContent: "start",
-                                marginBottom: "10px",
-                                marginLeft: "20px"
-                            }}>
+                            <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
                                     <InputLabel id="valuetype-select-label">Value type</InputLabel>
                                     <Select
@@ -308,27 +280,20 @@ function GeneView() {
 
                     {/* a button to fetch data and a loading indicator*/}
                     <Box sx={{display: "flex", justifyContent: "center", margin: "20px 0px"}}>
-                        <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading}
-                                onClick={handleLoadPlot}>
+                        <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading} onClick={handleLoadPlot}>
                             {loading ? "Loading plots..." : "Refresh Plots"}
                         </Button>
                     </Box>
 
                 </div>
-                {/* Left UMAP Plot Area (80%) */
-                }
+                {/* Left UMAP Plot Area (80%) */}
                 <div className="plot-main">
                     {loading ? (
                         <>
-                            <Box sx={{width: '100%'}}>
-                                <LinearProgress/>
-                            </Box>
-                            <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
-                                <CircularProgress/>
-                            </Box>
+                            <Box sx={{width: '100%'}}><LinearProgress/></Box>
+                            <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}><CircularProgress/></Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
-                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading
-                                    data...</Typography>
+                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading data...</Typography>
                             </Box>
                         </>
                     ) : error ? (
@@ -350,8 +315,7 @@ function GeneView() {
                                 ))}
                             </div>
 
-                            {Object.keys(exprDataDict).length >= 1 &&
-                                <Divider sx={{marginTop: "10px"}} flexItem>Gene Expression Plots</Divider>}
+                            {Object.keys(exprDataDict).length >= 1 && <Divider sx={{marginTop: "10px"}} flexItem>Gene Expression Plots</Divider>}
 
                             {/*gene expression/meta plot*/}
                             {allMetaData && <GeneMetaPlots sampleList={selectedSamples}
