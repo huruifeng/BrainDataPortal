@@ -25,6 +25,7 @@ import {toast} from "react-toastify"
 import PlotlyFeaturePlot from "../VisiumView/VisiumPlotlyPlot.jsx"
 
 import "./XDatasets.css"
+import EChartScatterPlot from "../GeneView/EChartScatter.jsx";
 
 function getDatasetType(datasetRecords, datasetId) {
     for (const dataset of datasetRecords) {
@@ -75,7 +76,7 @@ function XDatasetsView() {
     const {
         fetchGeneList, fetchSampleList, fetchMetaList,
         setDataset, loading, error,
-        fetchUMAPData, fetchAllMetaData, fetchExprData,fetchMetaDataOfSample, fetchImageData,
+        fetchUMAPData, fetchAllMetaData, fetchExprData, fetchMetaDataOfSample, fetchImageData,
     } = useSampleGeneMetaStore()
 
     // Load initial data
@@ -872,12 +873,17 @@ function XDatasetsView() {
                                                                 plotData[dataset.id] &&
                                                                 plotData[dataset.id]["umapdata"] &&
                                                                 plotData[dataset.id]["exprdict"] &&
-                                                                plotData[dataset.id]["allmetadata"]? (
-                                                                    <div>
-                                                                        {/* Replace with your actual UMAP component */}
-                                                                        <Box sx={{display: "flex", justifyContent: "center", alignItems: "center",}}>
-                                                                            UMAP Plot for {feature}
-                                                                        </Box>
+                                                                plotData[dataset.id]["allmetadata"] ? (
+                                                                    <div key={`${dataset.id}-${feature}`} className="umap-item">
+                                                                        <div className="umap-wrapper">
+                                                                            <EChartScatterPlot
+                                                                                gene={feature}
+                                                                                sampleList={[dataset.sample]}
+                                                                                umapData={plotData[dataset.id]["umapdata"]}
+                                                                                exprData={plotData[dataset.id]["exprdict"][feature]}
+                                                                                metaData={plotData[dataset.id]["allmetadata"]}
+                                                                                group={feature}/>
+                                                                        </div>
                                                                     </div>
                                                                 ) : (
                                                                     <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", borderRadius: 1,}}>
@@ -904,17 +910,8 @@ function XDatasetsView() {
                                                                         feature={feature}
                                                                     />
                                                                 ) : (
-                                                                    <Box sx={{
-                                                                        display: "flex",
-                                                                        justifyContent: "center",
-                                                                        alignItems: "center",
-                                                                        height: "100%",
-                                                                        bgcolor: "#f5f5f5",
-                                                                        borderRadius: 1,
-                                                                    }}>
-                                                                        <Typography variant="body2"
-                                                                                    color="text.secondary">No Visium
-                                                                            data available</Typography>
+                                                                    <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                                                        <Typography variant="body2" color="text.secondary">No Visium data available</Typography>
                                                                     </Box>
                                                                 )}
                                                             </Box>
@@ -923,27 +920,12 @@ function XDatasetsView() {
                                                 )
                                             })
                                         ) : (
-                                            <Box sx={{
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                height: 200,
-                                                bgcolor: "#f5f5f5",
-                                                borderRadius: 1,
-                                            }}>
-                                                <Typography variant="body1" color="text.secondary">No features
-                                                    selected</Typography>
+                                            <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: 200, bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                                <Typography variant="body1" color="text.secondary">No features selected</Typography>
                                             </Box>
                                         )
                                     ) : (
-                                        <Box sx={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            height: 200,
-                                            bgcolor: "#f5f5f5",
-                                            borderRadius: 1,
-                                        }}>
+                                        <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: 200, bgcolor: "#f5f5f5", borderRadius: 1,}}>
                                             <Typography variant="body1" color="text.secondary">
                                                 {dataset.id ? "Select a sample" : "Select a dataset"}
                                             </Typography>
