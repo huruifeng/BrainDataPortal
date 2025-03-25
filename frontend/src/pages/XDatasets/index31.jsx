@@ -959,9 +959,7 @@ function XDatasetsView() {
                                                         ...params.InputProps,
                                                         endAdornment: (
                                                             <>
-                                                                {featureSearchLoading[dataset.id] ? (
-                                                                    <CircularProgress color="inherit" size={20}/>
-                                                                ) : null}
+                                                                {featureSearchLoading[dataset.id] ? (<CircularProgress color="inherit" size={20}/>) : null}
                                                                 {params.InputProps.endAdornment}
                                                             </>
                                                         ),
@@ -978,23 +976,13 @@ function XDatasetsView() {
                                     {dataset.isLoading && (
                                         <Box
                                             sx={{
-                                                position: "absolute",
-                                                top: 0,
-                                                left: 0,
-                                                right: 0,
-                                                bottom: 0,
-                                                zIndex: 10,
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                justifyContent: "center",
-                                                alignItems: "center",
+                                                position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10,
+                                                display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
                                                 backgroundColor: "rgba(255, 255, 255, 0.7)",
                                             }}
                                         >
                                             <CircularProgress/>
-                                            <Typography variant="body2" sx={{mt: 2}}>
-                                                Loading data...
-                                            </Typography>
+                                            <Typography variant="body2" sx={{mt: 2}}>Loading data...</Typography>
                                         </Box>
                                     )}
 
@@ -1005,15 +993,7 @@ function XDatasetsView() {
 
                                                 return (
                                                     <Paper key={`${dataset.id}-${feature}`} sx={{p: 1}}>
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{
-                                                                mb: 1,
-                                                                fontWeight: "bold",
-                                                            }}
-                                                        >
-                                                            {feature}
-                                                        </Typography>
+                                                        <Typography variant="body2" sx={{mb: 1, fontWeight: "bold",}}>{feature}</Typography>
 
                                                         {/* UMAP Plot */}
                                                         {(effectivePlotType === "umap" || effectivePlotType === "both") && (
@@ -1037,19 +1017,8 @@ function XDatasetsView() {
                                                                         // If we don't have expression data for this feature, show a message
                                                                         if (!gene_expr && feature !== "all") {
                                                                             return (
-                                                                                <Box
-                                                                                    sx={{
-                                                                                        display: "flex",
-                                                                                        justifyContent: "center",
-                                                                                        alignItems: "center",
-                                                                                        height: "100%",
-                                                                                        borderRadius: 1,
-                                                                                    }}
-                                                                                >
-                                                                                    <Typography variant="body2"
-                                                                                                color="text.secondary">
-                                                                                        No expression data for {feature}
-                                                                                    </Typography>
+                                                                                <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", borderRadius: 1,}}>
+                                                                                    <Typography variant="body2" color="text.secondary">No expression data for {feature}</Typography>
                                                                                 </Box>
                                                                             )
                                                                         }
@@ -1070,19 +1039,8 @@ function XDatasetsView() {
                                                                         )
                                                                     })()
                                                                 ) : (
-                                                                    <Box
-                                                                        sx={{
-                                                                            display: "flex",
-                                                                            justifyContent: "center",
-                                                                            alignItems: "center",
-                                                                            height: "100%",
-                                                                            borderRadius: 1,
-                                                                        }}
-                                                                    >
-                                                                        <Typography variant="body2"
-                                                                                    color="text.secondary">
-                                                                            Loading UMAP data...
-                                                                        </Typography>
+                                                                   <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", borderRadius: 1,}}>
+                                                                        <Typography variant="body2" color="text.secondary">Loading UMAP data...</Typography>
                                                                     </Box>
                                                                 )}
                                                             </Box>
@@ -1094,25 +1052,11 @@ function XDatasetsView() {
                                                                 {plotData &&
                                                                 plotData[dataset.id] &&
                                                                 plotData[dataset.id]["imagedict"] &&
-                                                                plotData[dataset.id]["imagedict"][dataset.sample] &&
-                                                                plotData[dataset.id]["metadict"] &&
-                                                                plotData[dataset.id]["metadict"][dataset.sample] ? (
+                                                                plotData[dataset.id]["metadict"] ? (
                                                                     dataset.sample === "all" ? (
-                                                                        <Typography variant="body2"
-                                                                                    color="text.secondary">
-                                                                            Please select a specific sample.
-                                                                        </Typography>
+                                                                        <Typography variant="body2" color="text.secondary">Please select a specific sample.</Typography>
                                                                     ) : (
                                                                         (() => {
-                                                                            console.log(
-                                                                                `Rendering Visium for dataset ${dataset.id}, sample ${dataset.sample}, feature ${feature}:`,
-                                                                                {
-                                                                                    hasImageData: !!plotData[dataset.id]["imagedict"][dataset.sample],
-                                                                                    hasMetaData: !!plotData[dataset.id]["metadict"][dataset.sample],
-                                                                                    hasExprData: !!plotData[dataset.id]["exprdict"],
-                                                                                },
-                                                                            )
-
                                                                             return (
                                                                                 <div className="visium-item">
                                                                                     <div className="visium-wrapper">
@@ -1128,20 +1072,8 @@ function XDatasetsView() {
                                                                         })()
                                                                     )
                                                                 ) : (
-                                                                    <Box
-                                                                        sx={{
-                                                                            display: "flex",
-                                                                            flexDirection: "column",
-                                                                            justifyContent: "center",
-                                                                            alignItems: "center",
-                                                                            height: "100%",
-                                                                            bgcolor: "#f5f5f5",
-                                                                            borderRadius: 1,
-                                                                            padding: 2,
-                                                                        }}
-                                                                    >
-                                                                        <Typography variant="body2"
-                                                                                    color="text.secondary" sx={{mb: 1}}>
+                                                                    <Box sx={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100%", bgcolor: "#f5f5f5", borderRadius: 1, padding: 2,}}>
+                                                                        <Typography variant="body2" color="text.secondary" sx={{mb: 1}}>
                                                                             {!plotData[dataset.id]?.imagedict
                                                                                 ? "Image data not loaded"
                                                                                 : !plotData[dataset.id]?.imagedict[dataset.sample]
@@ -1164,35 +1096,13 @@ function XDatasetsView() {
                                                 )
                                             })
                                         ) : (
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    height: 200,
-                                                    bgcolor: "#f5f5f5",
-                                                    borderRadius: 1,
-                                                }}
-                                            >
-                                                <Typography variant="body1" color="text.secondary">
-                                                    No features selected
-                                                </Typography>
+                                            <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: 200, bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                                <Typography variant="body1" color="text.secondary">No features selected</Typography>
                                             </Box>
                                         )
                                     ) : (
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                height: 200,
-                                                bgcolor: "#f5f5f5",
-                                                borderRadius: 1,
-                                            }}
-                                        >
-                                            <Typography variant="body1" color="text.secondary">
-                                                {dataset.id ? "Select a sample" : "Select a dataset"}
-                                            </Typography>
+                                        <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: 200, bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                            <Typography variant="body1" color="text.secondary">{dataset.id ? "Select a sample" : "Select a dataset"}</Typography>
                                         </Box>
                                     )}
                                 </Box>
