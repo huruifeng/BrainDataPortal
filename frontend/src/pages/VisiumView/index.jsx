@@ -18,6 +18,8 @@ import "./VisiumView.css";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
 import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
+import CanvasFeaturePlot from "./VisiumCanvasPlot.jsx";
+import PlotlyFeaturePlot from "./VisiumPlotlyPlot.jsx";
 
 function VisiumView() {
 
@@ -133,7 +135,7 @@ function VisiumView() {
             ? "two-plots" : Object.keys(selectedFeatures).length === 3
                 ? "three-plots" : "four-plots";
 
-    console.log("metaOptions", metaOptions);
+
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
@@ -250,7 +252,7 @@ function VisiumView() {
 
                 </div>
                 {/* Left UMAP Plot Area (80%) */}
-                <div className="plot-main">
+                <div className="plot-main" >
                     {loading ? (
                         <>
                             <Box sx={{width: '100%'}}>
@@ -277,20 +279,19 @@ function VisiumView() {
                             ) : Object.entries(imageDataDict).map(([sample_i, visiumData_i]) => (
                                 <div key={sample_i} className="sample-row">
                                     {/* Sample Label */}
-                                    <div className="sample-label">
+                                    <div key={`${sample_i}-label`} className="sample-label">
                                         <Typography variant="subtitle1" align="center" sx={{mb: 1}}>
                                             Sample: {sample_i}
                                         </Typography>
                                     </div>
 
                                     {/* Features Container */}
-                                    <div className={`features-container ${plotClass}`}>
+                                    <div key={`${sample_i}-features`} className={`features-container ${plotClass}`}>
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
                                                 <>
-                                                    <div key={`${sample_i}-${feature}-echart`}
-                                                         className="feature-plot-echart">
-                                                        {sampleMetaDict[sample_i] && <EChartFeaturePlot visiumData={visiumData_i}
+                                                    <div key={`${sample_i}-${feature}-chart`} className="feature-plot-echart">
+                                                        {sampleMetaDict[sample_i] && <PlotlyFeaturePlot visiumData={visiumData_i}
                                                                            geneData={exprDataDict}
                                                                            metaData={sampleMetaDict[sample_i] || {}}
                                                                            feature={feature}/>}

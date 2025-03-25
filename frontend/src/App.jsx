@@ -16,6 +16,7 @@ import UnauthorizedPage from "./pages/Unauthorized/index.jsx";
 import {Bounce, ToastContainer} from "react-toastify";
 import GeneView from "./pages/GeneView";
 import VisiumView from "./pages/VisiumView";
+import XDatasetsView from "./pages/XDatasets";
 
 
 
@@ -47,6 +48,7 @@ function App() {
                       <Route path="/" element={<Home />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/datasets" element={<DatasetsPage />} />
+                      <Route path="/xcheck" element={<XDatasetsView />} />
 
                       <Route path="/samples" element={<Navigate to="/samples/all" replace />} />
                       <Route path="/samples/:dataset_id" element={<SamplesPage />} />

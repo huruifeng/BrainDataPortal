@@ -73,6 +73,10 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
             title: 'Stacked Plot',
             margin: {t: 5, b: 50, l: 50, r: 50}, // Reduce white space
             annotations: [],
+            yaxis: {
+                // type: type === "boxplot" ? "log" : "-",
+                // dtick: type === "boxplot" ? Math.log10(2) : "auto",
+              }
         };
 
         genes.forEach((gene, index) => {

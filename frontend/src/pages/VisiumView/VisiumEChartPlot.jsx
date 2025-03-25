@@ -120,6 +120,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     }, [coordinates, hires, displayScale, featuredData]);
 
     let mySeries = [];
+    let legendData = [];
     if (isCat) {
         const groupedData = {};
         scatterData.forEach((p) => {
@@ -130,6 +131,8 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         });
         // console.log("groupedData: ", groupedData);
         const groupNames = Object.keys(groupedData);
+        legendData = groupNames;
+
         mySeries = groupNames.map((group_i, index) => {
             return {
                 name: `${group_i}`,
@@ -139,7 +142,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                 symbolSize: 6 * displayScale,
                 itemStyle: {
                     borderColor: '#fff',
-                    borderWidth: 0 * displayScale,
+                    borderWidth: 0.1 * displayScale,
                     color: colorPalette[index % colorPalette.length]
                 },
                 emphasis: {
@@ -159,7 +162,7 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             symbolSize: 6 * displayScale,
             itemStyle: {
                 borderColor: '#fff',
-                borderWidth: 0 * displayScale
+                borderWidth: 0.1 * displayScale
             },
             emphasis: {
                 itemStyle: {
@@ -173,31 +176,46 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
 
     // ECharts configuration
     const option = useMemo(() => ({
-        // =====================
-        // !!!!! This grid configuration is very important !!!!!
-        // The grid configuration aligns the scatter plot with the image
-        // =====================
-        grid: {top: 0, left: 0, right: 0, bottom: 0, containLabel: false},
-        xAxis: {show: false, min: 0, max: naturalDimensions.width},
-        yAxis: {show: false, min: 0, max: naturalDimensions.height, inverse: true},
-        graphic: [{
-            type: 'image',
-            left: 0,
-            top: 0,
-            style: {
-                image: imageUrl,
-                width: naturalDimensions.width * displayScale,
-                height: naturalDimensions.height * displayScale
+            // =====================
+            // !!!!! This grid configuration is very important !!!!!
+            // The grid configuration aligns the scatter plot with the image
+            // =====================
+            grid: {top: 0, left: 0, right: 0, bottom: 0, containLabel: false},
+            xAxis: {show: false, min: 0, max: naturalDimensions.width},
+            yAxis: {show: false, min: 0, max: naturalDimensions.height, inverse: true},
+            graphic: [{
+                type: 'image',
+                left: 0,
+                top: 0,
+                style: {
+                    image: imageUrl,
+                    width: naturalDimensions.width * displayScale,
+                    height: naturalDimensions.height * displayScale
+                },
+                z: 0
+            }],
+            tooltip: {
+                trigger: 'item',
+                formatter: params =>
+                    `ID: ${params.name}<br/>${feature}: ${params.value[2]}`
             },
-            z: 0
-        }],
-        tooltip: {
-            trigger: 'item',
-            formatter: params =>
-                `ID: ${params.name}<br/>${feature}: ${params.value[2]}`
-        },
-        series: mySeries
-    }), [scatterData, displayScale, imageUrl, minFeature, maxFeature, feature, naturalDimensions]);
+            toolbox: {
+                show: true,
+                showTitle: false, // hide the default text so they don't overlap each other
+                feature: {
+                    saveAsImage: {
+                        show: true,
+                        title: 'Save As Image',
+                        name: `${feature}`,
+
+                    },
+                },
+            },
+            series: mySeries,
+            // dataZoom: [{type: 'inside', xAxisIndex: 0, yAxisIndex: 0},],
+            brush: {toolbox: ['rect', 'polygon', 'clear']},
+        }
+), [scatterData, displayScale, imageUrl, minFeature, maxFeature, feature, naturalDimensions]);
 
     if (!isCat) {
         option.visualMap = {
@@ -211,6 +229,14 @@ const EChartFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                 // color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
                 color: ['#5d4ea8', '#58b2ac', '#fcfeba', "#f6804b", '#9e0341']
             }
+        }
+    } else {
+        option.legend = {
+            orient: 'vertical',
+            left: 'right',
+            top: 'center',
+            show: true,
+            data: legendData
         }
     }
 
