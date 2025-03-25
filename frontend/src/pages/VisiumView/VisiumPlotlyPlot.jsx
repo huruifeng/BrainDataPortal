@@ -200,7 +200,7 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                     toImageButtonOptions: {
                         name: "Save as PNG",
                         format: 'png', // one of png, svg, jpeg, webp
-                        filename: `png-${feature}`,
+                        filename: `BDP_png-${feature}`,
                         scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
                     },
                     modeBarButtonsToRemove: [
@@ -215,7 +215,7 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                                 name: "Save as SVG",
                                 icon: Plotly.Icons.disk,
                                 click: function (gd) {
-                                    Plotly.downloadImage(gd, {format: "svg", filename: `svg-${feature}`});
+                                    Plotly.downloadImage(gd, {format: "svg", filename: `BDP_svg-${feature}`});
                                 },
                             },
                             {
