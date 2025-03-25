@@ -14,7 +14,8 @@ import {
     Tooltip,
     FormControl,
     Select,
-    MenuItem, // Import MenuItem
+    MenuItem,
+    Button, // Add Button import
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import DeleteIcon from "@mui/icons-material/Delete"
@@ -89,60 +90,24 @@ function XDatasetsView() {
         fetchImageData,
     } = useSampleGeneMetaStore()
 
-    // Load initial data
-    useEffect(() => {
-        fetchDatasetList()
-
-        // Initialize from URL params if available
-        const urlDatasets = []
-        let i = 0
-        while (queryParams.get(`dataset${i}`) !== null) {
-            urlDatasets.push({
-                id: queryParams.get(`dataset${i}`) || "",
-                sample: queryParams.get(`sample${i}`) || "",
-                features: queryParams.getAll(`features${i}`) || [],
-                plotType: queryParams.get(`plottype${i}`) || "auto",
-                isLoading: false,
-            })
-            i++
-            if (i >= 3) break
-        }
-
-        // If we have URL datasets, use them; otherwise keep our default two columns
-        if (urlDatasets.length > 0) {
-            if (urlDatasets.length === 1) {
-                urlDatasets.push({id: "", sample: "", features: [], plotType: "auto", isLoading: false})
-            }
-            setDatasets(urlDatasets)
-        }
-    }, [])
-
-    // Update loading state when global loading state changes
-    useEffect(() => {
-        if (!loading) {
-            // When global loading is done, update all datasets to not loading
-            setDatasets((prevDatasets) =>
-                prevDatasets.map((dataset) => ({
-                    ...dataset,
-                    isLoading: false,
-                })),
-            )
-        }
-    }, [loading])
-
     // Check if a dataset has been loaded
     const isDatasetLoaded = (datasetId) => {
         if (!datasetId) return false
 
         const data = plotData[datasetId]
-        return !!(data?.genelist && data?.samplelist && data?.metalist && data?.allmetadata && data?.umapdata)
+        return !!(data?.genelist && data?.samplelist && data?.metalist && data?.allmetadata)
     }
 
     // Direct data loading function with request deduplication
-    const loadDatasetData = async (index) => {
-        const datasetId = datasets[index]?.id
+    const loadDatasetData = async (datasetId) => {
         // Skip if no dataset ID
         if (!datasetId) {
+            return
+        }
+
+        // Skip if already loading this dataset
+        if (metadataLoading[datasetId]) {
+            console.log(`Already loading metadata for dataset ${datasetId}, skipping duplicate request`)
             return
         }
 
@@ -159,10 +124,11 @@ function XDatasetsView() {
 
         try {
             // Set the current dataset in the store ONLY for this operation
-            await setDataset(datasetId)
+            setDataset(datasetId)
 
             // Fetch gene list if not already loaded
             if (!plotData[datasetId]?.genelist) {
+                console.log(`Loading gene list for dataset ${datasetId}`)
                 await fetchGeneList(datasetId)
 
                 // Store the actual data from the store
@@ -179,6 +145,7 @@ function XDatasetsView() {
 
             // Fetch sample list if not already loaded
             if (!plotData[datasetId]?.samplelist) {
+                console.log(`Loading sample list for dataset ${datasetId}`)
                 await fetchSampleList(datasetId)
 
                 // Store the actual data from the store
@@ -195,6 +162,7 @@ function XDatasetsView() {
 
             // Fetch meta list if not already loaded
             if (!plotData[datasetId]?.metalist) {
+                console.log(`Loading meta list for dataset ${datasetId}`)
                 await fetchMetaList(datasetId)
 
                 // Store the actual data from the store
@@ -210,8 +178,9 @@ function XDatasetsView() {
             }
 
             // Fetch UMAP data if selected and not already loaded
-            if (datasets[index].plotType === "umap") {
+            if (getDatasetPlotType(datasets, datasetId) === "umap") {
                 if (!plotData[datasetId]?.umapdata) {
+                    console.log(`Loading UMAP data for dataset ${datasetId}`)
                     await fetchUMAPData(datasetId)
 
                     // Store the actual data from the store
@@ -229,6 +198,7 @@ function XDatasetsView() {
 
             // Only fetch metadata once per dataset
             if (!plotData[datasetId]?.allmetadata) {
+                console.log(`Loading all metadata for dataset ${datasetId}`)
                 await fetchAllMetaData(datasetId)
 
                 // Store the actual data from the store
@@ -251,26 +221,24 @@ function XDatasetsView() {
     }
 
     // Separate effect for loading sample-specific data
-    const loadSampleData = async (index, sample) => {
-        const datasetId = datasets[index]?.id
+    const loadSampleData = async (datasetId, sample) => {
         // Skip if no sample is selected
         if (!sample) return
+
+        console.log(`Loading sample data for dataset ${datasetId}, sample ${sample}`)
 
         try {
             // Get the dataset object
             const dataset = datasets.find((d) => d.id === datasetId)
             if (!dataset) return
 
-            /// Set this dataset as loading
-            setDatasets((prevDatasets) => {
-                const newDatasets = [...prevDatasets]
-                newDatasets[index] = {...newDatasets[index], isLoading: true}
-                return newDatasets
-            })
+            // Set this dataset as loading
+            setDatasets((prevDatasets) => prevDatasets.map((d) => (d.id === datasetId ? {...d, isLoading: true} : d)))
 
             // Ensure meta list is loaded
             let metaList = plotData[datasetId]?.metalist
             if (!metaList || metaList.length === 0) {
+                console.log(`Meta list for dataset ${datasetId} is empty or not loaded, fetching it now`)
                 // Set the current dataset in the store ONLY for this operation
                 setDataset(datasetId)
                 await fetchMetaList(datasetId)
@@ -286,6 +254,8 @@ function XDatasetsView() {
                 }))
             }
 
+            console.log(`Meta features for dataset ${datasetId}:`, metaList)
+
             // Create a Set for faster lookups
             const metaSet = new Set(metaList)
 
@@ -295,32 +265,35 @@ function XDatasetsView() {
                 return !isMeta
             })
 
+            console.log(`Selected features: ${dataset.features}, Filtered gene features: ${geneFeatures}`)
+
             // IMPORTANT: Create a clean store state for this specific dataset operation
-            // This is crucial to prevent cross-contamination between datasets
-            await setDataset(datasetId)
+            setDataset(datasetId)
+
+            // Reset the store state to prevent cross-contamination
             useSampleGeneMetaStore.setState({
                 selectedSamples: [sample],
                 selectedGenes: geneFeatures,
-                // Reset any other state that might be shared
-                exprDataDict: {},
-                sampleMetaDict: {},
-                imageDataDict: {},
             })
 
             // Fetch expression data for this specific dataset
+            console.log(`Fetching expression data for dataset ${datasetId}, sample ${sample}, features:`, geneFeatures)
             await fetchExprData(datasetId)
             const currentExprData = {...useSampleGeneMetaStore.getState().exprDataDict}
+
+            console.log(`Received expression data for dataset ${datasetId}:`, currentExprData)
 
             // Store the expression data in our plotData state
             setPlotData((prevData) => ({
                 ...prevData,
                 [datasetId]: {
                     ...prevData[datasetId],
-                    exprdict: {...(prevData[datasetId]?.exprdict || {}), ...currentExprData},
+                    exprdict: currentExprData,
                 },
             }))
 
             // Fetch metadata for this specific dataset
+            console.log(`Fetching metadata for dataset ${datasetId}, sample ${sample}`)
             await fetchMetaDataOfSample(datasetId)
             const currentMetaData = {...useSampleGeneMetaStore.getState().sampleMetaDict}
 
@@ -329,40 +302,89 @@ function XDatasetsView() {
                 ...prevData,
                 [datasetId]: {
                     ...prevData[datasetId],
-                    metadict: {...(prevData[datasetId]?.metadict || {}), ...currentMetaData},
+                    metadict: currentMetaData,
                 },
             }))
 
             // Only fetch image data for Visium datasets
             const effectivePlotType = getEffectivePlotType(datasetId, dataset.plotType)
             if (effectivePlotType === "visium" || effectivePlotType === "both") {
+                console.log(`Fetching image data for dataset ${datasetId}, sample ${sample}`)
+
+                // Make sure we're still using the correct dataset
+                setDataset(datasetId)
+
+                // Reset imageDataDict to prevent cross-contamination
+                useSampleGeneMetaStore.setState((state) => ({
+                    ...state,
+                    imageDataDict: {},
+                }))
+
                 await fetchImageData(datasetId)
                 const currentImageData = {...useSampleGeneMetaStore.getState().imageDataDict}
 
-                // Store the image data in our plotData state
-                setPlotData((prevData) => ({
-                    ...prevData,
-                    [datasetId]: {
-                        ...prevData[datasetId],
-                        imagedict: {...(prevData[datasetId]?.imagedict || {}), ...currentImageData},
-                    },
-                }))
-            }
-            // Set this dataset as not loading
-            setDatasets((prevDatasets) => {
-                const newDatasets = [...prevDatasets]
-                newDatasets[index] = {...newDatasets[index], isLoading: false}
-                return newDatasets
-            })
+                console.log(`Received image data for dataset ${datasetId}, sample ${sample}:`, currentImageData)
 
+                // Store the image data in our plotData state
+                setPlotData((prevData) => {
+                    // Create a deep copy to avoid reference issues
+                    const newData = {
+                        ...prevData,
+                        [datasetId]: {
+                            ...prevData[datasetId],
+                            imagedict: currentImageData,
+                        },
+                    }
+
+                    console.log(`Updated plotData with image data for dataset ${datasetId}:`, newData[datasetId].imagedict)
+                    return newData
+                })
+            }
+
+            // Set this dataset as not loading
+            setDatasets((prevDatasets) => prevDatasets.map((d) => (d.id === datasetId ? {...d, isLoading: false} : d)))
         } catch (error) {
+            console.error(`Error loading sample data for dataset ${datasetId}:`, error)
             // Set this dataset as not loading even if there's an error
-            console.error(`Error loading data for dataset ${datasetId}:`, error)
-            setDatasets((prevDatasets) => {
-                const newDatasets = [...prevDatasets]
-                newDatasets[index] = {...newDatasets[index], isLoading: false}
-                return newDatasets
-            })
+            setDatasets((prevDatasets) => prevDatasets.map((d) => (d.id === datasetId ? {...d, isLoading: false} : d)))
+        }
+    }
+
+    // Add this function after handleRefreshDataset
+    const refreshImageData = async (datasetId, sample) => {
+        if (!datasetId || !sample) return
+
+        console.log(`Refreshing image data for dataset ${datasetId}, sample ${sample}`)
+
+        try {
+            // Set the current dataset in the store
+            setDataset(datasetId)
+
+            // Reset imageDataDict to prevent cross-contamination
+            useSampleGeneMetaStore.setState((state) => ({
+                ...state,
+                imageDataDict: {},
+            }))
+
+            // Fetch image data
+            await fetchImageData(datasetId)
+            const currentImageData = {...useSampleGeneMetaStore.getState().imageDataDict}
+
+            console.log(`Refreshed image data for dataset ${datasetId}, sample ${sample}:`, currentImageData)
+
+            // Update plotData with the new image data
+            setPlotData((prevData) => ({
+                ...prevData,
+                [datasetId]: {
+                    ...prevData[datasetId],
+                    imagedict: currentImageData,
+                },
+            }))
+
+            return currentImageData
+        } catch (error) {
+            console.error(`Error refreshing image data for dataset ${datasetId}:`, error)
+            return null
         }
     }
 
@@ -374,8 +396,7 @@ function XDatasetsView() {
         // Process each dataset sequentially to avoid race conditions
         const processSampleData = async () => {
             for (const dataset of datasetsWithSamples) {
-                const originalIndex = datasets.indexOf(dataset)
-                await loadSampleData(originalIndex, dataset.sample)
+                await loadSampleData(dataset.id, dataset.sample)
             }
         }
 
@@ -403,35 +424,12 @@ function XDatasetsView() {
         setQueryParams(newParams)
     }, [datasets])
 
-
-    // Add this useEffect after the other useEffects
-    useEffect(() => {
-        // When the component mounts or datasets change significantly, reload all data
-        const loadAllData = async () => {
-            // First load basic dataset data
-            for (const [i, dataset] of datasets.entries()) {
-                if (dataset.id && !isDatasetLoaded(dataset.id)) {
-                    await loadDatasetData(i)
-                }
-            }
-
-            // Then load sample-specific data
-            for (const [i, dataset] of datasets.entries()) {
-                if (dataset.id && dataset.sample) {
-                    await loadSampleData(i, dataset.sample)
-                }
-            }
-        }
-
-        loadAllData()
-    }, [])
-
-    // Add a new dataset slot (max 3)
+    // Add a new dataset slot (max 4)
     const handleAddDataset = () => {
-        if (datasets.length < 3) {
+        if (datasets.length < 4) {
             setDatasets([...datasets, {id: "", sample: "", features: [], plotType: "auto", isLoading: false}])
         } else {
-            toast.info("Maximum of 3 datasets allowed.")
+            toast.info("Maximum of 4 datasets allowed.")
         }
     }
 
@@ -448,6 +446,8 @@ function XDatasetsView() {
         if (datasets[index].id === newDatasetId) {
             return
         }
+
+        console.log(`Changing dataset at index ${index} to ${newDatasetId}`)
 
         const newDatasets = [...datasets]
         newDatasets[index] = {...newDatasets[index], id: newDatasetId, sample: "", features: []}
@@ -489,6 +489,8 @@ function XDatasetsView() {
 
             // If changing to UMAP and we haven't loaded UMAP data yet, load it
             if ((newPlotType === "umap" || newPlotType === "both") && !plotData[datasetId]?.umapdata) {
+                console.log(`Loading UMAP data for dataset ${datasetId} due to plot type change`)
+
                 // Set the current dataset in the store ONLY for this operation
                 setDataset(datasetId)
 
@@ -513,6 +515,7 @@ function XDatasetsView() {
 
             // If changing to Visium and we have a sample selected, we need to load image data
             if ((newPlotType === "visium" || newPlotType === "both") && dataset.sample) {
+                console.log(`Reloading sample data for dataset ${datasetId} due to plot type change to Visium`)
                 loadSampleData(datasetId, dataset.sample)
             }
         }
@@ -537,6 +540,15 @@ function XDatasetsView() {
             const newDatasets = [...datasets]
             newDatasets[index] = {...newDatasets[index], isLoading: true}
             setDatasets(newDatasets)
+
+            // Reload all data for this dataset
+            loadSampleData(dataset.id, dataset.sample).then(() => {
+                // If this is a Visium dataset, also refresh the image data
+                const effectivePlotType = getEffectivePlotType(dataset.id, dataset.plotType)
+                if (effectivePlotType === "visium" || effectivePlotType === "both") {
+                    refreshImageData(dataset.id, dataset.sample)
+                }
+            })
         }
     }
 
@@ -550,6 +562,11 @@ function XDatasetsView() {
         const datasetData = plotData[datasetId] || {}
         const geneOptions = datasetData.genelist || []
         const metaOptions = datasetData.metalist || []
+
+        console.log(
+            `Available features for dataset ${datasetId}:`,
+            `genes: ${geneOptions.length}, meta: ${metaOptions.length}`,
+        )
 
         const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"])
 
@@ -570,6 +587,7 @@ function XDatasetsView() {
         const datasetData = plotData[datasetId] || {}
         const samples = datasetData.samplelist || []
 
+        console.log(`Available samples for dataset ${datasetId}:`, samples.length)
 
         if (!samples.includes("all")) {
             return ["all", ...samples]
@@ -638,17 +656,22 @@ function XDatasetsView() {
         setFeatureSearchLoading((prev) => ({...prev, [datasetId]: true}))
 
         try {
+            console.log(`Searching for genes matching "${newInputValue}" in dataset ${datasetId}`)
+
             // Fetch genes matching the search term
             await fetchGeneList(datasetId, newInputValue)
 
             // Get the updated gene list from the store
             const storedGenes = useSampleGeneMetaStore.getState().geneList
+            console.log(`Found ${storedGenes.length} matching genes for "${newInputValue}"`)
+
             // Update feature options for this dataset
             setFeatureOptions((prevFeatureOptions) => ({
                 ...prevFeatureOptions,
                 [datasetId]: storedGenes,
             }))
         } catch (error) {
+            console.error(`Error searching for genes in dataset ${datasetId}:`, error)
             toast.error(`Failed to search for genes: ${error.message}`)
         } finally {
             // Clear loading state
@@ -668,9 +691,70 @@ function XDatasetsView() {
         }
     }
 
-
     console.log("===datasets", datasets)
     console.log("===plotData", plotData)
+
+    // Load initial data
+    useEffect(() => {
+        fetchDatasetList()
+
+        // Initialize from URL params if available
+        const urlDatasets = []
+        let i = 0
+        while (queryParams.get(`dataset${i}`) !== null) {
+            urlDatasets.push({
+                id: queryParams.get(`dataset${i}`) || "",
+                sample: queryParams.get(`sample${i}`) || "",
+                features: queryParams.getAll(`features${i}`) || [],
+                plotType: queryParams.get(`plottype${i}`) || "auto",
+                isLoading: false,
+            })
+            i++
+            if (i >= 4) break
+        }
+
+        // If we have URL datasets, use them; otherwise keep our default two columns
+        if (urlDatasets.length > 0) {
+            if (urlDatasets.length === 1) {
+                urlDatasets.push({id: "", sample: "", features: [], plotType: "auto", isLoading: false})
+            }
+            setDatasets(urlDatasets)
+        }
+    }, [])
+
+    // Update loading state when global loading state changes
+    useEffect(() => {
+        if (!loading) {
+            // When global loading is done, update all datasets to not loading
+            setDatasets((prevDatasets) =>
+                prevDatasets.map((dataset) => ({
+                    ...dataset,
+                    isLoading: false,
+                })),
+            )
+        }
+    }, [loading])
+
+    // When the component mounts or datasets change significantly, reload all data
+    useEffect(() => {
+        const loadAllData = async () => {
+            // First load basic dataset data
+            for (const dataset of datasets) {
+                if (dataset.id && !isDatasetLoaded(dataset.id)) {
+                    await loadDatasetData(dataset.id)
+                }
+            }
+
+            // Then load sample-specific data
+            for (const dataset of datasets) {
+                if (dataset.id && dataset.sample) {
+                    await loadSampleData(dataset.id, dataset.sample)
+                }
+            }
+        }
+
+        loadAllData()
+    }, [datasets])
 
     return (
         <div className="plot-page-container" style={{display: "flex", flexDirection: "column", flex: 1}}>
@@ -678,8 +762,8 @@ function XDatasetsView() {
             <Box className="title-row" sx={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
                 <Typography variant="h6">Cross Dataset Feature Check</Typography>
                 <Box>
-                    <Tooltip title="Add Dataset (Max 3)">
-                        <IconButton color="primary" onClick={handleAddDataset} disabled={datasets.length >= 3}
+                    <Tooltip title="Add Dataset (Max 4)">
+                        <IconButton color="primary" onClick={handleAddDataset} disabled={datasets.length >= 4}
                                     size="small">
                             <AddIcon/>
                         </IconButton>
@@ -941,12 +1025,33 @@ function XDatasetsView() {
                                                                     (() => {
                                                                         // Get the expression data specifically for this dataset
                                                                         const expr_data = plotData[dataset.id]["exprdict"] || {}
-                                                                        let gene_name = feature
+                                                                        const gene_name = feature
                                                                         const gene_expr = expr_data[feature]
+
+                                                                        console.log(`Rendering UMAP for dataset ${dataset.id}, feature ${feature}:`, {
+                                                                            hasExprData: !!expr_data,
+                                                                            hasGeneExpr: !!gene_expr,
+                                                                            umapData: !!plotData[dataset.id]["umapdata"],
+                                                                        })
 
                                                                         // If we don't have expression data for this feature, show a message
                                                                         if (!gene_expr && feature !== "all") {
-                                                                            gene_name = "all"
+                                                                            return (
+                                                                                <Box
+                                                                                    sx={{
+                                                                                        display: "flex",
+                                                                                        justifyContent: "center",
+                                                                                        alignItems: "center",
+                                                                                        height: "100%",
+                                                                                        borderRadius: 1,
+                                                                                    }}
+                                                                                >
+                                                                                    <Typography variant="body2"
+                                                                                                color="text.secondary">
+                                                                                        No expression data for {feature}
+                                                                                    </Typography>
+                                                                                </Box>
+                                                                            )
                                                                         }
 
                                                                         return (
@@ -965,16 +1070,19 @@ function XDatasetsView() {
                                                                         )
                                                                     })()
                                                                 ) : (
-                                                                    <Box sx={{
-                                                                        display: "flex",
-                                                                        justifyContent: "center",
-                                                                        alignItems: "center",
-                                                                        height: "100%",
-                                                                        borderRadius: 1,
-                                                                    }}>
+                                                                    <Box
+                                                                        sx={{
+                                                                            display: "flex",
+                                                                            justifyContent: "center",
+                                                                            alignItems: "center",
+                                                                            height: "100%",
+                                                                            borderRadius: 1,
+                                                                        }}
+                                                                    >
                                                                         <Typography variant="body2"
-                                                                                    color="text.secondary">Loading UMAP
-                                                                            data...</Typography>
+                                                                                    color="text.secondary">
+                                                                            Loading UMAP data...
+                                                                        </Typography>
                                                                     </Box>
                                                                 )}
                                                             </Box>
@@ -991,10 +1099,20 @@ function XDatasetsView() {
                                                                 plotData[dataset.id]["metadict"][dataset.sample] ? (
                                                                     dataset.sample === "all" ? (
                                                                         <Typography variant="body2"
-                                                                                    color="text.secondary">Please select
-                                                                            a specific sample.</Typography>
+                                                                                    color="text.secondary">
+                                                                            Please select a specific sample.
+                                                                        </Typography>
                                                                     ) : (
                                                                         (() => {
+                                                                            console.log(
+                                                                                `Rendering Visium for dataset ${dataset.id}, sample ${dataset.sample}, feature ${feature}:`,
+                                                                                {
+                                                                                    hasImageData: !!plotData[dataset.id]["imagedict"][dataset.sample],
+                                                                                    hasMetaData: !!plotData[dataset.id]["metadict"][dataset.sample],
+                                                                                    hasExprData: !!plotData[dataset.id]["exprdict"],
+                                                                                },
+                                                                            )
+
                                                                             return (
                                                                                 <div className="visium-item">
                                                                                     <div className="visium-wrapper">
@@ -1013,17 +1131,31 @@ function XDatasetsView() {
                                                                     <Box
                                                                         sx={{
                                                                             display: "flex",
+                                                                            flexDirection: "column",
                                                                             justifyContent: "center",
                                                                             alignItems: "center",
                                                                             height: "100%",
                                                                             bgcolor: "#f5f5f5",
                                                                             borderRadius: 1,
+                                                                            padding: 2,
                                                                         }}
                                                                     >
                                                                         <Typography variant="body2"
-                                                                                    color="text.secondary">
-                                                                            Loading Visium data...
+                                                                                    color="text.secondary" sx={{mb: 1}}>
+                                                                            {!plotData[dataset.id]?.imagedict
+                                                                                ? "Image data not loaded"
+                                                                                : !plotData[dataset.id]?.imagedict[dataset.sample]
+                                                                                    ? `No image data for sample ${dataset.sample}`
+                                                                                    : "Loading Visium data..."}
                                                                         </Typography>
+                                                                        <Button
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            onClick={() => refreshImageData(dataset.id, dataset.sample)}
+                                                                            sx={{mt: 1}}
+                                                                        >
+                                                                            Retry Loading Image
+                                                                        </Button>
                                                                     </Box>
                                                                 )}
                                                             </Box>
@@ -1073,27 +1205,5 @@ function XDatasetsView() {
     )
 }
 
-export default XDatasetsView
+export default XDatasetsView;
 
-
-// // Add this useEffect after the other useEffects
-// useEffect(() => {
-//     // When the component mounts or datasets change significantly, reload all data
-//     const loadAllData = async () => {
-//         // First load basic dataset data
-//         for (const dataset of datasets) {
-//             if (dataset.id && !isDatasetLoaded(dataset.id)) {
-//                 await loadDatasetData(dataset.id)
-//             }
-//         }
-//
-//         // Then load sample-specific data
-//         for (const dataset of datasets) {
-//             if (dataset.id && dataset.sample) {
-//                 await loadSampleData(dataset.id, dataset.sample)
-//             }
-//         }
-//     }
-//
-//     loadAllData()
-// }, [])

@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import {isCategorical} from "../../utils/funcs.js";
 
 const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, group}) => {
+
+    console.log("EChartScatterPlot: ", gene, exprData, group);
+
     if (umapData.length === 0) return "UMAP data is loading...";
 
     if(sampleList.length >= 1 && !sampleList.includes("all")) {

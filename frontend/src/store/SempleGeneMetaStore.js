@@ -171,6 +171,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
         try {
             for (var sample of selectedSamples) {
+                if (sample === "all") continue;
                 if (!get().sampleMetaDict[sample]) {
                     const response = await getMetaDataOfSample(dataset_id, sample);
                     set({sampleMetaDict: {...get().sampleMetaDict, [sample]: response.data}});
@@ -331,6 +332,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         try {
             // get().imageDataDict = {};
             for (var sample of selectedSamples) {
+                if (sample === "all") continue;
                 if (!get().imageDataDict[sample]) {
                     const coor_response = await getCoordinates(dataset_id, sample);
                     const img_response = await getImage(dataset_id, sample);
