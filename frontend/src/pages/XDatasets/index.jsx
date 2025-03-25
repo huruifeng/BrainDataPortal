@@ -38,17 +38,10 @@ function getDatasetType(datasetRecords, datasetId) {
     return undefined
 }
 
-function getDatasetPlotType(datasets, datasetId) {
-    return datasets.find((d) => d.id === datasetId)?.plotType
-}
-
 function XDatasetsView() {
     // Create a state for plotData to ensure it triggers re-renders when updated
     const [plotData, setPlotData] = useState({})
     const [featureOptions, setFeatureOptions] = useState({})
-
-    // Track loading state for metadata requests
-    const [metadataLoading, setMetadataLoading] = useState({})
 
     // Near the top where other state variables are defined
     const [featureSearchLoading, setFeatureSearchLoading] = useState({})
@@ -146,16 +139,7 @@ function XDatasetsView() {
             return
         }
 
-        // Skip if already loaded
-        if (isDatasetLoaded(datasetId)) {
-            console.log(`Dataset ${datasetId} already loaded, skipping`)
-            return
-        }
-
         console.log(`Loading data for dataset ${datasetId}`)
-
-        // Mark as loading
-        setMetadataLoading((prev) => ({...prev, [datasetId]: true}))
 
         try {
             // Set the current dataset in the store ONLY for this operation
@@ -244,9 +228,6 @@ function XDatasetsView() {
             }
         } catch (error) {
             console.error(`Error loading data for dataset ${datasetId}:`, error)
-        } finally {
-            // Clear loading state
-            setMetadataLoading((prev) => ({...prev, [datasetId]: false}))
         }
     }
 
@@ -366,21 +347,6 @@ function XDatasetsView() {
         }
     }
 
-    // Modified useEffect to only load data for datasets with samples
-    useEffect(() => {
-        // Only process datasets that have both an ID and a sample
-        const datasetsWithSamples = datasets.filter((d) => d.id && d.sample)
-
-        // Process each dataset sequentially to avoid race conditions
-        const processSampleData = async () => {
-            for (const dataset of datasetsWithSamples) {
-                const originalIndex = datasets.indexOf(dataset)
-                await loadSampleData(originalIndex, dataset.sample)
-            }
-        }
-
-        processSampleData()
-    }, [datasets.map((d) => `${d.id}-${d.sample}-${d.features.join(",")}`).join("|")])
 
     // Update URL params when state changes
     useEffect(() => {
@@ -1075,25 +1041,3 @@ function XDatasetsView() {
 
 export default XDatasetsView
 
-
-// // Add this useEffect after the other useEffects
-// useEffect(() => {
-//     // When the component mounts or datasets change significantly, reload all data
-//     const loadAllData = async () => {
-//         // First load basic dataset data
-//         for (const dataset of datasets) {
-//             if (dataset.id && !isDatasetLoaded(dataset.id)) {
-//                 await loadDatasetData(dataset.id)
-//             }
-//         }
-//
-//         // Then load sample-specific data
-//         for (const dataset of datasets) {
-//             if (dataset.id && dataset.sample) {
-//                 await loadSampleData(dataset.id, dataset.sample)
-//             }
-//         }
-//     }
-//
-//     loadAllData()
-// }, [])
