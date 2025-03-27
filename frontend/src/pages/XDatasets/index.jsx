@@ -239,7 +239,7 @@ function XDatasetsView() {
 
         try {
             // Get the dataset object
-            const dataset = datasets.find((d) => d.id === datasetId)
+            const dataset =  datasets[index]
             if (!dataset) return
 
             /// Set this dataset as loading
@@ -390,7 +390,7 @@ function XDatasetsView() {
         }
 
         loadAllData()
-    }, [])
+    }, [datasets.map((d) => `${d.id}-${d.sample}-${d.features.join(",")}`).join("|")])
 
     // Add a new dataset slot (max 3)
     const handleAddDataset = () => {
