@@ -853,12 +853,12 @@ function XDatasetsView() {
                                                 const effectivePlotType = getEffectivePlotType(dataset.id, dataset.plotType)
 
                                                 return (
-                                                    <Paper key={`${dataset.id}-${feature}`} sx={{p: 1}}>
+                                                    <Paper key={`${dataset.id}-${feature}`} sx={{p: 1, alignItems: "center", justifyContent: "center"}}>
                                                         <Typography variant="body2" sx={{mb: 1, fontWeight: "bold",}}>{feature}</Typography>
 
                                                         {/* UMAP Plot */}
                                                         {(effectivePlotType === "umap" || effectivePlotType === "both") && (
-                                                            <Box className="feature-plot">
+                                                            <Box className="feature-plots">
                                                                 {plotData &&
                                                                 plotData[dataset.id] &&
                                                                 plotData[dataset.id]["umapdata"] &&
@@ -899,7 +899,7 @@ function XDatasetsView() {
 
                                                         {/* Visium Plot */}
                                                         {(effectivePlotType === "visium" || effectivePlotType === "both") && (
-                                                            <Box className="feature-plot">
+                                                            <Box className="feature-plots">
                                                                 {plotData &&
                                                                 plotData[dataset.id] &&
                                                                 plotData[dataset.id]["imagedict"] &&
@@ -923,9 +923,9 @@ function XDatasetsView() {
                                                                         })()
                                                                     )
                                                                 ) : (
-                                                                    <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", bgcolor: "#f5f5f5", borderRadius: 1,}}>
+                                                                    <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", bgcolor: "#ffffff", borderRadius: 1,}}>
                                                                         <Typography variant="body2" color="text.secondary" sx={{mb: 1}}>
-                                                                            {!plotData[dataset.id]?.imagedict ? "Image data not loaded" : !plotData[dataset.id]?.imagedict[dataset.sample] ? `No image data for sample ${dataset.sample}` : "Loading Visium data..."}
+                                                                            {!plotData[dataset.id]?.imagedict ? "Image datta is loading" : !plotData[dataset.id]?.imagedict[dataset.sample] ? `No image data for sample ${dataset.sample}` : "Loading Visium data..."}
                                                                         </Typography>
                                                                     </Box>
                                                                 )}

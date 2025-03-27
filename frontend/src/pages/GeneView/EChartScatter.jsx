@@ -4,7 +4,7 @@ import {isCategorical} from "../../utils/funcs.js";
 
 const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, group}) => {
 
-    console.log("EChartScatterPlot: ", gene, exprData, group);
+    // console.log("EChartScatterPlot: ", gene, exprData, group);
 
     if (umapData.length === 0) return "UMAP data is loading...";
 
@@ -28,7 +28,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         ]; // Up to 20 unique colors
 
 
-        const groupNames = Object.keys(groupedData);
+        const groupNames = Object.keys(groupedData).sort();
         const series = groupNames.map((group_i, index) => ({
             name: `${group_i}`,
             type: "scatter",
@@ -51,9 +51,9 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
             legend: {
                 type: "scroll", // Support for many groups
                 orient: "vertical",
-                right: 0,
-                top: 0,
-                data: groupNames.map(group_i => `${group_i}`),
+                right: -20,
+                top: 50,
+                data: groupNames.map(group_i => `${group_i}`).sort(),
             },
             xAxis: {type: "value"},
             yAxis: {type: "value"},
@@ -122,6 +122,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         })) || [];
         options = createContinuousOptions(plotData, gene);
     }
+    options.backgroundColor = '#ffffff';
     return <ReactECharts
         key={`${gene}-${group}`}
         option={options}
