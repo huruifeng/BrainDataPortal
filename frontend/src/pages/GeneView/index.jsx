@@ -293,7 +293,7 @@ function GeneView() {
                             <Box sx={{width: '100%'}}><LinearProgress/></Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}><CircularProgress/></Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
-                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading data...</Typography>
+                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading data...(100k cells/spots...)</Typography>
                             </Box>
                         </>
                     ) : error ? (
