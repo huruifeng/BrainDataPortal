@@ -10,9 +10,11 @@ import {useParams, useSearchParams} from "react-router-dom";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
 import EChartScatterPlot from "./EChartScatter.jsx";
+import PlotlyScatterPlot from "./PlotlyScatter.jsx";
 import GeneMetaPlots from "./GenePlots.jsx";
 
 import "./GeneView.css";
+
 
 function GeneView() {
 
@@ -305,11 +307,8 @@ function GeneView() {
                                 {Object.entries(exprDataDict).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {umapData && <EChartScatterPlot gene={gene}
-                                                                            sampleList={selectedSamples}
-                                                                            umapData={umapData}
-                                                                            exprData={expr_data}
-                                                                            metaData={allMetaData} group={coloring}/>}
+                                            {/*{umapData && <EChartScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} metaData={allMetaData} group={coloring}/>}*/}
+                                            {umapData && <PlotlyScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} metaData={allMetaData} group={coloring}/>}
                                         </div>
                                     </div>
                                 ))}
@@ -330,12 +329,8 @@ function GeneView() {
                         <div className={`umap-container single-plot`}>
                             <div key={'all_gene'} className="umap-item">
                                 <div className="umap-wrapper">
-                                    {umapData && <EChartScatterPlot gene={"all"}
-                                                                    sampleList={selectedSamples}
-                                                                    umapData={umapData}
-                                                                    exprData={{"all": "all"}}
-                                                                    metaData={allMetaData ?? {}}
-                                                                    group={coloring}/>}
+                                    {/*{umapData && <EChartScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData} exprData={{"all": "all"}} metaData={allMetaData ?? {}} group={coloring}/>}*/}
+                                    {umapData && <PlotlyScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData} exprData={{"all": "all"}} metaData={allMetaData ?? {}} group={coloring}/>}
 
                                 </div>
                             </div>
