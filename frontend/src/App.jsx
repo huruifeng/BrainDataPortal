@@ -59,6 +59,10 @@ function App() {
                       <Route path="/visiumview" element={<Navigate to="/datasets" replace />} />
                       <Route path="/visiumview/:dataset_id" element={<VisiumView />} />
 
+                      <Route path="/views/celltypes" element={<Navigate to="/datasets" replace />} />
+                      <Route path="/views/celltypes/:dataset_id" element={<CellTypesView />} />
+
+
                       <Route path="/login" element={<Login />} />
 
                       {/* Protected Routes */}
