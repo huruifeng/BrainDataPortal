@@ -19,6 +19,8 @@ const useSampleGeneMetaStore = create((set, get) => ({
     allSampleMetaData: {},
     sampleMetaDict: {},
 
+    selectedMetaData: {}, // selected feature meta data, e.g., cell type, cell subtype, etc
+
     selectedGenes: [],
     exprDataDict: {},
     pseudoExprDict: {},
@@ -40,10 +42,6 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
     setAllMetaData: async (meta) => {
         set({allMetaData: meta});
-    },
-
-    setAllBulkMetaData: async (meta) => {
-        set({allBulkMetaData: meta});
     },
 
     setSampleMetaDict: async (meta) => {
@@ -218,6 +216,23 @@ const useSampleGeneMetaStore = create((set, get) => ({
             set({error: "Failed to fetch all metadata:" + error});
         }
     },
+
+     fetchSelectedMetaData: async (dataset_id = null, features=["all"]) => {
+        dataset_id = dataset_id ?? get().dataSet;
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchAllMetaData: No dataset selected"});
+            return;
+        }
+
+        try {
+            const response = await getAllMetaData(dataset_id, features);
+            set({selectedMetaData: response.data}); // Update directly without loading state
+        } catch (error) {
+            console.error("Failed to fetch metadata:", error);
+            set({error: "Failed to fetch all metadata:" + error});
+        }
+    },
+
 
     fetchUMAPData: async (dataset_id) => {
         dataset_id = dataset_id ?? get().dataSet;

@@ -97,7 +97,7 @@ def get_metadata_of_sample(dataset, sample="all", meta="all"):
     else:
         return f"Error: Meta file not found."
 
-def get_all_metadata(dataset, drop_cols=None):
+def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
@@ -107,6 +107,10 @@ def get_all_metadata(dataset, drop_cols=None):
             data_df = pd.read_csv(meta_file, index_col=0, header=0)
             if drop_cols is not None:
                 data_df = data_df.drop(drop_cols, axis=1)
+
+            if keep_cols and keep_cols[0] != "all":
+                data_df = data_df.loc[:,keep_cols]
+
             data = data_df.to_dict(orient="index")
             return data
     else:

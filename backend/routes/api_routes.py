@@ -89,12 +89,13 @@ async def getallmetadata(request:Request):
     print("getallmetadata() called================")
     dataset = request.query_params.get("dataset_id")
     dataset_type = request.query_params.get("dataset_type")
+    features = request.query_params.getlist ("features")
 
     if dataset_type == "visium":
         drop_cols = ["UMAP_1", "UMAP_2"]
     else:
         drop_cols = None
-    metadata = get_all_metadata(dataset, drop_cols=drop_cols)
+    metadata = get_all_metadata(dataset, drop_cols=drop_cols, keep_cols=features)
 
     if "Error" in metadata:
         raise HTTPException(status_code=404, detail=metadata)
