@@ -326,7 +326,7 @@ function GeneView() {
                             </Box>
                         </>
                     ) : datasetId==="" ? (
-                        <Typography color="error" variant="h5" sx={{textAlign: "center", marginTop: "60px"}}>Please select a dataset !</Typography>
+                        <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">Please select a dataset to view</Typography>
                     ): error ? (
                         <Typography color="error">{error}</Typography>
                     ) : Object.keys(exprDataDict).length > 0 ? (
@@ -336,8 +336,8 @@ function GeneView() {
                                 {Object.entries(exprDataDict).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {/*{umapData && <EChartScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} metaData={allMetaData} group={coloring}/>}*/}
-                                            {umapData && <PlotlyScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} metaData={allMetaData} group={coloring}/>}
+                                            {umapData && <EChartScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} metaData={allMetaData} group={coloring}/>}
+                                            {/*{umapData && <PlotlyScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} metaData={allMetaData} group={coloring}/>}*/}
                                         </div>
                                     </div>
                                 ))}
@@ -358,8 +358,8 @@ function GeneView() {
                         <div className={`umap-container single-plot`}>
                             <div key={'all_gene'} className="umap-item">
                                 <div className="umap-wrapper">
-                                    {/*{umapData && <EChartScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData} exprData={{"all": "all"}} metaData={allMetaData ?? {}} group={coloring}/>}*/}
-                                    {umapData && <PlotlyScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData} exprData={{"all": "all"}} metaData={allMetaData ?? {}} group={coloring}/>}
+                                    {umapData && <EChartScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData} exprData={{"all": "all"}} metaData={allMetaData ?? {}} group={coloring}/>}
+                                    {/*{umapData && <PlotlyScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData} exprData={{"all": "all"}} metaData={allMetaData ?? {}} group={coloring}/>}*/}
 
                                 </div>
                             </div>

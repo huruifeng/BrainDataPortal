@@ -83,7 +83,7 @@ const PlotlyScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
             "UMAP_2": item.UMAP_2,
             [group]: metaData?.[item.cs_id]?.[group] ?? "Point", // Works for both objects and arrays, returns 0 for undefined/null values
         })) || [];
-        console.log("plotData: ", plotData);
+        // console.log("plotData: ", plotData);
         isCategoricalGroup = isCategorical(Object.values(metaData).map((p) => p[group]));
 
         if (isCategoricalGroup) {

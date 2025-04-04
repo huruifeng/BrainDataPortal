@@ -11,11 +11,12 @@ import {
     Autocomplete,
 } from "@mui/material";
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
-import {useParams, useSearchParams} from "react-router-dom";
+import {useSearchParams} from "react-router-dom";
 
 import "./VisiumView.css";
 
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
+import useDataStore from "../../store/DataStore.js";
 
 import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
 import CanvasFeaturePlot from "./VisiumCanvasPlot.jsx";
@@ -24,13 +25,20 @@ import PlotlyFeaturePlot from "./VisiumPlotlyPlot.jsx";
 function VisiumView() {
 
     // Get all the pre-selected values
-    const {dataset_id} = useParams();
-    const datasetId = dataset_id ?? "all";
-
     const [queryParams, setQueryParams] = useSearchParams();
     const initialGenes = queryParams.getAll("gene") ?? [];
     const initialSamples = queryParams.getAll("sample") ?? [];
     const initialMetas = queryParams.getAll("meta") ?? [];
+    const initialDataset = queryParams.get("dataset") ?? "";
+
+    const {datasetRecords, fetchDatasetList} = useDataStore()
+    useEffect(() => {
+        fetchDatasetList()
+    }, [])
+    const datasetOptions = datasetRecords.map((d) => d.dataset_id)
+
+    const [datasetId, setDatasetId] = useState(initialDataset)
+    const [datasetSearchText, setDatasetSearchText] = useState("")
 
 
     // Prepare all the  data
@@ -72,7 +80,7 @@ function VisiumView() {
     }, [datasetId]);
 
     const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
-    const metaOptions = metaList ? metaList.filter(option => !excludedKeys.has(option)): [];
+    const metaOptions = metaList ? metaList.filter(option => !excludedKeys.has(option)) : [];
 
     const [geneSearchText, setGeneSearchText] = useState("");
     const [sampleSearchText, setSampleSearchText] = useState("");
@@ -80,8 +88,9 @@ function VisiumView() {
 
 
     /** Updates the query parameters in the URL */
-    const updateQueryParams = (genes, samples, metas = []) => {
+    const updateQueryParams = (dataset, genes, samples, metas = []) => {
         const newParams = new URLSearchParams();
+        dataset && newParams.set("dataset", dataset)
         genes.forEach((gene) => newParams.append("gene", gene));
         samples.forEach((sample) => newParams.append("sample", sample));
         metas.forEach((meta) => newParams.append("meta", meta));
@@ -89,10 +98,16 @@ function VisiumView() {
         setQueryParams(newParams);
     };
 
+    const handleDatasetChange = (event, newValue) => {
+        setDataset(newValue)
+        setDatasetId(newValue)
+        updateQueryParams(newValue, selectedGenes, selectedSamples)
+    }
+
     /** Handles sample selection change */
     const handleSampleChange = (event, newValue) => {
         setSelectedSamples(newValue);
-        updateQueryParams(selectedGenes, newValue);
+        updateQueryParams(datasetId, selectedGenes, newValue);
         fetchImageData();
         fetchMetaDataOfSample();
     };
@@ -100,25 +115,25 @@ function VisiumView() {
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
         setSelectedGenes(newValue);
-        updateQueryParams(newValue, selectedSamples);
+        updateQueryParams(datasetId, newValue, selectedSamples);
         fetchExprData();
     };
 
     const handleGeneDelete = (delGene) => {
         const newGenes = selectedGenes.filter(g => g !== delGene);
         setSelectedGenes(newGenes);
-        updateQueryParams(newGenes, selectedSamples);
+        updateQueryParams(datasetId, newGenes, selectedSamples);
         fetchExprData();
     }
 
     const handleMetaFeatureChange = (event, newValue) => {
         setSelectedMetaFeatures(newValue);
-        updateQueryParams(selectedGenes, selectedSamples, newValue);
+        updateQueryParams(datasetId, selectedGenes, selectedSamples, newValue);
     }
     const handleMetaDelete = (delMeta) => {
         const newMetas = selectedMetaFeatures.filter(m => m !== delMeta);
         setSelectedMetaFeatures(newMetas);
-        updateQueryParams(selectedGenes, selectedSamples, newMetas);
+        updateQueryParams(datasetId, selectedGenes, selectedSamples, newMetas);
     }
 
     // click the button to fetch umap data
@@ -146,8 +161,21 @@ function VisiumView() {
             <div className="plot-content">
                 {/* Right Panel for Sample & Gene Selection (20%) */}
                 <div className="plot-panel">
-                    <Typography variant="subtitle1">Select Samples</Typography>
+                    <Typography variant="subtitle1">Select a Dataset </Typography>
+                    {/* Dataset Selection */}
+                    <Autocomplete
+                        size="small"
+                        options={datasetOptions}
+                        value={datasetId}
+                        onChange={handleDatasetChange}
+                        inputValue={datasetSearchText}
+                        onInputChange={(event, newInputValue) => setDatasetSearchText(newInputValue)}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Dataset" variant="standard" style={{marginBottom: "30px"}}/>
+                        )}
+                    />
 
+                    <Typography variant="subtitle1">Select Samples</Typography>
                     {/* Sample Selection */}
                     <Autocomplete
                         multiple
@@ -169,7 +197,7 @@ function VisiumView() {
                                         onDelete={() => {
                                             const newSamples = selectedSamples.filter(s => s !== option);
                                             setSelectedSamples(newSamples);
-                                            updateQueryParams(selectedGenes, newSamples);
+                                            updateQueryParams(datasetId, selectedGenes, newSamples);
                                             fetchImageData();
                                             fetchMetaDataOfSample();
                                         }}
@@ -252,7 +280,7 @@ function VisiumView() {
 
                 </div>
                 {/* Left UMAP Plot Area (80%) */}
-                <div className="plot-main" >
+                <div className="plot-main">
                     {loading ? (
                         <>
                             <Box sx={{width: '100%'}}>
@@ -266,7 +294,10 @@ function VisiumView() {
                                     sample list and metadata...</Typography>
                             </Box>
                         </>
-                    ) : error ? (
+                    ) : datasetId === "" ? (
+                        <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
+                            No dataset selected for exploration
+                        </Typography>) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : (
                         <div className="visium-container">
@@ -290,11 +321,13 @@ function VisiumView() {
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
                                                 <>
-                                                    <div key={`${sample_i}-${feature}-chart`} className="feature-plot-echart">
-                                                        {sampleMetaDict[sample_i] && <PlotlyFeaturePlot visiumData={visiumData_i}
-                                                                           geneData={exprDataDict}
-                                                                           metaData={sampleMetaDict[sample_i] || {}}
-                                                                           feature={feature}/>}
+                                                    <div key={`${sample_i}-${feature}-chart`}
+                                                         className="feature-plot-echart">
+                                                        {sampleMetaDict[sample_i] &&
+                                                            <PlotlyFeaturePlot visiumData={visiumData_i}
+                                                                               geneData={exprDataDict}
+                                                                               metaData={sampleMetaDict[sample_i] || {}}
+                                                                               feature={feature}/>}
                                                         <Typography variant="caption" display="block" align="center">
                                                             {feature}
                                                         </Typography>

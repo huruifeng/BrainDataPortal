@@ -131,7 +131,7 @@ const DatasetDisplay = ({dataRecords}) => {
                                         <TableCell>
                                             <Box sx={{display: "flex", gap: "10px"}}>
                                                 <Link
-                                                    to={`/views/geneview?dataset=${record.dataset_id}?sample=all`}>UMAP</Link>
+                                                    to={`/views/geneview?dataset=${record.dataset_id}&sample=all`}>UMAP</Link>
                                                 {record.assay === "VisiumST" && <Link
                                                     to={`/views/visiumview?dataset=${record.dataset_id}`}>Visium</Link>}
                                             </Box>
@@ -156,7 +156,7 @@ const DatasetDisplay = ({dataRecords}) => {
                                     <Box><b>Assay type:</b> {record.assay}</Box>
                                 </Box>
                                 <Box sx={{fontSize: "14px", padding: "8px 0", display: "flex", gap: "8px"}}>
-                                    <Link to={`/views/geneview?dataset=${record.dataset_id}?sample=all`}>UMAP</Link>
+                                    <Link to={`/views/geneview?dataset=${record.dataset_id}&sample=all`}>UMAP</Link>
                                     {record.assay === "VisiumST" &&
                                         <Link to={`/views/visiumview?dataset=${record.dataset_id}`}>Visium</Link>}
                                 </Box>
