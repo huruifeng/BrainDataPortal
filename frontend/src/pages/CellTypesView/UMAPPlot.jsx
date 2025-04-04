@@ -10,14 +10,17 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
     useEffect(() => {
         if (!umapData || !metaData || !plotRef.current) return
 
-        // Filter data based on selected cell types
-        let filteredData = umapData
-        if (!isAllCellTypesSelected && selectedCellTypes.length > 0) {
-            filteredData = umapData.filter((point) => {
-                const cellType = metaData[point.id]?.cell_type
-                return selectedCellTypes.includes(cellType)
-            })
-        }
+        const colorPalette = [
+            "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
+            "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
+            "#00ffff", "#ffff00", "#9bed56", "#8000ff", "#0080ff", "#80ff00"
+        ]; // Up to 20 unique colors
+
+        // cell type colors
+        const cellTypeColors = {}
+        selectedCellTypes.forEach((cellType) => {
+            cellTypeColors[cellType] = colorPalette[selectedCellTypes.indexOf(cellType) % colorPalette.length]
+        })
 
         const traces = []
 
@@ -25,21 +28,16 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             // Group by cell type for coloring
             const cellTypeGroups = {}
 
-            filteredData.forEach((point) => {
-                const cellType = metaData[point.id]?.cell_type || "Unknown"
+            umapData.forEach((point) => {
+                const cellType = metaData[point.cs_id]?.MajorCellTypes || "Other"
                 if (!cellTypeGroups[cellType]) {
-                    cellTypeGroups[cellType] = {
-                        x: [],
-                        y: [],
-                        text: [],
-                        ids: [],
-                    }
+                    cellTypeGroups[cellType] = {x: [], y: [], text: [], ids: []}
                 }
 
                 cellTypeGroups[cellType].x.push(point.UMAP_1)
                 cellTypeGroups[cellType].y.push(point.UMAP_2)
                 cellTypeGroups[cellType].text.push(cellType)
-                cellTypeGroups[cellType].ids.push(point.id)
+                cellTypeGroups[cellType].ids.push(point.cs_id)
             })
 
             // Create a trace for each cell type
@@ -52,10 +50,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
                     mode: "markers",
                     type: "scattergl",
                     name: cellType,
-                    marker: {
-                        size: 3,
-                        opacity: 0.7,
-                    },
+                    marker: {size: 4, opacity: 0.8,},
                     hoverinfo: "text",
                 })
             })
@@ -67,7 +62,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const colors = []
 
             umapData.forEach((point) => {
-                const cellType = metaData[point.id]?.cell_type || "Unknown"
+                const cellType = metaData[point.cs_id]?.MajorCellTypes || "Other"
                 const isSelected = selectedCellTypes.includes(cellType)
 
                 x.push(point.UMAP_1)
@@ -75,53 +70,33 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
                 text.push(cellType)
 
                 // Highlight selected cell types
-                colors.push(isSelected ? "red" : "rgba(200, 200, 200, 0.3)")
+                colors.push(isSelected ? cellTypeColors[cellType] : "rgba(200, 200, 200, 0.3)")
             })
 
             traces.push({
-                x,
-                y,
-                text,
+                x, y, text,
                 mode: "markers",
                 type: "scattergl",
-                marker: {
-                    size: 3,
-                    color: colors,
-                },
+                marker: {size: 4, color: colors,},
                 hoverinfo: "text",
             })
         }
 
         const layout = {
             title: "UMAP Visualization of Cell Types",
-            xaxis: {
-                title: "UMAP_1",
-                zeroline: false,
-            },
-            yaxis: {
-                title: "UMAP_2",
-                zeroline: false,
-            },
+            xaxis: {title: "UMAP_1", zeroline: true, showgrid: false, visible: false},
+            yaxis: {title: "UMAP_2", zeroline: true, showgrid: false, visible: false},
             hovermode: "closest",
             showlegend: isAllCellTypesSelected,
-            legend: {
-                x: 1,
-                y: 0.5,
-            },
-            margin: {
-                l: 50,
-                r: 50,
-                b: 50,
-                t: 50,
-                pad: 4,
-            },
-            height: 400,
+            legend: {x: 1, y: 0.5,},
+            margin: {l: 50, r: 50, b: 50, t: 50, pad: 4,},
             autosize: true,
         }
 
         Plotly.newPlot(plotRef.current, traces, layout, {
             responsive: true,
             displayModeBar: true,
+            displaylogo: false, // Removes the Plotly logo
             modeBarButtonsToRemove: ["lasso2d", "select2d"],
         })
 
@@ -133,7 +108,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
         }
     }, [umapData, metaData, selectedCellTypes, isAllCellTypesSelected])
 
-    return <div ref={plotRef} style={{width: "100%", height: "400px", minHeight: "400px"}}/>
+    return <div ref={plotRef} style={{width: "100%", height: "100%"}}/>
 }
 
 UMAPPlot.propTypes = {

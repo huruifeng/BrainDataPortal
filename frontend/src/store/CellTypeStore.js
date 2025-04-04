@@ -1,4 +1,6 @@
 import {create} from "zustand"
+import {getCellTypeList} from "../api/api.js";
+import {toast} from "react-toastify";
 
 const useCellTypeStore = create((set, get) => ({
     // State
@@ -17,23 +19,16 @@ const useCellTypeStore = create((set, get) => ({
         try {
             set({loading: true})
             // Mock API call - replace with actual API
-            await new Promise((resolve) => setTimeout(resolve, 500))
+            const response = await getCellTypeList(datasetId);
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({cellTypeList: data, loading: false})
 
-            // Mock data
-            const cellTypes = [
-                "Astrocytes",
-                "Microglia",
-                "Neurons",
-                "Oligodendrocytes",
-                "OPCs",
-                "Endothelial",
-                "Pericytes",
-                "Excitatory Neurons",
-                "Inhibitory Neurons",
-                "Dopaminergic Neurons",
-            ]
-
-            set({cellTypeList: cellTypes, loading: false})
+            } else {
+               const error_message = "Error fetching cell type list: "+ response.message;
+                await set({cellTypeList: [],error: error_message, loading: false});
+                toast.error(response.message);
+            }
         } catch (error) {
             set({error: error.message, loading: false})
         }

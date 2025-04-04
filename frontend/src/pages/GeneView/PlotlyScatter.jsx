@@ -109,10 +109,7 @@ const PlotlyScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
     const layout = {
         title: {
             text: gene==="all" ? `UMAP Plot for ${group}` : `${gene}`,
-            font: {
-                size: 18,
-                weight: 'bold'
-            },
+            font: {size: 18, weight: 'bold'},
             pad: { t: 10, b: 10 },
             automargin: true
         },

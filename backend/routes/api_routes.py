@@ -48,6 +48,16 @@ async def getmetalist(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting Meta list.")
     return response
 
+@router.get("/getcelltypelist")
+async def getcelltypelist(request:Request):
+    print("getcelltypelist() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_celltype_list(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting Meta list.")
+    return response
 
 @router.get("/getumapembedding")
 async def getumapembedding(request:Request):

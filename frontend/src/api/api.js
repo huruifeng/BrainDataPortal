@@ -38,6 +38,18 @@ export const getMetaList = async (dataset,query_str) => {
     }
 }
 
+export const getCellTypeList = async (dataset) => {
+    try {
+        const response = await axios.get(`${API_URL}/getcelltypelist`,
+            {params: {dataset:dataset}});
+        return response;
+    } catch (error) {
+        console.error("Error reading umap data:", error);
+        throw error;
+    }
+
+}
+
 export const getUMAPData = async (dataset) => {
     try {
         const response = await axios.get(`${API_URL}/getumapembedding`,

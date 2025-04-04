@@ -52,6 +52,18 @@ def get_meta_list(dataset, query_str="all"):
     else:
         print(meta_file + " not found")
         return "Error: Gene list file not found"
+def get_celltype_list(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        meta_file = os.path.join("backend", "datasets", dataset, 'metadata_lite_50k.csv')
+
+    if os.path.exists(meta_file):
+        data_df = pd.read_csv(meta_file, index_col=None, header=0)
+        data = data_df['MajorCellTypes'].unique().tolist()
+        return data
+    else:
+        print(meta_file + " not found")
 
 def get_umapembedding(dataset):
     if dataset == "all":

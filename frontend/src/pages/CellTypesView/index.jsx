@@ -59,7 +59,7 @@ function CellTypesView() {
         // Main data fetches (control loading state)
         const fetchPrimaryData = async () => {
             await fetchUMAPData(selectedDataset)
-            await fetchSelectedMetaData(selectedDataset)
+            await fetchSelectedMetaData(selectedDataset, ["MajorCellTypes"])
             await fetchCellTypeList(selectedDataset)
         }
 
