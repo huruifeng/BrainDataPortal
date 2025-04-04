@@ -161,7 +161,7 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
     }
 
     return (
-        <div>
+        <div style={{minHeight: "650px"}}>
             <FormControl variant="standard" sx={{width: "250px", marginBottom: "20px"}}>
                 <InputLabel id="cell-type-label">Cell Type</InputLabel>
                 <Select
@@ -178,7 +178,7 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
                     ))}
                 </Select>
             </FormControl>
-            <div ref={plotRef} style={{width: "100%", height: "600px"}}/>
+            <div ref={plotRef} style={{width: "100%", height: "600px", minHeight: "600px"}}/>
         </div>
     )
 }

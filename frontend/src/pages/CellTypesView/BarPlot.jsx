@@ -233,7 +233,7 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
     }
 
     return (
-        <div>
+        <div style={{minHeight: "450px"}}>
             <FormControl variant="standard" sx={{width: "250px", marginBottom: "20px"}}>
                 <InputLabel id="comparison-type-label">Comparison Type</InputLabel>
                 <Select
@@ -249,7 +249,7 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     <MenuItem value="pd_vs_control_female">PD vs Control (Female)</MenuItem>
                 </Select>
             </FormControl>
-            <div ref={plotRef} style={{width: "100%", height: "400px"}}/>
+            <div ref={plotRef} style={{width: "100%", height: "400px", minHeight: "400px"}}/>
         </div>
     )
 }

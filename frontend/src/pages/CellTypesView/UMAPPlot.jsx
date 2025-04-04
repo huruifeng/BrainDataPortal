@@ -115,6 +115,8 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
                 t: 50,
                 pad: 4,
             },
+            height: 400,
+            autosize: true,
         }
 
         Plotly.newPlot(plotRef.current, traces, layout, {
@@ -131,7 +133,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
         }
     }, [umapData, metaData, selectedCellTypes, isAllCellTypesSelected])
 
-    return <div ref={plotRef} style={{width: "100%", height: "400px"}}/>
+    return <div ref={plotRef} style={{width: "100%", height: "400px", minHeight: "400px"}}/>
 }
 
 UMAPPlot.propTypes = {

@@ -17,9 +17,8 @@ import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
 import {useParams, useSearchParams} from "react-router-dom"
 
 import useCellTypeStore from "../../store/CellTypeStore.js"
-import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
-import useDataStore from "../../store/DataStore.js";
-
+import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
+import useDataStore from "../../store/DataStore.js"
 
 import UMAPPlot from "./UMAPPlot.jsx"
 import BubblePlot from "./BubblePlot.jsx"
@@ -42,9 +41,9 @@ function CellTypesView() {
     const {datasetRecords, fetchDatasetList} = useDataStore()
 
     // Prepare all the data
-    const {setDataset, umapData, fetchUMAPData,selectedMetaData ,fetchSelectedMetaData} = useSampleGeneMetaStore()
+    const {setDataset, umapData, fetchUMAPData, selectedMetaData, fetchSelectedMetaData} = useSampleGeneMetaStore()
 
-    const {selectedCellTypes,setSelectedCellTypes} = useCellTypeStore()
+    const {selectedCellTypes, setSelectedCellTypes} = useCellTypeStore()
     const {cellTypeList, fetchCellTypeList, markerGenes, fetchMarkerGenes} = useCellTypeStore()
     const {cellCounts, fetchCellCounts, diffExpGenes, fetchDiffExpGenes} = useCellTypeStore()
     const {loading, error} = useCellTypeStore()
@@ -67,7 +66,7 @@ function CellTypesView() {
         fetchPrimaryData()
     }, [selectedDataset])
 
-    const datasetOptions =datasetRecords.map((d) => d.dataset_id)
+    const datasetOptions = datasetRecords.map((d) => d.dataset_id)
 
     useEffect(() => {
         const initialSelectedCellTypes = initialCellTypes.length ? initialCellTypes : []
@@ -125,16 +124,18 @@ function CellTypesView() {
     const isAllCellTypesSelected = selectedCellTypes.includes("all")
 
     return (
-        <div className="plot-page-container" style={{display: "flex", flexDirection: "column", flex: 1}}>
+        <div className="plot-page-container">
             {/* Title Row */}
-            <Box className="title-row"><Typography variant="h6">Cell Type Analysis</Typography></Box>
+            <Box className="title-row">
+                <Typography variant="h6">Cell Type Analysis</Typography>
+            </Box>
             <Divider/>
             <div className="plot-content">
                 {/* Left Panel for Dataset & Cell Type Selection (25%) */}
                 <div className="plot-panel">
                     <Typography variant="subtitle1">Select Datasets & Cell Types</Typography>
 
-                     {/* Dataset Selection */}
+                    {/* Dataset Selection */}
                     <Autocomplete
                         size="small"
                         options={datasetOptions}
@@ -143,7 +144,8 @@ function CellTypesView() {
                         inputValue={datasetSearchText}
                         onInputChange={(event, newInputValue) => setDatasetSearchText(newInputValue)}
                         renderInput={(params) => (
-                            <TextField {...params} label="Select Dataset" variant="standard" style={{margin: "10px 0px"}}/>
+                            <TextField {...params} label="Select Dataset" variant="standard"
+                                       style={{margin: "10px 0px"}}/>
                         )}
                     />
 
@@ -187,7 +189,9 @@ function CellTypesView() {
                 <div className="plot-main">
                     {loading ? (
                         <>
-                            <Box sx={{width: "100%"}}><LinearProgress/></Box>
+                            <Box sx={{width: "100%"}}>
+                                <LinearProgress/>
+                            </Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
                                 <CircularProgress/>
                             </Box>
@@ -201,44 +205,54 @@ function CellTypesView() {
                         <Typography color="error">{error}</Typography>
                     ) : (
                         <>
-                            <Divider sx={{marginTop: "10px"}}>UMAP Visualization</Divider>
-                            <div className="umap-container single-plot">
-                                <div className="umap-item">
-                                    <div className="umap-wrapper">
-                                        {umapData && (
-                                            <UMAPPlot
-                                                umapData={umapData}
-                                                metaData={selectedMetaData}
-                                                selectedCellTypes={selectedCellTypes}
-                                                isAllCellTypesSelected={isAllCellTypesSelected}
-                                            />
-                                        )}
+                            <div className="plot-section" id="umap-section">
+                                <Typography variant="p" sx={{marginTop: "10px"}}>UMAP Visualization</Typography>
+                                <div className="umap-container single-plot">
+                                    <div className="umap-item">
+                                        <div className="umap-wrapper">
+                                            {umapData && (
+                                                <UMAPPlot
+                                                    umapData={umapData}
+                                                    metaData={selectedMetaData}
+                                                    selectedCellTypes={selectedCellTypes}
+                                                    isAllCellTypesSelected={isAllCellTypesSelected}
+                                                />
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <Divider sx={{marginTop: "10px"}} flexItem> Marker Genes</Divider>
-
-                            <div className="bubble-container">
-                                {markerGenes && (
-                                    <BubblePlot
-                                        markerGenes={markerGenes}
-                                        selectedCellTypes={selectedCellTypes}
-                                        isAllCellTypesSelected={isAllCellTypesSelected}
-                                    />
-                                )}
+                            <div className="plot-section" id="marker-genes-section">
+                                <Divider sx={{marginTop: "10px"}} flexItem>
+                                    Marker Genes
+                                </Divider>
+                                <div className="bubble-container">
+                                    {markerGenes && (
+                                        <BubblePlot
+                                            markerGenes={markerGenes}
+                                            selectedCellTypes={selectedCellTypes}
+                                            isAllCellTypesSelected={isAllCellTypesSelected}
+                                        />
+                                    )}
+                                </div>
                             </div>
 
-                            <Divider sx={{marginTop: "10px"}} flexItem>Cell Counts & Differential Expression</Divider>
-
-                            <Grid container spacing={2} className="bottom-plots-container">
-                                <Grid item xs={12} md={6}>
-                                    {cellCounts && <BarPlot cellCounts={cellCounts} selectedCellTypes={selectedCellTypes}/>}
+                            <div className="plot-section" id="cell-counts-deg-section">
+                                <Divider sx={{marginTop: "10px"}} flexItem>
+                                    Cell Counts & Differential Expression
+                                </Divider>
+                                <Grid container spacing={2} className="bottom-plots-container">
+                                    <Grid item xs={12} md={6}>
+                                        {cellCounts && <BarPlot cellCounts={cellCounts} selectedCellTypes={selectedCellTypes}/>}
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        {diffExpGenes && selectedCellTypes.length > 0 && (
+                                            <HeatmapPlot diffExpGenes={diffExpGenes} selectedCellTypes={selectedCellTypes}/>
+                                        )}
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                    {diffExpGenes && selectedCellTypes.length > 0 && (<HeatmapPlot diffExpGenes={diffExpGenes} selectedCellTypes={selectedCellTypes}/>)}
-                                </Grid>
-                            </Grid>
+                            </div>
                         </>
                     )}
                 </div>

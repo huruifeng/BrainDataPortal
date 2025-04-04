@@ -140,6 +140,7 @@ const BubblePlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) =>
                     pad: 4,
                 },
                 height: 400,
+                autosize: true,
             }
         }
 
@@ -156,7 +157,7 @@ const BubblePlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) =>
         }
     }, [markerGenes, selectedCellTypes, isAllCellTypesSelected])
 
-    return <div ref={plotRef} style={{width: "100%", height: "400px"}}/>
+    return <div ref={plotRef} style={{width: "100%", height: "400px", minHeight: "400px"}}/>
 }
 
 BubblePlot.propTypes = {
