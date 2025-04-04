@@ -5,7 +5,7 @@ import {
     LinearProgress, InputLabel, FormControl, Select, MenuItem
 } from "@mui/material";
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
-import {useParams, useSearchParams} from "react-router-dom";
+import {useSearchParams} from "react-router-dom";
 
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 
@@ -14,21 +14,28 @@ import PlotlyScatterPlot from "./PlotlyScatter.jsx";
 import GeneMetaPlots from "./GenePlots.jsx";
 
 import "./GeneView.css";
+import useDataStore from "../../store/DataStore.js";
 
 
 function GeneView() {
 
     // Get all the pre-selected values
-    const {dataset_id} = useParams();
-    const datasetId = dataset_id ?? "all";
-
     const [queryParams, setQueryParams] = useSearchParams();
     const initialGenes = queryParams.getAll("gene");
     const initialSamples = queryParams.getAll("sample") ?? ["all"];
     const initialColoring = queryParams.get("color") ?? "";
     const initialGrouping = queryParams.get("group") ?? "";
+    const initialDataset = queryParams.get("dataset") ?? "";
 
-    // Prepare all the  data
+    const {datasetRecords, fetchDatasetList} = useDataStore()
+    useEffect(() => {
+        fetchDatasetList()
+    }, [])
+    const datasetOptions = datasetRecords.map((d) => d.dataset_id)
+
+    const [datasetId, setDatasetId] = useState(initialDataset)
+    const [datasetSearchText, setDatasetSearchText] = useState("")
+
     // Prepare all the  data
     const {
         setDataset,
@@ -82,8 +89,9 @@ function GeneView() {
     }, []);
 
     /** Updates the query parameters in the URL */
-    const updateQueryParams = (genes, samples, color = null, group = null) => {
+    const updateQueryParams = (dataset,genes, samples, color = null, group = null) => {
         const newParams = new URLSearchParams();
+        dataset && newParams.set("dataset", dataset)
         genes.forEach((gene) => newParams.append("gene", gene));
         samples.forEach((sample) => newParams.append("sample", sample));
         if (color) newParams.append("color", color);
@@ -91,23 +99,29 @@ function GeneView() {
         setQueryParams(newParams);
     };
 
+    const handleDatasetChange = (event, newValue) => {
+        setDataset(newValue)
+        setDatasetId(newValue)
+        updateQueryParams(newValue, selectedGenes, selectedSamples)
+    }
+
     /** Handles sample selection change */
     const handleSampleChange = (event, newValue) => {
         setSelectedSamples(newValue);
-        updateQueryParams(selectedGenes, newValue); // Pass the new value instead of old state
+        updateQueryParams(datasetId,selectedGenes, newValue); // Pass the new value instead of old state
     };
 
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
         setSelectedGenes(newValue);
-        updateQueryParams(newValue, selectedSamples); // Pass the new value instead of old state
+        updateQueryParams(datasetId,newValue, selectedSamples); // Pass the new value instead of old state
         fetchExprData();
     };
 
     const handleGeneDelete = (delGene) => {
         const newGenes = selectedGenes.filter(g => g !== delGene);
         setSelectedGenes(newGenes);
-        updateQueryParams(newGenes, selectedSamples);
+        updateQueryParams(datasetId,newGenes, selectedSamples);
         fetchExprData();
     }
 
@@ -119,12 +133,12 @@ function GeneView() {
 
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value);
-        updateQueryParams(selectedGenes, selectedSamples, coloring, event.target.value);
+        updateQueryParams(datasetId, selectedGenes, selectedSamples, coloring, event.target.value);
     }
 
     const handleColoringChange = (event) => {
         setColoring(event.target.value);
-        updateQueryParams(selectedGenes, selectedSamples, event.target.value, grouping);
+        updateQueryParams(datasetId, selectedGenes, selectedSamples, event.target.value, grouping);
     }
 
     const handleExprValueTypeChange = (event) => {
@@ -148,6 +162,19 @@ function GeneView() {
             <div className="plot-content">
                 {/* Right Panel for Sample & Gene Selection (20%) */}
                 <div className="plot-panel">
+                    <Typography variant="subtitle1">Select a Dataset </Typography>
+                     {/* Dataset Selection */}
+                    <Autocomplete
+                        size="small"
+                        options={datasetOptions}
+                        value={datasetId}
+                        onChange={handleDatasetChange}
+                        inputValue={datasetSearchText}
+                        onInputChange={(event, newInputValue) => setDatasetSearchText(newInputValue)}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Dataset" variant="standard" style={{marginBottom: "30px"}}/>
+                        )}
+                    />
                     <Typography variant="subtitle1">Select Samples & Genes</Typography>
 
                     {/* Gene Selection with Fuzzy Search & Chips */}
@@ -201,7 +228,7 @@ function GeneView() {
                                         onDelete={() => {
                                             const newSamples = selectedSamples.filter(s => s !== option);
                                             setSelectedSamples(newSamples);
-                                            updateQueryParams(selectedGenes, newSamples);
+                                            updateQueryParams(datasetId, selectedGenes, newSamples);
                                         }}
                                     />
                                 );
@@ -298,7 +325,9 @@ function GeneView() {
                                 <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading data...(100k cells/spots...)</Typography>
                             </Box>
                         </>
-                    ) : error ? (
+                    ) : datasetId==="" ? (
+                        <Typography color="error" variant="h5" sx={{textAlign: "center", marginTop: "60px"}}>Please select a dataset !</Typography>
+                    ): error ? (
                         <Typography color="error">{error}</Typography>
                     ) : Object.keys(exprDataDict).length > 0 ? (
                         <>

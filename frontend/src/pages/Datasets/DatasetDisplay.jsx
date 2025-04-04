@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import {
     Box,
     Typography,
@@ -8,7 +8,7 @@ import {
     TableCell,
     TableBody,
     Paper,
-    Pagination, ToggleButtonGroup, ToggleButton, TextField, FormControl, InputLabel, Select, MenuItem, Grid,
+    Pagination, ToggleButtonGroup, ToggleButton, TextField, FormControl, InputLabel, Select, MenuItem,
 } from "@mui/material";
 import "./DatasetDisplay.css";
 import TableChartIcon from "@mui/icons-material/TableChart";
@@ -16,16 +16,16 @@ import ListIcon from "@mui/icons-material/List";
 import PivotTableChart from "@mui/icons-material/PivotTableChart";
 import {Link} from "react-router-dom";
 
-const DatasetDisplay = ({ dataRecords}) => {
+const DatasetDisplay = ({dataRecords}) => {
     const [page, setPage] = useState(1);
     const [displayMode, setDisplayMode] = useState("table"); // "table" or "list"
     const [searchQuery, setSearchQuery] = useState("");
 
     const [recordsPerPage, setRecordsPerPage] = useState(15);
 
-  const handleChange = (event) => {
-    setRecordsPerPage(event.target.value);
-  };
+    const handleChange = (event) => {
+        setRecordsPerPage(event.target.value);
+    };
 
     const handleDisplayModeChange = (event, newMode) => {
         setDisplayMode(newMode);
@@ -55,7 +55,7 @@ const DatasetDisplay = ({ dataRecords}) => {
     };
 
     return (
-        <Box className="data-display-area" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box className="data-display-area" style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
             <Box className="data-toolbar">
                 <div>
                     <ToggleButtonGroup
@@ -66,29 +66,29 @@ const DatasetDisplay = ({ dataRecords}) => {
                         aria-label="display mode"
                     >
                         <ToggleButton value="table" aria-label="Table">
-                            <TableChartIcon />
+                            <TableChartIcon/>
                         </ToggleButton>
                         <ToggleButton value="list" aria-label="List">
-                            <ListIcon />
+                            <ListIcon/>
                         </ToggleButton>
                         <ToggleButton value="matrix" aria-label="Matrix">
-                            <PivotTableChart />
+                            <PivotTableChart/>
                         </ToggleButton>
                     </ToggleButtonGroup>
-                    <FormControl sx={{ m: 1, minWidth: 120, margin: "0 8px" }} size="small">
-                      <InputLabel id="select-records-per-page-label">Records / Page</InputLabel>
-                      <Select
-                        labelId="select-records-per-page"
-                        id="select-records-per-page"
-                        value={recordsPerPage}
-                        label="Records / Page"
-                        onChange={handleChange}
-                      >
-                        <MenuItem value={15}>15</MenuItem>
-                        <MenuItem value={30}>30</MenuItem>
-                        <MenuItem value={50}>50</MenuItem>
-                        <MenuItem value={100}>100</MenuItem>
-                      </Select>
+                    <FormControl sx={{m: 1, minWidth: 120, margin: "0 8px"}} size="small">
+                        <InputLabel id="select-records-per-page-label">Records / Page</InputLabel>
+                        <Select
+                            labelId="select-records-per-page"
+                            id="select-records-per-page"
+                            value={recordsPerPage}
+                            label="Records / Page"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value={15}>15</MenuItem>
+                            <MenuItem value={30}>30</MenuItem>
+                            <MenuItem value={50}>50</MenuItem>
+                            <MenuItem value={100}>100</MenuItem>
+                        </Select>
                     </FormControl>
                 </div>
 
@@ -102,7 +102,7 @@ const DatasetDisplay = ({ dataRecords}) => {
                 />
             </Box>
 
-            <Box className="data-display" style={{ flex: 1, overflowY: 'auto' }}>
+            <Box className="data-display" style={{flex: 1, overflowY: 'auto'}}>
                 {displayMode === "table" ? (
                     <Paper className="data-table">
                         <Table>
@@ -130,8 +130,10 @@ const DatasetDisplay = ({ dataRecords}) => {
                                         <TableCell>{record.assay}</TableCell>
                                         <TableCell>
                                             <Box sx={{display: "flex", gap: "10px"}}>
-                                                <Link to={`/geneview/${record.dataset_id}?sample=all`}>UMAP</Link>
-                                                {record.assay === "VisiumST" && <Link to={`/visiumview/${record.dataset_id}`}>Visium</Link>}
+                                                <Link
+                                                    to={`/views/geneview?dataset=${record.dataset_id}?sample=all`}>UMAP</Link>
+                                                {record.assay === "VisiumST" && <Link
+                                                    to={`/views/visiumview?dataset=${record.dataset_id}`}>Visium</Link>}
                                             </Box>
                                         </TableCell>
                                     </TableRow>
@@ -143,18 +145,20 @@ const DatasetDisplay = ({ dataRecords}) => {
                     <Box className="data-list">
                         {displayedData.map((record) => (
                             <Box key={record.dataset_id} className="list-item">
-                                <Typography variant="h6"><Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link></Typography>
-                                 <Box>{record.name}</Box>
-                                  <Box display="flex" gap={2} sx={{fontSize: "14px", padding: "8px 0"}}>
+                                <Typography variant="h6"><Link
+                                    to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link></Typography>
+                                <Box>{record.name}</Box>
+                                <Box display="flex" gap={2} sx={{fontSize: "14px", padding: "8px 0"}}>
                                     <Box><b>PI:</b> {record.PI_full_name}</Box>
                                     <Box><b>First contributor:</b> {record.first_contributor}</Box>
                                     <Box><b>Brain Region:</b> {record.brain_regions}</Box>
                                     <Box><b># Samples:</b> {record.n_samples}</Box>
                                     <Box><b>Assay type:</b> {record.assay}</Box>
-                                  </Box>
+                                </Box>
                                 <Box sx={{fontSize: "14px", padding: "8px 0", display: "flex", gap: "8px"}}>
-                                    <Link to={`/geneview/${record.dataset_id}?sample=all`}>UMAP</Link>
-                                    {record.assay === "VisiumST" && <Link to={`/visiumview/${record.dataset_id}`}>Visium</Link>}
+                                    <Link to={`/views/geneview?dataset=${record.dataset_id}?sample=all`}>UMAP</Link>
+                                    {record.assay === "VisiumST" &&
+                                        <Link to={`/views/visiumview?dataset=${record.dataset_id}`}>Visium</Link>}
                                 </Box>
 
                             </Box>

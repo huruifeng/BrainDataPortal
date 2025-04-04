@@ -27,6 +27,8 @@ const NavBar = () => {
                 <Button color="inherit" component={Link} to="/samples">Samples</Button>
                 <Button color="inherit" onClick={openViewsMenu}>Views</Button>
                 <Menu anchorEl={viewsMenuAnchor} open={Boolean(viewsMenuAnchor)} onClose={closeViewsMenu}>
+                    <MenuItem component={Link} to="/views/geneview" onClick={closeViewsMenu}>Genes</MenuItem>
+                    <MenuItem component={Link} to="/views/visiumview" onClick={closeViewsMenu}>Visium</MenuItem>
                     <MenuItem component={Link} to="/views/celltypes" onClick={closeViewsMenu}>Celltypes</MenuItem>
                     <MenuItem component={Link} to="/views/layers" onClick={closeViewsMenu}>Layers</MenuItem>
                     <MenuItem component={Link} to="/views/regions" onClick={closeViewsMenu}>Regions</MenuItem>
