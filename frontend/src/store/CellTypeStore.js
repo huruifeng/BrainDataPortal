@@ -15,14 +15,18 @@ const useCellTypeStore = create((set, get) => ({
     // Actions
     setSelectedCellTypes: (cellTypes) => set({selectedCellTypes: cellTypes}),
 
-    fetchCellTypeList: async (datasetId) => {
+    fetchCellTypeList: async (dataset_id) => {
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchCellTypeList: No dataset selected"});
+            return;
+        }
         try {
             set({loading: true})
             // Mock API call - replace with actual API
-            const response = await getCellTypeList(datasetId);
+            const response = await getCellTypeList(dataset_id);
             if (response.status === 200) {
                 const data = await response.data;
-                await set({cellTypeList: data, loading: false})
+                await set({cellTypeList: data, loading: false, error: null});
 
             } else {
                const error_message = "Error fetching cell type list: "+ response.message;
@@ -34,11 +38,11 @@ const useCellTypeStore = create((set, get) => ({
         }
     },
 
-    fetchMarkerGenes: async (datasetId) => {
+    fetchMarkerGenes: async (dataset_id) => {
         try {
             set({loading: true})
             // Mock API call - replace with actual API
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await new Promise((resolve) => setTimeout(resolve, 300))
 
             const selectedCellTypes = get().selectedCellTypes
             const isAllSelected = selectedCellTypes.includes("all")
@@ -95,11 +99,11 @@ const useCellTypeStore = create((set, get) => ({
         }
     },
 
-    fetchCellCounts: async (datasetId) => {
+    fetchCellCounts: async (dataset_id) => {
         try {
             set({loading: true})
             // Mock API call - replace with actual API
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await new Promise((resolve) => setTimeout(resolve, 300))
 
             // Generate mock cell count data
             const cellTypes = ["Astrocytes", "Microglia", "Neurons", "Oligodendrocytes", "OPCs"]
@@ -132,11 +136,11 @@ const useCellTypeStore = create((set, get) => ({
         }
     },
 
-    fetchDiffExpGenes: async (datasetId) => {
+    fetchDiffExpGenes: async (dataset_id) => {
         try {
             set({loading: true})
             // Mock API call - replace with actual API
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await new Promise((resolve) => setTimeout(resolve, 300))
 
             const selectedCellTypes = get().selectedCellTypes
 

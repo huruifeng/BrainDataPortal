@@ -297,7 +297,8 @@ function VisiumView() {
                     ) : datasetId === "" ? (
                         <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
                             No dataset selected for exploration
-                        </Typography>) : error ? (
+                        </Typography>
+                    ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : (
                         <div className="visium-container">

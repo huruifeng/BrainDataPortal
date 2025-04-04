@@ -14,7 +14,7 @@ import {
     Grid,
 } from "@mui/material"
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
-import {useParams, useSearchParams} from "react-router-dom"
+import {useSearchParams} from "react-router-dom"
 
 import useCellTypeStore from "../../store/CellTypeStore.js"
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
@@ -29,12 +29,9 @@ import "./CellTypesView.css"
 
 function CellTypesView() {
     // Get all the pre-selected values
-    const {dataset_id} = useParams()
-    const datasetId = dataset_id ?? ""
-
     const [queryParams, setQueryParams] = useSearchParams()
     const initialCellTypes = queryParams.getAll("celltype")
-    const initialDataset = queryParams.get("dataset") ?? datasetId
+    const initialDataset = queryParams.get("dataset") ?? ""
 
     const [selectedDataset, setSelectedDataset] = useState(initialDataset)
 
@@ -115,7 +112,7 @@ function CellTypesView() {
 
     // click the button to fetch umap data
     const handleLoadPlot = () => {
-        setDataset(datasetId)
+        setDataset(selectedDataset)
         fetchMarkerGenes(selectedDataset)
         fetchCellCounts(selectedDataset)
         fetchDiffExpGenes(selectedDataset)
@@ -187,7 +184,11 @@ function CellTypesView() {
 
                 {/* Right Plot Area (75%) */}
                 <div className="plot-main">
-                    {loading ? (
+                    {selectedDataset === "" ? (
+                        <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
+                            No dataset selected for exploration
+                        </Typography>
+                    ) : loading ? (
                         <>
                             <Box sx={{width: "100%"}}>
                                 <LinearProgress/>
