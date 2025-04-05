@@ -91,7 +91,7 @@
 }
 
 /* Bubble Plot Container */
-.bubble-container {
+.dot-container {
     width: 100%;
     display: flex;
     justify-content: center;

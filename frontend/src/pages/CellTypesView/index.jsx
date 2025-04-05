@@ -21,7 +21,7 @@ import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
 import useDataStore from "../../store/DataStore.js"
 
 import UMAPPlot from "./UMAPPlot.jsx"
-import BubblePlot from "./BubblePlot.jsx"
+import DotPlot from "./DotPlot.jsx"
 import BarPlot from "./BarPlot.jsx"
 import HeatmapPlot from "./HeatmapPlot.jsx"
 
@@ -225,12 +225,10 @@ function CellTypesView() {
                             </div>
 
                             <div className="plot-section" id="marker-genes-section">
-                                <Divider sx={{marginTop: "10px"}} flexItem>
-                                    Marker Genes
-                                </Divider>
-                                <div className="bubble-container">
+                                <Divider sx={{marginTop: "10px"}} flexItem>Marker Genes</Divider>
+                                <div className="dot-container">
                                     {markerGenes && (
-                                        <BubblePlot
+                                        <DotPlot
                                             markerGenes={markerGenes}
                                             selectedCellTypes={selectedCellTypes}
                                             isAllCellTypesSelected={isAllCellTypesSelected}
@@ -240,9 +238,7 @@ function CellTypesView() {
                             </div>
 
                             <div className="plot-section" id="cell-counts-deg-section">
-                                <Divider sx={{marginTop: "10px"}} flexItem>
-                                    Cell Counts & Differential Expression
-                                </Divider>
+                                <Divider sx={{marginTop: "10px"}} flexItem>Cell Counts & Differential Expression</Divider>
                                 <Grid container spacing={2} className="bottom-plots-container">
                                     <Grid item xs={12} md={6}>
                                         {cellCounts && <BarPlot cellCounts={cellCounts} selectedCellTypes={selectedCellTypes}/>}

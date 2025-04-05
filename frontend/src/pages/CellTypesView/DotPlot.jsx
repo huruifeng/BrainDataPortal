@@ -4,7 +4,7 @@ import {useEffect, useRef} from "react"
 import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
-const BubblePlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
+const DotPlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
     const plotRef = useRef(null)
 
     useEffect(() => {
@@ -160,11 +160,11 @@ const BubblePlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) =>
     return <div ref={plotRef} style={{width: "100%", height: "400px", minHeight: "400px"}}/>
 }
 
-BubblePlot.propTypes = {
+DotPlot.propTypes = {
     markerGenes: PropTypes.object.isRequired,
     selectedCellTypes: PropTypes.array.isRequired,
     isAllCellTypesSelected: PropTypes.bool.isRequired,
 }
 
-export default BubblePlot
+export default DotPlot
 
