@@ -190,9 +190,7 @@ function CellTypesView() {
                         </Typography>
                     ) : loading ? (
                         <>
-                            <Box sx={{width: "100%"}}>
-                                <LinearProgress/>
-                            </Box>
+                            <Box sx={{width: "100%"}}><LinearProgress/></Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
                                 <CircularProgress/>
                             </Box>

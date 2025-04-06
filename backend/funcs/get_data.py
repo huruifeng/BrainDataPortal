@@ -52,6 +52,7 @@ def get_meta_list(dataset, query_str="all"):
     else:
         print(meta_file + " not found")
         return "Error: Gene list file not found"
+
 def get_celltype_list(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
@@ -64,6 +65,21 @@ def get_celltype_list(dataset):
         return data
     else:
         print(meta_file + " not found")
+        return "Error: Meta file not found"
+
+def get_marker_genes(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        markergene_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_markergenes_cellcounts.csv')
+
+    if os.path.exists(markergene_file):
+        data_df = pd.read_csv(markergene_file, index_col=None, header=0)
+        data = data_df.to_dict(orient="records")
+        return data
+    else:
+        print(markergene_file + " not found")
+        return "Error: Marker Genes file not found"
 
 def get_umapembedding(dataset):
     if dataset == "all":

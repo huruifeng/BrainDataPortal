@@ -11,7 +11,7 @@ export const getGeneList = async (dataset,query_str) => {
             {params: {dataset:dataset,query_str:query_str}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getGeneList:", error);
         throw error;
     }
 }
@@ -22,7 +22,7 @@ export const getSampleList = async (dataset,query_str) => {
             {params: {dataset:dataset,query_str:query_str}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getSampleList:", error);
         throw error;
     }
 }
@@ -33,7 +33,7 @@ export const getMetaList = async (dataset,query_str) => {
             {params: {dataset:dataset,query_str:query_str}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getMetaList:", error);
         throw error;
     }
 }
@@ -44,7 +44,7 @@ export const getCellTypeList = async (dataset) => {
             {params: {dataset:dataset}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getCellTypeList:", error);
         throw error;
     }
 
@@ -56,7 +56,7 @@ export const getUMAPData = async (dataset) => {
             {params: {dataset:dataset}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getUMAPData:", error);
         throw error;
     }
 }
@@ -67,7 +67,7 @@ export const getExprData = async (dataset,gene) => {
             {params: {dataset:dataset,gene:gene}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getExprData:", error);
         throw error;
     }
 }
@@ -78,7 +78,7 @@ export const getPseudoExprData = async (dataset,gene) => {
             {params: {dataset:dataset,gene:gene}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getPseudoExprData:", error);
         throw error;
     }
 }
@@ -89,7 +89,7 @@ export const getMetaDataOfSample = async (dataset, sample) => {
             {params: {dataset:dataset, sample:sample}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getMetaDataOfSample:", error);
         throw error;
     }
 }
@@ -100,11 +100,10 @@ export const getAllSampleMetaData = async (dataset) => {
             {params: {dataset:dataset}});
         return response;
     } catch (error) {
-        console.error("Error reading umap data:", error);
+        console.error("Error getAllSampleMetaData:", error);
         throw error;
     }
 }
-
 
 
 export const getAllMetaData = async (dataset_id="all",features=["all"],dataset_type="all") => {
@@ -113,10 +112,24 @@ export const getAllMetaData = async (dataset_id="all",features=["all"],dataset_t
             {params: {dataset_id: dataset_id, features: features, dataset_type: dataset_type}});
         return response;
     } catch (error) {
-        console.error("Error reading gene/meta records:", error);
+        console.error("Error getAllMetaData:", error);
         throw error;
     }
 }
+
+
+export const getMarkerGenes = async (dataset) => {
+    try {
+        const response = await axios.get(`${API_URL}/getmarkergenes`,
+            {params: {dataset:dataset}});
+        return response;
+    } catch (error) {
+        console.error("Error getMarkerGenes:", error);
+        throw error;
+    }
+}
+
+
 
 export const getData_get = async (data_id="all") => {
     try {

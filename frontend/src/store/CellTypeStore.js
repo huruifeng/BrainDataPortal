@@ -1,14 +1,16 @@
 import {create} from "zustand"
-import {getCellTypeList} from "../api/api.js";
+import {getCellTypeList, getMarkerGenes} from "../api/api.js";
 import {toast} from "react-toastify";
 
 const useCellTypeStore = create((set, get) => ({
     // State
     cellTypeList: [],
-    markerGenes: null,
-    cellCounts: null,
-    diffExpGenes: null,
     selectedCellTypes: [],
+    cellCounts: null,
+
+    markerGenes: null,
+    diffExpGenes: null,
+
     loading: false,
     error: null,
 
@@ -29,8 +31,8 @@ const useCellTypeStore = create((set, get) => ({
                 await set({cellTypeList: data, loading: false, error: null});
 
             } else {
-               const error_message = "Error fetching cell type list: "+ response.message;
-                await set({cellTypeList: [],error: error_message, loading: false});
+                const error_message = "Error fetching cell type list: " + response.message;
+                await set({cellTypeList: [], error: error_message, loading: false});
                 toast.error(response.message);
             }
         } catch (error) {
@@ -39,61 +41,22 @@ const useCellTypeStore = create((set, get) => ({
     },
 
     fetchMarkerGenes: async (dataset_id) => {
+         if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchMarkerGenes: No dataset selected"});
+            return;
+        }
         try {
             set({loading: true})
-            // Mock API call - replace with actual API
-            await new Promise((resolve) => setTimeout(resolve, 300))
+            const response = await getMarkerGenes(dataset_id);
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({markerGenes: data, loading: false, error: null});
 
-            const selectedCellTypes = get().selectedCellTypes
-            const isAllSelected = selectedCellTypes.includes("all")
-
-            // Generate mock marker genes data
-            const cellTypes = isAllSelected
-                ? ["Astrocytes", "Microglia", "Neurons", "Oligodendrocytes", "OPCs"]
-                : selectedCellTypes
-
-            const genePool = [
-                "GFAP",
-                "S100B",
-                "AQP4",
-                "ALDH1L1",
-                "SLC1A3", // Astrocyte markers
-                "CX3CR1",
-                "P2RY12",
-                "TMEM119",
-                "ITGAM",
-                "CSF1R", // Microglia markers
-                "RBFOX3",
-                "MAP2",
-                "TUBB3",
-                "SYP",
-                "SYT1", // Neuron markers
-                "MBP",
-                "PLP1",
-                "MOG",
-                "MAG",
-                "MOBP", // Oligodendrocyte markers
-                "PDGFRA",
-                "CSPG4",
-                "OLIG1",
-                "OLIG2",
-                "SOX10", // OPC markers
-            ]
-
-            const mockMarkerGenes = {}
-
-            cellTypes.forEach((cellType) => {
-                // Generate 15 marker genes for each cell type (so we have more than 10)
-                mockMarkerGenes[cellType] = Array.from({length: 15}, (_, i) => {
-                    const randomGene = genePool[Math.floor(Math.random() * genePool.length)]
-                    return {
-                        name: `${randomGene}_${i}`,
-                        score: Math.random() * 5 + 1, // Score between 1 and 6
-                    }
-                }).sort((a, b) => b.score - a.score) // Sort by score descending
-            })
-
-            set({markerGenes: mockMarkerGenes, loading: false})
+            } else {
+                const error_message = "Error fetching cell type list: " + response.message;
+                await set({markerGenes: [], error: error_message, loading: false});
+                toast.error(response.message);
+            }
         } catch (error) {
             set({error: error.message, loading: false})
         }
