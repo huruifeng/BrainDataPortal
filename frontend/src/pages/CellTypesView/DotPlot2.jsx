@@ -5,7 +5,7 @@ import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
 const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected }) => {
-  console.log(markerGenes, selectedCellTypes)
+
   const plotRef = useRef(null)
 
   useEffect(() => {
