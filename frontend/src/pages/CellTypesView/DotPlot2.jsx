@@ -171,6 +171,12 @@ const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected }) =>
       xaxis: {
         title: "Cell Types",
         tickangle: 45,
+       // Reduce space between axis and plot
+        automargin: false,
+        tickfont: { size: 10 },
+        zeroline: true,
+        showgrid: true,
+        showline: true,
         domain: [0, 0.9], // Make more room for the legend on the right
       },
       yaxis: {
@@ -181,7 +187,6 @@ const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected }) =>
       xaxis2: {
         domain: [0.9, 1], // Legend area
         showgrid: false,
-        zeroline: false,
         showticklabels: false,
         range: [1, 1.2], // Fixed range for legend
       },
@@ -204,6 +209,11 @@ const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected }) =>
       autosize: true,
       hovermode: "closest",
       annotations: annotations,
+      // Adjust the plot padding
+      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: "rgba(0,0,0,0)",
+      bargap: 0,
+      bargroupgap: 0,
     }
 
     // Combine main trace with legend traces
@@ -211,7 +221,6 @@ const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected }) =>
 
     Plotly.newPlot(plotRef.current, allTraces, layout, {
       responsive: true,
-      displayModeBar: true,
       displaylogo: false,
     })
 

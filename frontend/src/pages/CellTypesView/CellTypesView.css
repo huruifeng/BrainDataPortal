@@ -28,7 +28,7 @@
     width: 25%;
     padding: 10px;
     background-color: #f8f9fa;
-    border-right: 1px solid #ddd;
+    /*border-right: 1px solid #ddd;*/
     position: sticky;
     top: 0;
     height: 100vh;
@@ -40,6 +40,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    border-left: 1px solid #ddd;
     margin: 0px;
     overflow-y: auto;
     align-items: center;
@@ -95,8 +96,6 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
     min-height: 400px;
 }
 
