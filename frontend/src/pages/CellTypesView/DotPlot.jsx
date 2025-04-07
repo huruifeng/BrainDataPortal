@@ -21,7 +21,7 @@ const DotPlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
             const cellTypeMarkers = markerGenes.filter((gene) => gene.MajorCellTypes === cellType && gene.is_marker)
 
             // Sort by score or another metric if available, then take top 10
-            const topMarkers = cellTypeMarkers.sort((a, b) => (b.score || b.avg_expr) - (a.score || a.avg_expr)).slice(0, 10)
+            const topMarkers = cellTypeMarkers.sort((b,a) => (b.score || b.avg_expr) - (a.score || a.avg_expr)).slice(0, 10)
 
             // Add to pooled genes with source cell type
             pooledGenes = [
