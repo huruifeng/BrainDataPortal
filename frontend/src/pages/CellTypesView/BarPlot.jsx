@@ -6,8 +6,16 @@ import Plotly from "plotly.js-dist-min"
 import {FormControl, InputLabel, Select, MenuItem} from "@mui/material"
 
 const BarPlot = ({cellCounts, selectedCellTypes}) => {
+    console.log("cellCounts", cellCounts)
     const plotRef = useRef(null)
-    const [comparisonType, setComparisonType] = useState("pd_vs_control")
+    const [comparisonType, setComparisonType] = useState("conditions")
+
+    const ConditionSet = new Set();
+    const SexSet = new Set();
+    for (const cellType in cellCounts) {
+      cellCounts[cellType].forEach(item => ConditionSet.add(item.condation));
+      cellCounts[cellType].forEach(item => SexSet.add(item.sex));
+    }
 
     useEffect(() => {
         if (!cellCounts || !plotRef.current) return
@@ -23,7 +31,7 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
         const traces = []
 
         switch (comparisonType) {
-            case "pd_vs_control":
+            case "conditions":
                 // PD vs Control comparison
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     const pdData = data.filter((item) => item.condition === "PD")
@@ -60,7 +68,7 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                 })
                 break
 
-            case "male_vs_female":
+            case "sex":
                 // Male vs Female comparison
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     const maleData = data.filter((item) => item.sex === "Male")
@@ -97,7 +105,7 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                 })
                 break
 
-            case "pd_vs_control_male":
+            case "conditions_sex":
                 // PD vs Control within Male
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     const pdMaleData = data.filter((item) => item.condition === "PD" && item.sex === "Male")
@@ -135,7 +143,44 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                 })
                 break
 
-            case "pd_vs_control_female":
+            case "conditions_male":
+                // PD vs Control within Female
+                Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                    const pdFemaleData = data.filter((item) => item.condition === "PD" && item.sex === "M")
+                    const controlFemaleData = data.filter((item) => item.condition === "Control" && item.sex === "M")
+
+                    const pdFemaleAvg = pdFemaleData.reduce((sum, item) => sum + item.count, 0) / (pdFemaleData.length || 1)
+                    const controlFemaleAvg =
+                        controlFemaleData.reduce((sum, item) => sum + item.count, 0) / (controlFemaleData.length || 1)
+
+                    traces.push({
+                        x: [`${cellType} - PD Female`],
+                        y: [pdFemaleAvg],
+                        type: "bar",
+                        name: `${cellType} - PD Female`,
+                        marker: {color: "salmon"},
+                        error_y: {
+                            type: "data",
+                            array: [calculateStdError(pdFemaleData.map((item) => item.count))],
+                            visible: true,
+                        },
+                    })
+
+                    traces.push({
+                        x: [`${cellType} - Control Female`],
+                        y: [controlFemaleAvg],
+                        type: "bar",
+                        name: `${cellType} - Control Female`,
+                        marker: {color: "lightblue"},
+                        error_y: {
+                            type: "data",
+                            array: [calculateStdError(controlFemaleData.map((item) => item.count))],
+                            visible: true,
+                        },
+                    })
+                })
+                break
+            case "conditions_female":
                 // PD vs Control within Female
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     const pdFemaleData = data.filter((item) => item.condition === "PD" && item.sex === "Female")
@@ -219,14 +264,16 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
 
     const getComparisonTitle = (type) => {
         switch (type) {
-            case "pd_vs_control":
-                return "Cell Counts: PD vs Control"
-            case "male_vs_female":
-                return "Cell Counts: Male vs Female"
-            case "pd_vs_control_male":
-                return "Cell Counts: PD vs Control (Male)"
-            case "pd_vs_control_female":
-                return "Cell Counts: PD vs Control (Female)"
+            case "conditions":
+                return "Cell Counts across Conditions"
+            case "sex":
+                return "Cell Counts across Sex"
+            case "conditions_sex":
+                return "Cell Counts in Conditions x Sex"
+            case "conditions_male":
+                return "Cell Counts in Conditions (Male)"
+            case "conditions_female":
+                return "Cell Counts in Conditions (Female)"
             default:
                 return "Cell Counts"
         }
@@ -243,10 +290,11 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     onChange={(e) => setComparisonType(e.target.value)}
                     size="small"
                 >
-                    <MenuItem value="pd_vs_control">PD vs Control</MenuItem>
-                    <MenuItem value="male_vs_female">Male vs Female</MenuItem>
-                    <MenuItem value="pd_vs_control_male">PD vs Control (Male)</MenuItem>
-                    <MenuItem value="pd_vs_control_female">PD vs Control (Female)</MenuItem>
+                    <MenuItem value="conditions">Conditions</MenuItem>
+                    <MenuItem value="sex">Sex</MenuItem>
+                    <MenuItem value="conditions_sex">Conditions x Sex</MenuItem>
+                    <MenuItem value="conditions_male">Conditions (Male)</MenuItem>
+                    <MenuItem value="conditions_female">Conditions (Female)</MenuItem>
                 </Select>
             </FormControl>
             <div ref={plotRef} style={{width: "100%", height: "400px", minHeight: "400px"}}/>

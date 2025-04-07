@@ -203,7 +203,7 @@ const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected }) =>
         l: 100,
         r: 50, // Increase right margin to accommodate the size legend
         b: 100,
-        t: 50,
+        t: 0,
         pad: 4,
       },
       height: Math.max(400, uniqueGeneNames.length * 25 + 120), // Dynamic height based on number of genes

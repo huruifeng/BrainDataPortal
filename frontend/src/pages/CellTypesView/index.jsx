@@ -240,7 +240,9 @@ function CellTypesView() {
                                 <Divider sx={{marginTop: "10px"}} flexItem>Cell Counts & Differential Expression</Divider>
                                 <Grid container spacing={2} className="bottom-plots-container">
                                     <Grid item xs={12} md={6}>
-                                        {cellCounts && <BarPlot cellCounts={cellCounts} selectedCellTypes={selectedCellTypes}/>}
+                                        {cellCounts && selectedCellTypes.length > 0 && (
+                                            <BarPlot cellCounts={cellCounts} selectedCellTypes={selectedCellTypes}/>)
+                                        }
                                     </Grid>
                                     <Grid item xs={12} md={6}>
                                         {diffExpGenes && selectedCellTypes.length > 0 && (

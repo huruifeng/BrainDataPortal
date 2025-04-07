@@ -79,34 +79,6 @@ const useCellTypeStore = create((set, get) => ({
                 await set({cellCounts: [], error: error_message, loading: false});
                 toast.error(response.message);
             }
-
-
-            // Generate mock cell count data
-            const cellTypes = ["Astrocytes", "Microglia", "Neurons", "Oligodendrocytes", "OPCs"]
-            const conditions = ["PD", "Control"]
-            const sexes = ["Male", "Female"]
-
-            const mockCellCounts = {}
-
-            cellTypes.forEach((cellType) => {
-                mockCellCounts[cellType] = []
-
-                // Generate 5 samples for each combination of condition and sex
-                conditions.forEach((condition) => {
-                    sexes.forEach((sex) => {
-                        for (let i = 0; i < 5; i++) {
-                            mockCellCounts[cellType].push({
-                                condition,
-                                sex,
-                                count: Math.floor(Math.random() * 1000) + 100, // Random count between 100 and 1100
-                                sample_id: `sample_${condition}_${sex}_${i}`,
-                            })
-                        }
-                    })
-                })
-            })
-
-            set({cellCounts: mockCellCounts, loading: false})
         } catch (error) {
             set({error: error.message, loading: false})
         }

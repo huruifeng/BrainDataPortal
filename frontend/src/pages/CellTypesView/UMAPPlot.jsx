@@ -95,7 +95,6 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
 
         Plotly.newPlot(plotRef.current, traces, layout, {
             responsive: true,
-            displayModeBar: true,
             displaylogo: false, // Removes the Plotly logo
             modeBarButtonsToRemove: ["lasso2d", "select2d"],
         })
