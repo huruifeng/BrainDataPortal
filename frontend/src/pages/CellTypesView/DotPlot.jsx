@@ -21,7 +21,7 @@ const DotPlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
             const cellTypeMarkers = markerGenes.filter((gene) => gene.MajorCellTypes === cellType && gene.is_marker)
 
             // Sort by score or another metric if available, then take top 10
-            const topMarkers = cellTypeMarkers.sort((b, a) => (b.score || b.avg_expr) - (a.score || a.avg_expr)).slice(0, 10)
+            const topMarkers = cellTypeMarkers.sort((a, b) => (b.score || b.avg_expr) - (a.score || a.avg_expr)).slice(0, 10)
 
             // Add to pooled genes with source cell type
             pooledGenes = [
@@ -89,9 +89,12 @@ const DotPlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
             })
         })
 
-        // console.log(
-        //     `Total data points: ${xValues.length} (${uniqueGeneNames.length} genes × ${allCellTypes.length} cell types)`,
-        // )
+        // Calculate the plot height
+        const plotHeight = Math.max(400, uniqueGeneNames.length * 25 + 120)
+
+        // Make dots smaller by increasing the sizeref value
+        // Higher sizeref = smaller dots
+        const sizeref = 0.2 // Adjust this value to make dots smaller or larger
 
         // Create the main dot plot trace
         const mainTrace = {
@@ -101,7 +104,7 @@ const DotPlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
             marker: {
                 size: sizeValues,
                 sizemode: "area",
-                sizeref: 0.1, // Adjust this value to scale the dots appropriately
+                sizeref: sizeref, // Use adjusted sizeref for smaller dots
                 sizemin: 1, // Minimum dot size
                 color: colorValues,
                 colorscale: "Viridis", // Use a color scale that works well for expression data
@@ -110,7 +113,11 @@ const DotPlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
                     thickness: 15,
                     tickvals: [0, 2, 4, 6],
                     ticktext: ["0", "2", "4", "6+"],
-                    len: 1/selectedCellTypes.length,
+                    // Position the colorbar below the vertical center line
+                    y: 0.5,
+                    x: 0.90,
+                    len: 1/(selectedCellTypes.length + 1),
+                    yanchor: "top",
                 },
                 opacity: 0.8,
             },
@@ -120,70 +127,68 @@ const DotPlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
             showlegend: false,
         }
 
-        // Create size legend traces (invisible points with different sizes)
-        const sizeLegendTraces = [
-            {x: [null], y: [null],
-                mode: "markers",
-                marker: {size: 20, color: "rgba(0,0,0,0.5)",},
-                name: "20% of cells",
-                showlegend: true,
-                hoverinfo: "none",
-                legendgroup: "size-legend",
-            },
-            {x: [null], y: [null],
-                mode: "markers",
-                marker: {size: 40, color: "rgba(0,0,0,0.5)",},
-                name: "40% of cells",
-                showlegend: true,
-                hoverinfo: "none",
-                legendgroup: "size-legend",
-            },
-            {x: [null], y: [null],
-                mode: "markers",
-                marker: {size: 60, color: "rgba(0,0,0,0.5)",},
-                name: "60% of cells",
-                showlegend: true,
-                hoverinfo: "none",
-                legendgroup: "size-legend",
-            },
-            {x: [null], y: [null],
-                mode: "markers",
-                marker: {size: 80, color: "rgba(0,0,0,0.5)",},
-                name: "80% of cells",
-                showlegend: true,
-                hoverinfo: "none",
-                legendgroup: "size-legend",
-            },
-            {x: [null], y: [null],
-                mode: "markers",
-                marker: {size: 100, color: "rgba(0,0,0,0.5)",},
-                name: "100% of cells",
-                showlegend: true,
-                hoverinfo: "none",
-                legendgroup: "size-legend",
-            },
-        ]
+        // Create a separate div for the legend
+        const legendDiv = document.createElement("div")
+        legendDiv.className = "dot-size-legend"
+        legendDiv.style.position = "absolute"
+        legendDiv.style.top = selectedCellTypes.length * 40 + "px"
+        legendDiv.style.right = "60px"
+        legendDiv.style.width = "100px"
+        legendDiv.style.height = "200px" // Fixed height
+        legendDiv.style.pointerEvents = "none"
+        legendDiv.style.zIndex = "1000"
 
-        // Add a title for the size legend
-        const sizeLegendTitle = {
-            x: [null],
-            y: [null],
-            mode: "markers",
-            marker: {size: 0, color: "rgba(0,0,0,0)",},
-            name: "Percent of Cells",
-            showlegend: true,
-            hoverinfo: "none",
-            legendgroup: "size-legend",
-        }
+        // Create the legend title
+        const titleDiv = document.createElement("div")
+        titleDiv.textContent = "Percent of Cells:"
+        titleDiv.style.fontSize = "12px"
+        titleDiv.style.marginBottom = "10px"
+        titleDiv.style.textAlign = "center"
+        legendDiv.appendChild(titleDiv)
 
-        // Combine all traces
-        const plotData = [mainTrace, sizeLegendTitle, ...sizeLegendTraces]
+        // Create the legend items
+        const sizeLegendSizes = [20, 40, 60, 80, 100]
+
+        // Create SVG for the legend
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        svg.setAttribute("width", "100")
+        svg.setAttribute("height", "170")
+        svg.style.display = "block"
+
+        // Calculate the fixed spacing between legend items
+        const itemSpacing = 25
+        const startY = 5
+
+        sizeLegendSizes.forEach((size, i) => {
+            // Calculate circle radius based on the same sizeref as the main plot
+            const radius = Math.sqrt((size / sizeref) / Math.PI )
+
+            // Create circle
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+            circle.setAttribute("cx", "20")
+            circle.setAttribute("cy", startY + i * itemSpacing)
+            circle.setAttribute("r", radius)
+            circle.setAttribute("fill", "rgba(0,0,0,0.7)")
+
+            // Create text label
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text")
+            text.setAttribute("x", "35")
+            text.setAttribute("y", startY + i * itemSpacing + 4) // +4 for vertical alignment
+            text.setAttribute("font-size", "10px")
+            text.textContent = `${size}%`
+
+            svg.appendChild(circle)
+            svg.appendChild(text)
+        })
+
+        legendDiv.appendChild(svg)
 
         const layout = {
             title: `Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} cell types)`,
             xaxis: {
                 title: "Cell Types",
                 tickangle: 45,
+                domain: [0, 0.9], // Make more room for the legend on the right
             },
             yaxis: {
                 title: "Genes",
@@ -191,36 +196,45 @@ const DotPlot = ({markerGenes, selectedCellTypes, isAllCellTypesSelected}) => {
             },
             margin: {
                 l: 100,
-                r: 50,
-                b: 120,
-                t: 30,
+                r: 50, // Increase right margin to accommodate the size legend
+                b: 100,
+                t: 50,
                 pad: 4,
             },
-            height: Math.max(400, uniqueGeneNames.length * 25 + 150), // Dynamic height based on number of genes
+            height: plotHeight,
             autosize: true,
             hovermode: "closest",
-            legend: {
-                title: {
-                    text: "Legend",
-                },
-                orientation: "v",
-                x: 1.05,
-                y: 1,
-                traceorder: "grouped",
-                itemsizing: "constant",
-            },
         }
 
-        Plotly.newPlot(plotRef.current, plotData, layout, {
+        Plotly.newPlot(plotRef.current, [mainTrace], layout, {
             responsive: true,
             displayModeBar: true,
             displaylogo: false,
         })
 
+        // Add the legend div to the plot container after Plotly has rendered
+        setTimeout(() => {
+            if (plotRef.current) {
+                // Remove any existing legend first
+                const existingLegend = plotRef.current.querySelector(".dot-size-legend")
+                if (existingLegend) {
+                    existingLegend.remove()
+                }
+
+                // Add the new legend
+                plotRef.current.style.position = "relative"
+                plotRef.current.appendChild(legendDiv)
+            }
+        }, 100)
+
         // Cleanup
         return () => {
             if (plotRef.current) {
                 Plotly.purge(plotRef.current)
+                const existingLegend = plotRef.current.querySelector(".dot-size-legend")
+                if (existingLegend) {
+                    existingLegend.remove()
+                }
             }
         }
     }, [markerGenes, selectedCellTypes, isAllCellTypesSelected])

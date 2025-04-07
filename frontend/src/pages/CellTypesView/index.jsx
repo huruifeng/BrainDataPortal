@@ -22,6 +22,7 @@ import useDataStore from "../../store/DataStore.js"
 
 import UMAPPlot from "./UMAPPlot.jsx"
 import DotPlot from "./DotPlot.jsx"
+import DotPlot2 from "./DotPlot2.jsx"
 import BarPlot from "./BarPlot.jsx"
 import HeatmapPlot from "./HeatmapPlot.jsx"
 
@@ -226,7 +227,7 @@ function CellTypesView() {
                                 <Divider sx={{marginTop: "10px"}} flexItem>Marker Genes</Divider>
                                 <div className="dot-container">
                                     {markerGenes && (
-                                        <DotPlot
+                                        <DotPlot2
                                             markerGenes={markerGenes}
                                             selectedCellTypes={selectedCellTypes}
                                             isAllCellTypesSelected={isAllCellTypesSelected}
