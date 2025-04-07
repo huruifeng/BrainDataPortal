@@ -57,14 +57,28 @@ def get_celltype_list(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
-        meta_file = os.path.join("backend", "datasets", dataset, 'metadata_lite_50k.csv')
+        cellconuts_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_cellcounts.json')
 
-    if os.path.exists(meta_file):
-        data_df = pd.read_csv(meta_file, index_col=None, header=0)
-        data = data_df['MajorCellTypes'].unique().tolist()
+    if os.path.exists(cellconuts_file):
+        with open(cellconuts_file, 'r') as f:
+            data = json.load(f)
+        return list(data.keys()) if data is not None else data.keys()
+    else:
+        print(cellconuts_file + " not found")
+        return "Error: Meta file not found"
+
+def get_celltype_counts(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        cellconuts_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_cellcounts.json')
+
+    if os.path.exists(cellconuts_file):
+        with open(cellconuts_file, 'r') as f:
+            data = json.load(f)
         return data
     else:
-        print(meta_file + " not found")
+        print(cellconuts_file + " not found")
         return "Error: Meta file not found"
 
 def get_marker_genes(dataset):

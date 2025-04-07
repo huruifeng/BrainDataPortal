@@ -59,6 +59,17 @@ async def getcelltypelist(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting celltype list.")
     return response
 
+@router.get("/getcellcounts")
+async def getcellcounts(request:Request):
+    print("getcellcounts() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_celltype_counts(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting celltype list.")
+    return response
+
 @router.get("/getmarkergenes")
 async def getmarkergenes(request:Request):
     print("getmarkergenes() called================")

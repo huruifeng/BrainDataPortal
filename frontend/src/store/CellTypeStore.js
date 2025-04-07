@@ -1,5 +1,5 @@
 import {create} from "zustand"
-import {getCellTypeList, getMarkerGenes} from "../api/api.js";
+import {getCellTypeList, getMarkerGenes,getCellCounts} from "../api/api.js";
 import {toast} from "react-toastify";
 
 const useCellTypeStore = create((set, get) => ({
@@ -63,10 +63,23 @@ const useCellTypeStore = create((set, get) => ({
     },
 
     fetchCellCounts: async (dataset_id) => {
+         if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchMarkerGenes: No dataset selected"});
+            return;
+        }
         try {
             set({loading: true})
-            // Mock API call - replace with actual API
-            await new Promise((resolve) => setTimeout(resolve, 300))
+            const response = await getCellCounts(dataset_id);
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({cellCounts: data, loading: false, error: null});
+
+            } else {
+                const error_message = "Error fetching cell counts: " + response.message;
+                await set({cellCounts: [], error: error_message, loading: false});
+                toast.error(response.message);
+            }
+
 
             // Generate mock cell count data
             const cellTypes = ["Astrocytes", "Microglia", "Neurons", "Oligodendrocytes", "OPCs"]

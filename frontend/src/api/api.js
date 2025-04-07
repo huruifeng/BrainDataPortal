@@ -47,7 +47,17 @@ export const getCellTypeList = async (dataset) => {
         console.error("Error getCellTypeList:", error);
         throw error;
     }
+}
 
+export const getCellCounts = async (dataset) => {
+    try {
+        const response = await axios.get(`${API_URL}/getcellcounts`,
+            {params: {dataset:dataset}});
+        return response;
+    } catch (error) {
+        console.error("Error getCellCounts:", error);
+        throw error;
+    }
 }
 
 export const getUMAPData = async (dataset) => {
