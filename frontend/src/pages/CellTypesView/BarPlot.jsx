@@ -6,23 +6,30 @@ import Plotly from "plotly.js-dist-min"
 import {FormControl, InputLabel, Select, MenuItem} from "@mui/material"
 
 const BarPlot = ({cellCounts, selectedCellTypes}) => {
-    console.log("cellCounts", cellCounts)
     const plotRef = useRef(null)
     const [comparisonType, setComparisonType] = useState("conditions")
 
     const color_platte = [
-        "#d62728", "#1f77b4", "#2ca02c", "#ff7f0e",
-        "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
-        "#bcbd22", "#17becf"]
+        "#d62728",
+        "#1f77b4",
+        "#2ca02c",
+        "#ff7f0e",
+        "#9467bd",
+        "#8c564b",
+        "#e377c2",
+        "#7f7f7f",
+        "#bcbd22",
+        "#17becf",
+    ]
 
-    let ConditionSet = new Set();
-    let SexSet = new Set();
+    let ConditionSet = new Set()
+    let SexSet = new Set()
     for (const cellType in cellCounts) {
-        cellCounts[cellType].forEach(item => ConditionSet.add(item.condition));
-        cellCounts[cellType].forEach(item => SexSet.add(item.sex));
+        cellCounts[cellType].forEach((item) => ConditionSet.add(item.condition))
+        cellCounts[cellType].forEach((item) => SexSet.add(item.sex))
     }
-    ConditionSet = [...ConditionSet];
-    SexSet = [...SexSet];
+    ConditionSet = [...ConditionSet]
+    SexSet = [...SexSet]
 
     useEffect(() => {
         if (!cellCounts || !plotRef.current) return
@@ -40,97 +47,160 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
         switch (comparisonType) {
             case "conditions":
                 // PD vs Control comparison
+                // Track which conditions have been added to the legend
                 const conditionLegendAdded = {}
-                Object.entries(filteredCounts).forEach(([cellType, data]) => {
-                    ConditionSet.forEach((condition) => {
+
+                ConditionSet.forEach((condition, index) => {
+                    const x = []
+                    const y = []
+
+                    // Collect data for all cell types for this condition
+                    Object.entries(filteredCounts).forEach(([cellType, data]) => {
                         const conditionData = data.filter((item) => item.condition === condition)
                         const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
-                        // Only show in legend if this is the first occurrence of this condition
-                        const showInLegend = !conditionLegendAdded[condition]
-                        if (showInLegend) {
-                            conditionLegendAdded[condition] = true
-                        }
-                        traces.push({
-                            x: [`${cellType} - ${condition}`],
-                            y: [count_sum],
-                            type: "bar",
-                            showlegend: showInLegend,
-                            name: `${condition}`,
-                            marker: {color: color_platte[ConditionSet.indexOf(condition)]},
-                        })
+
+                        x.push(cellType)
+                        y.push(count_sum)
+                    })
+
+                    // Only show in legend if this is the first occurrence of this condition
+                    const showInLegend = !conditionLegendAdded[condition]
+                    if (showInLegend) {
+                        conditionLegendAdded[condition] = true
+                    }
+
+                    traces.push({
+                        x: x,
+                        y: y,
+                        type: "bar",
+                        name: condition,
+                        marker: {color: color_platte[index % color_platte.length]},
                     })
                 })
                 break
 
             case "sex":
                 // Male vs Female comparison
-                Object.entries(filteredCounts).forEach(([cellType, data]) => {
-                    SexSet.forEach((sex) => {
+                // Track which sexes have been added to the legend
+                const sexLegendAdded = {}
+
+                SexSet.forEach((sex, index) => {
+                    const x = []
+                    const y = []
+
+                    // Collect data for all cell types for this sex
+                    Object.entries(filteredCounts).forEach(([cellType, data]) => {
                         const sexData = data.filter((item) => item.sex === sex)
                         const count_sum = sexData.reduce((sum, item) => sum + item.count, 0)
-                        traces.push({
-                            x: [`${cellType} - ${sex}`],
-                            y: [count_sum],
-                            type: "bar",
-                            legendgroup: `${sex}`,
-                            name: `${sex}`,
-                            marker: {color: color_platte[SexSet.indexOf(sex)]},
-                        })
+
+                        x.push(cellType)
+                        y.push(count_sum)
+                    })
+
+                    // Only show in legend if this is the first occurrence of this sex
+                    const showInLegend = !sexLegendAdded[sex]
+                    if (showInLegend) {
+                        sexLegendAdded[sex] = true
+                    }
+
+                    traces.push({
+                        x: x,
+                        y: y,
+                        type: "bar",
+                        name: sex,
+                        marker: {color: color_platte[index % color_platte.length]},
                     })
                 })
                 break
 
             case "conditions_sex":
                 // PD vs Control within Male vs Female
-                Object.entries(filteredCounts).forEach(([cellType, data]) => {
-                    ConditionSet.forEach((condition) => {
-                        SexSet.forEach((sex) => {
-                            const conditionData = data.filter((item) => item.condition === condition && item.sex === sex)
-                            const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
-                            traces.push({
-                                x: [`${cellType} - ${condition} - ${sex}`],
-                                y: [count_sum],
-                                type: "bar",
-                                name: `${condition}`,
-                                 legendgroup: `${condition}`,
-                                marker: {color: color_platte[ConditionSet.indexOf(condition)] },
-                            })
+                // Track which combinations have been added to the legend
+                const condSexLegendAdded = {}
+                let combinedIndex = 0
+
+                ConditionSet.forEach((condition) => {
+                    SexSet.forEach((sex) => {
+                        const x = []
+                        const y = []
+
+                        // Collect data for all cell types for this condition and sex
+                        Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                            const filteredData = data.filter((item) => item.condition === condition && item.sex === sex)
+                            const count_sum = filteredData.reduce((sum, item) => sum + item.count, 0)
+
+                            x.push(cellType)
+                            y.push(count_sum)
                         })
+
+                        // Create a combined key for condition and sex
+                        const groupKey = `${condition}_${sex}`
+
+                        // Only show in legend if this is the first occurrence of this combination
+                        const showInLegend = !condSexLegendAdded[groupKey]
+                        if (showInLegend) {
+                            condSexLegendAdded[groupKey] = true
+                        }
+
+                        traces.push({
+                            x: x,
+                            y: y,
+                            type: "bar",
+                            name: `${condition} - ${sex}`,
+                            marker: {color: color_platte[combinedIndex % color_platte.length]},
+                        })
+
+                        combinedIndex++
                     })
                 })
                 break
 
             case `conditions_${SexSet[0]}`:
-                // PD vs Control within Male
-                Object.entries(filteredCounts).forEach(([cellType, data]) => {
-                    ConditionSet.forEach((condition) => {
-                        const conditionData = data.filter((item) => item.condition === condition && item.sex === SexSet[0])
-                        const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
-                        traces.push({
-                            x: [`${cellType} - ${condition}`],
-                            y: [count_sum],
-                            type: "bar",
-                            legendgroup: `${condition}`,
-                            name: `${condition}`,
-                            marker: {color: color_platte[ConditionSet.indexOf(condition)]},
-                        })
+                // PD vs Control within first sex (e.g., Male)
+                ConditionSet.forEach((condition, index) => {
+                    const x = []
+                    const y = []
+
+                    // Collect data for all cell types for this condition and first sex
+                    Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                        const filteredData = data.filter((item) => item.condition === condition && item.sex === SexSet[0])
+                        const count_sum = filteredData.reduce((sum, item) => sum + item.count, 0)
+
+                        x.push(cellType)
+                        y.push(count_sum)
+                    })
+
+                    traces.push({
+                        x: x,
+                        y: y,
+                        type: "bar",
+                        name: condition,
+                        marker: {color: color_platte[index % color_platte.length]},
                     })
                 })
                 break
+
             case `conditions_${SexSet[1]}`:
-                // PD vs Control within Female
-                Object.entries(filteredCounts).forEach(([cellType, data]) => {
-                    ConditionSet.forEach((condition) => {
-                        const conditionData = data.filter((item) => item.condition === condition && item.sex === SexSet[1])
-                        const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
-                        traces.push({
-                            x: [`${cellType} - ${condition}`],
-                            y: [count_sum],
-                            type: "bar",
-                            legendgroup: `${condition}`,
-                            name: `${condition}`,
-                            marker: {color: color_platte[ConditionSet.indexOf(condition)]},
-                        })
+                // PD vs Control within second sex (e.g., Female)
+                ConditionSet.forEach((condition, index) => {
+                    const x = []
+                    const y = []
+
+                    // Collect data for all cell types for this condition and second sex
+                    Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                        const filteredData = data.filter((item) => item.condition === condition && item.sex === SexSet[1])
+                        const count_sum = filteredData.reduce((sum, item) => sum + item.count, 0)
+
+                        x.push(cellType)
+                        y.push(count_sum)
+                    })
+
+                    traces.push({
+                        x: x,
+                        y: y,
+                        type: "bar",
+                        name: condition,
+                        marker: {color: color_platte[index % color_platte.length]},
                     })
                 })
                 break
@@ -142,23 +212,23 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
         const layout = {
             title: "Cell Counts",
             yaxis: {
-                title: "Average Cell Count",
+                title: "Total Cell Count",
                 zeroline: true,
             },
+            xaxis: {
+                tickangle: 45,
+            },
             barmode: "group",
-            bargap: 0,
-            bargroupgap: 0.1,
-            legend: {orientation: "h", y: 1.25,},
+            bargap: 0.1, // Minimal gap between different cell types
+            bargroupgap: 0.05, // Minimal gap between bars within the same cell type
+            legend: {orientation: "h", y: 1.25},
             margin: {
                 l: 50,
                 r: 50,
                 b: 100,
                 t: 50,
-                pad: 4,
+                pad: 0,
             },
-            // Adjust the plot padding
-            plot_bgcolor: "rgba(0,0,0,0)",
-            paper_bgcolor: "rgba(0,0,0,0)",
         }
 
         Plotly.newPlot(plotRef.current, traces, layout, {
@@ -202,4 +272,4 @@ BarPlot.propTypes = {
     selectedCellTypes: PropTypes.array.isRequired,
 }
 
-export default BarPlot;
+export default BarPlot
