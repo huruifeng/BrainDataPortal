@@ -91,6 +91,9 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             legend: {x: 1, y: 0.5,},
             margin: {l: 50, r: 50, b: 50, t: 50, pad: 4,},
             autosize: true,
+             // Adjust the plot padding
+            plot_bgcolor: "rgba(0,0,0,0)",
+            paper_bgcolor: "rgba(0,0,0,0)",
         }
 
         Plotly.newPlot(plotRef.current, traces, layout, {
