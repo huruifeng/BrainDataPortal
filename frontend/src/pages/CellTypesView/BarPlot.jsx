@@ -195,6 +195,8 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                 t: 50,
                 pad: 0,
             },
+            plot_bgcolor: "rgba(0,0,0,0)",
+            paper_bgcolor: "rgba(0,0,0,0)",
         }
 
         Plotly.newPlot(plotRef.current, traces, layout, {

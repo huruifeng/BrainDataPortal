@@ -212,7 +212,6 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                 t: 50,
                 pad: 4,
             },
-            // Adjust the plot padding
             plot_bgcolor: "rgba(0,0,0,0)",
             paper_bgcolor: "rgba(0,0,0,0)",
         }

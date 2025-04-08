@@ -27,7 +27,7 @@
 .plot-panel {
     width: 25%;
     padding: 10px;
-    background-color: #f8f9fa;
+    background-color: #f9f9f9;
     /*border-right: 1px solid #ddd;*/
     position: sticky;
     top: 0;
@@ -68,7 +68,7 @@
 
 .umap-item {
     aspect-ratio: 1 / 1; /* Maintain square shape */
-    background-color: #ffffff;
+    background-color: #f9f9f9;
     border: 1px solid #f0f0f0;
     display: flex;
     justify-content: center;
