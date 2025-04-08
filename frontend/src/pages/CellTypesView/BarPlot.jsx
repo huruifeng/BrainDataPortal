@@ -10,16 +10,9 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
     const [comparisonType, setComparisonType] = useState("conditions")
 
     const color_platte = [
-        "#d62728",
-        "#1f77b4",
-        "#2ca02c",
-        "#ff7f0e",
-        "#9467bd",
-        "#8c564b",
-        "#e377c2",
-        "#7f7f7f",
-        "#bcbd22",
-        "#17becf",
+        "#d62728", "#1f77b4", "#2ca02c", "#ff7f0e",
+        "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
+        "#bcbd22", "#17becf",
     ]
 
     let ConditionSet = new Set()
@@ -45,11 +38,8 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
         const traces = []
 
         switch (comparisonType) {
-            case "conditions":
+            case "conditions": {
                 // PD vs Control comparison
-                // Track which conditions have been added to the legend
-                const conditionLegendAdded = {}
-
                 ConditionSet.forEach((condition, index) => {
                     const x = []
                     const y = []
@@ -63,11 +53,6 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                         y.push(count_sum)
                     })
 
-                    // Only show in legend if this is the first occurrence of this condition
-                    const showInLegend = !conditionLegendAdded[condition]
-                    if (showInLegend) {
-                        conditionLegendAdded[condition] = true
-                    }
 
                     traces.push({
                         x: x,
@@ -78,12 +63,10 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     })
                 })
                 break
+            }
 
-            case "sex":
+            case "sex":{
                 // Male vs Female comparison
-                // Track which sexes have been added to the legend
-                const sexLegendAdded = {}
-
                 SexSet.forEach((sex, index) => {
                     const x = []
                     const y = []
@@ -97,12 +80,6 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                         y.push(count_sum)
                     })
 
-                    // Only show in legend if this is the first occurrence of this sex
-                    const showInLegend = !sexLegendAdded[sex]
-                    if (showInLegend) {
-                        sexLegendAdded[sex] = true
-                    }
-
                     traces.push({
                         x: x,
                         y: y,
@@ -112,11 +89,9 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     })
                 })
                 break
-
-            case "conditions_sex":
+            }
+            case "conditions_sex": {
                 // PD vs Control within Male vs Female
-                // Track which combinations have been added to the legend
-                const condSexLegendAdded = {}
                 let combinedIndex = 0
 
                 ConditionSet.forEach((condition) => {
@@ -133,15 +108,6 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                             y.push(count_sum)
                         })
 
-                        // Create a combined key for condition and sex
-                        const groupKey = `${condition}_${sex}`
-
-                        // Only show in legend if this is the first occurrence of this combination
-                        const showInLegend = !condSexLegendAdded[groupKey]
-                        if (showInLegend) {
-                            condSexLegendAdded[groupKey] = true
-                        }
-
                         traces.push({
                             x: x,
                             y: y,
@@ -154,8 +120,8 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     })
                 })
                 break
-
-            case `conditions_${SexSet[0]}`:
+            }
+            case `conditions_${SexSet[0]}`:{
                 // PD vs Control within first sex (e.g., Male)
                 ConditionSet.forEach((condition, index) => {
                     const x = []
@@ -179,8 +145,8 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     })
                 })
                 break
-
-            case `conditions_${SexSet[1]}`:
+            }
+            case `conditions_${SexSet[1]}`:{
                 // PD vs Control within second sex (e.g., Female)
                 ConditionSet.forEach((condition, index) => {
                     const x = []
@@ -204,7 +170,7 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     })
                 })
                 break
-
+            }
             default:
                 break
         }
