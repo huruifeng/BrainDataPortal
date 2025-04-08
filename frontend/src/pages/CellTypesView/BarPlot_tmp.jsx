@@ -13,16 +13,18 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
     const color_platte = [
         "#d62728", "#1f77b4", "#2ca02c", "#ff7f0e",
         "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
-        "#bcbd22", "#17becf"]
+        "#bcbd22", "#17becf", "#c49c94", "#c7c7c7",
+        "#b5bd61", "#dbdb8d", "#9a9ac8", "#f7b6d2",
+    ]
 
-    let ConditionSet = new Set();
-    let SexSet = new Set();
+    let ConditionSet = new Set()
+    let SexSet = new Set()
     for (const cellType in cellCounts) {
-        cellCounts[cellType].forEach(item => ConditionSet.add(item.condition));
-        cellCounts[cellType].forEach(item => SexSet.add(item.sex));
+        cellCounts[cellType].forEach((item) => ConditionSet.add(item.condition))
+        cellCounts[cellType].forEach((item) => SexSet.add(item.sex))
     }
-    ConditionSet = [...ConditionSet];
-    SexSet = [...SexSet];
+    ConditionSet = [...ConditionSet]
+    SexSet = [...SexSet]
 
     useEffect(() => {
         if (!cellCounts || !plotRef.current) return
@@ -38,102 +40,152 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
         const traces = []
 
         switch (comparisonType) {
-            case "conditions":
-                // PD vs Control comparison
+            case "conditions": {
+                // Condition comparison
+                // Track which conditions have been added to the legend
                 const conditionLegendAdded = {}
+
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     ConditionSet.forEach((condition) => {
                         const conditionData = data.filter((item) => item.condition === condition)
                         const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
+
                         // Only show in legend if this is the first occurrence of this condition
                         const showInLegend = !conditionLegendAdded[condition]
                         if (showInLegend) {
                             conditionLegendAdded[condition] = true
                         }
+
                         traces.push({
-                            x: [`${cellType} - ${condition}`],
+                            x: [`${cellType}`],
                             y: [count_sum],
                             type: "bar",
+                            name: condition,
                             showlegend: showInLegend,
-                            name: `${condition}`,
                             marker: {color: color_platte[ConditionSet.indexOf(condition)]},
                         })
                     })
                 })
                 break
-
-            case "sex":
+            }
+            case "sex": {
                 // Male vs Female comparison
+                // Track which sexes have been added to the legend
+                const sexLegendAdded = {}
+
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     SexSet.forEach((sex) => {
                         const sexData = data.filter((item) => item.sex === sex)
                         const count_sum = sexData.reduce((sum, item) => sum + item.count, 0)
+
+                        // Only show in legend if this is the first occurrence of this sex
+                        const showInLegend = !sexLegendAdded[sex]
+                        if (showInLegend) {
+                            sexLegendAdded[sex] = true
+                        }
+
                         traces.push({
-                            x: [`${cellType} - ${sex}`],
+                            x: [`${cellType}`],
                             y: [count_sum],
                             type: "bar",
-                            legendgroup: `${sex}`,
-                            name: `${sex}`,
+                            name: sex,
+                            showlegend: showInLegend,
                             marker: {color: color_platte[SexSet.indexOf(sex)]},
                         })
                     })
                 })
                 break
-
-            case "conditions_sex":
+            }
+            case "conditions_sex": {
                 // PD vs Control within Male vs Female
+                // Track which conditions have been added to the legend
+                const condSexLegendAdded = {}
+
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     ConditionSet.forEach((condition) => {
                         SexSet.forEach((sex) => {
                             const conditionData = data.filter((item) => item.condition === condition && item.sex === sex)
                             const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
+
+                            // Create a combined key for condition and sex
+                            const groupKey = `${condition}_${sex}`
+
+                            // Only show in legend if this is the first occurrence of this combination
+                            const showInLegend = !condSexLegendAdded[groupKey]
+                            if (showInLegend) {
+                                condSexLegendAdded[groupKey] = true
+                            }
+
                             traces.push({
-                                x: [`${cellType} - ${condition} - ${sex}`],
+                                x: [`${cellType}`],
                                 y: [count_sum],
                                 type: "bar",
-                                name: `${condition}`,
-                                 legendgroup: `${condition}`,
-                                marker: {color: color_platte[ConditionSet.indexOf(condition)] },
+                                name: `${condition} - ${sex}`,
+                                showlegend: showInLegend,
+                                marker: {color: color_platte[ConditionSet.indexOf(condition) * 2 + SexSet.indexOf(sex)]},
                             })
                         })
                     })
                 })
                 break
+            }
+            case `conditions_${SexSet[0]}`: {
+                // PD vs Control within first sex (e.g., Male)
+                // Track which conditions have been added to the legend
+                const condFirstSexLegendAdded = {}
 
-            case `conditions_${SexSet[0]}`:
-                // PD vs Control within Male
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     ConditionSet.forEach((condition) => {
                         const conditionData = data.filter((item) => item.condition === condition && item.sex === SexSet[0])
                         const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
+
+                        // Only show in legend if this is the first occurrence of this condition
+                        const showInLegend = !condFirstSexLegendAdded[condition]
+                        if (showInLegend) {
+                            condFirstSexLegendAdded[condition] = true
+                        }
+
                         traces.push({
-                            x: [`${cellType} - ${condition}`],
+                            x: [`${cellType}`],
                             y: [count_sum],
                             type: "bar",
-                            legendgroup: `${condition}`,
-                            name: `${condition}`,
+                            name: condition,
+                            showlegend: showInLegend,
                             marker: {color: color_platte[ConditionSet.indexOf(condition)]},
                         })
                     })
                 })
                 break
-            case `conditions_${SexSet[1]}`:
-                // PD vs Control within Female
+            }
+
+            case `conditions_${SexSet[1]}`: {
+                // PD vs Control within second sex (e.g., Female)
+                // Track which conditions have been added to the legend
+                const condSecondSexLegendAdded = {}
+
                 Object.entries(filteredCounts).forEach(([cellType, data]) => {
                     ConditionSet.forEach((condition) => {
                         const conditionData = data.filter((item) => item.condition === condition && item.sex === SexSet[1])
                         const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
+
+                        // Only show in legend if this is the first occurrence of this condition
+                        const showInLegend = !condSecondSexLegendAdded[condition]
+                        if (showInLegend) {
+                            condSecondSexLegendAdded[condition] = true
+                        }
+
                         traces.push({
-                            x: [`${cellType} - ${condition}`],
+                            x: [`${cellType}`],
                             y: [count_sum],
                             type: "bar",
-                            legendgroup: `${condition}`,
-                            name: `${condition}`,
+                            name: condition,
+                            showlegend: showInLegend,
                             marker: {color: color_platte[ConditionSet.indexOf(condition)]},
                         })
                     })
                 })
                 break
+            }
 
             default:
                 break
@@ -141,14 +193,18 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
 
         const layout = {
             title: "Cell Counts",
+            xaxis: {
+                type: 'category',
+                title: "Cell Type",
+                automargin: true,},
             yaxis: {
-                title: "Average Cell Count",
+                title: "Total Cell Count",
                 zeroline: true,
             },
             barmode: "group",
-            bargap: 0,
-            bargroupgap: 0.1,
-            legend: {orientation: "h", y: 1.25,},
+            bargap: 0.01,
+            bargroupgap: 0.05,
+            legend: {orientation: "h", y: 1.25},
             margin: {
                 l: 50,
                 r: 50,
@@ -202,4 +258,4 @@ BarPlot.propTypes = {
     selectedCellTypes: PropTypes.array.isRequired,
 }
 
-export default BarPlot;
+export default BarPlot
