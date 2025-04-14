@@ -8,40 +8,40 @@ export default function HomePage() {
             title: "Gene View",
             description:
                 "Explore gene expression patterns and analyze specific genes across different cell types and conditions.",
-            icon: <Dna size={64} style={{color: "#10b981"}}/>,
-            href: "/views/geneview",
+            icon: <Dna size={48} style={{color: "#10b981"}}/>,
+            href: "geneview",
         },
         {
             title: "Cell Type View",
             description: "Visualize and compare different cell types, their markers, and distribution across samples.",
-            icon: <Cells size={64} style={{color: "#5154f1"}}/>,
-            href: "/views/celltypes",
+            icon: <Cells size={48} style={{color: "#5154f1"}}/>,
+            href: "celltypes",
         },
         {
             title: "Layer View",
             description:
                 "Examine tissue layers and their composition with detailed visualization of layer-specific features.",
-            icon: <Layers size={64} style={{color: "#f59e0b"}}/>,
-            href: "/views/layersview",
+            icon: <Layers size={48} style={{color: "#f59e0b"}}/>,
+            href: "layersview",
         },
         {
             title: "Visium ST View",
             description:
                 "Analyze spatial transcriptomics data with Visium technology for tissue-wide gene expression patterns.",
-            icon: <Grid3X3 size={64} style={{color: "#f43f5e"}}/>,
-            href: "/views/visiumview",
+            icon: <Grid3X3 size={48} style={{color: "#f43f5e"}}/>,
+            href: "visiumview",
         },
         {
             title: "Chr Region View",
             description: "Investigate specific chromosomal regions and their associated genes and regulatory elements.",
-            icon: <ScanSearch size={64} style={{color: "#06b6d4"}}/>,
-            href: "/views/regionsview",
+            icon: <ScanSearch size={48} style={{color: "#06b6d4"}}/>,
+            href: "regionsview",
         },
         {
             title: "XCheck View",
             description: "Cross-check and compare data across different modalities, samples, or experimental conditions.",
-            icon: <CheckSquare size={64} style={{color: "#8b5cf6"}}/>,
-            href: "/views/xcheck",
+            icon: <CheckSquare size={48} style={{color: "#8b5cf6"}}/>,
+            href: "xcheck",
         },
     ]
 
@@ -77,27 +77,8 @@ export default function HomePage() {
                                 }}
                             >
                                 <CardContent
-                                    sx={{
-                                        flexGrow: 1,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        textAlign: "center",
-                                        p: 2,
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            mb: 0,
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            width: 80,
-                                            height: 80,
-                                            borderRadius: "50%",
-                                            backgroundColor: "rgba(0,0,0,0.04)",
-                                        }}
-                                    >
+                                    sx={{flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", p: 2,}}>
+                                    <Box sx={{mb: 0, display: "flex", justifyContent: "center", alignItems: "center", width: 80, height: 80, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.04)",}}>
                                         {option.icon}
                                     </Box>
                                     <Typography variant="h5" component="h2" gutterBottom sx={{fontWeight: 600, mb: 1,}}>
@@ -110,7 +91,7 @@ export default function HomePage() {
                                 <CardActions sx={{p: 2, pt: 0}}>
                                     <Button
                                         component={Link}
-                                        href={option.href}
+                                        to={option.href}
                                         variant="contained"
                                         fullWidth
                                         size="medium"
