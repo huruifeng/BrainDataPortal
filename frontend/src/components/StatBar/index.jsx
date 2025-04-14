@@ -5,10 +5,10 @@ import "./StatBar.css";
 const StatBar = () => {
 
     const stats = [
-      { icon: <People />, value: "86", label: "Datasets" },
-      { icon: <LocationOn />, value: "69", label: "Primary Sites" },
-      { icon: <Description />, value: "44,736", label: "Cases" },
-      { icon: <InsertDriveFile />, value: "1,027,517", label: "Files" },
+      { icon: <People />, value: "3", label: "Datasets" },
+      { icon: <LocationOn />, value: "3", label: "Primary Sites" },
+      { icon: <Description />, value: "94", label: "Cases" },
+      { icon: <InsertDriveFile />, value: "525", label: "Files" },
       { icon: <HourglassEmpty />, value: "22,534", label: "Genes" },
       { icon: <Science />, value: "2,940,240", label: "Mutations" },
     ];

@@ -4,11 +4,11 @@ import {isCategorical} from "../../utils/funcs.js";
 
 const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, group}) => {
 
-    console.log("EChartScatterPlot: ", gene, exprData, group);
+    // console.log("EChartScatterPlot: ", gene, exprData, group);
 
     if (umapData.length === 0) return "UMAP data is loading...";
 
-    if(sampleList.length >= 1 && !sampleList.includes("all")) {
+    if (sampleList.length >= 1 && !sampleList.includes("all")) {
         umapData = umapData.filter((point) => sampleList.includes(point.sample_id));
     }
 
@@ -28,7 +28,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         ]; // Up to 20 unique colors
 
 
-        const groupNames = Object.keys(groupedData);
+        const groupNames = Object.keys(groupedData).sort();
         const series = groupNames.map((group_i, index) => ({
             name: `${group_i}`,
             type: "scatter",
@@ -39,6 +39,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
 
         // Step 3: Configure ECharts options
         return {
+
             title: {
                 text: colorGroup,
                 left: "center",
@@ -52,11 +53,24 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
                 type: "scroll", // Support for many groups
                 orient: "vertical",
                 right: 0,
-                top: 0,
-                data: groupNames.map(group_i => `${group_i}`),
+                top: 50,
+                width: 200,  // Adjust as needed
+                data: groupNames.map(group_i => `${group_i}`).sort(),
             },
-            xAxis: {type: "value"},
-            yAxis: {type: "value"},
+            xAxis: {
+                type: "value",
+                axisLine: {show: true}, // Hide axis line
+                axisTick: {show: true}, // Hide ticks
+                splitLine: {show: false}, // Hide grid lines
+                axisLabel: {show: true}, // Hide labels
+            },
+            yAxis: {
+                type: "value",
+                axisLine: {show: true},
+                axisTick: {show: true},
+                splitLine: {show: false},
+                axisLabel: {show: true},
+            },
             series: series,
         };
     }
@@ -71,8 +85,20 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
 
         return {
             title: {text: colorGroup, left: 'center', top: 0},
-            xAxis: {type: "value"},
-            yAxis: {type: "value"},
+             xAxis: {
+                type: "value",
+                axisLine: {show: true}, // Hide axis line
+                axisTick: {show: true}, // Hide ticks
+                splitLine: {show: false}, // Hide grid lines
+                axisLabel: {show: true}, // Hide labels
+            },
+            yAxis: {
+                type: "value",
+                axisLine: {show: true},
+                axisTick: {show: true},
+                splitLine: {show: false},
+                axisLabel: {show: true},
+            },
             visualMap: {
                 min: minValue,
                 max: maxValue,
@@ -84,7 +110,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
                 calculable: true,
                 inRange: {color: ["#CCCCCCFF", "#FF0000FF"],} // Color gradient from low to high
             },
-            legend: { show: false },
+            legend: {show: false},
             series: [
                 {
                     type: "scatter",
@@ -122,6 +148,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         })) || [];
         options = createContinuousOptions(plotData, gene);
     }
+    options.backgroundColor = '#ffffff';
     return <ReactECharts
         key={`${gene}-${group}`}
         option={options}

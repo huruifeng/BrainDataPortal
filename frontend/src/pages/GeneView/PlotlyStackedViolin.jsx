@@ -62,7 +62,6 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
             return traces;
         }).flat();
     };
-
     // Create subplot layout
     const createLayout = () => {
         const rows = genes.length;
@@ -91,20 +90,23 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
                 automargin: true,
                 type: "category",
             };
-            layout[`yaxis${index + 1}`] = {
-                title: {text: gene, font: {size: 12}},
-                automargin: true, // Prevent axis labels from being cut off
-                domain: [yMin, yMax], // Reduce space between rows
-            };
+            // layout[`yaxis${index + 1}`] = {
+            //     title: {text: gene, font: {size: 12}},
+            //     automargin: true, // Prevent axis labels from being cut off
+            //     domain: [yMin, yMax], // Reduce space between rows
+            // };
             layout.annotations.push({
-                x: -0.2, // Position to the left of y-axis
+                x: -0.01, // Position to the left of y-axis
                 y: (yMin + yMax) / 2,
                 text: gene,
                 showarrow: false,
                 xref: "paper",
                 yref: "paper",
                 font: {size: 12, color: "black"},
-                align: "right",
+                yanchor: "middle",
+                xanchor: "right",
+                valign: "middle",
+                textangle: 270,
             });
         });
 

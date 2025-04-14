@@ -19,6 +19,18 @@ def get_gene_list(dataset, query_str="AB"):
         print(genes_file + " not found")
         return "Error: Gene list file not found"
 
+def get_cell2sample_map(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+
+    cell2sample_file = os.path.join("backend","datasets",dataset,'cell_to_sample.json')
+    if os.path.exists(cell2sample_file):
+        with open(cell2sample_file, 'r') as f:
+            data = json.load(f)
+        return data
+    else:
+        return f"Error: cell2sample file not found."
+
 def get_sample_list(dataset, query_str="all"):
     if dataset == "all":
         return "Error: Sample dataset not specified."
@@ -53,11 +65,102 @@ def get_meta_list(dataset, query_str="all"):
         print(meta_file + " not found")
         return "Error: Gene list file not found"
 
+def get_celltype_list(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        cellconuts_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_cellcounts.json')
+
+    if os.path.exists(cellconuts_file):
+        with open(cellconuts_file, 'r') as f:
+            data = json.load(f)
+        return list(data.keys()) if data is not None else data.keys()
+    else:
+        print(cellconuts_file + " not found")
+        return "Error: Meta file not found"
+
+def get_celltype_counts(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        cellconuts_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_cellcounts.json')
+
+    if os.path.exists(cellconuts_file):
+        with open(cellconuts_file, 'r') as f:
+            data = json.load(f)
+        return data
+    else:
+        print(cellconuts_file + " not found")
+        return "Error: Meta file not found"
+
+def get_marker_genes(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        markergene_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_markergenes_cellcounts.csv')
+
+    if os.path.exists(markergene_file):
+        data_df = pd.read_csv(markergene_file, index_col=None, header=0)
+        data = data_df.to_dict(orient="records")
+        return data
+    else:
+        print(markergene_file + " not found")
+        return "Error: Marker Genes file not found"
+
+def get_degs_celltype(dataset, celltype):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        degs_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_pseudobulk_DEGs_top10.csv')
+
+    data = {}
+    if os.path.exists(degs_file):
+        degs_df = pd.read_csv(degs_file, index_col=None, header=0)
+        degs_df = degs_df.loc[degs_df["CellType_DE"].str.startswith(celltype),["CellType_DE","gene","avg_log2FC","p_val_adj"]]
+
+        ## keep only 4 digits for avg_log2FC
+        degs_df["avg_log2FC"] = degs_df["avg_log2FC"].round(4)
+        degs_df["p_val_adj"] = degs_df["p_val_adj"].round(4)
+
+        ## split CellType_DE into CellType and DE
+        # degs_df["CellType_DE"] = degs_df["CellType_DE"].astype(str)
+        # degs_df["CellType"] = [i.split(".")[0] for i in degs_df["CellType_DE"].tolist()]
+        degs_df["DE"] = [i.split(".")[1] for i in degs_df["CellType_DE"].tolist()]
+        degs_df = degs_df.drop("CellType_DE", axis=1)
+
+        ## group by DE
+        degs_groups = degs_df.groupby("DE").apply(lambda g: g.drop("DE", axis=1).to_dict(orient='records')).to_dict()
+
+        ## get gene expression data for each DE,format: [{sampleId: 'sample1', condition: 'PD', value: 8.1053},...]
+        sample_calletype_df = pd.read_csv(os.path.join("backend", "datasets", dataset,'celltypes', 'metadata_sample_celltype_condition.csv'), index_col=0, header=0)
+        expr_df = pd.read_csv(os.path.join("backend", "datasets", dataset,'celltypes', 'pb_expr_matrix_topN_DEGs.csv'), index_col=0, header=0)
+
+        for DE, degs in degs_groups.items():
+            for deg in degs:
+                expression = []
+                gene_name = deg["gene"]
+                expr_val_df = expr_df.loc[gene_name,expr_df.columns.str.contains(celltype)]
+                samples = expr_val_df.index.tolist()
+                for sample_i in samples:
+                    condation = sample_calletype_df.loc[sample_i,"condition"]
+                    if condation not in DE:
+                        continue
+                    expr_val = expr_val_df[sample_i]
+                    expression.append({"sampleId": sample_i, "condition": condation, "value": expr_val})
+                deg['expression'] = expression
+
+        data = degs_groups
+
+        return data
+    else:
+        print(degs_file + " not found")
+        return "Error: DEGs file not found"
+
 def get_umapembedding(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_sample_id_100k.csv')
+    umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_sample_id_50k.csv')
     if os.path.exists(umap_file):
         data_df = pd.read_csv(umap_file, index_col=None, header=0)
         data = data_df.to_dict(orient="records")
@@ -97,16 +200,20 @@ def get_metadata_of_sample(dataset, sample="all", meta="all"):
     else:
         return f"Error: Meta file not found."
 
-def get_all_metadata(dataset, drop_cols=None):
+def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_100k.csv')
+    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_50k.csv')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=0, header=0)
             if drop_cols is not None:
                 data_df = data_df.drop(drop_cols, axis=1)
+
+            if keep_cols and keep_cols[0] != "all":
+                data_df = data_df.loc[:,keep_cols]
+
             data = data_df.to_dict(orient="index")
             return data
     else:

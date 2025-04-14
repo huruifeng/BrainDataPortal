@@ -17,6 +17,7 @@ import {Bounce, ToastContainer} from "react-toastify";
 import GeneView from "./pages/GeneView";
 import VisiumView from "./pages/VisiumView";
 import XDatasetsView from "./pages/XDatasets";
+import CellTypesView from "./pages/CellTypesView";
 
 
 
@@ -53,11 +54,10 @@ function App() {
                       <Route path="/samples" element={<Navigate to="/samples/all" replace />} />
                       <Route path="/samples/:dataset_id" element={<SamplesPage />} />
 
-                      <Route path="/geneview" element={<Navigate to="/datasets" replace />} />
-                      <Route path="/geneview/:dataset_id" element={<GeneView />} />
+                      <Route path="/views/geneview" element={<GeneView />} />
+                      <Route path="/views/visiumview" element={<VisiumView />} />
+                      <Route path="/views/celltypes" element={<CellTypesView />} />
 
-                      <Route path="/visiumview" element={<Navigate to="/datasets" replace />} />
-                      <Route path="/visiumview/:dataset_id" element={<VisiumView />} />
 
                       <Route path="/login" element={<Login />} />
 

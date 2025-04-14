@@ -53,3 +53,12 @@ export const calculateMinMax = (arr) => {
   return [min === Infinity ? 0 : min, max === -Infinity ? 0 : max];
 };
 
+
+export function sortObjectByKey(object) {
+  const sortedKeys = Object.keys(object).sort();
+  const sortedObject = {};
+  sortedKeys.forEach(key => {
+    sortedObject[key] = object[key];
+  });
+  return sortedObject;
+}

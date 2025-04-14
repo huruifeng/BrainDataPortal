@@ -2,7 +2,7 @@ import {useEffect, useRef, useState, useCallback, useMemo} from "react";
 import Plot from "react-plotly.js";
 import Plotly from "plotly.js-dist";
 import PropTypes from "prop-types";
-import {calculateMinMax, isCategorical} from "../../utils/funcs.js";
+import {calculateMinMax, isCategorical, sortObjectByKey} from "../../utils/funcs.js";
 
 const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     const containerRef = useRef(null);
@@ -83,14 +83,14 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     // Prepare trace data for Plotly
     const traces = useMemo(() => {
         if (isCat) {
-            const groups = {};
+            let groups = {};
             scatterData.forEach((p) => {
                 if (!groups[p.value]) groups[p.value] = {x: [], y: [], text: []};
                 groups[p.value].x.push(p.x);
                 groups[p.value].y.push(p.y);
                 groups[p.value].text.push(`${feature}: ${p.value}`);
             });
-
+            groups = sortObjectByKey(groups);
             return Object.entries(groups).map(([group, data], i) => ({
                 x: data.x,
                 y: data.y,

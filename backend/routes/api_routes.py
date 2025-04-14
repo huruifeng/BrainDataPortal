@@ -48,6 +48,50 @@ async def getmetalist(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting Meta list.")
     return response
 
+@router.get("/getcelltypelist")
+async def getcelltypelist(request:Request):
+    print("getcelltypelist() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_celltype_list(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting celltype list.")
+    return response
+
+@router.get("/getcellcounts")
+async def getcellcounts(request:Request):
+    print("getcellcounts() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_celltype_counts(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting celltype list.")
+    return response
+
+@router.get("/getmarkergenes")
+async def getmarkergenes(request:Request):
+    print("getmarkergenes() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_marker_genes(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting gene markers.")
+    return response
+
+@router.get("/getdegsofcelltype")
+async def getdegsofcelltype(request:Request):
+    print("getdegsofcelltype() called================")
+    dataset_id = request.query_params.get("dataset")
+    celltype = request.query_params.get("celltype")
+
+    response = get_degs_celltype(dataset_id, celltype)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting gene markers.")
+    return response
 
 @router.get("/getumapembedding")
 async def getumapembedding(request:Request):
@@ -89,12 +133,13 @@ async def getallmetadata(request:Request):
     print("getallmetadata() called================")
     dataset = request.query_params.get("dataset_id")
     dataset_type = request.query_params.get("dataset_type")
+    features = request.query_params.getlist ("features")
 
     if dataset_type == "visium":
         drop_cols = ["UMAP_1", "UMAP_2"]
     else:
         drop_cols = None
-    metadata = get_all_metadata(dataset, drop_cols=drop_cols)
+    metadata = get_all_metadata(dataset, drop_cols=drop_cols, keep_cols=features)
 
     if "Error" in metadata:
         raise HTTPException(status_code=404, detail=metadata)
