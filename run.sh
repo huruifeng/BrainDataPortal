@@ -1,15 +1,18 @@
+printf "Activating conda environment ...\n"
+conda activate FastAPI
+
 printf "Installing backend dependencies ...\n"
 pip install -r backend/requirements.txt
+
+printf "Staring backend ...\n"
+nohup python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 >> backend.log 2>&1 &
 
 printf "Installing frontend dependencies ...\n"
 cd frontend || exit
 npm install
-cd ..
-
-printf "Staring backend ...\n"
-./run_backend.sh
 
 printf "Staring frontend ...\n"
-./run_frontend.sh
+nohup npm run dev >> frontend.log 2>&1 &
+cd ..
 
 printf "Done ^_^\n"
