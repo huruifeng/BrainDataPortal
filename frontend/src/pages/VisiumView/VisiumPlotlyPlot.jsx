@@ -122,13 +122,7 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
                         ['0.888888888889', 'rgb(215,48,39)'],
                         ['1.000000000000', 'rgb(165,0,38)']
                     ],
-                    colorbar: {
-                        titleside: 'right',
-                        len: 0.4,
-                        thickness: 20,
-                        x: 0.9,
-                        y: 0.5
-                    },
+                    colorbar: {titleside: 'right', len: 0.4, thickness: 20, x: 0.85, y: 0.5},
                     cmin: minFeature,
                     cmax: maxFeature
                 }
@@ -154,7 +148,7 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
             sizing: 'stretch',
         }] : [],
         margin: {l: 0, r: 0, t: 0, b: 0},
-        legend: {orientation: "v", x: 0.9, y: 0.8, itemsizing: "constant",bgcolor: "rgba(0,0,0,0)"},
+        legend: {orientation: "v", x: 0.85, y: 0.8, itemsizing: "constant",bgcolor: "rgba(0,0,0,0)"},
     }), [imageUrl, naturalDimensions, feature]);
 
     const resetZoom = (gd) => {
