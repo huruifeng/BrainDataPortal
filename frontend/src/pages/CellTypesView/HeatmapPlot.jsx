@@ -6,6 +6,7 @@ import Plotly from "plotly.js-dist-min"
 import {FormControl, InputLabel, Select, MenuItem} from "@mui/material"
 
 const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
+    console.log(diffExpGenes)
     const plotRef = useRef(null)
     const [selectedCellType, setSelectedCellType] = useState("")
 
@@ -114,6 +115,8 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
             colorbar: {
                 title: "Z-score",
                 titleside: "right",
+                len: 0.5,
+                thickness: 15,
             },
         }
 
@@ -134,18 +137,20 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
             },
             annotations: annotations,
             margin: {
-                l: 150,
+                l: 100,
                 r: 50,
                 b: 100,
-                t: 50,
+                t: 0,
                 pad: 4,
             },
             height: 600,
+            plot_bgcolor: "rgba(0,0,0,0)",
+            paper_bgcolor: "rgba(0,0,0,0)",
         }
 
         Plotly.newPlot(plotRef.current, [trace], layout, {
             responsive: true,
-            displayModeBar: true,
+            displaylogo: false,
         })
 
         // Cleanup

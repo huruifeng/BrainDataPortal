@@ -139,6 +139,16 @@ export const getMarkerGenes = async (dataset) => {
     }
 }
 
+export const getDEGsOfCellType = async (dataset,cell_type) => {
+    try {
+        const response = await axios.get(`${API_URL}/getdegsofcelltype`,
+            {params: {dataset:dataset,celltype:cell_type}});
+        return response;
+    } catch (error) {
+        console.error("Error getDEGsOfCellType:", error);
+        throw error;
+    }
+}
 
 
 export const getData_get = async (data_id="all") => {
