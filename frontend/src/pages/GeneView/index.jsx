@@ -82,11 +82,16 @@ function GeneView() {
             selectedSamples: initialSelectedSamples,
             selectedGenes: initialSelectedGenes
         });
-        fetchExprData(); // Fetch data once after both are set
+        fetchExprData(datasetId); // Fetch data once after both are set
 
         fetchAllMetaData(datasetId);
 
     }, []);
+
+    useEffect(() => {
+        fetchExprData(datasetId);
+        fetchAllMetaData(datasetId);
+    }, [datasetId]);
 
     /** Updates the query parameters in the URL */
     const updateQueryParams = (dataset,genes, samples, color = null, group = null) => {
@@ -145,13 +150,13 @@ function GeneView() {
         setExprValueType(event.target.value);
     }
 
-    // console.log("Dataset:", datasetId, "Selected Genes:", selectedGenes, "Selected Samples:", selectedSamples);
     const plotClass = selectedGenes.length <= 1
         ? "single-plot" : selectedGenes.length === 2
             ? "two-plots" : selectedGenes.length === 3
                 ? "three-plots" : "four-plots";
 
     const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
+    console.log("Dataset:", datasetId);
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
@@ -325,7 +330,7 @@ function GeneView() {
                                 <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading data...(100k cells/spots...)</Typography>
                             </Box>
                         </>
-                    ) : datasetId==="" ? (
+                    ) : datasetId==="" || datasetId===null || datasetId===undefined ? (
                         <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">Please select a dataset to view</Typography>
                     ): error ? (
                         <Typography color="error">{error}</Typography>

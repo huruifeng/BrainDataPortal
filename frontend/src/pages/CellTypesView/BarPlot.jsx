@@ -215,7 +215,7 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
     return (
         <div style={{minHeight: "450px"}}>
             <FormControl variant="standard" sx={{width: "250px", marginBottom: "20px"}}>
-                <InputLabel id="comparison-type-label">Comparison Type</InputLabel>
+                <InputLabel id="comparison-type-label">Group by</InputLabel>
                 <Select
                     labelId="comparison-type-label"
                     id="comparison-type-select"
