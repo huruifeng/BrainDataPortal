@@ -294,7 +294,7 @@ function VisiumView() {
                                     sample list and metadata...</Typography>
                             </Box>
                         </>
-                    ) : datasetId === "" ? (
+                    ) : datasetId === "" || datasetId === "all" || datasetId === undefined || datasetId === null ? (
                         <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
                             No dataset selected for exploration
                         </Typography>
