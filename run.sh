@@ -5,7 +5,7 @@ printf "Installing backend dependencies ...\n"
 pip install -r backend/requirements.txt
 
 printf "Staring backend ...\n"
-nohup python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 >> backend.log 2>&1 &
+nohup python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 >> backend/backend.log 2>&1 &
 
 printf "Installing frontend dependencies ...\n"
 cd frontend || exit
