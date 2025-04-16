@@ -220,7 +220,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
      fetchSelectedMetaData: async (dataset_id = null, features=["all"]) => {
         dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchAllMetaData: No dataset selected"});
+            set({error: "fetchSelectedMetaData: No dataset selected"});
             return;
         }
 
