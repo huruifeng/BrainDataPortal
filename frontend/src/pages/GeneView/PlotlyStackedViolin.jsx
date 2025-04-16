@@ -32,7 +32,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
     );
 
     const genes = Object.keys(exprData);
-    const xCategories = Object.keys(groupedData);
+    const xCategories = Object.keys(groupedData).sort();
     const colorPalette = [
             "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
             "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
@@ -65,7 +65,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
     // Create subplot layout
     const createLayout = () => {
         const rows = genes.length;
-        const totalHeight = 100 * rows + 50; // Dynamically adjust height
+        const totalHeight = 150 * rows + 50; // Dynamically adjust height
         const layout = {
             grid: {rows, columns: 1, pattern: 'independent',},
             height: totalHeight, // Adjust height based on number of genes
