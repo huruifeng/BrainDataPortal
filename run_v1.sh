@@ -17,7 +17,7 @@ pip install -r backend/requirements.txt
 check_error "Failed to install backend dependencies"
 
 printf "Starting backend ...\n"
-nohup python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 >> backend/backend.log 2>&1 &
+nohup python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 >> backend.log 2>&1 &
 if [ $? -ne 0 ]; then
   echo "❌ Failed to start backend server"
   exit 1
@@ -30,7 +30,7 @@ npm install
 check_error "Failed to install frontend dependencies"
 
 printf "Starting frontend ...\n"
-nohup npm run dev >> frontend.log 2>&1 &
+nohup npm run dev >> ../frontend.log 2>&1 &
 if [ $? -ne 0 ]; then
   echo "❌ Failed to start frontend server"
   exit 1
