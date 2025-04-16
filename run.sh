@@ -1,5 +1,6 @@
 printf "Activating conda environment ...\n"
-conda activate FastAPI
+conda init
+conda activate FastAPI || exit
 
 printf "Installing backend dependencies ...\n"
 pip install -r backend/requirements.txt

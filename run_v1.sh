@@ -10,6 +10,7 @@ function check_error() {
 }
 
 printf "Activating conda environment ...\n"
+conda init bash
 conda activate FastAPI || { echo "❌ Failed to activate conda environment 'FastAPI'"; exit 1; }
 
 printf "Installing backend dependencies ...\n"
