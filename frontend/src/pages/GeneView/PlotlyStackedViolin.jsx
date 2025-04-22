@@ -25,7 +25,9 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
             Object.fromEntries(
                 Object.entries(groupedData).map(([x_i, ids]) => [
                     x_i,
-                    ids.map((id) => exprData[gene]?.[id] ?? 0),
+                    ids
+                    // .filter((id) => exprData[gene]?.[id] !== undefined)
+                    .map((id) => exprData[gene]?.[id] ?? 0),
                 ])
             ),
         ])
