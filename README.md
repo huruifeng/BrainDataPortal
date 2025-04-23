@@ -1,6 +1,8 @@
 ## BrainDataPortal
-#### 1. Load all the meta data when first load the page, separate the meta data into cell level and sample level
-#### 2. To reduce the size of the meta data file, meta file only save an index/key of the meta string. And the actual meta data is stored in a JSON file (Dict).
+
+### NOTES:
+- 1. Load all the meta data when first load the page, separate the meta data into cell level and sample level
+- 2. To reduce the size of the meta data file, meta file only save an index/key of the meta string. And the actual meta data is stored in a JSON file (Dict).
 
 
 ### Overview
