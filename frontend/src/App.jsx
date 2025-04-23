@@ -18,7 +18,8 @@ import GeneView from "./pages/GeneView";
 import VisiumView from "./pages/VisiumView";
 import XDatasetsView from "./pages/XDatasets";
 import CellTypesView from "./pages/CellTypesView";
-import ViewsHome from "./pages/ViewsHome/index.jsx";
+import ViewsHome from "./pages/ViewsHome";
+import DatasetManagePage from "./pages/DatasetManage";
 
 
 
@@ -60,6 +61,7 @@ function App() {
                       <Route path="/views/celltypes" element={<CellTypesView />} />
                       <Route path="/views/xcheck" element={<XDatasetsView />} />
 
+                      <Route path="/datasetmanager" element={<DatasetManagePage />} />
 
                       <Route path="/login" element={<Login />} />
 
