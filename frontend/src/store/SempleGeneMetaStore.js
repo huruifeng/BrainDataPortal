@@ -67,7 +67,9 @@ const useSampleGeneMetaStore = create((set, get) => ({
             return;
         }
         if (query_str.length === 0) {
-            query_str = "ABC";
+            // query_str = "ABC";
+            set({geneList: ["SNCA","SNCA-AS1","LRRK2","GBA","PRKN","MAPT","PINK1","PARK7"]});
+            return;
         } else if (query_str.length < 3) {
             set({geneList: []});
             return;
@@ -220,7 +222,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
      fetchSelectedMetaData: async (dataset_id = null, features=["all"]) => {
         dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchAllMetaData: No dataset selected"});
+            set({error: "fetchSelectedMetaData: No dataset selected"});
             return;
         }
 

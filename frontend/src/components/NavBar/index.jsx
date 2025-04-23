@@ -25,16 +25,17 @@ const NavBar = () => {
                 <Button color="inherit" component={Link} to="/about">About</Button>
                 <Button color="inherit" component={Link} to="/datasets">Datasets</Button>
                 <Button color="inherit" component={Link} to="/samples">Samples</Button>
-                <Button color="inherit" onClick={openViewsMenu}>Views</Button>
-                <Menu anchorEl={viewsMenuAnchor} open={Boolean(viewsMenuAnchor)} onClose={closeViewsMenu}>
-                    <MenuItem component={Link} to="/views/geneview" onClick={closeViewsMenu}>Genes</MenuItem>
-                    <MenuItem component={Link} to="/views/visiumview" onClick={closeViewsMenu}>Visium</MenuItem>
-                    <MenuItem component={Link} to="/views/celltypes" onClick={closeViewsMenu}>Celltypes</MenuItem>
-                    <MenuItem component={Link} to="/views/layers" onClick={closeViewsMenu}>Layers</MenuItem>
-                    <MenuItem component={Link} to="/views/regions" onClick={closeViewsMenu}>Regions</MenuItem>
-                    <MenuItem divider />
-                    <MenuItem component={Link} to="/xcheck" onClick={closeViewsMenu}>XCheck</MenuItem>
-                </Menu>
+                <Button color="inherit" component={Link} to="/views">Views</Button>
+                {/*<Button color="inherit" onClick={openViewsMenu}>Views</Button>*/}
+                {/*<Menu anchorEl={viewsMenuAnchor} open={Boolean(viewsMenuAnchor)} onClose={closeViewsMenu}>*/}
+                {/*    <MenuItem component={Link} to="/views/geneview" onClick={closeViewsMenu}>Genes</MenuItem>*/}
+                {/*    <MenuItem component={Link} to="/views/visiumview" onClick={closeViewsMenu}>Visium</MenuItem>*/}
+                {/*    <MenuItem component={Link} to="/views/celltypes" onClick={closeViewsMenu}>Celltypes</MenuItem>*/}
+                {/*    <MenuItem component={Link} to="/views/layersview" onClick={closeViewsMenu}>Layers</MenuItem>*/}
+                {/*    <MenuItem component={Link} to="/views/regionsview" onClick={closeViewsMenu}>Regions</MenuItem>*/}
+                {/*    <MenuItem divider />*/}
+                {/*    <MenuItem component={Link} to="/views/xcheck" onClick={closeViewsMenu}>XCheck</MenuItem>*/}
+                {/*</Menu>*/}
 
                 {/*<Button color="inherit" component={Link} to="/xcheck">XCheck</Button>*/}
                 <Button color="inherit" onClick={openHelpMenu}>Help</Button>

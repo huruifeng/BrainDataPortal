@@ -21,7 +21,7 @@ const FilterPanel = () => {
     const filters = [
         {
             title: "Assay Type",
-            options: ["DNA Binding", "Transcription", "RNA Binding", "Single Cell"],
+            options: ["WGS", "VisiumST", "scRNAseq"],
             key: "assayType",
         },
         {
@@ -31,7 +31,7 @@ const FilterPanel = () => {
         },
         {
             title: "Cell",
-            options: ["T Cell", "B Cell", "Stem Cell", "Epithelial Cell"],
+            options: ["Astrocytes", "Endothelial_Cells", "GABA_Neurons", "GLU_Neurons","Microglia","T Cell", "B Cell", "Stem Cell", "Epithelial Cell"],
             key: "cell",
         },
         {

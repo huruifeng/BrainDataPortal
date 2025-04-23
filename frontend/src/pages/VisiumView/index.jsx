@@ -28,7 +28,7 @@ function VisiumView() {
     const [queryParams, setQueryParams] = useSearchParams();
     const initialGenes = queryParams.getAll("gene") ?? [];
     const initialSamples = queryParams.getAll("sample") ?? [];
-    const initialMetas = queryParams.getAll("meta") ?? [];
+    const initialMetas = queryParams.getAll("meta") ?? ["smoothed_label_s5"];
     const initialDataset = queryParams.get("dataset") ?? "";
 
     const {datasetRecords, fetchDatasetList} = useDataStore()
@@ -294,7 +294,7 @@ function VisiumView() {
                                     sample list and metadata...</Typography>
                             </Box>
                         </>
-                    ) : datasetId === "" ? (
+                    ) : datasetId === "" || datasetId === "all" || datasetId === undefined || datasetId === null ? (
                         <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
                             No dataset selected for exploration
                         </Typography>

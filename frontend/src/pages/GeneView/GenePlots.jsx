@@ -15,11 +15,11 @@ function filterBySampleId(obj, sampleList) {
 }
 
 const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) => {
-    console.log("sampleList", sampleList);
-    console.log("metaData", metaData);
-    console.log("exprData", exprData);
-    console.log("group", group);
-    console.log("exprValueType", exprValueType);
+    // console.log("sampleList", sampleList);
+    // console.log("metaData", metaData);
+    // console.log("exprData", exprData);
+    // console.log("group", group);
+    // console.log("exprValueType", exprValueType);
 
     const {pseudoExprDict, fetchPseudoExprData, allSampleMetaData, fetchAllSampleMetaData} = useSampleGeneMetaStore();
 
