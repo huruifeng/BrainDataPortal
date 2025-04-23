@@ -1,5 +1,6 @@
 ## BrainDataPortal
-#### (Load all the meta data when first load the page)
+#### 1. Load all the meta data when first load the page, separate the meta data into cell level and sample level
+#### 2. To reduce the size of the meta data file, meta file only save an index/key of the meta string. And the actual meta data is stored in a JSON file (Dict).
 
 - This is project designed for the brain data analysis and visualization.
 - The data assays include: scRNAseq, scATACseq, ChIPseq, Spatial Transcriptomics and other omics data.
