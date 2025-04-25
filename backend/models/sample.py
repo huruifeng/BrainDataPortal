@@ -7,26 +7,30 @@ from typing import Optional, List
 
 class SampleBase(SQLModel):
     sample_id: str = Field(index=True, unique=True, primary_key=True)
-    source_sample_id: str = Field(index=True)
+    source_id: str = Field(index=True)
     subject_id: str = Field(index=True, foreign_key="subject.subject_id")
+
     replicate: str = Field(default="NA")
     replicate_count: int = Field(default=np.nan)
     repeated_sample: int = Field(default=np.nan)
     batch: str = Field(default="NA")
+
     tissue: str = Field(default="NA")
     brain_region: str = Field(default="NA")
     hemisphere: str = Field(default="NA")
     region_level_1: str = Field(default="NA")
     region_level_2: str = Field(default="NA")
     region_level_3: str = Field(default="NA")
+
     RIN: float = Field(default=-1)
     source_RIN: float = Field(default=-1)
     molecular_source: str = Field(default="NA")
     input_cell_count: int = Field(default=-1)
-    assay: str = Field(default="NA")
+    assay_kit: str = Field(default="NA")
     sequencing_end: str = Field(default="NA")
     sequencing_length: int = Field(default="NA")
     sequencing_instrument: str = Field(default="NA")
+
     organism_ontology_term_id: str = Field(default="NA")
     development_stage_ontology_term_id: str = Field(default="NA")
     sex_ontology_term_id: str = Field(default="NA")
@@ -42,7 +46,7 @@ class SampleBase(SQLModel):
 
     dataset_id: str = Field(index=True, foreign_key="dataset.dataset_id")
 
-    data_type: str = Field(default="NA")
+    assay: str = Field(default="NA")
     data_location: str = Field(default="NA")
 
     data_protocol: str = Field(default="NA", foreign_key="protocol.protocol_id")

@@ -5,11 +5,7 @@ from typing import Optional, List
 
 class DataBasic(SQLModel):
     sample_id: str = Field(index=True,foreign_key="sample.sample_id")
-    source_sample_id: str = Field(default="NA")
-    replicate: str = Field(default="NA")
-    replicate_count: int = Field(default=-1)
-    repeated_sample: int = Field(default=-1)
-    batch: str = Field(default="NA")
+
     file_type: str = Field(default="NA")
     file_name_source: str = Field(default="NA")
     file_name: str = Field(default="NA")
@@ -25,8 +21,6 @@ class DataBasic(SQLModel):
     annotation: str = Field(default="NA")
     configuration_file: str = Field(default="NA")
 
-    data_type: str = Field(default="NA")
-
 class Data(DataBasic, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
@@ -40,12 +34,7 @@ class DataCreate(DataBasic):
 
 class DataUpdate(SQLModel):
     sample_id: Optional[str] = Field(default="NA")
-    subject_id: Optional[str] = Field(default="NA")
-    source_sample_id: Optional[str] = Field(default="NA")
-    replicate: Optional[str] = Field(default="NA")
-    replicate_count: Optional[int] = Field(default=-1)
-    repeated_sample: Optional[int] = Field(default=-1)
-    batch: Optional[str] = Field(default="NA")
+
     file_type: Optional[str] = Field(default="NA")
     file_name: Optional[str] = Field(default="NA")
     file_description: Optional[str] = Field(default="NA")
@@ -58,7 +47,6 @@ class DataUpdate(SQLModel):
     header: Optional[str] = Field(default="NA")
     annotation: Optional[str] = Field(default="NA")
     configuration_file: Optional[str] = Field(default="NA")
-
 
 
 class DataPublic(DataBasic):

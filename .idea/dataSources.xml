@@ -8,12 +8,5 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/braindataportal</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="postgres@giraffe(10.168.236.29)" uuid="d3e48fad-500b-4adb-86e6-c4c7d84a2181">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://10.168.236.29:5432/braindataportal</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
   </component>
 </project>
