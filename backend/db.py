@@ -5,7 +5,7 @@ from fastapi import Depends
 
 from backend.models import *
 
-DATABASE_URL = "sqlite:///./database.db"
+DATABASE_URL = "sqlite:///./backend/bdp_db.db"
 # DATABASE_URL = "postgresql://huruifeng:123456&Abc@localhost:5432/braindataportal"
 engine = create_engine(DATABASE_URL, echo=False)
 

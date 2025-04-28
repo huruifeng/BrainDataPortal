@@ -14,7 +14,7 @@ import PlotlyScatterPlot from "./PlotlyScatter.jsx";
 import GeneMetaPlots from "./GenePlots.jsx";
 
 import "./GeneView.css";
-import useDataStore from "../../store/DataStore.js";
+import useDataStore from "../../store/DatatableStore.js";
 
 
 function GeneView() {

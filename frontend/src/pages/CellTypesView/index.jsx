@@ -18,7 +18,7 @@ import {useSearchParams} from "react-router-dom"
 
 import useCellTypeStore from "../../store/CellTypeStore.js"
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
-import useDataStore from "../../store/DataStore.js"
+import useDataStore from "../../store/DatatableStore.js"
 
 import UMAPPlot from "./UMAPPlot.jsx"
 import DotPlot from "./DotPlot.jsx"

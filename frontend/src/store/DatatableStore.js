@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import { toast } from "react-toastify";
-import {getData_get, getDataset_get, getSample_get} from "../api/api.js";
+import {getDatatable_get, getDatasetList, getSampletable_get} from "../api/api.js";
 
 const useDataStore = create((set) => ({
     dataRecords: [],
@@ -14,7 +14,7 @@ const useDataStore = create((set) => ({
 
     fetchDataTable: async (dataset_id="all") => {
         try {
-            const response = await getData_get(dataset_id);
+            const response = await getDatatable_get(dataset_id);
             // console.log(response);
             if(response.status === 200){
                 const data = await response.data;
@@ -36,7 +36,7 @@ const useDataStore = create((set) => ({
     fetchSampleData: async (conditions) => {
         try {
             conditions = {dataset_id: "all", sample_id: "all",...conditions}
-            const response = await getSample_get(conditions);
+            const response = await getSampletable_get(conditions);
             // console.log(response);
             if(response.status === 200){
                 const data = await response.data;
@@ -57,7 +57,7 @@ const useDataStore = create((set) => ({
 
     fetchDatasetList: async () => {
         try {
-            const response = await getDataset_get();
+            const response = await getDatasetList();
             // console.log(response);
             if(response.status === 200){
                 const data = await response.data;
@@ -72,7 +72,7 @@ const useDataStore = create((set) => ({
         } catch (error) {
             console.error("Error fetching data:", error);
             await set({ datasetRecords: [], datasetfetchStatus: "error" });
-            toast.error("Error while fetching datasets.");
+            toast.info(error.response.data.detail);
         }
     },
 

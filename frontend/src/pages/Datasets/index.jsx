@@ -4,7 +4,7 @@ import {Box, Typography, Divider} from "@mui/material";
 import FilterPanel from "./FilterPanel";
 import DatasetDisplay from "./DatasetDisplay.jsx";
 import "./DatasetPage.css";
-import useDataStore from "../../store/DataStore.js";
+import useDataStore from "../../store/DatatableStore.js";
 
 const DatasetsPage = () => {
     const {datasetRecords,fetchDatasetList} = useDataStore();

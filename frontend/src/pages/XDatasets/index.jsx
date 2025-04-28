@@ -22,7 +22,7 @@ import RefreshIcon from "@mui/icons-material/Refresh"
 import {useSearchParams} from "react-router-dom"
 
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
-import useDataStore from "../../store/DataStore.js"
+import useDataStore from "../../store/DatatableStore.js"
 import {toast} from "react-toastify"
 import PlotlyFeaturePlot from "../VisiumView/VisiumPlotlyPlot.jsx"
 

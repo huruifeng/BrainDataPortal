@@ -169,8 +169,8 @@ async def getmetadataofsample(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting sample metadata.")
     return response
 
-@router.get("/getdata/{data_id}")
-async def getdata(data_id: str | uuid.UUID, session: SessionDep):
+@router.get("/getdatatable/{data_id}")
+async def getdatatable(data_id: str | uuid.UUID, session: SessionDep):
     if not data_id:
         raise HTTPException(status_code=400, detail="data_id is empty")
 
@@ -186,8 +186,8 @@ async def getdata(data_id: str | uuid.UUID, session: SessionDep):
         return data
 
 
-@router.get("/getsample")
-async def getsample(request:Request, session: SessionDep):
+@router.get("/getsampletable")
+async def getsampletable(request:Request, session: SessionDep):
     sample_ids = request.query_params.getlist("sample_id")
     dataset_ids = request.query_params.getlist("dataset_id")
     conditions = {k: request.query_params.getlist(k) for k, v in request.query_params.items()}
@@ -221,8 +221,8 @@ async def getsample(request:Request, session: SessionDep):
             return sample
 
 
-@router.get("/getdataset/{dataset_id}")
-async def getdataset(dataset_id: str | uuid.UUID, session: SessionDep):
+@router.get("/getdatasetlist/{dataset_id}")
+async def getdatasetlist(dataset_id: str | uuid.UUID, session: SessionDep):
     if not dataset_id:
         raise HTTPException(status_code=400, detail="dataset_id is empty")
 
@@ -234,5 +234,5 @@ async def getdataset(dataset_id: str | uuid.UUID, session: SessionDep):
     else:
         dataset = get_dataset_by_id(dataset_id,session)
         if not dataset:
-            raise HTTPException(status_code=404, detail="dataset not found")
+            raise HTTPException(status_code=404, detail=f"dataset not found with id: {dataset_id}")
         return dataset
