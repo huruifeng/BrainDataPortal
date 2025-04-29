@@ -1,5 +1,15 @@
-import React, {useState} from 'react';
-import {Box, Stepper, Step, StepLabel, Button, Paper, Typography, Divider} from '@mui/material';
+import {useState, useRef} from 'react';
+import {
+    Box,
+    Stepper,
+    Step,
+    StepLabel,
+    Button,
+    Paper,
+    Typography,
+    Divider,
+} from '@mui/material';
+import axios from 'axios';
 import ExtractInfo from './ExtractInfo';
 import MetaPrepare from './MetaPrepare';
 
@@ -7,9 +17,27 @@ const steps = ['Extract Info', 'Metadata Prepare'];
 
 const DatasetManage = () => {
     const [activeStep, setActiveStep] = useState(0);
+    const extractInfoRef = useRef();
 
-    const handleNext = () => {
-        setActiveStep((prev) => prev + 1);
+    const handleNext = async () => {
+        if (activeStep === 0) {
+            // Validate and collect form data from ExtractInfo step
+            if (extractInfoRef.current && extractInfoRef.current.validateFields()) {
+                const payload = extractInfoRef.current.collectData();
+                try {
+                    const response = await axios.post('/api/datasets/create', payload);
+                    console.log('Successfully submitted:', response.data);
+                    setActiveStep((prev) => prev + 1);
+                } catch (error) {
+                    console.error('Submission failed:', error);
+                    alert('Failed to submit dataset info.');
+                }
+            } else {
+                alert('Please fill all required fields.');
+            }
+        } else {
+            setActiveStep((prev) => prev + 1);
+        }
     };
 
     const handleBack = () => {
@@ -19,7 +47,7 @@ const DatasetManage = () => {
     const getStepContent = (step) => {
         switch (step) {
             case 0:
-                return <ExtractInfo/>;
+                return <ExtractInfo ref={extractInfoRef}/>;
             case 1:
                 return <MetaPrepare/>;
             default:
@@ -31,10 +59,10 @@ const DatasetManage = () => {
         <div className="dataset-manage-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
             <Box className="title-row">
-                <Typography variant="h6">Dataaet Management</Typography>
+                <Typography variant="h6">Dataset Management</Typography>
             </Box>
             <Divider/>
-            <Box sx={{display: 'flex', pb: 2, pl:4, mb: 4}}>
+            <Box sx={{display: 'flex', pb: 2, pl: 4, mb: 4}}>
                 {/* Sidebar */}
                 <Box sx={{width: '15%', minWidth: '200px', maxWidth: '400px', py: 2, pl: 2}}>
                     <Stepper activeStep={activeStep} orientation="vertical">
@@ -51,8 +79,12 @@ const DatasetManage = () => {
                         <Button disabled={activeStep === 0} onClick={handleBack}>
                             Back
                         </Button>
-                        <Button variant="contained" onClick={handleNext} disabled={activeStep === steps.length - 1}>
-                            Next
+                        <Button
+                            variant="contained"
+                            onClick={handleNext}
+                            disabled={activeStep >= steps.length}
+                        >
+                            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                         </Button>
                     </Box>
                 </Paper>

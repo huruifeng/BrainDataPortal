@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import RegionStore from "../../store/RegionStore.js";
 
 import * as brainRegions_inner from "../../assets/images/brain_inner";
