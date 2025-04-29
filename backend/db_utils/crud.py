@@ -1,46 +1,49 @@
 import uuid
 
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from backend.models import *
 
-from backend.db import get_session
-
-
 ## ===================================================
 ## insert functions
-def insert_data(data: Data, session: Session = Depends(get_session)):
-    session.add(data)
-    session.commit()
-    session.refresh(data)
-    return data
-
-def insert_study(study: Study, session: Session = Depends(get_session)):
+def insert_study(study: Study, session: Session):
     session.add(study)
     session.commit()
     session.refresh(study)
     return study
 
-def insert_sample(sample: Sample, session: Session = Depends(get_session)):
+def insert_dataset(dataset: Dataset, session: Session):
+    session.add(dataset)
+    session.commit()
+    session.refresh(dataset)
+    return dataset
+
+def insert_data(data: Data, session: Session):
+    session.add(data)
+    session.commit()
+    session.refresh(data)
+    return data
+
+def insert_sample(sample: Sample, session: Session):
     session.add(sample)
     session.commit()
     session.refresh(sample)
     return sample
 
-def insert_protocol(protocol: Protocol, session: Session = Depends(get_session)):
+def insert_protocol(protocol: Protocol, session: Session):
     session.add(protocol)
     session.commit()
     session.refresh(protocol)
     return protocol
 
-def insert_subject(subject: Subject, session: Session = Depends(get_session)):
+def insert_subject(subject: Subject, session: Session):
     session.add(subject)
     session.commit()
     session.refresh(subject)
     return subject
 
-def insert_clinpath(clinpath: Clinpath, session: Session = Depends(get_session)):
+def insert_clinpath(clinpath: Clinpath, session: Session):
     session.add(clinpath)
     session.commit()
     session.refresh(clinpath)

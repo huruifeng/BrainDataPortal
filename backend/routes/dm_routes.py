@@ -1,9 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 import os
 import json
 
 from pydantic import BaseModel
 from typing import Optional
+
+from sqlmodel import Session
+
+from backend.db import get_session
+from backend.db_utils.crud import insert_study, insert_dataset
+from backend.models import Study, Dataset
 
 router = APIRouter()
 
@@ -56,7 +62,7 @@ class SubmissionData(BaseModel):
     protocol_info: ProtocolInfo
 
 @router.get("/")
-async def read_root():
+async def dm_root():
     return {"Message": "Hello DataManager."}
 
 @router.get("/getseuratobjects")
@@ -68,8 +74,31 @@ async def getseuratobjects():
             file_ls.remove(file)
     return file_ls
 
-
 @router.post("/processdataset")
-async def processdataset(data: SubmissionData):
+async def processdataset(data: SubmissionData, session: Session = Depends(get_session)):
+    seurat = data.seurat_info.seurat
+    datatype = data.seurat_info.datatype
+    dataset_name = data.dataset_info.dataset_name
+
+    print("========get dict=========")
+    study_dict = data.study_info.model_dump()
+    protocol_dict = data.protocol_info.model_dump()
+    dataset_dict = data.dataset_info.model_dump()
+
+    print("=======insert study==========")
+    study_dict["study_id"] = study_dict["study_name"]
+    study = Study(**study_dict)
+
+    print("=======insert dataset==========")
+    dataset_dict["dataset_id"] = dataset_name
+    dataset_dict["study_id"] = study_dict["study_id"]
+    dataset_dict["seurat"] = seurat
+    dataset = Dataset(**dataset_dict)
+
+    # Insert into DB
+    insert_study(study, session)
+    insert_dataset(dataset, session)
+
+
     return {"message": "Data received successfully", "data": data}
 
