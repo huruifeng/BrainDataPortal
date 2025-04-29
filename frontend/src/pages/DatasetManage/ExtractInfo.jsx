@@ -12,7 +12,7 @@ import {
 import useDatasetManageStore from "../../store/DatasetManageStore.js";
 
 const requiredFields = {
-    dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email','brain_super_region','brain_region', 'assay'],
+    dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email', 'brain_super_region', 'brain_region', 'assay'],
     study: ['study_name', 'team_name', 'lab_name'],
     protocol: ['protocol_id', 'protocol_name'],
 };
@@ -21,7 +21,13 @@ const emailFields = ['PI_email', 'first_contributor_email', 'submitter_email'];
 const numericFields = ['n_samples'];
 
 const ExtractInfo = forwardRef((props, ref) => {
-    const {seuratObjects, selectedSeurat, setSelectedSeurat, fetchSeuratObjects,setDatasetName} = useDatasetManageStore()
+    const {
+        seuratObjects,
+        selectedSeurat,
+        setSelectedSeurat,
+        fetchSeuratObjects,
+        setDatasetName
+    } = useDatasetManageStore()
     const [dataType, setDataType] = useState('');
 
 
@@ -74,7 +80,7 @@ const ExtractInfo = forwardRef((props, ref) => {
     const [errors, setErrors] = useState({});
 
     const handleChange = (section, setter) => (key) => (e) => {
-        if(key==='dataset_name'){
+        if (key === 'dataset_name') {
             setDatasetName(key)
         }
         setter(prev => ({...prev, [key]: e.target.value}));
@@ -133,8 +139,11 @@ const ExtractInfo = forwardRef((props, ref) => {
         },
 
         collectData: () => ({
-            seurat_info: { seurat: selectedSeurat, datatype: dataType },
-            dataset_info: datasetInfo,
+            seurat_info: {seurat: selectedSeurat, datatype: dataType},
+            dataset_info: {
+                ...datasetInfo,
+                n_samples: datasetInfo.n_samples ? Number(datasetInfo.n_samples) : null,
+            },
             study_info: studyInfo,
             protocol_info: protocolInfo
         })

@@ -68,7 +68,7 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    processDataset: async () => {
+    processDataset: async (payload) => {
         const {selectedSeurat, datasetName} = get();
 
         if (!selectedSeurat || !datasetName) {
@@ -96,24 +96,22 @@ const useDatasetManageStore = create((set, get) => ({
         });
 
         try {
-            const response = await axios.post(`${dmURL}/process`, {
-                seurat: selectedSeurat,
-                datasetName,
-            });
+            console.log(payload);
+            const response = await axios.post(`${dmURL}/processdataset`, payload);
+            console.log(response);
+            // const jobId = response.data.jobId;
 
-            const jobId = response.data.jobId;
-
-            // Clear any existing polling
-            if (get().pollingInterval) {
-                clearInterval(get().pollingInterval);
-            }
-
-            // Start polling for status updates
-            const interval = setInterval(() => {
-                get().fetchProcessingStatus(jobId);
-            }, 2000);
-
-            set({pollingInterval: interval});
+            // // Clear any existing polling
+            // if (get().pollingInterval) {
+            //     clearInterval(get().pollingInterval);
+            // }
+            //
+            // // Start polling for status updates
+            // const interval = setInterval(() => {
+            //     get().fetchProcessingStatus(jobId);
+            // }, 2000);
+            //
+            // set({pollingInterval: interval});
 
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'An error occurred while processing the dataset';
@@ -139,7 +137,7 @@ const useDatasetManageStore = create((set, get) => ({
 
     fetchProcessingStatus: async (jobId) => {
         try {
-            const response = await axios.get(`${dmURL}/status?jobId=${jobId}`);
+            const response = await axios.get(`${dmURL}/datasetprocessingstatus?jobId=${jobId}`);
             const data = response.data;
 
             set({processingStatus: data});

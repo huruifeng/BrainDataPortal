@@ -1,23 +1,16 @@
 import {useState, useRef} from 'react';
-import {
-    Box,
-    Stepper,
-    Step,
-    StepLabel,
-    Button,
-    Paper,
-    Typography,
-    Divider,
-} from '@mui/material';
-import axios from 'axios';
+import {Box, Stepper, Step, StepLabel, Button, Paper, Typography, Divider,} from '@mui/material';
+
 import ExtractInfo from './ExtractInfo';
 import MetaPrepare from './MetaPrepare';
+import useDatasetManageStore from "../../store/DatasetManageStore.js";
 
-const steps = ['Extract Info', 'Metadata Prepare'];
+const steps = ['Setup dataset', 'Prepare metadata'];
 
 const DatasetManage = () => {
     const [activeStep, setActiveStep] = useState(0);
     const extractInfoRef = useRef();
+    const {processDataset} = useDatasetManageStore();
 
     const handleNext = async () => {
         if (activeStep === 0) {
@@ -25,8 +18,7 @@ const DatasetManage = () => {
             if (extractInfoRef.current && extractInfoRef.current.validateFields()) {
                 const payload = extractInfoRef.current.collectData();
                 try {
-                    const response = await axios.post('/api/datasets/create', payload);
-                    console.log('Successfully submitted:', response.data);
+                    const response = processDataset(payload);
                     setActiveStep((prev) => prev + 1);
                 } catch (error) {
                     console.error('Submission failed:', error);

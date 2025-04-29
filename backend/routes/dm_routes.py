@@ -1,7 +1,59 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 import os
+import json
+
+from pydantic import BaseModel
+from typing import Optional
 
 router = APIRouter()
+
+class SeuratInfo(BaseModel):
+    seurat: str
+    datatype: str
+
+class DatasetInfo(BaseModel):
+    dataset_name: str
+    assay: str
+    description: Optional[str] = None
+    PI_full_name: str
+    PI_email: str
+    first_contributor: str
+    first_contributor_email: str
+    other_contributors: Optional[str] = None
+    support_grants: Optional[str] = None
+    other_funding_source: Optional[str] = None
+    publication_DOI: Optional[str] = None
+    publication_PMID: Optional[str] = None
+    n_samples: Optional[int] = None
+    brain_super_region: Optional[str] = None
+    brain_region: Optional[str] = None
+    sample_info: Optional[str] = None
+
+class StudyInfo(BaseModel):
+    study_name: str
+    description: Optional[str] = None
+    team_name: str
+    lab_name: str
+    submitter_name: str
+    submitter_email: str
+
+class ProtocolInfo(BaseModel):
+    protocol_id: str
+    protocol_name: str
+    version: Optional[str] = None
+    github_url: Optional[str] = None
+    sample_collection_summary: Optional[str] = None
+    cell_extraction_summary: Optional[str] = None
+    lib_prep_summary: Optional[str] = None
+    data_processing_summary: Optional[str] = None
+    protocols_io_DOI: Optional[str] = None
+    other_reference: Optional[str] = None
+
+class SubmissionData(BaseModel):
+    seurat_info: SeuratInfo
+    dataset_info: DatasetInfo
+    study_info: StudyInfo
+    protocol_info: ProtocolInfo
 
 @router.get("/")
 async def read_root():
@@ -15,3 +67,9 @@ async def getseuratobjects():
         if not file.endswith(".rds"):
             file_ls.remove(file)
     return file_ls
+
+
+@router.post("/processdataset")
+async def processdataset(data: SubmissionData):
+    return {"message": "Data received successfully", "data": data}
+
