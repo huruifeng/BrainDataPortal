@@ -10,12 +10,10 @@ const useDatasetManageStore = create((set, get) => ({
     // Seurat objects
     seuratObjects: [],
     selectedSeurat: '',
-    isLoading: false,
 
     // Dataset name
     datasetName: '',
     isNameUnique: null,
-    isCheckingName: false,
 
     // Processing
     isProcessing: false,
@@ -41,7 +39,7 @@ const useDatasetManageStore = create((set, get) => ({
     fetchSeuratObjects: async () => {
         set({isLoading: true, error: null});
         try {
-            const response = await axios.get(`${dmURL}/seurat-objects`);
+            const response = await axios.get(`${dmURL}/getseuratobjects`);
             set({seuratObjects: response.data});
         } catch (error) {
             set({

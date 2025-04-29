@@ -12,9 +12,6 @@ class StudyBase(SQLModel):
     team_name: str = Field(index=True)
     lab_name: str = Field(index=True)
 
-    team_dataset_id: str = Field(default="NA")
-    dataset_name: str = Field(default="NA")
-
     submitter_name: str = Field(default="NA")
     submitter_email: str = Field(default="NA")
 
