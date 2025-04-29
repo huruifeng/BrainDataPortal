@@ -7,9 +7,10 @@ import {
     InputLabel,
     FormControl,
     Typography,
-    Divider
+    Divider, CircularProgress, FormHelperText
 } from '@mui/material';
 import useDatasetManageStore from "../../store/DatasetManageStore.js";
+import {CheckCircle as CheckCircleIcon, Error as ErrorIcon} from "@mui/icons-material";
 
 const requiredFields = {
     dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email', 'brain_super_region', 'brain_region', 'assay'],
@@ -28,6 +29,7 @@ const ExtractInfo = forwardRef((props, ref) => {
         fetchSeuratObjects,
         setDatasetName
     } = useDatasetManageStore()
+    const {checkDatasetName, isNameUnique,isCheckingName} = useDatasetManageStore();
     const [dataType, setDataType] = useState('');
 
 
@@ -81,7 +83,8 @@ const ExtractInfo = forwardRef((props, ref) => {
 
     const handleChange = (section, setter) => (key) => (e) => {
         if (key === 'dataset_name') {
-            setDatasetName(key)
+            setDatasetName(e.target.value)
+            checkDatasetName(e.target.value)
         }
         setter(prev => ({...prev, [key]: e.target.value}));
         setErrors(prev => ({...prev, [`${section}.${key}`]: false}));
@@ -171,6 +174,38 @@ const ExtractInfo = forwardRef((props, ref) => {
                                     <MenuItem value="scRNAseq">scRNAseq</MenuItem>
                                     <MenuItem value="VisiumST">VisiumST</MenuItem>
                                 </Select>
+                            </FormControl>
+                        </Grid>
+                    );
+                }
+                if (key === 'dataset_name') {
+                    return (
+                        <Grid item xs={12} md={6} key={key}>
+                            <FormControl fullWidth error={isNameUnique === false || !!errors[errorKey] }>
+                                <TextField
+                                    id="dataset-name"
+                                    label="Dataset Name"
+                                    required={requiredFields[section].includes(key)}
+                                    placeholder="Enter a unique dataset name"
+                                    value={value}
+                                    size="small"
+                                    onChange={handleChange(section, setter)(key)}
+                                    error={isNameUnique === false || !!errors[errorKey]}
+                                    InputProps={{
+                                        endAdornment: isCheckingName ? (
+                                            <CircularProgress size={20}/>
+                                        ) : isNameUnique === true ? (
+                                            <CheckCircleIcon color="success"/>
+                                        ) : isNameUnique === false ? (
+                                            <ErrorIcon color="error"/>
+                                        ) : null,
+                                    }}
+                                />
+                                <FormHelperText>
+                                    {isNameUnique === false
+                                        ? "This name is already in use"
+                                        : "The dataset name must be unique and will be used to identify this dataset in the system"}
+                                </FormHelperText>
                             </FormControl>
                         </Grid>
                     );

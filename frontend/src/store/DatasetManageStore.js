@@ -14,6 +14,7 @@ const useDatasetManageStore = create((set, get) => ({
     // Dataset name
     datasetName: '',
     isNameUnique: null,
+    isCheckingName: false,
 
     // Processing
     isProcessing: false,
@@ -59,7 +60,7 @@ const useDatasetManageStore = create((set, get) => ({
 
         set({isCheckingName: true});
         try {
-            const response = await axios.get(`${dmURL}/check-name?name=${encodeURIComponent(name)}`);
+            const response = await axios.get(`${dmURL}/checkdatasetname?name=${encodeURIComponent(name)}`);
             set({isNameUnique: response.data.isUnique});
         } catch (error) {
             console.error('Error checking dataset name:', error);

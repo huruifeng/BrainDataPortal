@@ -74,6 +74,13 @@ async def getseuratobjects():
             file_ls.remove(file)
     return file_ls
 
+@router.get("/checkdatasetname")
+async def checkdatasetname(name: str):
+    path_str = "backend/datasets/" + name
+    if os.path.exists(path_str):
+        return {"isUnique": False}
+    return {"isUnique": True}
+
 @router.post("/processdataset")
 async def processdataset(data: SubmissionData, session: Session = Depends(get_session)):
     seurat = data.seurat_info.seurat
