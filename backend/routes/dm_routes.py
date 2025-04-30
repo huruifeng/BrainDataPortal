@@ -1,6 +1,7 @@
+import subprocess
+
 from fastapi import APIRouter, Depends
 import os
-import json
 
 from pydantic import BaseModel
 from typing import Optional
@@ -87,25 +88,69 @@ async def processdataset(data: SubmissionData, session: Session = Depends(get_se
     datatype = data.seurat_info.datatype
     dataset_name = data.dataset_info.dataset_name
 
-    print("========get dict=========")
+    print("========get data dict=========")
     study_dict = data.study_info.model_dump()
     protocol_dict = data.protocol_info.model_dump()
     dataset_dict = data.dataset_info.model_dump()
 
-    print("=======insert study==========")
     study_dict["study_id"] = study_dict["study_name"]
     study = Study(**study_dict)
 
-    print("=======insert dataset==========")
     dataset_dict["dataset_id"] = dataset_name
     dataset_dict["study_id"] = study_dict["study_id"]
     dataset_dict["seurat"] = seurat
     dataset = Dataset(**dataset_dict)
 
-    # Insert into DB
-    insert_study(study, session)
-    insert_dataset(dataset, session)
+    ## check if dataset exists
+    print("=======set dataset path==========")
+    dataset_path = "backend/datasets/" + dataset_name
+    if not os.path.exists(dataset_path):
+        os.makedirs(dataset_path)
+
+    ## process seurat
+    print("=======process seurat==========")
+    # Open a file to log stdout and stderr
+    log_file = open(f"{dataset_path}/extract_seurat_output.log", "w")
+    if datatype.lower() in ["scrnaseq", "snrnaseq"]:
+        subprocess.Popen(
+            ["Rscript", "backend/funcs/extract_SC.R", f"backend/Seurats/{seurat}", dataset_path],
+            stdout=log_file,
+            stderr=log_file,
+        )
+    elif datatype.lower() in ["visiumst"]:
+        subprocess.Popen(
+            ["Rscript", "backend/funcs/extract_Visium.R", f"backend/Seurats/{seurat}", dataset_path],
+            stdout=log_file,
+            stderr=log_file,
+        )
+    else:
+        return {"message": "Error: Invalid datatype.", "success": False}
 
 
-    return {"message": "Data received successfully", "data": data}
+    ## process metadata
+    print("=======process metadata==========")
+    # Open a file to log stdout and stderr
+    log_file = open(f"{dataset_path}/process_metadata_output.log", "w")
+    subprocess.Popen(
+        ["Rscript", "backend/funcs/extract_metadata.R", f"backend/Seurats/{seurat}", dataset_path],
+        stdout=log_file,
+        stderr=log_file,
+    )
+
+    ## process protocol
+    print("=======process protocol==========")
+    # Open a file to log stdout and stderr
+    log_file = open(f"{dataset_path}/extract_protocol_output.log", "w")
+    subprocess.Popen(
+        ["Rscript", "backend/funcs/extract_protocol.R", f"backend/Seurats/{seurat}", dataset_path],
+        stdout=log_file,
+        stderr=log_file,
+    )
+
+    print("=======insert info into database==========")
+    # insert_study(study, session)
+    # insert_dataset(dataset, session)
+
+
+    return {"message": "Data received successfully", "success": True}
 

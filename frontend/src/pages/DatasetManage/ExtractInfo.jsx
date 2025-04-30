@@ -13,7 +13,7 @@ import useDatasetManageStore from "../../store/DatasetManageStore.js";
 import {CheckCircle as CheckCircleIcon, Error as ErrorIcon} from "@mui/icons-material";
 
 const requiredFields = {
-    dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email', 'brain_super_region', 'brain_region', 'assay'],
+    dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email', 'brain_super_region', 'brain_region', 'n_samples', 'assay'],
     study: ['study_name', 'team_name', 'lab_name'],
     protocol: ['protocol_id', 'protocol_name'],
 };
@@ -29,7 +29,7 @@ const ExtractInfo = forwardRef((props, ref) => {
         fetchSeuratObjects,
         setDatasetName
     } = useDatasetManageStore()
-    const {checkDatasetName, isNameUnique,isCheckingName} = useDatasetManageStore();
+    const {checkDatasetName, isNameUnique, isCheckingName} = useDatasetManageStore();
     const [dataType, setDataType] = useState('');
 
 
@@ -82,10 +82,6 @@ const ExtractInfo = forwardRef((props, ref) => {
     const [errors, setErrors] = useState({});
 
     const handleChange = (section, setter) => (key) => (e) => {
-        if (key === 'dataset_name') {
-            setDatasetName(e.target.value)
-            checkDatasetName(e.target.value)
-        }
         setter(prev => ({...prev, [key]: e.target.value}));
         setErrors(prev => ({...prev, [`${section}.${key}`]: false}));
     };
@@ -181,7 +177,7 @@ const ExtractInfo = forwardRef((props, ref) => {
                 if (key === 'dataset_name') {
                     return (
                         <Grid item xs={12} md={6} key={key}>
-                            <FormControl fullWidth error={isNameUnique === false || !!errors[errorKey] }>
+                            <FormControl fullWidth error={isNameUnique === false || !!errors[errorKey]}>
                                 <TextField
                                     id="dataset-name"
                                     label="Dataset Name"
@@ -190,6 +186,10 @@ const ExtractInfo = forwardRef((props, ref) => {
                                     value={value}
                                     size="small"
                                     onChange={handleChange(section, setter)(key)}
+                                    onBlur={() => {
+                                        setDatasetName(value);
+                                        checkDatasetName(value);
+                                    }}
                                     error={isNameUnique === false || !!errors[errorKey]}
                                     InputProps={{
                                         endAdornment: isCheckingName ? (
