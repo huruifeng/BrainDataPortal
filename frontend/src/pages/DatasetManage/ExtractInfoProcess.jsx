@@ -83,6 +83,7 @@ const ExtractInfoProcess = () => {
                                 </Box>
                                 <LinearProgress
                                     variant={processingStatus.status === "processing" ? "indeterminate" : "determinate"}
+                                    value={processingStatus.status === "processing" ? 0 : 100}
                                     color={processingStatus.status === "completed" ? "success"
                                         : processingStatus.status === "failed" ? "error" : "primary"}
                                 />

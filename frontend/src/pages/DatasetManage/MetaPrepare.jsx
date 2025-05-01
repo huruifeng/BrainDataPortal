@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import {
-    Box,
+    Box,Chip,
     Typography,
     Card,
     CardContent,
@@ -63,7 +63,7 @@ const MetaPrepare = () => {
             <Typography variant="h5" gutterBottom>Meta Preparation</Typography>
 
             {/* Dataset Selection */}
-            <Card elevation={0} sx={{m: 0, p:0}}>
+            <Card elevation={0} sx={{m: 0, p: 0}}>
                 <CardContent sx={{pl: 2}}>
                     <Typography variant="p" gutterBottom>Select dataset</Typography>
                     <FormControl fullWidth>
@@ -84,26 +84,30 @@ const MetaPrepare = () => {
             {/* Meta Features Selection */}
             <Card elevation={0} sx={{mb: 0}}>
                 <CardContent>
-                    <Typography variant="p" gutterBottom>Select Meta Features (up to 10)</Typography>
+                    <Typography variant="p" gutterBottom>Select meta features (up to 10)</Typography>
                     <FormControl fullWidth>
                         <Select
                             multiple
                             size={"small"}
                             value={selectedFeatures}
                             onChange={handleFeatureChange}
-                            renderValue={(selected) => selected.join(", ")}
+                            renderValue={(selected) => (
+                                <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
+                                    {selected.map((value) => (<Chip key={value} label={value}/>))}
+                                </Box>
+                            )}
                             MenuProps={{
                                 PaperProps: {
                                     style: {
-                                        maxHeight: 200,
+                                        maxHeight: 400,
                                     },
                                 },
                             }}
                         >
                             {datasetMetaFeatures.map((feature) => (
-                                <MenuItem key={feature} value={feature}>
-                                    <Checkbox checked={selectedFeatures.indexOf(feature) > -1}/>
-                                    <ListItemText primary={feature}/>
+                                <MenuItem key={feature} value={feature} sx={{py: "4px"}}>
+                                    <Checkbox sx={{py: 0}} checked={selectedFeatures.indexOf(feature) > -1}/>
+                                    <ListItemText sx={{py: 0}} primary={feature}/>
                                 </MenuItem>
                             ))}
                         </Select>
@@ -116,7 +120,7 @@ const MetaPrepare = () => {
                 <Grid item xs={4}>
                     <Card elevation={0}>
                         <CardContent>
-                            <Typography variant="p" gutterBottom>Select SampleID Column</Typography>
+                            <Typography variant="p" gutterBottom>SampleID column</Typography>
                             <FormControl fullWidth>
                                 <Select
                                     value={sampleIDColumn}
@@ -136,7 +140,7 @@ const MetaPrepare = () => {
                 <Grid item xs={4}>
                     <Card elevation={0}>
                         <CardContent>
-                            <Typography variant="p" gutterBottom>Select Major Cell Type</Typography>
+                            <Typography variant="p" gutterBottom>Major cluster column</Typography>
                             <FormControl fullWidth>
                                 <Select
                                     value={majorClusterColumn}
@@ -157,7 +161,7 @@ const MetaPrepare = () => {
                 <Grid item xs={4}>
                     <Card elevation={0}>
                         <CardContent>
-                            <Typography variant="p" gutterBottom>Select Condition Column</Typography>
+                            <Typography variant="p" gutterBottom>Condition column</Typography>
                             <FormControl fullWidth>
                                 <Select
                                     value={conditionColumn}
