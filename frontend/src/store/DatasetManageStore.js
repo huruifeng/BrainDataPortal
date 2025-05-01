@@ -23,7 +23,7 @@ const useDatasetManageStore = create((set, get) => ({
         log: '',
     },
 
-    metaFeatures: [],
+    datasetMetaFeatures: [],
 
     // Messages
     error: null,
@@ -81,7 +81,7 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    processDataset: async (payload) => {
+    extractSeuratData: async (payload) => {
         const {selectedSeurat, datasetName} = get();
 
         if (!selectedSeurat || !datasetName) {
@@ -100,11 +100,11 @@ const useDatasetManageStore = create((set, get) => ({
         });
 
         try {
-            const response = await axios.post(`${dmURL}/processdataset`, payload);
+            const response = await axios.post(`${dmURL}/extractseuratdata`, payload);
             return response.data;
 
         } catch (error) {
-            const errorMessage = error.response?.data?.error || 'An error occurred while processing the dataset';
+            const errorMessage = error.response?.data?.error || 'An error occurred while running extractseuratdata.';
             set({
                 error: errorMessage,
                 isProcessing: false,
@@ -142,10 +142,10 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    fetchMetaFeatures: async () => {
+    fetchMetaFeatures: async (dataset) => {
         try {
-            const response = await axios.get(`${dmURL}/getmetafeatures`);
-            set({metaFeatures: response.data});
+            const response = await axios.get(`${dmURL}/getdatasetfeatures?dataset=${dataset}`);
+            set({datasetMetaFeatures: response.data});
         } catch (error) {
             console.error('Error fetching meta features:', error);
         }

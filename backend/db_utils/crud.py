@@ -8,10 +8,16 @@ from backend.models import *
 ## ===================================================
 ## insert functions
 def insert_study(study: Study, session: Session):
-    session.add(study)
-    session.commit()
-    session.refresh(study)
-    return study
+    ## check if study exists
+    statement = select(Study).where(Study.study_id == study.study_id)  # Create a SELECT query
+    result = session.exec(statement).first()
+    if result:
+        return result
+    else:
+        session.add(study)
+        session.commit()
+        session.refresh(study)
+        return study
 
 def insert_dataset(dataset: Dataset, session: Session):
     session.add(dataset)

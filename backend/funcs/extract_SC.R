@@ -9,8 +9,9 @@ library(Matrix)
 library(data.table)
 library(Seurat)
 library(tidyverse)
+library(jsonlite)
 
-
+cat("===================================================\n")
 # Check if the script is run with the correct number of arguments
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 2) {
@@ -64,6 +65,13 @@ cat("Save metadata...\n")
 # Save to CSV with index as the first column
 metadata <- seurat_obj@meta.data
 write.csv(metadata, file = paste0(output_dir, "/raw_metadata.csv"), row.names = TRUE)
+
+## Save the metadata column names in a JSON file
+cat("Save metadata feature names...\n")
+# Extract metadata column names
+column_names <- colnames(metadata)
+# Save column names to JSON
+write_json(column_names, path = file.path(output_dir, "raw_metadata_columns.json"), pretty = TRUE)
 
 # save the umap embedding
 cat("Save umap embedding...\n")

@@ -1,8 +1,9 @@
+import json
 import subprocess
 from datetime import datetime
-from fastapi import APIRouter, Depends, Query
-from fastapi.responses import PlainTextResponse
 import os
+
+from fastapi import APIRouter, Depends, Query
 
 from pydantic import BaseModel
 from typing import Optional
@@ -83,8 +84,8 @@ async def checkdatasetname(name: str):
         return {"isUnique": False}
     return {"isUnique": True}
 
-@router.post("/processdataset")
-async def processdataset(data: SubmissionData, session: Session = Depends(get_session)):
+@router.post("/extractseuratdata")
+async def extractseuratdata(data: SubmissionData, session: Session = Depends(get_session)):
     seurat = data.seurat_info.seurat
     datatype = data.seurat_info.datatype
     dataset_name = data.dataset_info.dataset_name
@@ -127,21 +128,9 @@ async def processdataset(data: SubmissionData, session: Session = Depends(get_se
     else:
         return {"message": "Error: Invalid datatype.", "success": False}
 
-
-    # ## process metadata
-    # print("=======process metadata==========")
-    # # Open a file to log stdout and stderr
-    # log_file = open(f"{dataset_path}/process_metadata_output.log", "w")
-    # subprocess.Popen(
-    #     ["Rscript", "backend/funcs/extract_metadata.R", f"backend/Seurats/{seurat}", dataset_path],
-    #     stdout=log_file,
-    #     stderr=log_file,
-    # )
-
-
     print("=======insert info into database==========")
-    # insert_study(study, session)
-    # insert_dataset(dataset, session)
+    insert_study(study, session)
+    insert_dataset(dataset, session)
 
     now = datetime.now()
     return {"message": "Data received successfully", "success": True, "jobId": dataset_name + now.strftime("%Y%m%d%H%M%S")}
@@ -170,3 +159,12 @@ async def extractseuratstatus(dataset: str =  Query(...)):
             "log": str(e),
         }
         return processingStatus
+
+
+@router.get("/getdatasetfeatures")
+async def getdatasetfeatures(dataset: str = Query(...)):
+    dataset_path = f"backend/datasets/{dataset}"
+    features_file = f"{dataset_path}/raw_metadata_columns.json"
+    with open(features_file, "r") as f:
+        features = json.load(f)
+    return features

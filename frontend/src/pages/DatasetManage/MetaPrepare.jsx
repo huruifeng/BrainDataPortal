@@ -17,9 +17,9 @@ import useDatasetManageStore from "../../store/DatasetManageStore.js";
 import axios from "axios";
 
 const MetaPrepare = () => {
-    const {datasetName, metaFeatures, fetchMetaFeatures} = useDatasetManageStore();
+    const {datasetName, datasetMetaFeatures, fetchMetaFeatures} = useDatasetManageStore();
     const [selectedFeatures, setSelectedFeatures] = useState([]);
-    const [majorCellType, setMajorCellType] = useState("");
+    const [majorClusterColumn, setMajorClusterColumn] = useState("");
     const [conditionColumn, setConditionColumn] = useState("");
     const [sampleIDColumn, setSampleIDColumn] = useState("");
     const [loading, setLoading] = useState(false);
@@ -44,7 +44,7 @@ const MetaPrepare = () => {
         const metaData = {
             dataset: datasetName,
             selected_features: selectedFeatures,
-            major_cell_type: majorCellType,
+            major_cluster_column: majorClusterColumn,
             condition_column: conditionColumn,
         };
 
@@ -100,7 +100,7 @@ const MetaPrepare = () => {
                                 },
                             }}
                         >
-                            {metaFeatures.map((feature) => (
+                            {datasetMetaFeatures.map((feature) => (
                                 <MenuItem key={feature} value={feature}>
                                     <Checkbox checked={selectedFeatures.indexOf(feature) > -1}/>
                                     <ListItemText primary={feature}/>
@@ -125,10 +125,8 @@ const MetaPrepare = () => {
                                     displayEmpty
                                 >
                                     <MenuItem value="">None</MenuItem>
-                                    {metaFeatures.map((feature) => (
-                                        <MenuItem key={feature} value={feature}>
-                                            {feature}
-                                        </MenuItem>
+                                    {datasetMetaFeatures.map((feature) => (
+                                        <MenuItem key={feature} value={feature}>{feature}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
@@ -141,17 +139,15 @@ const MetaPrepare = () => {
                             <Typography variant="p" gutterBottom>Select Major Cell Type</Typography>
                             <FormControl fullWidth>
                                 <Select
-                                    value={majorCellType}
+                                    value={majorClusterColumn}
                                     size={"small"}
-                                    onChange={(e) => setMajorCellType(e.target.value)}
+                                    onChange={(e) => setMajorClusterColumn(e.target.value)}
                                     displayEmpty
 
                                 >
                                     <MenuItem value="">None</MenuItem>
-                                    {metaFeatures.map((feature) => (
-                                        <MenuItem key={feature} value={feature}>
-                                            {feature}
-                                        </MenuItem>
+                                    {datasetMetaFeatures.map((feature) => (
+                                        <MenuItem key={feature} value={feature}>{feature}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
@@ -170,10 +166,8 @@ const MetaPrepare = () => {
                                     displayEmpty
                                 >
                                     <MenuItem value="">None</MenuItem>
-                                    {metaFeatures.map((feature) => (
-                                        <MenuItem key={feature} value={feature}>
-                                            {feature}
-                                        </MenuItem>
+                                    {datasetMetaFeatures.map((feature) => (
+                                        <MenuItem key={feature} value={feature}>{feature}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
@@ -188,7 +182,7 @@ const MetaPrepare = () => {
                     variant="contained"
                     color="primary"
                     onClick={handleSubmit}
-                    disabled={selectedFeatures.length < 1 || !majorCellType || !conditionColumn || loading}
+                    disabled={selectedFeatures.length < 1 || !majorClusterColumn || !conditionColumn || loading}
                 >
                     {loading ? "Processing..." : "Submit"}
                 </Button>

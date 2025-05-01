@@ -21,21 +21,30 @@ const ExtractInfoProcess = () => {
 
     const logContainerRef = useRef(null);
     const [scrollLocked, setScrollLocked] = useState(false);
+    const processingStatusRef = useRef(processingStatus);
+
+    useEffect(() => {
+        processingStatusRef.current = processingStatus;
+    }, [processingStatus]);
+
 
     // Polling log status
     useEffect(() => {
-        const interval = setInterval(() => {
-            fetchExtractSeuratStatus(datasetName);
-            if (processingStatus.log && /Done!/.test(processingStatus.log)) {
-                clearInterval(interval);
-            }
-            if(processingStatus.status === "completed" || processingStatus.status === "failed") {
-                clearInterval(interval);
-            }
-        }, 5000);
+    const interval = setInterval(() => {
+        fetchExtractSeuratStatus(datasetName);
 
-        return () => clearInterval(interval);
-    }, [datasetName]);
+        const currentStatus = processingStatusRef.current;
+
+        if (currentStatus.log && /Done!/.test(currentStatus.log)) {
+            clearInterval(interval);
+        }
+        if (currentStatus.status === "completed" || currentStatus.status === "failed") {
+            clearInterval(interval);
+        }
+    }, 5000);
+
+    return () => clearInterval(interval);
+}, [datasetName]);
 
     // Auto-scroll only if not locked
     useEffect(() => {

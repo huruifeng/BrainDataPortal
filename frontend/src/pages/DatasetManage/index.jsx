@@ -1,4 +1,6 @@
-import {useState, useRef} from 'react';
+import {useState, useRef, useEffect} from 'react';
+import {useSearchParams} from "react-router-dom";
+
 import {Box, Stepper, Step, StepLabel, Button, Paper, Typography, Divider,} from '@mui/material';
 
 import ExtractInfo from './ExtractInfo';
@@ -8,12 +10,34 @@ import MetaPrepare from './MetaPrepare';
 
 import useDatasetManageStore from "../../store/DatasetManageStore.js";
 
-const steps = ['Setup dataset','Extracting data', 'Prepare metadata'];
+const steps = ['Setup dataset', 'Extracting data', 'Prepare metadata'];
 
 const DatasetManage = () => {
-    const [activeStep, setActiveStep] = useState(2);
+    const {datasetName, setDatasetName, extractSeuratData, isProcessing} = useDatasetManageStore();
+
+    // Get all the pre-selected values
+    const [queryParams, setQueryParams] = useSearchParams();
+    let dataset = queryParams.get("dataset") ?? "";
+    let stepidx = parseInt(queryParams.get("stepidx") ?? 0);
+
+    useEffect(() => {
+        if (dataset === "") {
+            stepidx = 0;
+        } else {
+            setDatasetName(dataset);
+        }
+        if (stepidx >= steps.length) {
+            stepidx = steps.length - 1;
+        }
+        if (stepidx < 0) {
+            stepidx = 0;
+        }
+
+    }, []);
+
+
+    const [activeStep, setActiveStep] = useState(stepidx);
     const extractInfoRef = useRef();
-    const {processDataset,isProcessing} = useDatasetManageStore();
 
     const handleNext = async () => {
         if (activeStep === 0) {
@@ -21,7 +45,7 @@ const DatasetManage = () => {
             if (extractInfoRef.current && extractInfoRef.current.validateFields()) {
                 const payload = extractInfoRef.current.collectData();
                 try {
-                    const response = processDataset(payload);
+                    const response = extractSeuratData(payload);
                     setActiveStep((prev) => prev + 1);
                 } catch (error) {
                     console.error('Submission failed:', error);
@@ -30,15 +54,24 @@ const DatasetManage = () => {
             } else {
                 alert('Please fill all required fields.');
             }
-        }else if (activeStep === 1) {
+        } else if (activeStep === 1) {
             setActiveStep((prev) => prev + 1);
         } else {
             setActiveStep((prev) => prev + 1);
         }
+
+        const newParams = new URLSearchParams();
+        datasetName && newParams.set("dataset", datasetName)
+        newParams.set("stepidx", activeStep + 1)
+        setQueryParams(newParams);
     };
 
     const handleBack = () => {
         setActiveStep((prev) => prev - 1);
+        const newParams = new URLSearchParams();
+        datasetName && newParams.set("dataset", datasetName)
+        newParams.set("stepidx", activeStep)
+        setQueryParams(newParams);
     };
 
     const getStepContent = (step) => {
