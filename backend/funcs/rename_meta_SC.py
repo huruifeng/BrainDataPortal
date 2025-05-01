@@ -1,18 +1,16 @@
 # %% ==============================
 import pandas as pd
 import json
-from collections import defaultdict
 import os
-import numpy as np
 import sys
 
-from utils.funcs import is_categorical
-from utils.funcs import dumps_compact_lists
+from .utils import is_categorical
+from .utils import dumps_compact_lists
 
 # %% ==============================
 # Get the arguments
-# dataset_name = sys.argv[1]
-dataset_name = "SC_data"
+dataset_name = sys.argv[1]
+# dataset_name = "SC_data"
 
 metadata = pd.read_csv(dataset_name + "/raw_metadata.csv", index_col=0, header=0)
 
@@ -174,5 +172,5 @@ for gene, df_gene in pseudo_bulk.groupby("Gene"):
     with open(f"{dataset_name}/gene_pseudobulk/{safe_gene_name}.json", "w") as f:
         json.dump(gene_dict, f, indent=4)
 
-print("Done processing metadata and expression data...")
+print("Done! Feature/Gene data processed and saved.")
 

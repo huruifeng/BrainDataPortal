@@ -1,6 +1,7 @@
 import subprocess
-
-from fastapi import APIRouter, Depends
+from datetime import datetime
+from fastapi import APIRouter, Depends, Query
+from fastapi.responses import PlainTextResponse
 import os
 
 from pydantic import BaseModel
@@ -127,30 +128,45 @@ async def processdataset(data: SubmissionData, session: Session = Depends(get_se
         return {"message": "Error: Invalid datatype.", "success": False}
 
 
-    ## process metadata
-    print("=======process metadata==========")
-    # Open a file to log stdout and stderr
-    log_file = open(f"{dataset_path}/process_metadata_output.log", "w")
-    subprocess.Popen(
-        ["Rscript", "backend/funcs/extract_metadata.R", f"backend/Seurats/{seurat}", dataset_path],
-        stdout=log_file,
-        stderr=log_file,
-    )
+    # ## process metadata
+    # print("=======process metadata==========")
+    # # Open a file to log stdout and stderr
+    # log_file = open(f"{dataset_path}/process_metadata_output.log", "w")
+    # subprocess.Popen(
+    #     ["Rscript", "backend/funcs/extract_metadata.R", f"backend/Seurats/{seurat}", dataset_path],
+    #     stdout=log_file,
+    #     stderr=log_file,
+    # )
 
-    ## process protocol
-    print("=======process protocol==========")
-    # Open a file to log stdout and stderr
-    log_file = open(f"{dataset_path}/extract_protocol_output.log", "w")
-    subprocess.Popen(
-        ["Rscript", "backend/funcs/extract_protocol.R", f"backend/Seurats/{seurat}", dataset_path],
-        stdout=log_file,
-        stderr=log_file,
-    )
 
     print("=======insert info into database==========")
     # insert_study(study, session)
     # insert_dataset(dataset, session)
 
+    now = datetime.now()
+    return {"message": "Data received successfully", "success": True, "jobId": dataset_name + now.strftime("%Y%m%d%H%M%S")}
 
-    return {"message": "Data received successfully", "success": True}
+@router.get("/extractseuratstatus")
+async def extractseuratstatus(dataset: str =  Query(...)):
+    log_file_path = f"backend/datasets/{dataset}/extract_seurat_output.log"
+    try:
+        with open(log_file_path, "r") as f:
+            log_content = f.read()
+        if "Done!" in log_content:
+            status = "completed"
+        else:
+            status = "processing"
 
+        processingStatus = {
+            "status": status,
+            "log": log_content,
+        }
+        return processingStatus
+
+    except Exception as e:
+        status = "failed"
+        processingStatus = {
+            "status": status,
+            "log": log_content,
+        }
+        return processingStatus

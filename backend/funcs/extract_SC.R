@@ -93,8 +93,7 @@ nonzero_data <- as.data.table(nonzero_data)
 # Save to CSV with index as the first column in a fast way
 fwrite(nonzero_data, file = paste0(output_dir, "/raw_normalized_counts.csv"), row.names = FALSE)
 
-cat("Done! Data saved! ^_^ ...\n")
-cat("==========================================\n")
+cat("Done! Data extraction is done! ^_^ ...\n")
 
 
 

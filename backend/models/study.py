@@ -5,8 +5,8 @@ from typing import Optional
 
 
 class StudyBase(SQLModel):
-    study_id: str = Field(index=True, unique=True, primary_key=True)
-    study_name: str = Field(index=True, unique=True)
+    study_id: str = Field(index=True, primary_key=True)
+    study_name: str = Field(index=True)
     description: str = Field(default="NA")
 
     team_name: str = Field(index=True)

@@ -20,17 +20,12 @@ const useDatasetManageStore = create((set, get) => ({
     isProcessing: false,
     processingStatus: {
         status: 'idle',
-        progress: 0,
-        currentStep: '',
-        outputs: [],
+        log: '',
     },
 
     // Messages
     error: null,
     success: null,
-
-    // Polling
-    pollingInterval: null,
 
     // Setters
     setSelectedSeurat: (seurat) => set({selectedSeurat: seurat}),
@@ -83,36 +78,13 @@ const useDatasetManageStore = create((set, get) => ({
             success: null,
             processingStatus: {
                 status: 'processing',
-                progress: 0,
-                currentStep: 'Initializing...',
-                outputs: [
-                    {
-                        id: 'init',
-                        timestamp: new Date().toISOString(),
-                        message: 'Starting dataset processing...',
-                        type: 'info',
-                    },
-                ],
+                log: 'Starting dataset processing...',
             }
         });
 
         try {
-            console.log(payload);
             const response = await axios.post(`${dmURL}/processdataset`, payload);
-            console.log(response);
-            // const jobId = response.data.jobId;
-
-            // // Clear any existing polling
-            // if (get().pollingInterval) {
-            //     clearInterval(get().pollingInterval);
-            // }
-            //
-            // // Start polling for status updates
-            // const interval = setInterval(() => {
-            //     get().fetchProcessingStatus(jobId);
-            // }, 2000);
-            //
-            // set({pollingInterval: interval});
+            return response.data;
 
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'An error occurred while processing the dataset';
@@ -120,36 +92,22 @@ const useDatasetManageStore = create((set, get) => ({
                 error: errorMessage,
                 isProcessing: false,
                 processingStatus: {
-                    ...get().processingStatus,
                     status: 'failed',
-                    outputs: [
-                        ...get().processingStatus.outputs,
-                        {
-                            id: `error-${Date.now()}`,
-                            timestamp: new Date().toISOString(),
-                            message: errorMessage,
-                            type: 'error',
-                        },
-                    ],
+                    log: get().processingStatus.log + '\n\n' + errorMessage,
                 }
             });
         }
     },
 
-    fetchProcessingStatus: async (jobId) => {
+    fetchExtractSeuratStatus: async (dataset) => {
         try {
-            const response = await axios.get(`${dmURL}/datasetprocessingstatus?jobId=${jobId}`);
+            const response = await axios.get(`${dmURL}/extractseuratstatus?dataset=${dataset}`);
             const data = response.data;
 
             set({processingStatus: data});
 
             // If processing is complete or failed, stop polling
             if (data.status === 'completed' || data.status === 'failed') {
-                if (get().pollingInterval) {
-                    clearInterval(get().pollingInterval);
-                    set({pollingInterval: null});
-                }
-
                 if (data.status === 'completed') {
                     set({
                         success: `Dataset "${get().datasetName}" has been successfully processed!`,
@@ -168,11 +126,6 @@ const useDatasetManageStore = create((set, get) => ({
     },
 
     resetState: () => {
-        // Clear polling if it exists
-        if (get().pollingInterval) {
-            clearInterval(get().pollingInterval);
-        }
-
         set({
             selectedSeurat: '',
             datasetName: '',
@@ -180,12 +133,9 @@ const useDatasetManageStore = create((set, get) => ({
             error: null,
             success: null,
             isProcessing: false,
-            pollingInterval: null,
             processingStatus: {
                 status: 'idle',
-                progress: 0,
-                currentStep: '',
-                outputs: [],
+                log: '',
             }
         });
     }
