@@ -167,6 +167,6 @@ async def extractseuratstatus(dataset: str =  Query(...)):
         status = "failed"
         processingStatus = {
             "status": status,
-            "log": log_content,
+            "log": str(e),
         }
         return processingStatus

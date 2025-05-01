@@ -1,39 +1,65 @@
-import {useEffect} from "react";
-import {Box, Typography, Paper, Card, CardContent, LinearProgress, Container} from "@mui/material";
+import {useEffect, useRef, useState} from "react";
+import {
+    Button,
+    Box,
+    Typography,
+    Paper,
+    Card,
+    CardContent,
+    LinearProgress,
+    FormControlLabel,
+    Checkbox
+} from "@mui/material";
 import useDatasetManageStore from "../../store/DatasetManageStore.js";
 
 const ExtractInfoProcess = () => {
-    const {datasetName, processingStatus, fetchExtractSeuratStatus,} = useDatasetManageStore();
+    const {
+        datasetName,
+        processingStatus,
+        fetchExtractSeuratStatus,
+    } = useDatasetManageStore();
 
+    const logContainerRef = useRef(null);
+    const [scrollLocked, setScrollLocked] = useState(false);
+
+    // Polling log status
     useEffect(() => {
         const interval = setInterval(() => {
             fetchExtractSeuratStatus(datasetName);
-            // Stop polling if log indicates completion
             if (processingStatus.log && /Done!/.test(processingStatus.log)) {
                 clearInterval(interval);
             }
-        }, 5000); // fetch every 5 seconds
+            if(processingStatus.status === "completed" || processingStatus.status === "failed") {
+                clearInterval(interval);
+            }
+        }, 5000);
 
-        return () => clearInterval(interval); // cleanup
+        return () => clearInterval(interval);
     }, [datasetName]);
+
+    // Auto-scroll only if not locked
+    useEffect(() => {
+        if (!scrollLocked && logContainerRef.current) {
+            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+        }
+    }, [processingStatus.log, scrollLocked]);
 
     const getMessageColor = (type) => {
         switch (type) {
             case "failed":
-                return "error.main"
+                return "error.main";
             case "processing":
-                return "text.primary"
+                return "text.primary";
             case "completed":
-                return "success.main"
+                return "success.main";
             default:
-                return "text.primary"
+                return "text.primary";
         }
-    }
+    };
 
     return (
         <Box sx={{pb: 4, pt: 0}}>
             <Typography variant="h5" gutterBottom>Extracting data from Seurat</Typography>
-            {/* Processing Output Section */}
             <Card elevation={2} sx={{mt: 2}}>
                 <CardContent>
                     <Box sx={{p: 0}}>
@@ -49,13 +75,39 @@ const ExtractInfoProcess = () => {
                                 <LinearProgress
                                     variant={processingStatus.status === "processing" ? "indeterminate" : "determinate"}
                                     color={processingStatus.status === "completed" ? "success"
-                                        : processingStatus.status === "failed" ? "error" : "primary"
-                                    }
+                                        : processingStatus.status === "failed" ? "error" : "primary"}
                                 />
                             </Box>
                         )}
 
+                        <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1}}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={scrollLocked}
+                                        onChange={(e) => setScrollLocked(e.target.checked)}
+                                        color="primary"
+                                    />
+                                }
+                                label="Lock scroll"
+                            />
+                            <Button
+                                variant="outlined"
+                                onClick={() => {
+                                    if (logContainerRef.current) {
+                                        logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+                                    }
+                                }}
+                                disabled={!scrollLocked}
+                                size="small"
+                            >
+                                Scroll to Bottom
+                            </Button>
+                        </Box>
+
+
                         <Paper
+                            ref={logContainerRef}
                             variant="outlined"
                             sx={{
                                 p: 1,
@@ -72,7 +124,6 @@ const ExtractInfoProcess = () => {
                                     {processingStatus.log || "Waiting for logs..."}
                                 </Typography>
                             </Box>
-
                         </Paper>
                     </Box>
                 </CardContent>

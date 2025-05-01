@@ -31,7 +31,23 @@ const useDatasetManageStore = create((set, get) => ({
     setSelectedSeurat: (seurat) => set({selectedSeurat: seurat}),
     setDatasetName: (name) => set({datasetName: name}),
 
+
     // Actions
+    fetDatasetInfo: async (dataset) => {
+        set({isLoading: true, error: null});
+        try {
+            const response = await axios.get(`${dmURL}/getdatasetinfo?dataset=${dataset}`);
+            set({datasetInfo: response.data});
+        } catch (error) {
+            set({
+                error: error.response?.data?.error || 'Failed to load dataset info. Please try again later.'
+            });
+            console.error('Error fetching dataset info:', error);
+        } finally {
+            set({isLoading: false});
+        }
+    },
+
     fetchSeuratObjects: async () => {
         set({isLoading: true, error: null});
         try {

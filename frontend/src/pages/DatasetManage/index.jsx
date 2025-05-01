@@ -11,7 +11,7 @@ import useDatasetManageStore from "../../store/DatasetManageStore.js";
 const steps = ['Setup dataset','Extracting data', 'Prepare metadata'];
 
 const DatasetManage = () => {
-    const [activeStep, setActiveStep] = useState(0);
+    const [activeStep, setActiveStep] = useState(2);
     const extractInfoRef = useRef();
     const {processDataset,isProcessing} = useDatasetManageStore();
 
