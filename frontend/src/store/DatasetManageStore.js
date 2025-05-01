@@ -23,6 +23,8 @@ const useDatasetManageStore = create((set, get) => ({
         log: '',
     },
 
+    metaFeatures: [],
+
     // Messages
     error: null,
     success: null,
@@ -30,7 +32,6 @@ const useDatasetManageStore = create((set, get) => ({
     // Setters
     setSelectedSeurat: (seurat) => set({selectedSeurat: seurat}),
     setDatasetName: (name) => set({datasetName: name}),
-
 
     // Actions
     fetDatasetInfo: async (dataset) => {
@@ -138,6 +139,15 @@ const useDatasetManageStore = create((set, get) => ({
             }
         } catch (error) {
             console.error('Error fetching processing status:', error);
+        }
+    },
+
+    fetchMetaFeatures: async () => {
+        try {
+            const response = await axios.get(`${dmURL}/getmetafeatures`);
+            set({metaFeatures: response.data});
+        } catch (error) {
+            console.error('Error fetching meta features:', error);
         }
     },
 
