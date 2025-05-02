@@ -240,7 +240,7 @@ async def preparemetafeatures(data: MetaFeatureData, session: Session = Depends(
 
     print("=======insert info into database==========")
     study_dict= dataset_info["study"]
-    study_dict["n_sample"] = int(study_dict["n_sample"])
+    study_dict["n_samples"] = int(study_dict["n_samples"])
     study_dict["study_id"] = study_dict["study_name"]
     study = Study(**study_dict)
 
