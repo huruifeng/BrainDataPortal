@@ -103,13 +103,14 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     if not os.path.exists(dataset_path):
         os.makedirs(dataset_path)
 
-    print("========get data dict=========")
     study_dict = data.study_info.model_dump()
     protocol_dict = data.protocol_info.model_dump()
     dataset_dict = data.dataset_info.model_dump()
 
     config = {
-        "seurat": seurat,
+        "seurat": {
+            "seurat_file": seurat,
+            "datatype": datatype},
         "dataset": dataset_dict,
         "study": study_dict,
         "protocol": protocol_dict
@@ -126,7 +127,6 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     dataset = Dataset(**dataset_dict)
 
     ## process seurat
-    print("=======process seurat==========")
     # Open a file to log stdout and stderr
     log_file = open(f"{dataset_path}/extract_seurat_output.log", "w")
     if datatype.lower() in ["scrnaseq", "snrnaseq"]:

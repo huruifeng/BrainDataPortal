@@ -17,6 +17,7 @@ const ExtractInfoProcess = () => {
         datasetName,
         processingStatus,
         fetchProcessingStatus,
+        resetProcessingState
     } = useDatasetManageStore();
 
     const logContainerRef = useRef(null);
@@ -30,21 +31,22 @@ const ExtractInfoProcess = () => {
 
     // Polling log status
     useEffect(() => {
-    const interval = setInterval(() => {
-        fetchProcessingStatus(datasetName,"extract_seurat");
+        resetProcessingState()
+        const interval = setInterval(() => {
+            fetchProcessingStatus(datasetName, "extract_seurat");
 
-        const currentStatus = processingStatusRef.current;
+            const currentStatus = processingStatusRef.current;
 
-        if (currentStatus.log && /Done!/.test(currentStatus.log)) {
-            clearInterval(interval);
-        }
-        if (currentStatus.status === "completed" || currentStatus.status === "failed") {
-            clearInterval(interval);
-        }
-    }, 5000);
+            if (currentStatus.log && /Done!/.test(currentStatus.log)) {
+                clearInterval(interval);
+            }
+            if (currentStatus.status === "completed" || currentStatus.status === "failed") {
+                clearInterval(interval);
+            }
+        }, 5000);
 
-    return () => clearInterval(interval);
-}, [datasetName]);
+        return () => clearInterval(interval);
+    }, [datasetName]);
 
     // Auto-scroll only if not locked
     useEffect(() => {

@@ -4,8 +4,7 @@ import json
 import os
 import sys
 
-from .utils import is_categorical
-from .utils import dumps_compact_lists
+from backend.funcs.utils import  is_categorical, dumps_compact_lists
 
 print("============================================")
 # %% ==============================
@@ -119,9 +118,14 @@ embeddings_data.to_csv(dataset_path + "/umap_embeddings.csv", index_label="cs_id
 
 ## sampling umap, get 100k cells
 print("Sampling umap...")
-embeddings_data_nk = embeddings_data.sample(n=100000, random_state=42)
+n_rows = embeddings_data.shape[0]
+
+sample_rows = 100000 if n_rows > 100000 else n_rows
+embeddings_data_nk = embeddings_data.sample(n=sample_rows, random_state=42)
 embeddings_data_nk.to_csv(dataset_path + "/umap_embeddings_100k.csv", index_label="cs_id")
-embeddings_data_nk = embeddings_data.sample(n=50000, random_state=42)
+
+sample_rows = 50000 if n_rows > 50000 else n_rows
+embeddings_data_nk = embeddings_data.sample(n=sample_rows, random_state=42)
 embeddings_data_nk.to_csv(dataset_path + "/umap_embeddings_50k.csv", index_label="cs_id")
 
 # %% ============================================================================

@@ -14,7 +14,7 @@ import MetaPrepareProcess from "./MetaPrepareProcess.jsx";
 const steps = ['Setup dataset', 'Extracting data', 'Prepare metadata', 'Running pipeline'];
 
 const DatasetManage = () => {
-    const {datasetName, setDatasetName, extractSeuratData, isProcessing} = useDatasetManageStore();
+    const {setDatasetName, extractSeuratData, isProcessing} = useDatasetManageStore();
     const {prepareMetaData} = useDatasetManageStore();
 
     // Get all the pre-selected values
@@ -35,7 +35,7 @@ const DatasetManage = () => {
             stepidx = 0;
         }
         const newParams = new URLSearchParams();
-        newParams.set("dataset", datasetName)
+        newParams.set("dataset", dataset)
         newParams.set("stepidx", activeStep)
         setQueryParams(newParams);
 
@@ -76,7 +76,7 @@ const DatasetManage = () => {
         }
 
         const newParams = new URLSearchParams();
-        datasetName && newParams.set("dataset", datasetName)
+        newParams.set("dataset", dataset)
         newParams.set("stepidx", activeStep + 1)
         setQueryParams(newParams);
     };
@@ -84,7 +84,7 @@ const DatasetManage = () => {
     const handleBack = () => {
         setActiveStep((prev) => prev - 1);
         const newParams = new URLSearchParams();
-        datasetName && newParams.set("dataset", datasetName)
+        newParams.set("dataset", dataset)
         newParams.set("stepidx", activeStep-1)
         setQueryParams(newParams);
     };

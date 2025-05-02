@@ -17,6 +17,7 @@ const MetaPrepareProcess = () => {
         datasetName,
         processingStatus,
         fetchProcessingStatus,
+        resetProcessingState
     } = useDatasetManageStore();
 
     const logContainerRef = useRef(null);
@@ -30,21 +31,20 @@ const MetaPrepareProcess = () => {
 
     // Polling log status
     useEffect(() => {
-    const interval = setInterval(() => {
-        fetchProcessingStatus(datasetName,"prepare_metadata");
+        resetProcessingState();
+        const interval = setInterval(() => {
+            fetchProcessingStatus(datasetName,"prepare_metadata");
+            const currentStatus = processingStatusRef.current;
+            if (currentStatus.log && /Done!/.test(currentStatus.log)) {
+                clearInterval(interval);
+            }
+            if (currentStatus.status === "completed" || currentStatus.status === "failed") {
+                clearInterval(interval);
+            }
+        }, 5000);
 
-        const currentStatus = processingStatusRef.current;
-
-        if (currentStatus.log && /Done!/.test(currentStatus.log)) {
-            clearInterval(interval);
-        }
-        if (currentStatus.status === "completed" || currentStatus.status === "failed") {
-            clearInterval(interval);
-        }
-    }, 5000);
-
-    return () => clearInterval(interval);
-}, [datasetName]);
+        return () => clearInterval(interval);
+    }, [datasetName]);
 
     // Auto-scroll only if not locked
     useEffect(() => {
