@@ -117,9 +117,9 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    fetchExtractSeuratStatus: async (dataset) => {
+    fetchProcessingStatus: async (dataset,task="extract_seurat") => {
         try {
-            const response = await axios.get(`${dmURL}/extractseuratstatus?dataset=${dataset}`);
+            const response = await axios.get(`${dmURL}/getprocessingstatus?dataset=${dataset}&task=${task}`);
             const data = response.data;
 
             set({processingStatus: data});

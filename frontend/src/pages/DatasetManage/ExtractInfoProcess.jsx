@@ -16,7 +16,7 @@ const ExtractInfoProcess = () => {
     const {
         datasetName,
         processingStatus,
-        fetchExtractSeuratStatus,
+        fetchProcessingStatus,
     } = useDatasetManageStore();
 
     const logContainerRef = useRef(null);
@@ -31,7 +31,7 @@ const ExtractInfoProcess = () => {
     // Polling log status
     useEffect(() => {
     const interval = setInterval(() => {
-        fetchExtractSeuratStatus(datasetName);
+        fetchProcessingStatus(datasetName,"extract_seurat");
 
         const currentStatus = processingStatusRef.current;
 

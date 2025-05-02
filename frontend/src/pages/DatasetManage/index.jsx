@@ -34,6 +34,10 @@ const DatasetManage = () => {
         if (stepidx < 0) {
             stepidx = 0;
         }
+        const newParams = new URLSearchParams();
+        newParams.set("dataset", datasetName)
+        newParams.set("stepidx", activeStep)
+        setQueryParams(newParams);
 
     }, []);
 
@@ -81,7 +85,7 @@ const DatasetManage = () => {
         setActiveStep((prev) => prev - 1);
         const newParams = new URLSearchParams();
         datasetName && newParams.set("dataset", datasetName)
-        newParams.set("stepidx", activeStep)
+        newParams.set("stepidx", activeStep-1)
         setQueryParams(newParams);
     };
 

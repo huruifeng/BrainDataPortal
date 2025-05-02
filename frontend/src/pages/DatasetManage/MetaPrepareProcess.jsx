@@ -16,7 +16,7 @@ const MetaPrepareProcess = () => {
     const {
         datasetName,
         processingStatus,
-        fetchExtractSeuratStatus,
+        fetchProcessingStatus,
     } = useDatasetManageStore();
 
     const logContainerRef = useRef(null);
@@ -31,7 +31,7 @@ const MetaPrepareProcess = () => {
     // Polling log status
     useEffect(() => {
     const interval = setInterval(() => {
-        fetchExtractSeuratStatus(datasetName);
+        fetchProcessingStatus(datasetName,"prepare_metadata");
 
         const currentStatus = processingStatusRef.current;
 

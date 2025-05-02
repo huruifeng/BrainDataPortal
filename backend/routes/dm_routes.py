@@ -99,6 +99,10 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     dataset_name = data.dataset_info.dataset_name
     dataset_path = "backend/datasets/" + dataset_name
 
+    ## check if dataset exists
+    if not os.path.exists(dataset_path):
+        os.makedirs(dataset_path)
+
     print("========get data dict=========")
     study_dict = data.study_info.model_dump()
     protocol_dict = data.protocol_info.model_dump()
@@ -120,11 +124,6 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     dataset_dict["study_id"] = study_dict["study_id"]
     dataset_dict["seurat"] = seurat
     dataset = Dataset(**dataset_dict)
-
-    ## check if dataset exists
-    print("=======set dataset path==========")
-    if not os.path.exists(dataset_path):
-        os.makedirs(dataset_path)
 
     ## process seurat
     print("=======process seurat==========")
@@ -152,9 +151,12 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     now = datetime.now()
     return {"message": "Data received successfully", "success": True, "jobId": dataset_name + now.strftime("%Y%m%d%H%M%S")}
 
-@router.get("/extractseuratstatus")
-async def extractseuratstatus(dataset: str =  Query(...)):
-    log_file_path = f"backend/datasets/{dataset}/extract_seurat_output.log"
+@router.get("/getprocessingstatus")
+async def getprocessingstatus(dataset: str =  Query(...), task: str = Query(...)):
+    if task == "extract_seurat":
+        log_file_path = f"backend/datasets/{dataset}/extract_seurat_output.log"
+    if task == "prepare_metadata":
+        log_file_path = f"backend/datasets/{dataset}/prepare_meta_output.log"
     try:
         with open(log_file_path, "r") as f:
             log_content = f.read()
