@@ -9,6 +9,7 @@ import ExtractInfoProcess from "./ExtractInfoProcess.jsx";
 import MetaPrepare from './MetaPrepare';
 
 import useDatasetManageStore from "../../store/DatasetManageStore.js";
+import MetaPrepareProcess from "./MetaPrepareProcess.jsx";
 
 const steps = ['Setup dataset', 'Extracting data', 'Prepare metadata', 'Running pipeline'];
 
@@ -60,7 +61,7 @@ const DatasetManage = () => {
             setActiveStep((prev) => prev + 1);
         } else if (activeStep === 2) {
             try{
-                const response = prepareMetaData({datasetMetaData});
+                const response = prepareMetaData(datasetMetaData);
                 setActiveStep((prev) => prev + 1);
             } catch (error) {
                 console.error('Submission failed:', error);
@@ -92,6 +93,8 @@ const DatasetManage = () => {
                 return <ExtractInfoProcess/>;
             case 2:
                 return <MetaPrepare onMetaDataChange={setDatasetMetaData} />;
+            case 3:
+                return <MetaPrepareProcess />;
             default:
                 return 'Unknown step';
         }
