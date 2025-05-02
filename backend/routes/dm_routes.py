@@ -144,9 +144,9 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     else:
         return {"message": "Error: Invalid datatype.", "success": False}
 
-    print("=======insert info into database==========")
-    insert_study(study, session)
-    insert_dataset(dataset, session)
+    # print("=======insert info into database==========")
+    # insert_study(study, session)
+    # insert_dataset(dataset, session)
 
     now = datetime.now()
     return {"message": "Data received successfully", "success": True, "jobId": dataset_name + now.strftime("%Y%m%d%H%M%S")}
@@ -189,7 +189,7 @@ async def getdatasetfeatures(dataset: str = Query(...)):
     return features
 
 @router.post("/preparemetafeatures")
-async def preparemetafeatures(data: MetaFeatureData):
+async def preparemetafeatures(data: MetaFeatureData, session: Session = Depends(get_session)):
     dataset = data.dataset
     selected_features = data.selected_features
     sample_id_column = data.sample_id_column
@@ -238,6 +238,19 @@ async def preparemetafeatures(data: MetaFeatureData):
     else:
         return {"message": "Error: Invalid datatype.", "success": False}
 
+    print("=======insert info into database==========")
+    study_dict= dataset_info["study"]
+    study_dict["n_sample"] = int(study_dict["n_sample"])
+    study_dict["study_id"] = study_dict["study_name"]
+    study = Study(**study_dict)
 
+    dataset_dict = dataset_info["dataset"]
+    dataset_dict["dataset_id"] = dataset_dict["dataset_name"]
+    dataset_dict["study_id"] = study_dict["study_id"]
+    dataset_dict["seurat"] = dataset_info["seurat"]["seurat_file"]
+    dataset = Dataset(**dataset_dict)
+
+    insert_study(study, session)
+    insert_dataset(dataset, session)
 
     return {"message": "Data received successfully", "success": True}

@@ -4,6 +4,8 @@ import json
 import os
 import sys
 
+from sqlalchemy.testing.util import total_size
+
 from backend.funcs.utils import  is_categorical, dumps_compact_lists
 
 print("============================================")
@@ -110,7 +112,7 @@ embeddings_data["UMAP_2"] = embeddings_data["UMAP_2"].round(2)
 
 ## reset index use barcode_cid map
 # Reset index and rename using the mapping
-print("Renaming....")
+print("Renaming embeddings....")
 embeddings_data = embeddings_data.reset_index()  # Move index to a column
 embeddings_data["index"] = embeddings_data["index"].map(barcode_to_cid)  # Rename using mapping
 embeddings_data = embeddings_data.set_index("index")  # Set the renamed column as index
@@ -134,7 +136,7 @@ print("Loading expression data...(Takes a while...be patient...)")
 ## rename_expression_data
 expression_data = pd.read_csv(dataset_path + "/raw_normalized_counts.csv", index_col=0, header=0)
 ## rename "Cell" column use barcode_cid map
-print("Renaming....")
+print("Renaming expression....")
 expression_data["cs_id"] = expression_data["Cell"].map(barcode_to_cid)
 expression_data.drop("Cell", axis=1, inplace=True)
 
@@ -161,10 +163,13 @@ os.makedirs(dataset_path + "/gene_jsons", exist_ok=True)
 # Save each gene as a separate JSON file
 print("Saving gene... be patient...")
 i = 0
+total_n = len(all_genes)
 for gene, df in grouped_by_gene:
     try:
         i += 1
-        print(i, gene)
+        if i % 1000 == 0:
+            print(f"{i}/{total_n}")
+
         gene_dict = dict(zip(df["cs_id"], df["Expression"]))
 
         safe_gene_name = gene.replace("/", "_")
@@ -173,7 +178,6 @@ for gene, df in grouped_by_gene:
         file_name = f"{dataset_path}/gene_jsons/{safe_gene_name}.json"
         with open(file_name, "w") as f:
             json.dump(gene_dict, f, indent=4)
-
 
     except Exception as e:
         print(f"Error in processing {gene} !!! Check the error_gene.txt")
@@ -192,8 +196,11 @@ pseudo_bulk = expression_data.groupby(["sample_id", "Gene"])["Expression"].sum()
 pseudo_bulk.rename(columns={"Expression": "pseudobulk_expr"}, inplace=True)
 
 # Save each gene's data to a separate JSON file
+i = 0
 for gene, df_gene in pseudo_bulk.groupby("Gene"):
-    print(gene)
+    i += 1
+    if i % 1000 == 0:
+        print(f"{i}/{total_n}")
     gene_dict = df_gene.set_index("sample_id")["pseudobulk_expr"].to_dict()
     safe_gene_name = gene.replace("/", "_")
     with open(f"{dataset_path}/gene_pseudobulk/{safe_gene_name}.json", "w") as f:
