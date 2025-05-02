@@ -4,8 +4,6 @@ import json
 import os
 import sys
 
-from sqlalchemy.testing.util import total_size
-
 from backend.funcs.utils import  is_categorical, dumps_compact_lists
 
 print("============================================")

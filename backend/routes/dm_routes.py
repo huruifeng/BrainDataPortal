@@ -238,19 +238,19 @@ async def preparemetafeatures(data: MetaFeatureData, session: Session = Depends(
     else:
         return {"message": "Error: Invalid datatype.", "success": False}
 
-    print("=======insert info into database==========")
-    study_dict= dataset_info["study"]
-    study_dict["n_samples"] = int(study_dict["n_samples"])
-    study_dict["study_id"] = study_dict["study_name"]
-    study = Study(**study_dict)
-
-    dataset_dict = dataset_info["dataset"]
-    dataset_dict["dataset_id"] = dataset_dict["dataset_name"]
-    dataset_dict["study_id"] = study_dict["study_id"]
-    dataset_dict["seurat"] = dataset_info["seurat"]["seurat_file"]
-    dataset = Dataset(**dataset_dict)
-
-    insert_study(study, session)
-    insert_dataset(dataset, session)
+    # print("=======insert info into database==========")
+    # study_dict= dataset_info["study"]
+    # study_dict["n_samples"] = int(study_dict["n_samples"])
+    # study_dict["study_id"] = study_dict["study_name"]
+    # study = Study(**study_dict)
+    #
+    # dataset_dict = dataset_info["dataset"]
+    # dataset_dict["dataset_id"] = dataset_dict["dataset_name"]
+    # dataset_dict["study_id"] = study_dict["study_id"]
+    # dataset_dict["seurat"] = dataset_info["seurat"]["seurat_file"]
+    # dataset = Dataset(**dataset_dict)
+    #
+    # insert_study(study, session)
+    # insert_dataset(dataset, session)
 
     return {"message": "Data received successfully", "success": True}
