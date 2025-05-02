@@ -10,10 +10,11 @@ import MetaPrepare from './MetaPrepare';
 
 import useDatasetManageStore from "../../store/DatasetManageStore.js";
 
-const steps = ['Setup dataset', 'Extracting data', 'Prepare metadata'];
+const steps = ['Setup dataset', 'Extracting data', 'Prepare metadata', 'Running pipeline'];
 
 const DatasetManage = () => {
     const {datasetName, setDatasetName, extractSeuratData, isProcessing} = useDatasetManageStore();
+    const {prepareMetaData} = useDatasetManageStore();
 
     // Get all the pre-selected values
     const [queryParams, setQueryParams] = useSearchParams();
@@ -38,6 +39,7 @@ const DatasetManage = () => {
 
     const [activeStep, setActiveStep] = useState(stepidx);
     const extractInfoRef = useRef();
+    const [datasetMetaData, setDatasetMetaData] = useState(null);
 
     const handleNext = async () => {
         if (activeStep === 0) {
@@ -56,6 +58,14 @@ const DatasetManage = () => {
             }
         } else if (activeStep === 1) {
             setActiveStep((prev) => prev + 1);
+        } else if (activeStep === 2) {
+            try{
+                const response = prepareMetaData({datasetMetaData});
+                setActiveStep((prev) => prev + 1);
+            } catch (error) {
+                console.error('Submission failed:', error);
+                alert('Failed to submit dataset info.');
+            }
         } else {
             setActiveStep((prev) => prev + 1);
         }
@@ -81,7 +91,7 @@ const DatasetManage = () => {
             case 1:
                 return <ExtractInfoProcess/>;
             case 2:
-                return <MetaPrepare/>;
+                return <MetaPrepare onMetaDataChange={setDatasetMetaData} />;
             default:
                 return 'Unknown step';
         }

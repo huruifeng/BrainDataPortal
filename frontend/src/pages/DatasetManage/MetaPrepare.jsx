@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import {
-    Box,Chip,
+    Box, Chip,
     Typography,
     Card,
     CardContent,
@@ -10,13 +10,12 @@ import {
     FormControl,
     Checkbox,
     ListItemText,
-    Button,
     Grid
 } from "@mui/material";
 import useDatasetManageStore from "../../store/DatasetManageStore.js";
-import axios from "axios";
 
-const MetaPrepare = () => {
+
+const MetaPrepare = ({ onMetaDataChange }) => {
     const {datasetName, datasetMetaFeatures, fetchMetaFeatures} = useDatasetManageStore();
     const [selectedFeatures, setSelectedFeatures] = useState([]);
     const [majorClusterColumn, setMajorClusterColumn] = useState("");
@@ -39,24 +38,18 @@ const MetaPrepare = () => {
         }
     };
 
-    const handleSubmit = () => {
-        // Prepare the selected values to send to the backend
-        const metaData = {
-            dataset: datasetName,
-            selected_features: selectedFeatures,
-            major_cluster_column: majorClusterColumn,
-            condition_column: conditionColumn,
-        };
+    useEffect(() => {
+        if (onMetaDataChange) {
+            onMetaDataChange({
+                dataset: datasetName,
+                selected_features: selectedFeatures,
+                sample_id_column: sampleIDColumn,
+                major_cluster_column: majorClusterColumn,
+                condition_column: conditionColumn,
+            });
+        }
+    }, [datasetName, selectedFeatures, sampleIDColumn, majorClusterColumn, conditionColumn, onMetaDataChange]);
 
-        axios
-        .post("/api/prepare-meta", metaData)
-        .then((response) => {
-            console.log("Meta data prepared successfully", response.data);
-        })
-        .catch((error) => {
-            console.error("Error preparing meta data:", error);
-        });
-    };
 
     return (
         <Box sx={{pb: 4}}>
@@ -179,18 +172,6 @@ const MetaPrepare = () => {
                     </Card>
                 </Grid>
             </Grid>
-
-            {/* Submit Button */}
-            <Box sx={{display: "flex", justifyContent: "center"}}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmit}
-                    disabled={selectedFeatures.length < 1 || !majorClusterColumn || !conditionColumn || loading}
-                >
-                    {loading ? "Processing..." : "Submit"}
-                </Button>
-            </Box>
         </Box>
     );
 };

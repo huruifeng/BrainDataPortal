@@ -2,6 +2,7 @@ import json
 import subprocess
 from datetime import datetime
 import os
+import toml
 
 from fastapi import APIRouter, Depends, Query
 
@@ -64,6 +65,13 @@ class SubmissionData(BaseModel):
     study_info: StudyInfo
     protocol_info: ProtocolInfo
 
+class MetaFeatureData(BaseModel):
+    dataset: str
+    selected_features: list
+    sample_id_column: str
+    major_cluster_column: str
+    condition_column: str
+
 @router.get("/")
 async def dm_root():
     return {"Message": "Hello DataManager."}
@@ -89,11 +97,21 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     seurat = data.seurat_info.seurat
     datatype = data.seurat_info.datatype
     dataset_name = data.dataset_info.dataset_name
+    dataset_path = "backend/datasets/" + dataset_name
 
     print("========get data dict=========")
     study_dict = data.study_info.model_dump()
     protocol_dict = data.protocol_info.model_dump()
     dataset_dict = data.dataset_info.model_dump()
+
+    config = {
+        "seurat": seurat,
+        "dataset": dataset_dict,
+        "study": study_dict,
+        "protocol": protocol_dict
+    }
+    with open(f"{dataset_path}/dataset_info.toml", 'w') as f:
+        toml.dump(config, f)
 
     study_dict["study_id"] = study_dict["study_name"]
     study = Study(**study_dict)
@@ -105,7 +123,6 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
 
     ## check if dataset exists
     print("=======set dataset path==========")
-    dataset_path = "backend/datasets/" + dataset_name
     if not os.path.exists(dataset_path):
         os.makedirs(dataset_path)
 
@@ -168,3 +185,57 @@ async def getdatasetfeatures(dataset: str = Query(...)):
     with open(features_file, "r") as f:
         features = json.load(f)
     return features
+
+@router.post("/preparemetafeatures")
+async def preparemetafeatures(data: MetaFeatureData):
+    dataset = data.dataset
+    selected_features = data.selected_features
+    sample_id_column = data.sample_id_column
+    major_cluster_column = data.major_cluster_column
+    condition_column = data.condition_column
+
+    if sample_id_column not in selected_features:
+        selected_features.append(sample_id_column)
+
+    if major_cluster_column not in selected_features:
+        selected_features.append(major_cluster_column)
+
+    if condition_column not in selected_features:
+        selected_features.append(condition_column)
+
+    dataset_path = f"backend/datasets/{dataset}"
+    ## load dataset info
+    with open(f"{dataset_path}/dataset_info.toml", 'r') as f:
+        dataset_info = toml.load(f)
+    dataset_info["meta_features"] = {
+        "selected_features": selected_features,
+        "sample_id_column": sample_id_column,
+        "major_cluster_column": major_cluster_column,
+        "condition_column": condition_column
+    }
+
+    with open(f"{dataset_path}/dataset_info.toml", 'w') as f:
+        toml.dump(dataset_info, f)
+
+    ## process meta data
+    print("=======process meta data==========")
+    # Open a file to log stdout and stderr
+    log_file = open(f"{dataset_path}/prepare_meta_output.log", "w")
+    if dataset_info["seurat"]["datatype"].lower() in ["scrnaseq", "snrnaseq"]:
+        subprocess.Popen(
+            ["python3", "backend/funcs/rename_meta_SC.py",dataset_path, ",".join(selected_features), sample_id_column, major_cluster_column, condition_column],
+            stdout=log_file,
+            stderr=log_file,
+        )
+    elif dataset_info["seurat"]["datatype"].lower() in ["visiumst"]:
+        subprocess.Popen(
+            ["python3", "backend/funcs/rename_meta_Visium.py",dataset_path, ",".join(selected_features), sample_id_column, major_cluster_column, condition_column],
+            stdout=log_file,
+            stderr=log_file,
+        )
+    else:
+        return {"message": "Error: Invalid datatype.", "success": False}
+
+
+
+    return {"message": "Data received successfully", "success": True}

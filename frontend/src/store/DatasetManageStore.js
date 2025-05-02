@@ -13,6 +13,7 @@ const useDatasetManageStore = create((set, get) => ({
 
     // Dataset name
     datasetName: '',
+    datasetType: '',
     isNameUnique: null,
     isCheckingName: false,
 
@@ -148,6 +149,17 @@ const useDatasetManageStore = create((set, get) => ({
             set({datasetMetaFeatures: response.data});
         } catch (error) {
             console.error('Error fetching meta features:', error);
+        }
+    },
+
+    prepareMetaData: async (payload) => {
+        try {
+            console.log(payload);
+            const response = await axios.post(`${dmURL}/preparemetafeatures`, payload);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching meta features:', error);
+            return null;
         }
     },
 
