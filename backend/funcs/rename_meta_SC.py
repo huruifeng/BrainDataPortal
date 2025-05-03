@@ -6,6 +6,9 @@ import sys
 
 from backend.funcs.utils import  is_categorical, dumps_compact_lists
 
+import functools
+print = functools.partial(print, flush=True)
+
 print("============================================")
 # %% ==============================
 # Get the arguments
@@ -16,6 +19,14 @@ sample_col = sys.argv[3]
 cluster_col = sys.argv[4]
 condition_col = sys.argv[5]
 
+print("Checking inputs...")
+if sample_col not in kept_features:
+    kept_features.append(sample_col)
+if cluster_col not in kept_features:
+    kept_features.append(cluster_col)
+if condition_col not in kept_features:
+    kept_features.append(condition_col)
+
 print("Loading metadata...")
 metadata = pd.read_csv(dataset_path + "/raw_metadata.csv", index_col=0, header=0)
 metadata = metadata.loc[:, kept_features]
@@ -25,13 +36,15 @@ if "sample_id" != sample_col:
     print("Renaming sample id...")
     metadata.drop("sample_id", axis=1, inplace=True, errors="ignore")
     metadata = metadata.rename(columns={sample_col: "sample_id"})
+    kept_features.remove(sample_col)
+    kept_features.append("sample_id")
 
 ## Rename the cell id as: SampleID_CellSerialNumber
 print("Renaming cell id...")
 new_ids = []
 sample_cell_n = {}
 for index, row in metadata.iterrows():
-    sample_id = row[sample_col]
+    sample_id = row["sample_id"]
     if sample_id not in sample_cell_n:
         sample_cell_n[sample_id] = 0
     sample_cell_n[sample_id] += 1

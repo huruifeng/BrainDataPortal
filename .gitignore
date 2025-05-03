@@ -5,3 +5,4 @@ backend/venv
 
 .Rproj.user
 /backend/datasets/
+/backend/dataset_bkp/
