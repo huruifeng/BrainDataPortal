@@ -238,19 +238,40 @@ async def preparemetafeatures(data: MetaFeatureData, session: Session = Depends(
     else:
         return {"message": "Error: Invalid datatype.", "success": False}
 
-    # print("=======insert info into database==========")
-    # study_dict= dataset_info["study"]
-    # study_dict["n_samples"] = int(study_dict["n_samples"])
-    # study_dict["study_id"] = study_dict["study_name"]
-    # study = Study(**study_dict)
-    #
-    # dataset_dict = dataset_info["dataset"]
-    # dataset_dict["dataset_id"] = dataset_dict["dataset_name"]
-    # dataset_dict["study_id"] = study_dict["study_id"]
-    # dataset_dict["seurat"] = dataset_info["seurat"]["seurat_file"]
-    # dataset = Dataset(**dataset_dict)
-    #
-    # insert_study(study, session)
-    # insert_dataset(dataset, session)
-
     return {"message": "Data received successfully", "success": True}
+
+@router.get("/refreshdatabase")
+async def refreshdatabase(session: Session = Depends(get_session)):
+    try:
+        ## loop through all datasets
+        for dataset_i in os.listdir("backend/datasets"):
+            dataset_path = f"backend/datasets/{dataset_i}"
+            ## load dataset info
+            dataset_info_file = f"{dataset_path}/dataset_info.toml"
+            if not os.path.exists(dataset_info_file):
+                continue
+
+            with open(f"{dataset_path}/dataset_info.toml", 'r') as f:
+                dataset_info = toml.load(f)
+
+            print("=======insert info into database==========")
+            study_dict= dataset_info["study"]
+            study_dict["study_id"] = study_dict["study_name"]
+            study = Study(**study_dict)
+
+            dataset_dict = dataset_info["dataset"]
+            dataset_dict["dataset_id"] = dataset_dict["dataset_name"]
+            dataset_dict["study_id"] = study_dict["study_id"]
+            dataset_dict["seurat"] = dataset_info["seurat"]["seurat_file"]
+            dataset_dict["n_samples"] = int(dataset_dict["n_samples"])
+            dataset = Dataset(**dataset_dict)
+
+            insert_study(study, session)
+            insert_dataset(dataset, session)
+
+        return {"message": "Database refreshed successfully", "success": True}
+    except Exception as e:
+        return {"message": str(e), "success": False}
+
+
+

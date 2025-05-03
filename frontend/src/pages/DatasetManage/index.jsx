@@ -15,7 +15,7 @@ const steps = ['Setup dataset', 'Extracting data', 'Prepare metadata', 'Running 
 
 const DatasetManage = () => {
     const {setDatasetName, extractSeuratData, isProcessing} = useDatasetManageStore();
-    const {prepareMetaData} = useDatasetManageStore();
+    const {prepareMetaData,refreshDatabase} = useDatasetManageStore();
 
     // Get all the pre-selected values
     const [queryParams, setQueryParams] = useSearchParams();
@@ -64,7 +64,7 @@ const DatasetManage = () => {
         } else if (activeStep === 1) {
             setActiveStep((prev) => prev + 1);
         } else if (activeStep === 2) {
-            try{
+            try {
                 const response = prepareMetaData(datasetMetaData);
                 setActiveStep((prev) => prev + 1);
             } catch (error) {
@@ -85,8 +85,16 @@ const DatasetManage = () => {
         setActiveStep((prev) => prev - 1);
         const newParams = new URLSearchParams();
         newParams.set("dataset", dataset)
-        newParams.set("stepidx", activeStep-1)
+        newParams.set("stepidx", activeStep - 1)
         setQueryParams(newParams);
+    };
+    const handleImportDataInfo = () => {
+        try {
+            const response = refreshDatabase();
+        } catch (error) {
+            console.error('Submission failed:', error);
+            alert('Failed to submit dataset info.');
+        }
     };
 
     const getStepContent = (step) => {
@@ -96,9 +104,9 @@ const DatasetManage = () => {
             case 1:
                 return <ExtractInfoProcess/>;
             case 2:
-                return <MetaPrepare onMetaDataChange={setDatasetMetaData} />;
+                return <MetaPrepare onMetaDataChange={setDatasetMetaData}/>;
             case 3:
-                return <MetaPrepareProcess />;
+                return <MetaPrepareProcess/>;
             default:
                 return 'Unknown step';
         }
@@ -115,7 +123,18 @@ const DatasetManage = () => {
                     <Stepper activeStep={activeStep} orientation="vertical">
                         {steps.map((label) => (<Step key={label}><StepLabel>{label}</StepLabel></Step>))}
                     </Stepper>
+                    {/* Import Button */}
+                    <Box sx={{mt: 4}}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleImportDataInfo}
+                        >
+                            Refresh DB
+                        </Button>
+                    </Box>
                 </Box>
+
 
                 {/* Main Content */}
                 <Paper sx={{flex: 1, p: 4}}>

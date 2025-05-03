@@ -1,5 +1,6 @@
 import {create} from 'zustand'
 import axios from 'axios'
+import {toast} from "react-toastify";
 
 const BASE_URL = "http://localhost:8000"; // Replace with your backend URL
 // const BASE_URL = "http://10.168.236.29:8000"; // Replace with your backend URL
@@ -173,6 +174,22 @@ const useDatasetManageStore = create((set, get) => ({
                 log: '',
             }
         });
+    },
+
+    refreshDatabase: async () => {
+        try {
+            const response = await axios.get(`${dmURL}/refreshdatabase`);
+            if(response.data.success){
+                toast.success(response.data.message);
+            }else{
+                toast.error(response.data.message);
+            }
+            return response.data;
+        } catch (error) {
+            console.error('Error refreshing database:', error);
+            toast.error('Error while refreshing database.');
+            return null;
+        }
     }
 }));
 
