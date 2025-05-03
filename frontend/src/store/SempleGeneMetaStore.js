@@ -215,26 +215,9 @@ const useSampleGeneMetaStore = create((set, get) => ({
             set({allMetaData: response.data}); // Update directly without loading state
         } catch (error) {
             console.error("Failed to fetch metadata:", error);
-            set({error: "Failed to fetch all metadata:" + error});
+            toast.error("Failed to fetch metadata:" + error);
         }
     },
-
-     fetchSelectedMetaData: async (dataset_id = null, features=["all"]) => {
-        dataset_id = dataset_id ?? get().dataSet;
-        if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchSelectedMetaData: No dataset selected"});
-            return;
-        }
-
-        try {
-            const response = await getAllMetaData(dataset_id, features);
-            set({selectedMetaData: response.data}); // Update directly without loading state
-        } catch (error) {
-            console.error("Failed to fetch metadata:", error);
-            set({error: "Failed to fetch all metadata:" + error});
-        }
-    },
-
 
     fetchUMAPData: async (dataset_id) => {
         dataset_id = dataset_id ?? get().dataSet;

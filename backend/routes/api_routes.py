@@ -135,7 +135,7 @@ async def getallmetadata(request:Request):
     dataset_type = request.query_params.get("dataset_type")
     features = request.query_params.getlist ("features")
 
-    if dataset_type == "visium":
+    if dataset_type == "visiumst":
         drop_cols = ["UMAP_1", "UMAP_2"]
     else:
         drop_cols = None

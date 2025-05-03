@@ -160,7 +160,7 @@ def get_umapembedding(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_with_sample_id_50k.csv')
+    umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_50k.csv')
     if os.path.exists(umap_file):
         data_df = pd.read_csv(umap_file, index_col=None, header=0)
         data = data_df.to_dict(orient="records")
@@ -204,7 +204,7 @@ def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite_50k.csv')
+    meta_file = os.path.join("backend","datasets",dataset,'cell_metadata.csv')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=0, header=0)
@@ -214,8 +214,17 @@ def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
             if keep_cols and keep_cols[0] != "all":
                 data_df = data_df.loc[:,keep_cols]
 
-            data = data_df.to_dict(orient="index")
-            return data
+            data_df = data_df.fillna('')
+            cell_metadata = data_df.to_dict(orient="index")
+
+        ## load cell2sample map file (json)
+        cell2sample = get_cell2sample_map(dataset)
+
+        ## get sample metadata
+        sample_metadata = get_sample_metadata(dataset)
+
+        data = {"cell_metadata": cell_metadata, "cell2sample": cell2sample, "sample_metadata": sample_metadata}
+        return data
     else:
         return "Error: Meta file not found"
 
