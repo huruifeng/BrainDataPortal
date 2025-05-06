@@ -59,13 +59,12 @@ function GeneView() {
     } = useSampleGeneMetaStore()
 
     useEffect(() => {
-        // Load these in parallel immediately
         fetchUMAPData(datasetId);
     }, [datasetId])
 
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore()
     const {allCellMetaData, fetchAllMetaData, exprDataDict, fetchExprData} = useSampleGeneMetaStore()
-    const {allSampleMetaData, CellSampleMap, CellMetaMap} = useSampleGeneMetaStore()
+    const {allSampleMetaData, CellMetaMap} = useSampleGeneMetaStore()
     const {metadataLoading, loading, error} = useSampleGeneMetaStore()
     const [coloring, setColoring] = useState(initialColoring)
     const [grouping, setGrouping] = useState(initialGrouping)
@@ -189,7 +188,6 @@ function GeneView() {
 
     const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"])
 
-    console.log("umap:", umapData);
     return (
         <div className="plot-page-container" style={{display: "flex", flexDirection: "column", flex: 1}}>
             {/* Title Row */}
@@ -432,6 +430,8 @@ function GeneView() {
                                             umapData={umapData}
                                             exprData={{all: "all"}}
                                             cellMetaData={allCellMetaData ?? {}}
+                                            CellMetaMap={CellMetaMap ?? {}}
+                                            sampleMetaData={allSampleMetaData ?? {}}
                                             group={coloring}
                                             isMetaDataLoading={metadataLoading}
                                         />

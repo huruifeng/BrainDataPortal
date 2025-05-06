@@ -201,11 +201,12 @@ def get_metadata_of_sample(dataset, sample="all", meta="all"):
         return data
     else:
         return f"Error: Meta file not found."
+
 def get_metadata_mapping(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'cell_metadata_mapping.json')
+    meta_file = os.path.join("backend","datasets",dataset,'cell_meta_mapping.json')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data = json.load(f)
@@ -232,7 +233,7 @@ def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
             cell_metadata = data_df.to_dict(orient="index")
 
         ## load cell2sample map file (json)
-        cell2sample = get_cell2sample_map(dataset)
+        # cell2sample = get_cell2sample_map(dataset)
 
         # get sample metadata
         sample_metadata = get_sample_metadata(dataset)
@@ -240,7 +241,7 @@ def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
         ## get cell_metadata_mapping
         cell_metadata_mapping = get_metadata_mapping(dataset)
 
-        data = {"cell_metadata": cell_metadata, "cell_metadata_mapping": cell_metadata_mapping, "cell2sample": cell2sample, "sample_metadata": sample_metadata}
+        data = {"cell_metadata": cell_metadata, "cell_metadata_mapping": cell_metadata_mapping, "sample_metadata": sample_metadata}
         return data
     else:
         return "Error: Meta file not found"

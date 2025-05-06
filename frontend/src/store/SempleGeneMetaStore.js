@@ -226,11 +226,11 @@ const useSampleGeneMetaStore = create((set, get) => ({
             // Handle the response when it completes
             fetchPromise
             .then((response) => {
+                console.log(response.data)
                 set({
                     allCellMetaData: response.data.cell_metadata,
                     allSampleMetaData: response.data.sample_metadata,
-                    CellSampleMapping: response.data.cell2sample,
-                    CellMetaMapping: response.data.cell_meta_mapping,
+                    CellMetaMap: response.data.cell_metadata_mapping,
                     metadataLoading: false,
                 })
             })
@@ -372,12 +372,6 @@ const useSampleGeneMetaStore = create((set, get) => ({
                             },
                         },
                     })
-
-                    // get().imageDataDict[sample] = {
-                    //     coordinates: coor_response.data.coordinates,
-                    //     scales: coor_response.data.scales,
-                    //     image: img_response.data
-                    // };
                 }
             }
             // remove gene item if it is not selected

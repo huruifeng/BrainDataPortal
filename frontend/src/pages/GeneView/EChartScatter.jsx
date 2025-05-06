@@ -2,8 +2,12 @@ import ReactECharts from "echarts-for-react"
 import PropTypes from "prop-types"
 import {isCategorical} from "../../utils/funcs.js"
 
-const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, group, isMetaDataLoading}) => {
-    console.log("EChartScatterPlot: ", umapData);
+const EChartScatterPlot = ({
+                               gene, sampleList, umapData, exprData,
+                               cellMetaData, CellMetaMap, sampleMetaData,
+                               group, isMetaDataLoading
+                           }) => {
+    console.log("EChartScatterPlot: ", cellMetaData, CellMetaMap, sampleMetaData);
 
     if (umapData.length === 0) return "UMAP data is loading..."
 
@@ -199,19 +203,42 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
     }
 
     let options = {}
+    const cell_level_meta = Object.keys(CellMetaMap);
+    const sample_level_meta = Object.keys(Object.values(sampleMetaData)[0]);
     if (gene === "all") {
         //===============================
         // In this case the expression data is not needed, just use the metaData
         //===============================
-        metaData = metaData ?? {}
+
+        let updatedCellMetaData = {};
+        if (cell_level_meta.includes(group)) {
+            // Create a **new object** with changes
+            updatedCellMetaData = Object.fromEntries(
+                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                    const newSubObj = {...csObj};  // shallow copy of inner object
+                    const targetValue = csObj[group];
+                    newSubObj[group] = CellMetaMap[group][targetValue][0];
+                    return [cs_id, newSubObj];
+                })
+            );
+        } else {
+            updatedCellMetaData = Object.fromEntries(
+                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                    const sample_id = cs_id.split("_cs")[0];
+                    const newSubObj = {...csObj};  // shallow copy of inner object
+                    newSubObj[group] = sampleMetaData[sample_id][group];
+                    return [cs_id, newSubObj];
+                })
+            );
+        }
         const plotData =
             umapData.map((item) => ({
                 x: item.UMAP_1,
                 y: item.UMAP_2,
-                [group]: metaData?.[item.cs_id]?.[group] ?? "Point", // Works for both objects and arrays, returns 0 for undefined/null values
+                [group]: updatedCellMetaData?.[item.cs_id]?.[group] ?? "Point", // Works for both objects and arrays, returns 0 for undefined/null values
             })) || []
 
-        const isCategoricalGroup = isCategorical(Object.values(metaData).map((p) => p[group]))
+        const isCategoricalGroup = isCategorical(Object.values(updatedCellMetaData).map((p) => p[group]))
         if (isCategoricalGroup) {
             options = createCategoryOptions(plotData, group)
         } else {
@@ -227,7 +254,7 @@ const EChartScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
             })) || []
         options = createContinuousOptions(plotData, gene)
     }
-    options.backgroundColor = "#ffffff"
+    options.backgroundColor = "#f9f9f9"
     return (
         <ReactECharts
             key={`${gene}-${group}`}
@@ -247,7 +274,9 @@ EChartScatterPlot.propTypes = {
     sampleList: PropTypes.array.isRequired,
     umapData: PropTypes.array.isRequired,
     exprData: PropTypes.object.isRequired,
-    metaData: PropTypes.object,
+    cellMetaData: PropTypes.object,
+    sampleMetaData: PropTypes.object,
+    CellMetaMap: PropTypes.object,
     group: PropTypes.string.isRequired,
     isMetaDataLoading: PropTypes.bool,
 }
