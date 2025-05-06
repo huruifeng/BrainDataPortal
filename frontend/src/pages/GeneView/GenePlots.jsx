@@ -15,7 +15,7 @@ function filterBySampleId(obj, sampleList) {
 }
 
 const GeneMetaPlots = ({
-                           sampleList, exprData,
+                           geneList, sampleList, exprData,
                            cellMetaData, sampleMetaData, CellMetaMap, group, exprValueType
                        }) => {
 
@@ -54,7 +54,7 @@ const GeneMetaPlots = ({
         }
 
         return {processedExprData: newExprData, processedMetaData: newMetaData};
-    }, [exprValueType, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData]);
+    }, [exprValueType,geneList, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData]);
 
     useEffect(() => {
         fetchPseudoExprData();

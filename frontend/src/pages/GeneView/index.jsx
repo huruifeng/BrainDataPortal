@@ -374,6 +374,7 @@ function GeneView() {
                             {/*gene expression/meta plot*/}
                             {allCellMetaData && (
                                 <GeneMetaPlots
+                                    geneList={selectedGenes}
                                     sampleList={selectedSamples}
                                     exprData={exprDataDict}
                                     cellMetaData={allCellMetaData}
