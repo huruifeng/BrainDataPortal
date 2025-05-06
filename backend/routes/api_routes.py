@@ -139,6 +139,7 @@ async def getallmetadata(request:Request):
         drop_cols = ["UMAP_1", "UMAP_2"]
     else:
         drop_cols = None
+
     metadata = get_all_metadata(dataset, drop_cols=drop_cols, keep_cols=features)
 
     if "Error" in metadata:

@@ -14,7 +14,7 @@ import Login from "./pages/Login/Login.jsx";
 import Test from "./pages/Test";
 import UnauthorizedPage from "./pages/Unauthorized/index.jsx";
 import {Bounce, ToastContainer} from "react-toastify";
-import GeneView from "./pages/GeneView";
+import GeneView from "./pages/GeneView/index.jsx";
 import VisiumView from "./pages/VisiumView";
 import XDatasetsView from "./pages/XDatasets";
 import CellTypesView from "./pages/CellTypesView";

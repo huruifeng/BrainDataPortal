@@ -21,7 +21,7 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
     // console.log("group", group);
     // console.log("exprValueType", exprValueType);
 
-    const {pseudoExprDict, fetchPseudoExprData, allSampleMetaData, fetchAllSampleMetaData} = useSampleGeneMetaStore();
+    const {pseudoExprDict, fetchPseudoExprData, allSampleMetaData} = useSampleGeneMetaStore();
 
     // Calculate processed data directly using useMemo
     const {processedExprData, processedMetaData} = useMemo(() => {
@@ -51,7 +51,6 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
 
     useEffect(() => {
         fetchPseudoExprData();
-        fetchAllSampleMetaData();
     }, []);
 
     const metaValues = Object.values(processedMetaData).map((meta) => meta[group]);
