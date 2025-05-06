@@ -101,7 +101,7 @@ function GeneView() {
         fetchExprData(datasetId)
 
         // Load metadata in the background without blocking rendering
-         if (datasetId) {
+        if (datasetId) {
             // Use setTimeout to move the metadata loading to the next event loop tick
             // This ensures it doesn't block the main thread
             setTimeout(() => {
@@ -188,6 +188,7 @@ function GeneView() {
 
     const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"])
 
+    console.log("selectedGenes", selectedGenes, CellMetaMap, allCellMetaData, allSampleMetaData)
     return (
         <div className="plot-page-container" style={{display: "flex", flexDirection: "column", flex: 1}}>
             {/* Title Row */}
@@ -270,13 +271,11 @@ function GeneView() {
                             })
                         }
                         renderInput={(params) => (
-                            <TextField {...params} label="Search Sample" variant="standard"
-                                       style={{margin: "10px 0px"}}/>
+                            <TextField {...params} label="Search Sample" variant="standard" style={{margin: "10px 0px"}}/>
                         )}
                     />
 
-                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting
-                        options:</Typography>
+                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting options:</Typography>
                     {selectedGenes.length === 0 ? (
                         // *a dropdown to select the options on how to color the plot*/
                         <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
@@ -293,27 +292,15 @@ function GeneView() {
                                     {metaList && metaList.length > 0 ? (
                                         metaList
                                         .filter((option) => !excludedKeys.has(option)) // Remove excluded keys first
-                                        .map((option) => (
-                                            <MenuItem key={option} value={option}>
-                                                {option}
-                                            </MenuItem>
-                                        ))
-                                    ) : (
-                                        <MenuItem
-                                            disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>
-                                    )}
+                                        .map((option) => (<MenuItem key={option} value={option}>{option}</MenuItem>))
+                                    ) : (<MenuItem disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Box>
                     ) : (
                         /*a dropdown to select the options on how to group the data*/
                         <>
-                            <Box sx={{
-                                display: "flex",
-                                justifyContent: "start",
-                                marginBottom: "10px",
-                                marginLeft: "20px",
-                            }}>
+                            <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px",}}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
                                     <InputLabel id="grouping-label">Gene grouping</InputLabel>
                                     <Select
@@ -325,33 +312,18 @@ function GeneView() {
                                         variant="standard">
                                         {metaList && metaList.length > 0 ? (
                                             metaList.map((option) => {
-                                                const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"])
                                                 if (excludedKeys.has(option)) return null
-                                                return (
-                                                    <MenuItem key={option} value={option}>
-                                                        {option}
-                                                    </MenuItem>
-                                                )
+                                                return (<MenuItem key={option} value={option}>{option}</MenuItem>)
                                             })
-                                        ) : (
-                                            <MenuItem
-                                                disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>
-                                        )}
+                                        ) : (<MenuItem disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)
+                                        }
                                     </Select>
                                 </FormControl>
                             </Box>
-                            <Box sx={{
-                                display: "flex",
-                                justifyContent: "start",
-                                marginBottom: "10px",
-                                marginLeft: "20px",
-                            }}>
+                            <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
                                     <InputLabel id="valuetype-select-label">Value type</InputLabel>
-                                    <Select labelId="valuetype-select-label" id="valuetype-select" value={exprValueType}
-                                            label="Value type"
-                                            onChange={handleExprValueTypeChange}
-                                    >
+                                    <Select labelId="valuetype-select-label" id="valuetype-select" value={exprValueType} label="Value type" onChange={handleExprValueTypeChange}>
                                         <MenuItem value={"celllevel"}>Cell level values</MenuItem>
                                         <MenuItem value={"pseudobulk"}>Sample level pseudobulks</MenuItem>
                                     </Select>
@@ -362,12 +334,12 @@ function GeneView() {
 
                     {/* a button to fetch data and a loading indicator*/}
                     <Box sx={{display: "flex", justifyContent: "center", margin: "20px 0px"}}>
-                        <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading}
-                                onClick={handleLoadPlot}>
+                        <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading} onClick={handleLoadPlot}>
                             {loading ? "Loading plots..." : "Refresh Plots"}
                         </Button>
                     </Box>
                 </div>
+
                 {/* Left UMAP Plot Area (80%) */}
                 <div className="plot-main">
                     {(metadataLoading || loading) && (<Box sx={{width: "100%"}}><LinearProgress/></Box>)}
@@ -385,13 +357,15 @@ function GeneView() {
                                 {Object.entries(exprDataDict).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {umapData && (
+                                            {(umapData && allCellMetaData) && (
                                                 <EChartScatterPlot
                                                     gene={gene}
                                                     sampleList={selectedSamples}
                                                     umapData={umapData}
                                                     exprData={expr_data}
                                                     cellMetaData={allCellMetaData ?? {}}
+                                                    CellMetaMap={CellMetaMap ?? {}}
+                                                    sampleMetaData={allSampleMetaData ?? {}}
                                                     group={coloring}
                                                     isMetaDataLoading={metadataLoading}
                                                 />
@@ -403,9 +377,7 @@ function GeneView() {
                             </div>
 
                             {Object.keys(exprDataDict).length >= 1 && (
-                                <Divider sx={{marginTop: "10px"}} flexItem>
-                                    Gene Expression Plots
-                                </Divider>
+                                <Divider sx={{marginTop: "10px"}} flexItem>Gene Expression Plots</Divider>
                             )}
 
                             {/*gene expression/meta plot*/}
@@ -414,6 +386,8 @@ function GeneView() {
                                     sampleList={selectedSamples}
                                     exprData={exprDataDict}
                                     cellMetaData={allCellMetaData}
+                                    sampleMetaData={allSampleMetaData}
+                                    CellMetaMap={CellMetaMap}
                                     group={grouping}
                                     exprValueType={exprValueType}
                                 />

@@ -247,7 +247,7 @@ def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
         return "Error: Meta file not found"
 
 def get_expr_data(dataset, gene):
-    gene_expr_file = os.path.join("backend","datasets",dataset, "genes",gene+".json")
+    gene_expr_file = os.path.join("backend","datasets",dataset, "gene_jsons",gene+".json")
     if not os.path.exists(gene_expr_file):
         return "Error: Gene expression file not found"
 

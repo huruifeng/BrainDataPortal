@@ -7,7 +7,7 @@ const EChartScatterPlot = ({
                                cellMetaData, CellMetaMap, sampleMetaData,
                                group, isMetaDataLoading
                            }) => {
-    console.log("EChartScatterPlot: ", cellMetaData, CellMetaMap, sampleMetaData);
+    console.log("EChartScatterPlot: ",gene, cellMetaData, CellMetaMap, sampleMetaData);
 
     if (umapData.length === 0) return "UMAP data is loading..."
 
@@ -67,7 +67,10 @@ const EChartScatterPlot = ({
     }
 
     if (sampleList.length >= 1 && !sampleList.includes("all")) {
-        umapData = umapData.filter((point) => sampleList.includes(point.sample_id))
+        umapData = umapData.filter((point) => {
+            const sample_id = point.cs_id.split("_")[0]
+            return sampleList.includes(sample_id)
+        })
     }
 
     const createCategoryOptions = (plotData, colorGroup) => {
@@ -80,35 +83,14 @@ const EChartScatterPlot = ({
 
         // Step 1: Generate distinct colors for each group and create a series for each group
         const colorPalette = [
-            "#A7D16B",
-            "#ADD9E9",
-            "#A84D9D",
-            "#F68D40",
-            "#0A71B1",
-            "#016B62",
-            "#BFAFD4",
-            "#6BAED6",
-            "#7BCCC4",
-            "#ff7f0e",
-            "#1f77b4",
-            "#2ca02c",
-            "#da6f70",
-            "#9467bd",
-            "#8c564b",
-            "#e377c2",
-            "#0d1dd1",
-            "#bcbd22",
-            "#17becf",
-            "#ff0000",
-            "#00ff00",
-            "#0000ff",
-            "#ff00ff",
-            "#00ffff",
-            "#ffff00",
-            "#9bed56",
-            "#8000ff",
-            "#0080ff",
-            "#80ff00",
+            "#A7D16B", "#ADD9E9", "#A84D9D", "#F68D40",
+            "#0A71B1", "#016B62", "#BFAFD4", "#6BAED6",
+            "#7BCCC4", "#ff7f0e", "#1f77b4", "#2ca02c",
+            "#da6f70", "#9467bd", "#8c564b", "#e377c2",
+            "#0d1dd1", "#bcbd22", "#17becf", "#ff0000",
+            "#00ff00", "#0000ff", "#ff00ff", "#00ffff",
+            "#ffff00", "#9bed56", "#8000ff", "#0080ff",
+            "#80ff00", "#cccccc", "#333333", "#000000"
         ] // Up to 20 unique colors
 
         const groupNames = Object.keys(groupedData).sort()
@@ -203,7 +185,6 @@ const EChartScatterPlot = ({
     }
 
     let options = {}
-    const cell_level_meta = Object.keys(CellMetaMap);
     const sample_level_meta = Object.keys(Object.values(sampleMetaData)[0]);
     if (gene === "all") {
         //===============================
@@ -211,22 +192,22 @@ const EChartScatterPlot = ({
         //===============================
 
         let updatedCellMetaData = {};
-        if (cell_level_meta.includes(group)) {
+        if (sample_level_meta.includes(group)) {
             // Create a **new object** with changes
-            updatedCellMetaData = Object.fromEntries(
+             updatedCellMetaData = Object.fromEntries(
                 Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                    const sample_id = cs_id.split("_")[0];
                     const newSubObj = {...csObj};  // shallow copy of inner object
-                    const targetValue = csObj[group];
-                    newSubObj[group] = CellMetaMap[group][targetValue][0];
+                    newSubObj[group] = sampleMetaData[sample_id][group];
                     return [cs_id, newSubObj];
                 })
             );
         } else {
-            updatedCellMetaData = Object.fromEntries(
+           updatedCellMetaData = Object.fromEntries(
                 Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                    const sample_id = cs_id.split("_cs")[0];
                     const newSubObj = {...csObj};  // shallow copy of inner object
-                    newSubObj[group] = sampleMetaData[sample_id][group];
+                    const targetValue = csObj[group];
+                    newSubObj[group] = CellMetaMap[group][targetValue][0];
                     return [cs_id, newSubObj];
                 })
             );

@@ -14,31 +14,31 @@ function filterBySampleId(obj, sampleList) {
     );
 }
 
-const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) => {
-    // console.log("sampleList", sampleList);
-    // console.log("metaData", metaData);
-    // console.log("exprData", exprData);
-    // console.log("group", group);
-    // console.log("exprValueType", exprValueType);
+const GeneMetaPlots = ({
+                           sampleList, exprData,
+                           cellMetaData, sampleMetaData, CellMetaMap, group, exprValueType
+                       }) => {
 
-    const {pseudoExprDict, fetchPseudoExprData, allSampleMetaData} = useSampleGeneMetaStore();
+    console.log("metaData", cellMetaData);
+
+    const {pseudoExprDict, fetchPseudoExprData } = useSampleGeneMetaStore();
 
     // Calculate processed data directly using useMemo
     const {processedExprData, processedMetaData} = useMemo(() => {
-        let newExprData = exprData;
-        let newMetaData = metaData;
+        let newExprData = {...exprData};
+        let newMetaData = {...cellMetaData};
         let isValidPseudobulk = false;
 
         if (exprValueType === "pseudobulk") {
-            const firstSampleMeta = Object.values(allSampleMetaData)[0] || {};
+            const firstSampleMeta = Object.values(sampleMetaData)[0] || {};
             const keys = Object.keys(firstSampleMeta);
             isValidPseudobulk = keys.includes(group);
 
             if (!isValidPseudobulk) {
                 toast.error(`${group} is not valid for pseudobulk plots.`);
             } else {
-                newExprData = pseudoExprDict;
-                newMetaData = allSampleMetaData;
+                newExprData = {...pseudoExprDict};
+                newMetaData = {...sampleMetaData};
             }
         }
 
@@ -47,7 +47,7 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
         }
 
         return {processedExprData: newExprData, processedMetaData: newMetaData};
-    }, [exprValueType, group, allSampleMetaData, pseudoExprDict, sampleList, metaData, exprData]);
+    }, [exprValueType, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData]);
 
     useEffect(() => {
         fetchPseudoExprData();
@@ -122,8 +122,10 @@ const GeneMetaPlots = ({sampleList, metaData, exprData, group, exprValueType}) =
 
 GeneMetaPlots.propTypes = {
     sampleList: PropTypes.array.isRequired,
-    metaData: PropTypes.object.isRequired,
     exprData: PropTypes.object.isRequired,
+    cellMetaData: PropTypes.object.isRequired,
+    sampleMetaData: PropTypes.object.isRequired,
+    CellMetaMap: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
     exprValueType: PropTypes.string.isRequired
 };

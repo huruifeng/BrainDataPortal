@@ -73,6 +73,8 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
             grid: {rows, columns: 1, pattern: 'independent',},
             height: totalHeight, // Adjust height based on number of genes
             title: 'Stacked Plot',
+            paper_bgcolor: '#F9F9F9',
+            plot_bgcolor: '#F9F9F9',
             margin: {t: 5, b: 50, l: 50, r: 50}, // Reduce white space
             annotations: [],
             yaxis: {
