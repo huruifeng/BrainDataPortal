@@ -21,12 +21,19 @@ const GeneMetaPlots = ({
 
     console.log("metaData", cellMetaData);
 
-    const {pseudoExprDict, fetchPseudoExprData } = useSampleGeneMetaStore();
+    const {pseudoExprDict, fetchPseudoExprData} = useSampleGeneMetaStore();
 
     // Calculate processed data directly using useMemo
     const {processedExprData, processedMetaData} = useMemo(() => {
         let newExprData = {...exprData};
-        let newMetaData = {...cellMetaData};
+        let newMetaData = Object.fromEntries(
+            Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                const newSubObj = {...csObj};  // shallow copy of inner object
+                const targetValue = csObj[group];
+                newSubObj[group] = CellMetaMap[group][targetValue][0];
+                return [cs_id, newSubObj];
+            })
+        );
         let isValidPseudobulk = false;
 
         if (exprValueType === "pseudobulk") {

@@ -185,29 +185,29 @@ const EChartScatterPlot = ({
     }
 
     let options = {}
-    const sample_level_meta = Object.keys(Object.values(sampleMetaData)[0]);
+    const cell_level_meta = Object.keys(CellMetaMap??{});
     if (gene === "all") {
         //===============================
         // In this case the expression data is not needed, just use the metaData
         //===============================
 
         let updatedCellMetaData = {};
-        if (sample_level_meta.includes(group)) {
+        if (cell_level_meta.includes(group)) {
             // Create a **new object** with changes
-             updatedCellMetaData = Object.fromEntries(
-                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                    const sample_id = cs_id.split("_")[0];
-                    const newSubObj = {...csObj};  // shallow copy of inner object
-                    newSubObj[group] = sampleMetaData[sample_id][group];
-                    return [cs_id, newSubObj];
-                })
-            );
-        } else {
-           updatedCellMetaData = Object.fromEntries(
+            updatedCellMetaData = Object.fromEntries(
                 Object.entries(cellMetaData).map(([cs_id, csObj]) => {
                     const newSubObj = {...csObj};  // shallow copy of inner object
                     const targetValue = csObj[group];
                     newSubObj[group] = CellMetaMap[group][targetValue][0];
+                    return [cs_id, newSubObj];
+                })
+            );
+        } else {
+            updatedCellMetaData = Object.fromEntries(
+                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                    const sample_id = cs_id.split("_")[0];
+                    const newSubObj = {...csObj};  // shallow copy of inner object
+                    newSubObj[group] = sampleMetaData[sample_id][group];
                     return [cs_id, newSubObj];
                 })
             );

@@ -97,17 +97,8 @@ function GeneView() {
     }, [])
 
     useEffect(() => {
-        // Load expression data first
-        fetchExprData(datasetId)
-
-        // Load metadata in the background without blocking rendering
-        if (datasetId) {
-            // Use setTimeout to move the metadata loading to the next event loop tick
-            // This ensures it doesn't block the main thread
-            setTimeout(() => {
-                fetchAllMetaData(datasetId)
-            }, 0)
-        }
+        fetchExprData(datasetId);
+        fetchAllMetaData(datasetId);
     }, [datasetId])
 
     useEffect(() => {
