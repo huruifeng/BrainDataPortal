@@ -10,8 +10,27 @@ import {toast} from "react-toastify";
 function filterBySampleId(obj, sampleList) {
     const sampleSet = new Set(sampleList);
     return Object.fromEntries(
-        Object.entries(obj).filter(([key, entry]) => sampleSet.has(entry.sample_id))
+        Object.entries(obj).filter(([key, entry]) => {
+            const sample_id = key.split("_")[0];
+            return sampleSet.has(sample_id)
+        })
     );
+}
+
+function filterExprBySampleId(exprObj, sampleList) {
+    const filteredExpr = {};
+
+    for (const [gene, values] of Object.entries(exprObj)) {
+        const filteredValues = Object.fromEntries(
+            Object.entries(values).filter(([sc, val]) => {
+                const sample = sc.split('_')[0];
+                return sampleList.includes(sample);
+            })
+        );
+        filteredExpr[gene] = filteredValues;
+    }
+    return filteredExpr;
+
 }
 
 const GeneMetaPlots = ({
@@ -19,7 +38,7 @@ const GeneMetaPlots = ({
                            cellMetaData, sampleMetaData, CellMetaMap, group, exprValueType
                        }) => {
 
-    console.log("metaData", cellMetaData);
+    console.log("metaData", cellMetaData, exprData);
 
     const {pseudoExprDict, fetchPseudoExprData} = useSampleGeneMetaStore();
 
@@ -51,10 +70,11 @@ const GeneMetaPlots = ({
 
         if (!isValidPseudobulk && sampleList.length > 0 && !sampleList.includes("all")) {
             newMetaData = filterBySampleId(newMetaData, sampleList);
+            newExprData = filterExprBySampleId(newExprData, sampleList);
         }
 
         return {processedExprData: newExprData, processedMetaData: newMetaData};
-    }, [exprValueType,geneList, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData]);
+    }, [exprValueType, geneList, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData]);
 
     useEffect(() => {
         fetchPseudoExprData();
@@ -128,6 +148,7 @@ const GeneMetaPlots = ({
 };
 
 GeneMetaPlots.propTypes = {
+    geneList: PropTypes.array.isRequired,
     sampleList: PropTypes.array.isRequired,
     exprData: PropTypes.object.isRequired,
     cellMetaData: PropTypes.object.isRequired,
