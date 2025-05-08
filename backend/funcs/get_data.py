@@ -206,7 +206,7 @@ def get_metadata_mapping(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'cell_meta_mapping.json')
+    meta_file = os.path.join("backend","datasets",dataset,'cellspot_meta_mapping.json')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data = json.load(f)
@@ -219,7 +219,7 @@ def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'cell_metadata.csv')
+    meta_file = os.path.join("backend","datasets",dataset,'cellspot_metadata.csv')
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=0, header=0)

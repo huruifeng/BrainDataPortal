@@ -41,18 +41,32 @@ const GeneMetaPlots = ({
     console.log("metaData", cellMetaData, exprData);
 
     const {pseudoExprDict, fetchPseudoExprData} = useSampleGeneMetaStore();
+    const cell_level_meta = Object.keys(CellMetaMap??{});
 
     // Calculate processed data directly using useMemo
     const {processedExprData, processedMetaData} = useMemo(() => {
         let newExprData = {...exprData};
-        let newMetaData = Object.fromEntries(
-            Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                const newSubObj = {...csObj};  // shallow copy of inner object
-                const targetValue = csObj[group];
-                newSubObj[group] = CellMetaMap[group][targetValue][0];
-                return [cs_id, newSubObj];
-            })
-        );
+        let newMetaData = {}
+        if (cell_level_meta.includes(group)) {
+            newMetaData = Object.fromEntries(
+                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                    const newSubObj = {...csObj};  // shallow copy of inner object
+                    const targetValue = csObj[group];
+                    newSubObj[group] = CellMetaMap[group][targetValue][0];
+                    return [cs_id, newSubObj];
+                })
+            );
+        }else{
+            newMetaData = Object.fromEntries(
+                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                    const sample_id = cs_id.split("_")[0];
+                    const newSubObj = {...csObj};  // shallow copy of inner object
+                    newSubObj[group] = sampleMetaData[sample_id][group];
+                    return [cs_id, newSubObj];
+                })
+            );
+        }
+
         let isValidPseudobulk = false;
 
         if (exprValueType === "pseudobulk") {
