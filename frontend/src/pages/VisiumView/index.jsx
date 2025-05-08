@@ -75,7 +75,6 @@ function VisiumView() {
         fetchExprData(); // Fetch data once after both are set
         fetchImageData();
         fetchMetaDataOfSample();
-        // fetchAllMetaData(datasetId);
 
     }, [datasetId]);
 

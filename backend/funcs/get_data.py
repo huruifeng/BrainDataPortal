@@ -190,15 +190,25 @@ def get_metadata_of_sample(dataset, sample="all", meta="all"):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    meta_file = os.path.join("backend","datasets",dataset,'metadata_lite.csv')
+    meta_file = os.path.join("backend","datasets",dataset,'cellspot_metadata.csv')
     if os.path.exists(meta_file):
         data_df = pd.read_csv(meta_file, index_col=0, header=0)
         if(sample != "all"):
-            data_df = data_df.loc[data_df["sample_id"] == sample,:]
+            data_df = data_df.loc[data_df.index.str.startswith(sample),:]
         if(meta != "all"):
             data_df = data_df[meta]
-        data = data_df.to_dict(orient="index")
+        cell_metadata = data_df.to_dict(orient="index")
+
+        # get sample metadata
+        sample_metadata = get_sample_metadata(dataset)
+
+        ## get cell_metadata_mapping
+        cell_metadata_mapping = get_metadata_mapping(dataset)
+
+        data = {"cell_metadata": cell_metadata, "cell_metadata_mapping": cell_metadata_mapping,
+                "sample_metadata": sample_metadata}
         return data
+
     else:
         return f"Error: Meta file not found."
 
@@ -270,18 +280,18 @@ def get_visium_coordinates(dataset, sample):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    coordinates_file = os.path.join("backend","datasets",dataset,'coordinates',sample+".csv")
-    scales_file = os.path.join("backend","datasets",dataset,'coordinates','scalefactors_'+sample+'.json')
+    coordinates_file = os.path.join("backend","datasets",dataset,'coordinates','raw_coordinates_slice1_'+sample+".csv")
+    scales_file = os.path.join("backend","datasets",dataset,'coordinates','raw_scalefactors_slice1_'+sample+'.json')
 
-    if os.path.exists(coordinates_file) and os.path.exists(scales_file):
-        with open(coordinates_file, 'r') as f:
-            coordinates_df = pd.read_csv(coordinates_file, index_col=0, header=0)
-            coordinates= coordinates_df.to_dict(orient="index")
+    # if os.path.exists(coordinates_file) and os.path.exists(scales_file):
+    with open(coordinates_file, 'r') as f:
+        coordinates_df = pd.read_csv(coordinates_file, index_col=0, header=0)
+        coordinates= coordinates_df.to_dict(orient="index")
 
-        with open(scales_file, 'r') as f:
-            scales = json.load(f)
+    with open(scales_file, 'r') as f:
+        scales = json.load(f)
 
 
-        return {"coordinates": coordinates, "scales": scales}
-    else:
-        return "Error: Image file not found"
+    return {"coordinates": coordinates, "scales": scales}
+    # else:
+    #     return "Error: Image file not found"
