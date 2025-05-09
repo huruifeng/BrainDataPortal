@@ -1,11 +1,14 @@
 import PlotlyStackedViolin from "./PlotlyStackedViolin.jsx";
 import EChartMetaScatter from "./EChartMetaScatter.jsx";
-import {useEffect, useMemo} from "react";
+import {useEffect, useMemo, useState} from "react";
 import "./GeneView.css";
 import {isCategorical} from "../../utils/funcs.js";
 import PropTypes from "prop-types";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 import {toast} from "react-toastify";
+import {Switch, Typography, Stack} from "@mui/material";
+import {saveAs} from "file-saver";
+import Papa from "papaparse";
 
 function filterBySampleId(obj, sampleList) {
     const sampleSet = new Set(sampleList);
@@ -19,7 +22,6 @@ function filterBySampleId(obj, sampleList) {
 
 function filterExprBySampleId(exprObj, sampleList) {
     const filteredExpr = {};
-
     for (const [gene, values] of Object.entries(exprObj)) {
         const filteredValues = Object.fromEntries(
             Object.entries(values).filter(([sc, val]) => {
@@ -30,37 +32,34 @@ function filterExprBySampleId(exprObj, sampleList) {
         filteredExpr[gene] = filteredValues;
     }
     return filteredExpr;
-
 }
 
 const GeneMetaPlots = ({
                            geneList, sampleList, exprData,
                            cellMetaData, sampleMetaData, CellMetaMap, group, exprValueType
                        }) => {
-
-    console.log("metaData", cellMetaData, exprData);
-
     const {pseudoExprDict, fetchPseudoExprData} = useSampleGeneMetaStore();
-    const cell_level_meta = Object.keys(CellMetaMap??{});
+    const cell_level_meta = Object.keys(CellMetaMap ?? {});
+    const [includeZeros, setIncludeZeros] = useState(true);
 
-    // Calculate processed data directly using useMemo
     const {processedExprData, processedMetaData} = useMemo(() => {
+
         let newExprData = {...exprData};
-        let newMetaData = {}
+        let newMetaData = {};
         if (cell_level_meta.includes(group)) {
             newMetaData = Object.fromEntries(
                 Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                    const newSubObj = {...csObj};  // shallow copy of inner object
+                    const newSubObj = {...csObj};
                     const targetValue = csObj[group];
                     newSubObj[group] = CellMetaMap[group][targetValue][0];
                     return [cs_id, newSubObj];
                 })
             );
-        }else{
+        } else {
             newMetaData = Object.fromEntries(
                 Object.entries(cellMetaData).map(([cs_id, csObj]) => {
                     const sample_id = cs_id.split("_")[0];
-                    const newSubObj = {...csObj};  // shallow copy of inner object
+                    const newSubObj = {...csObj};
                     newSubObj[group] = sampleMetaData[sample_id][group];
                     return [cs_id, newSubObj];
                 })
@@ -88,7 +87,7 @@ const GeneMetaPlots = ({
         }
 
         return {processedExprData: newExprData, processedMetaData: newMetaData};
-    }, [exprValueType, geneList, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData]);
+    }, [exprValueType, geneList, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData,includeZeros]);
 
     useEffect(() => {
         fetchPseudoExprData();
@@ -103,8 +102,58 @@ const GeneMetaPlots = ({
             ? "two-plots" : Object.keys(processedExprData).length === 3
                 ? "three-plots" : "four-plots";
 
+    const handleDownload = () => {
+        const result = [];
+        let x = 0;
+        Object.entries(processedExprData).forEach(([gene, values]) => {
+            Object.entries(values).forEach(([cellId, exprVal]) => {
+                if (includeZeros || exprVal !== 0) {
+                    const meta = processedMetaData[cellId] || {};
+                    // convert meta values to its original value based on CellMetaMap
+                    for (const [key, value] of Object.entries(meta)) {
+                        if (cell_level_meta.includes(key)) {
+                            let value_str = value.toString();
+                            if (CellMetaMap[key][value_str] === undefined) {
+                                continue
+                            }
+                            meta[key] = CellMetaMap[key][value_str][0];
+                        }else{
+                            meta[key] = value;
+                        }
+                    }
+                    result.push({
+                        gene,
+                        cell_id: cellId,
+                        expr: exprVal,
+                        ...meta
+                    });
+                }
+            });
+        });
+
+        const csv = Papa.unparse(result);
+        const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+        saveAs(blob, "gene_meta_export.csv");
+    };
+
     return (
         <>
+            <div className="gene-meta-controls">
+                <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
+                    <Typography>Without Zeros</Typography>
+                    <Switch
+                        checked={includeZeros}
+                        onChange={() => setIncludeZeros(prev => !prev)}
+                        color="primary"
+                    />
+                    <Typography>Include Zeros</Typography>
+                    <div>&nbsp;&nbsp;</div>
+                    <button onClick={handleDownload} className="download-button">
+                        Download CSV
+                    </button>
+                </Stack>
+            </div>
+
             {isCat ? (
                 isUsingPseudobulk ? (
                     <div id="stacked_violin_div" className={`violin-container`}>
@@ -116,6 +165,7 @@ const GeneMetaPlots = ({
                                         exprData={processedExprData}
                                         metaData={processedMetaData}
                                         group={group}
+                                        includeZeros={includeZeros}
                                         type="boxplot"
                                     />
                                 )}
@@ -132,6 +182,7 @@ const GeneMetaPlots = ({
                                         exprData={processedExprData}
                                         metaData={processedMetaData}
                                         group={group}
+                                        includeZeros={includeZeros}
                                         type="violin"
                                     />
                                 )}

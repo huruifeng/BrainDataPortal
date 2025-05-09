@@ -7,7 +7,7 @@ const EChartScatterPlot = ({
                                cellMetaData, CellMetaMap, sampleMetaData,
                                group, isMetaDataLoading
                            }) => {
-    console.log("EChartScatterPlot: ",gene, cellMetaData, CellMetaMap, sampleMetaData);
+    // console.log("EChartScatterPlot: ",gene, cellMetaData, CellMetaMap, sampleMetaData);
 
     if (umapData.length === 0) return "UMAP data is loading..."
 

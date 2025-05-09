@@ -8,7 +8,7 @@ import {
     TextField,
     LinearProgress,
     CircularProgress,
-    Autocomplete,
+    Autocomplete, Link,
 } from "@mui/material";
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import {useSearchParams} from "react-router-dom";
@@ -35,7 +35,12 @@ function VisiumView() {
     useEffect(() => {
         fetchDatasetList()
     }, [])
-    const datasetOptions = datasetRecords.map((d) => d.dataset_id)
+    const datasetOptions = []
+    datasetRecords.map((d) => {
+        if (d.assay.toLowerCase() === "visiumst") {
+            datasetOptions.push(d.dataset_id)
+        }
+    })
 
     const [datasetId, setDatasetId] = useState(initialDataset)
     const [datasetSearchText, setDatasetSearchText] = useState("")
@@ -311,9 +316,11 @@ function VisiumView() {
                                 <div key={sample_i} className="sample-row">
                                     {/* Sample Label */}
                                     <div key={`${sample_i}-label`} className="sample-label">
-                                        <Typography variant="subtitle1" align="center" sx={{mb: 1}}>
-                                            Sample: {sample_i}
-                                        </Typography>
+                                        <Box display="flex" alignItems="center" justifyContent="center" sx={{mb: 1}}>
+                                            <Typography variant="subtitle1">Sample: {sample_i}</Typography>
+                                            <div>&nbsp;&nbsp;</div>
+                                            (<Link href={`/gsMAP/${sample_i}_PD_gsMap_Report.html`} target="_blank" rel="noopener" underline="hover">View gsMAP</Link>)
+                                        </Box>
                                     </div>
 
                                     {/* Features Container */}

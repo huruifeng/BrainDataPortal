@@ -179,7 +179,8 @@ function GeneView() {
 
     const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"])
 
-    console.log("selectedGenes", selectedGenes, CellMetaMap, allCellMetaData, allSampleMetaData)
+    // console.log("selectedGenes", selectedGenes, CellMetaMap, allCellMetaData, allSampleMetaData);
+
     return (
         <div className="plot-page-container" style={{display: "flex", flexDirection: "column", flex: 1}}>
             {/* Title Row */}

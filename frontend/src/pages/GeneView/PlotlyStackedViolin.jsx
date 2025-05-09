@@ -2,7 +2,7 @@ import Plot from 'react-plotly.js';
 import PropTypes from "prop-types";
 
 
-const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) => {
+const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, type = "violin"}) => {
     if (metaData.length === 0) return "Sample not found in the MetaData";
     if (gene !== "stackedviolin") return null;
 
@@ -19,28 +19,34 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
         const key = attrs[group];  // Grouping key (e.g., celltype, sex, etc.)
         (groupedData[key] ||= []).push(id);
     }
-    const expressionData = Object.fromEntries(
-        Object.keys(exprData).map((gene) => [
-            gene,
-            Object.fromEntries(
-                Object.entries(groupedData).map(([x_i, ids]) => [
-                    x_i,
-                    ids
-                    .filter((id) => exprData[gene]?.[id] !== undefined)
-                    .map((id) => exprData[gene]?.[id] ?? 0),
-                ])
-            ),
-        ])
-    );
+    const expressionData = {};
+
+    for (const gene of Object.keys(exprData)) {
+        const geneGroupData = {};
+
+        for (const [groupValue, cellIds] of Object.entries(groupedData)) {
+            // Decide which IDs to use based on includeZeros
+            const relevantIds = includeZeros
+                ? cellIds
+                : cellIds.filter((id) => exprData[gene]?.[id] !== undefined);
+
+            // Map each ID to its expression value, defaulting to 0
+            const expressionValues = relevantIds.map((id) => exprData[gene]?.[id] ?? 0);
+
+            geneGroupData[groupValue] = expressionValues;
+        }
+
+        expressionData[gene] = geneGroupData;
+    }
 
     const genes = Object.keys(exprData);
     const xCategories = Object.keys(groupedData).sort();
     const colorPalette = [
-        "#A7D16B", "#ADD9E9", "#A84D9D","#F68D40","#0A71B1","#016B62","#BFAFD4","#6BAED6","#7BCCC4",
+        "#A7D16B", "#ADD9E9", "#A84D9D", "#F68D40", "#0A71B1", "#016B62", "#BFAFD4", "#6BAED6", "#7BCCC4",
         "#ff7f0e", "#1f77b4", "#2ca02c", "#da6f70", "#9467bd", "#8c564b", "#e377c2",
         "#0d1dd1", "#bcbd22", "#17becf", "#ff0000", "#00ff00", "#0000ff", "#ff00ff",
         "#00ffff", "#ffff00", "#9bed56", "#8000ff", "#0080ff", "#80ff00"
-        ]; // Up to 20 unique colors
+    ]; // Up to 20 unique colors
     // Create Plotly traces for each gene
     const createTraces = () => {
         return genes.map((gene, geneIndex) => {
@@ -80,7 +86,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group,type="violin"}) =>
             yaxis: {
                 // type: type === "boxplot" ? "log" : "-",
                 // dtick: type === "boxplot" ? Math.log10(2) : "auto",
-              }
+            }
         };
 
         genes.forEach((gene, index) => {
@@ -131,6 +137,7 @@ PlotlyStackedViolin.propTypes = {
     exprData: PropTypes.object.isRequired,
     metaData: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
+    includeZeros: PropTypes.bool.isRequired,
     type: PropTypes.string.isRequired
 };
 export default PlotlyStackedViolin;
