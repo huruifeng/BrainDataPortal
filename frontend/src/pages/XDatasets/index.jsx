@@ -80,6 +80,7 @@ function XDatasetsView() {
         fetchExprData,
         fetchMetaDataOfSample,
         fetchImageData,
+        metadataLoading,
     } = useSampleGeneMetaStore()
 
     // Load initial data
@@ -212,17 +213,21 @@ function XDatasetsView() {
             }
 
             // Only fetch metadata once per dataset
-            if (!plotData[datasetId]?.allmetadata) {
+            if (!plotData[datasetId]?.allCellMetaData) {
                 await fetchAllMetaData(datasetId)
 
                 // Store the actual data from the store
-                const storeAllMetaData = useSampleGeneMetaStore.getState().allMetaData
+                const storeAllCellMetaData = useSampleGeneMetaStore.getState().allCellMetaData
+                const storeCellMetaMap = useSampleGeneMetaStore.getState().CellMetaMap
+                const storeAllSampleMetaData = useSampleGeneMetaStore.getState().allSampleMetaData
 
                 setPlotData((prevData) => ({
                     ...prevData,
                     [datasetId]: {
                         ...prevData[datasetId],
-                        allmetadata: storeAllMetaData,
+                        allCellMetaData: storeAllCellMetaData,
+                        CellMetaMap: storeCellMetaMap,
+                        allSampleMetaData: storeAllSampleMetaData,
                     },
                 }))
             }
@@ -239,7 +244,7 @@ function XDatasetsView() {
 
         try {
             // Get the dataset object
-            const dataset =  datasets[index]
+            const dataset = datasets[index]
             if (!dataset) return
 
             /// Set this dataset as loading
@@ -645,7 +650,8 @@ function XDatasetsView() {
                 <Typography variant="h6">Cross Dataset Feature Check</Typography>
                 <Box>
                     <Tooltip title="Add Dataset (Max 3)">
-                        <IconButton color="primary" onClick={handleAddDataset} disabled={datasets.length >= 3} size="small">
+                        <IconButton color="primary" onClick={handleAddDataset} disabled={datasets.length >= 3}
+                                    size="small">
                             <AddIcon/>
                         </IconButton>
                     </Tooltip>
@@ -681,7 +687,12 @@ function XDatasetsView() {
                             >
                                 {/* Dataset Header */}
                                 <Paper elevation={1} sx={{pr: 1, pl: 1, pt: 1, mb: 1}}>
-                                    <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1,}}>
+                                    <Box sx={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        mb: 1,
+                                    }}>
                                         <Typography variant="subtitle1">Dataset {index + 1}: </Typography>
                                         {/* Dataset Selection */}
                                         <Autocomplete
@@ -689,7 +700,8 @@ function XDatasetsView() {
                                             options={datasetRecords.map((d) => d.dataset_id) || []}
                                             value={dataset.id}
                                             onChange={(event, newValue) => handleDatasetChange(index, newValue)}
-                                            sx={{flex: 1, pr: 2, pl: 2,
+                                            sx={{
+                                                flex: 1, pr: 2, pl: 2,
                                                 "& .MuiInputBase-root": {height: "30px"},
                                                 "& .MuiAutocomplete-input": {padding: "2px 4px !important"},
                                             }}
@@ -717,7 +729,8 @@ function XDatasetsView() {
 
                                     {/* Plot Type Selection Row */}
                                     <Box sx={{display: "flex", alignItems: "center", mb: 1}}>
-                                        <Typography variant="subtitle1" sx={{minWidth: "80px"}}>Plot Type:{" "}</Typography>
+                                        <Typography variant="subtitle1" sx={{minWidth: "80px"}}>Plot
+                                            Type:{" "}</Typography>
                                         <FormControl fullWidth size="small" disabled={!dataset.id} sx={{flex: 1}}>
                                             <Select
                                                 value={dataset.plotType}
@@ -746,7 +759,8 @@ function XDatasetsView() {
 
                                     {/* Sample Selection Row */}
                                     <Box sx={{display: "flex", alignItems: "center", mb: 1}}>
-                                        <Typography variant="subtitle1" sx={{minWidth: "80px"}}>Sample:{" "}</Typography>
+                                        <Typography variant="subtitle1"
+                                                    sx={{minWidth: "80px"}}>Sample:{" "}</Typography>
                                         <Autocomplete
                                             size="small"
                                             sx={{
@@ -771,7 +785,8 @@ function XDatasetsView() {
 
                                     {/* Feature Selection Row */}
                                     <Box sx={{display: "flex", alignItems: "flex-start", mb: 1}}>
-                                        <Typography variant="subtitle1" sx={{minWidth: "80px", mt: 0.5}}>Features:{" "}</Typography>
+                                        <Typography variant="subtitle1"
+                                                    sx={{minWidth: "80px", mt: 0.5}}>Features:{" "}</Typography>
                                         <Autocomplete
                                             multiple
                                             size="small"
@@ -820,7 +835,9 @@ function XDatasetsView() {
                                                         ...params.InputProps,
                                                         endAdornment: (
                                                             <>
-                                                                {featureSearchLoading[dataset.id] ? (<CircularProgress color="inherit" size={20}/>) : null}
+                                                                {featureSearchLoading[dataset.id] ? (
+                                                                    <CircularProgress color="inherit"
+                                                                                      size={20}/>) : null}
                                                                 {params.InputProps.endAdornment}
                                                             </>
                                                         ),
@@ -837,8 +854,16 @@ function XDatasetsView() {
                                     {dataset.isLoading && (
                                         <Box
                                             sx={{
-                                                position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10,
-                                                display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
+                                                position: "absolute",
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                zIndex: 10,
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "center",
+                                                alignItems: "center",
                                                 backgroundColor: "rgba(255, 255, 255, 0.7)",
                                             }}
                                         >
@@ -853,8 +878,12 @@ function XDatasetsView() {
                                                 const effectivePlotType = getEffectivePlotType(dataset.id, dataset.plotType)
 
                                                 return (
-                                                    <Paper key={`${dataset.id}-${feature}`} sx={{p: 1, alignItems: "center", justifyContent: "center"}}>
-                                                        <Typography variant="body2" sx={{mb: 1, fontWeight: "bold",}}>{feature}</Typography>
+                                                    <Paper key={`${dataset.id}-${feature}`}
+                                                           sx={{p: 1, alignItems: "center", justifyContent: "center"}}>
+                                                        <Typography variant="body2" sx={{
+                                                            mb: 1,
+                                                            fontWeight: "bold",
+                                                        }}>{feature}</Typography>
 
                                                         {/* UMAP Plot */}
                                                         {(effectivePlotType === "umap" || effectivePlotType === "both") && (
@@ -882,16 +911,27 @@ function XDatasetsView() {
                                                                                         sampleList={[dataset.sample]}
                                                                                         umapData={plotData[dataset.id]["umapdata"]}
                                                                                         exprData={gene_expr || {all: "all"}}
-                                                                                        metaData={plotData[dataset.id]["allmetadata"] || {}}
+                                                                                        cellMetaData={plotData[dataset.id]["allCellMetaData"] ?? {}}
+                                                                                        CellMetaMap={plotData[dataset.id]["CellMetaMap"] ?? {}}
+                                                                                        sampleMetaData={plotData[dataset.id]["allSampleMetaData"] ?? {}}
                                                                                         group={feature}
+                                                                                        isMetaDataLoading={metadataLoading}
                                                                                     />
                                                                                 </div>
                                                                             </div>
                                                                         )
                                                                     })()
                                                                 ) : (
-                                                                    <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", borderRadius: 1,}}>
-                                                                        <Typography variant="body2" color="text.secondary">Loading UMAP data...</Typography>
+                                                                    <Box sx={{
+                                                                        display: "flex",
+                                                                        justifyContent: "center",
+                                                                        alignItems: "center",
+                                                                        height: "100%",
+                                                                        borderRadius: 1,
+                                                                    }}>
+                                                                        <Typography variant="body2"
+                                                                                    color="text.secondary">Loading UMAP
+                                                                            data...</Typography>
                                                                     </Box>
                                                                 )}
                                                             </Box>
@@ -905,7 +945,10 @@ function XDatasetsView() {
                                                                 plotData[dataset.id]["imagedict"] &&
                                                                 plotData[dataset.id]["metadict"] ? (
                                                                     dataset.sample === "all" ? (
-                                                                        <Typography variant="body2" color="text.secondary">Please select a specific sample for Visium plots.</Typography>
+                                                                        <Typography variant="body2"
+                                                                                    color="text.secondary">Please select
+                                                                            a specific sample for Visium
+                                                                            plots.</Typography>
                                                                     ) : (
                                                                         (() => {
                                                                             return (
@@ -923,8 +966,16 @@ function XDatasetsView() {
                                                                         })()
                                                                     )
                                                                 ) : (
-                                                                    <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", bgcolor: "#ffffff", borderRadius: 1,}}>
-                                                                        <Typography variant="body2" color="text.secondary" sx={{mb: 1}}>
+                                                                    <Box sx={{
+                                                                        display: "flex",
+                                                                        justifyContent: "center",
+                                                                        alignItems: "center",
+                                                                        height: "100%",
+                                                                        bgcolor: "#ffffff",
+                                                                        borderRadius: 1,
+                                                                    }}>
+                                                                        <Typography variant="body2"
+                                                                                    color="text.secondary" sx={{mb: 1}}>
                                                                             {!plotData[dataset.id]?.imagedict ? "Image datta is loading" : !plotData[dataset.id]?.imagedict[dataset.sample] ? `No image data for sample ${dataset.sample}` : "Loading Visium data..."}
                                                                         </Typography>
                                                                     </Box>
@@ -935,13 +986,29 @@ function XDatasetsView() {
                                                 )
                                             })
                                         ) : (
-                                            <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: 200, bgcolor: "#f5f5f5", borderRadius: 1,}}>
-                                                <Typography variant="body1" color="text.secondary">No features selected</Typography>
+                                            <Box sx={{
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                height: 200,
+                                                bgcolor: "#f5f5f5",
+                                                borderRadius: 1,
+                                            }}>
+                                                <Typography variant="body1" color="text.secondary">No features
+                                                    selected</Typography>
                                             </Box>
                                         )
                                     ) : (
-                                        <Box sx={{display: "flex", justifyContent: "center", alignItems: "center", height: 200, bgcolor: "#f5f5f5", borderRadius: 1,}}>
-                                            <Typography variant="body1" color="text.secondary">{dataset.id ? "Select a sample" : "Select a dataset"}</Typography>
+                                        <Box sx={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            height: 200,
+                                            bgcolor: "#f5f5f5",
+                                            borderRadius: 1,
+                                        }}>
+                                            <Typography variant="body1"
+                                                        color="text.secondary">{dataset.id ? "Select a sample" : "Select a dataset"}</Typography>
                                         </Box>
                                     )}
                                 </Box>

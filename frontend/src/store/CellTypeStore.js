@@ -3,7 +3,6 @@ import {
     getCellTypeList,
     getMarkerGenes,
     getCellCounts,
-    getDEGsOfCellType
 } from "../api/api.js";
 import {toast} from "react-toastify";
 
