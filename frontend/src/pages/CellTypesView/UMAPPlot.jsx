@@ -5,7 +5,19 @@ import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
 const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected}) => {
+    // console.log("UMAPPlot", umapData, metaData, selectedCellTypes, isAllCellTypesSelected)
     const plotRef = useRef(null)
+
+    const {cell_metadata, cell_metadata_mapping, sample_metadata} = metaData
+    const updatedCellMetaData = Object.fromEntries(
+        Object.entries(cell_metadata??{}).map(([cs_id, csObj]) => {
+            const newSubObj = {...csObj};  // shallow copy of inner object
+            const targetValue = csObj["MajorCellTypes"];
+            newSubObj["MajorCellTypes"] = cell_metadata_mapping["MajorCellTypes"][targetValue][0];
+            return [cs_id, newSubObj];
+        })
+    );
+
 
     useEffect(() => {
         if (!umapData || !metaData || !plotRef.current) return
@@ -29,7 +41,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const cellTypeGroups = {}
 
             umapData.forEach((point) => {
-                const cellType = metaData[point.cs_id]?.MajorCellTypes || "Other"
+                const cellType = updatedCellMetaData[point.cs_id]?.MajorCellTypes || "Other"
                 if (!cellTypeGroups[cellType]) {
                     cellTypeGroups[cellType] = {x: [], y: [], text: [], ids: []}
                 }
@@ -62,7 +74,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const colors = []
 
             umapData.forEach((point) => {
-                const cellType = metaData[point.cs_id]?.MajorCellTypes || "Other"
+                const cellType = updatedCellMetaData?.[point.cs_id]?.MajorCellTypes || "Other"
                 const isSelected = selectedCellTypes.includes(cellType)
 
                 x.push(point.UMAP_1)
