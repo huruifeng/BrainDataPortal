@@ -32,7 +32,7 @@ import EChartScatterPlot from "../GeneView/EChartScatter.jsx"
 function getDatasetType(datasetRecords, datasetId) {
     for (const dataset of datasetRecords) {
         if (dataset.dataset_id === datasetId) {
-            return dataset.assay
+            return dataset.assay.toLowerCase()
         }
     }
     return undefined
@@ -54,14 +54,14 @@ function XDatasetsView() {
             id: queryParams.get("dataset0") || "",
             sample: queryParams.get("sample0") || "",
             features: queryParams.getAll("features0") || [],
-            plotType: queryParams.get("plottype0") || "auto", // auto, umap, visium
+            plotType: queryParams.get("plottype0") || "umap", // auto, umap, visium
             isLoading: false, // Track loading state for each dataset
         },
         {
             id: queryParams.get("dataset1") || "",
             sample: queryParams.get("sample1") || "",
             features: queryParams.getAll("features1") || [],
-            plotType: queryParams.get("plottype1") || "auto", // auto, umap, visium
+            plotType: queryParams.get("plottype1") || "umap", // auto, umap, visium
             isLoading: false, // Track loading state for each dataset
         },
     ])
@@ -69,19 +69,10 @@ function XDatasetsView() {
     // Store access
     const {datasetRecords, fetchDatasetList} = useDataStore()
     const {
-        fetchGeneList,
-        fetchSampleList,
-        fetchMetaList,
-        setDataset,
-        loading,
-        error,
-        fetchUMAPData,
-        fetchAllMetaData,
-        fetchExprData,
-        fetchMetaDataOfSample,
-        fetchImageData,
-        metadataLoading,
-    } = useSampleGeneMetaStore()
+        fetchGeneList, fetchSampleList, fetchMetaList, setDataset, loading, error,
+        fetchUMAPData, fetchExprData,fetchAllMetaData, fetchMetaDataOfSample, fetchImageData,
+    } = useSampleGeneMetaStore();
+    const {allCellMetaData, allSampleMetaData, CellMetaMap, metadataLoading} = useSampleGeneMetaStore()
 
     // Load initial data
     useEffect(() => {
@@ -95,7 +86,7 @@ function XDatasetsView() {
                 id: queryParams.get(`dataset${i}`) || "",
                 sample: queryParams.get(`sample${i}`) || "",
                 features: queryParams.getAll(`features${i}`) || [],
-                plotType: queryParams.get(`plottype${i}`) || "auto",
+                plotType: queryParams.get(`plottype${i}`) || "umap",
                 isLoading: false,
             })
             i++
@@ -105,31 +96,19 @@ function XDatasetsView() {
         // If we have URL datasets, use them; otherwise keep our default two columns
         if (urlDatasets.length > 0) {
             if (urlDatasets.length === 1) {
-                urlDatasets.push({id: "", sample: "", features: [], plotType: "auto", isLoading: false})
+                // show at least two datasets
+                urlDatasets.push({id: "", sample: "", features: [], plotType: "umap", isLoading: false})
             }
             setDatasets(urlDatasets)
         }
     }, [])
-
-    // Update loading state when global loading state changes
-    useEffect(() => {
-        if (!loading) {
-            // When global loading is done, update all datasets to not loading
-            setDatasets((prevDatasets) =>
-                prevDatasets.map((dataset) => ({
-                    ...dataset,
-                    isLoading: false,
-                })),
-            )
-        }
-    }, [loading])
 
     // Check if a dataset has been loaded
     const isDatasetLoaded = (datasetId) => {
         if (!datasetId) return false
 
         const data = plotData[datasetId]
-        return !!(data?.genelist && data?.samplelist && data?.metalist && data?.allmetadata && data?.umapdata)
+        return !!(data?.genelist && data?.samplelist && data?.metalist && data?.allCellMetaData && data?.umapdata)
     }
 
     // Direct data loading function with request deduplication
@@ -216,18 +195,13 @@ function XDatasetsView() {
             if (!plotData[datasetId]?.allCellMetaData) {
                 await fetchAllMetaData(datasetId)
 
-                // Store the actual data from the store
-                const storeAllCellMetaData = useSampleGeneMetaStore.getState().allCellMetaData
-                const storeCellMetaMap = useSampleGeneMetaStore.getState().CellMetaMap
-                const storeAllSampleMetaData = useSampleGeneMetaStore.getState().allSampleMetaData
-
                 setPlotData((prevData) => ({
                     ...prevData,
                     [datasetId]: {
                         ...prevData[datasetId],
-                        allCellMetaData: storeAllCellMetaData,
-                        CellMetaMap: storeCellMetaMap,
-                        allSampleMetaData: storeAllSampleMetaData,
+                        allCellMetaData: allCellMetaData,
+                        CellMetaMap: CellMetaMap,
+                        allSampleMetaData: allSampleMetaData,
                     },
                 }))
             }
@@ -556,7 +530,7 @@ function XDatasetsView() {
 
         if (userSelectedType === "auto") {
             // Auto-select based on datast type
-            return datasetType === "VisiumST" ? "visium" : "umap"
+            return datasetType === "visiumst" ? "visium" : "umap"
         }
 
         return userSelectedType
@@ -584,7 +558,7 @@ function XDatasetsView() {
 
         const datasetType = getDatasetType(datasetRecords, datasetId)
 
-        if (datasetType === "VisiumST") {
+        if (datasetType === "visiumst") {
             // return ["auto","umap", "visium", "both"]
             return ["umap", "visium"]
         } else {
