@@ -10,6 +10,7 @@ import {
 import {getAllSampleMetaData, getExprData, getPseudoExprData} from "../api/api.js"
 import {getCoordinates, getImage} from "../api/visium.js"
 import {toast} from "react-toastify"
+import {transformSplitFormat} from "../utils/funcs.js";
 
 const useSampleGeneMetaStore = create((set, get) => ({
     dataSet: null,
@@ -229,7 +230,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
             // Handle the response when it completes
             console.log(response.data)
             set({
-                allCellMetaData: response.data.cell_metadata,
+                allCellMetaData: transformSplitFormat(response.data.cell_metadata),
                 allSampleMetaData: response.data.sample_metadata,
                 CellMetaMap: response.data.cell_metadata_mapping,
                 metadataLoading: false,
@@ -272,6 +273,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
             const response = await getUMAPData(dataset_id)
             if (response.status === 200) {
                 const data = response.data
+                console.log("UMAP data:", data)
                 // Set UMAP data and immediately set loading to false
                 set({umapData: data, loading: false})
                 console.log("UMAP data loaded successfully:", data.length, "points")

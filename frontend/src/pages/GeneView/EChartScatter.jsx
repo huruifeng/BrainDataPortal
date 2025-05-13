@@ -15,8 +15,8 @@ const EChartScatterPlot = ({
     if (gene === "all" && isMetaDataLoading) {
         // Show a basic plot without coloring when metadata is still loading
         const plotData = umapData.map((item) => ({
-            x: item.UMAP_1,
-            y: item.UMAP_2,
+            x: item[1],
+            y: item[2],
         }))
 
         const basicOptions = {
@@ -68,7 +68,7 @@ const EChartScatterPlot = ({
 
     if (sampleList.length >= 1 && !sampleList.includes("all")) {
         umapData = umapData.filter((point) => {
-            const sample_id = point.cs_id.split("_")[0]
+            const sample_id = point[0].split("_")[0]
             return sampleList.includes(sample_id)
         })
     }
@@ -214,9 +214,9 @@ const EChartScatterPlot = ({
         }
         const plotData =
             umapData.map((item) => ({
-                x: item.UMAP_1,
-                y: item.UMAP_2,
-                [group]: updatedCellMetaData?.[item.cs_id]?.[group] ?? "Point", // Works for both objects and arrays, returns 0 for undefined/null values
+                x: item[1],
+                y: item[2],
+                [group]: updatedCellMetaData?.[item[0]]?.[group] ?? "Cell/Spot", // Works for both objects and arrays, returns 0 for undefined/null values
             })) || []
 
         const isCategoricalGroup = isCategorical(Object.values(updatedCellMetaData).map((p) => p[group]))
@@ -229,9 +229,9 @@ const EChartScatterPlot = ({
         // data processing
         const plotData =
             umapData.map((item) => ({
-                x: item.UMAP_1,
-                y: item.UMAP_2,
-                [gene]: exprData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+                x: item[1],
+                y: item[2],
+                [gene]: exprData?.[item[0]] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
             })) || []
         options = createContinuousOptions(plotData, gene)
     }

@@ -163,8 +163,8 @@ def get_umapembedding(dataset):
     umap_file = os.path.join("backend","datasets",dataset,'umap_embeddings_50k.csv')
     if os.path.exists(umap_file):
         data_df = pd.read_csv(umap_file, index_col=None, header=0)
-        data = data_df.to_dict(orient="records")
-        return data
+        data = data_df.to_dict(orient="split")
+        return data["data"]
     else:
         return "Error: UMAP file not found"
 
@@ -240,7 +240,7 @@ def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
                 data_df = data_df.loc[:,keep_cols]
 
             data_df = data_df.fillna('')
-            cell_metadata = data_df.to_dict(orient="index")
+            cell_metadata = data_df.to_dict(orient="split")
 
         ## load cell2sample map file (json)
         # cell2sample = get_cell2sample_map(dataset)
