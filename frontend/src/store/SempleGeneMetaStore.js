@@ -224,23 +224,15 @@ const useSampleGeneMetaStore = create((set, get) => ({
         // Use a non-blocking approach
         try {
             // Start the request but don't await it here
-            const fetchPromise = getAllMetaData(dataset_id)
+            const response = await getAllMetaData(dataset_id)
 
             // Handle the response when it completes
-            fetchPromise
-            .then((response) => {
-                // console.log(response.data)
-                set({
-                    allCellMetaData: response.data.cell_metadata,
-                    allSampleMetaData: response.data.sample_metadata,
-                    CellMetaMap: response.data.cell_metadata_mapping,
-                    metadataLoading: false,
-                })
-            })
-            .catch((error) => {
-                console.error("Failed to fetch metadata:", error)
-                toast.error("Failed to fetch metadata:" + error)
-                set({metadataLoading: false})
+            console.log(response.data)
+            set({
+                allCellMetaData: response.data.cell_metadata,
+                allSampleMetaData: response.data.sample_metadata,
+                CellMetaMap: response.data.cell_metadata_mapping,
+                metadataLoading: false,
             })
 
             // Return immediately without waiting for the promise to resolve
@@ -252,7 +244,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
-    fetchSelectedMetaData: async (dataset_id = null, features=["all"]) => {
+    fetchSelectedMetaData: async (dataset_id = null, features = ["all"]) => {
         dataset_id = dataset_id ?? get().dataSet;
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchSelectedMetaData: No dataset selected"});

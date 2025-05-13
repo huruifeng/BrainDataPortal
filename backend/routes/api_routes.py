@@ -130,10 +130,11 @@ async def getpseudoexprdata(request:Request):
 
 @router.get("/getallmetadata")
 async def getallmetadata(request:Request):
-    print("getallmetadata() called================")
     dataset = request.query_params.get("dataset_id")
     dataset_type = request.query_params.get("dataset_type")
     features = request.query_params.getlist ("features")
+    print(f"getallmetadata({dataset},{dataset_type},{features}) called================")
+
 
     if dataset_type == "visiumst":
         drop_cols = ["UMAP_1", "UMAP_2"]
