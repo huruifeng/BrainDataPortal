@@ -207,6 +207,9 @@ const useSampleGeneMetaStore = create((set, get) => ({
     fetchAllMetaData: async (dataset_id = null) => {
         // Set a specific loading state for metadata
         set((state) => ({
+            allCellMetaData: {},
+            allSampleMetaData: {},
+            CellMetaMap: {},
             metadataLoading: true,
             error: null,
             // Don't set the main loading state to true here

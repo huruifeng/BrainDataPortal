@@ -195,7 +195,7 @@ function XDatasetsView() {
             if (!plotData[datasetId]?.allCellMetaData) {
                 await fetchAllMetaData(datasetId)
 
-                setPlotData((prevData) => ({
+                await setPlotData((prevData) => ({
                     ...prevData,
                     [datasetId]: {
                         ...prevData[datasetId],
