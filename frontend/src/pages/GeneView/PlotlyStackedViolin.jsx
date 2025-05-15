@@ -1,4 +1,5 @@
 import Plot from 'react-plotly.js';
+import Plotly from "plotly.js-dist";
 import PropTypes from "prop-types";
 
 
@@ -129,6 +130,29 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, typ
             data={createTraces()}
             layout={createLayout()}
             style={{width: '100%', height: '100%'}}
+            config={{
+                displayModeBar: true,
+                displaylogo: false,
+                responsive: true,
+                doubleClick: false,
+                toImageButtonOptions: {
+                    name: "Save as SVG",
+                    format: 'svg', // one of png, svg, jpeg, webp
+                    filename: `stacked_violin`,
+                    scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+                },
+                modeBarButtonsToAdd: [
+                    [
+                        {
+                            name: "Save as SVG",
+                            icon: Plotly.Icons.disk,
+                            click: function (gd) {
+                                Plotly.downloadImage(gd, {format: "svg", filename: `stacked_violin`});
+                            },
+                        },
+                    ],
+                ],
+            }}
         />
     );
 };

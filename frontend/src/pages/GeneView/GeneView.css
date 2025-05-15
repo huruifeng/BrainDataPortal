@@ -78,7 +78,7 @@
 /* Dynamically adjust the number of columns */
 .umap-container.single-plot {
     grid-template-columns: 1fr;
-    width: 50%;
+    width: 60%;
 }
 
 .umap-container.two-plots {
@@ -94,7 +94,7 @@
 }
 
 /* Maximum of 3 plots per row */
-@media (min-width: 600px) {
+@media (min-width: 800px) {
     .umap-container {
         grid-template-columns: repeat(1, 1fr);
     }

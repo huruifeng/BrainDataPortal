@@ -41,15 +41,15 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const cellTypeGroups = {}
 
             umapData.forEach((point) => {
-                const cellType = updatedCellMetaData[point.cs_id]?.MajorCellTypes || "Other"
+                const cellType = updatedCellMetaData[point[0]]?.MajorCellTypes || "Other"
                 if (!cellTypeGroups[cellType]) {
                     cellTypeGroups[cellType] = {x: [], y: [], text: [], ids: []}
                 }
 
-                cellTypeGroups[cellType].x.push(point.UMAP_1)
-                cellTypeGroups[cellType].y.push(point.UMAP_2)
+                cellTypeGroups[cellType].x.push(point[1])
+                cellTypeGroups[cellType].y.push(point[2])
                 cellTypeGroups[cellType].text.push(cellType)
-                cellTypeGroups[cellType].ids.push(point.cs_id)
+                cellTypeGroups[cellType].ids.push(point[0])
             })
 
             // Create a trace for each cell type
@@ -74,11 +74,11 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const colors = []
 
             umapData.forEach((point) => {
-                const cellType = updatedCellMetaData?.[point.cs_id]?.MajorCellTypes || "Other"
+                const cellType = updatedCellMetaData?.[point[0]]?.MajorCellTypes || "Other"
                 const isSelected = selectedCellTypes.includes(cellType)
 
-                x.push(point.UMAP_1)
-                y.push(point.UMAP_2)
+                x.push(point[1])
+                y.push(point[2])
                 text.push(cellType)
 
                 // Highlight selected cell types

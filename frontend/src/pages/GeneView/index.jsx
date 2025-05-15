@@ -98,7 +98,7 @@ function GeneView() {
 
     useEffect(() => {
         fetchExprData(datasetId);
-        fetchAllMetaData(datasetId);
+        // fetchAllMetaData(datasetId);
     }, [datasetId])
 
     useEffect(() => {
@@ -145,13 +145,14 @@ function GeneView() {
         const newGenes = selectedGenes.filter((g) => g !== delGene)
         setSelectedGenes(newGenes)
         updateQueryParams(datasetId, newGenes, selectedSamples)
-        fetchExprData()
+        fetchExprData(datasetId)
     }
 
     // click the button to fetch umap data
     const handleLoadPlot = () => {
         setDataset(datasetId)
-        fetchExprData()
+        fetchAllMetaData(datasetId)
+        fetchExprData(datasetId)
     }
 
     const handleGroupingChange = (event) => {
@@ -327,7 +328,7 @@ function GeneView() {
                     {/* a button to fetch data and a loading indicator*/}
                     <Box sx={{display: "flex", justifyContent: "center", margin: "20px 0px"}}>
                         <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading} onClick={handleLoadPlot}>
-                            {loading ? "Loading plots..." : "Refresh Plots"}
+                            {loading ? "Loading plots..." : "Load Metadata / Refresh Plots"}
                         </Button>
                     </Box>
                 </div>

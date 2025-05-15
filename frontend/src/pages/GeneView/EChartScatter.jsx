@@ -104,6 +104,11 @@ const EChartScatterPlot = ({
 
         // Step 3: Configure ECharts options
         return {
+            grid: {
+                right: 150,
+                left: '0%',
+                bottom: '5%',
+            },
             title: {
                 text: colorGroup,
                 left: "center",
@@ -118,8 +123,15 @@ const EChartScatterPlot = ({
                 orient: "vertical",
                 right: 0,
                 top: 50,
-                width: 200, // Adjust as needed
+                width: 150, // Adjust as needed
                 data: groupNames.map((group_i) => `${group_i}`).sort(),
+                // Optional: truncate long names
+                formatter: function (name) {
+                    return name.length > 16 ? name.slice(0, 16) + '…' : name;
+                },
+                textStyle: {
+                    overflow: 'truncate', // Optional: helps when wrapping isn't wanted
+                },
             },
             xAxis: {
                 type: "value",
@@ -185,7 +197,7 @@ const EChartScatterPlot = ({
     }
 
     let options = {}
-    const cell_level_meta = Object.keys(CellMetaMap??{});
+    const cell_level_meta = Object.keys(CellMetaMap ?? {});
     if (gene === "all") {
         //===============================
         // In this case the expression data is not needed, just use the metaData
