@@ -6,6 +6,8 @@ import {isCategorical} from "../../utils/funcs.js";
 import PropTypes from "prop-types";
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
 import {toast} from "react-toastify";
+import Plotly from 'plotly.js-dist-min';
+
 import {Switch, Typography, Stack} from "@mui/material";
 import {saveAs} from "file-saver";
 import Papa from "papaparse";
@@ -40,7 +42,7 @@ const GeneMetaPlots = ({
                        }) => {
     const {pseudoExprDict, fetchPseudoExprData} = useSampleGeneMetaStore();
     const cell_level_meta = Object.keys(CellMetaMap ?? {});
-    const [includeZeros, setIncludeZeros] = useState(true);
+    const [includeZeros, setIncludeZeros] = useState(false);
 
     const {processedExprData, processedMetaData} = useMemo(() => {
 
@@ -87,7 +89,7 @@ const GeneMetaPlots = ({
         }
 
         return {processedExprData: newExprData, processedMetaData: newMetaData};
-    }, [exprValueType, geneList, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData,includeZeros]);
+    }, [exprValueType, geneList, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData, includeZeros]);
 
     useEffect(() => {
         fetchPseudoExprData();
@@ -117,7 +119,7 @@ const GeneMetaPlots = ({
                                 continue
                             }
                             meta[key] = CellMetaMap[key][value_str][0];
-                        }else{
+                        } else {
                             meta[key] = value;
                         }
                     }
@@ -136,6 +138,21 @@ const GeneMetaPlots = ({
         saveAs(blob, "gene_meta_export.csv");
     };
 
+    const handleDownloadPDF = () => {
+        const plotId = 'geneview-gene-plot'; // this should match the id of your plot container
+        const plotElement = document.getElementById(plotId);
+
+        if (!plotElement) {
+            toast.error("Plot element not found");
+            return;
+        }
+
+        Plotly.downloadImage(plotElement, {
+            format: 'svg',
+            filename: 'geneview_plot',
+        });
+    };
+
     return (
         <>
             <div className="gene-meta-controls">
@@ -151,6 +168,11 @@ const GeneMetaPlots = ({
                     <button onClick={handleDownload} className="download-button">
                         Download CSV
                     </button>
+                    <div>&nbsp;&nbsp;</div>
+                    <button onClick={handleDownloadPDF} className="download-button">
+                        Export image
+                    </button>
+
                 </Stack>
             </div>
 

@@ -27,12 +27,14 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, typ
 
         for (const [groupValue, cellIds] of Object.entries(groupedData)) {
             // Decide which IDs to use based on includeZeros
-            const relevantIds = includeZeros
-                ? cellIds
-                : cellIds.filter((id) => exprData[gene]?.[id] !== undefined);
+            const relevantIds = includeZeros ? cellIds : cellIds.filter((id) => exprData[gene]?.[id] !== undefined);
 
             // Map each ID to its expression value, defaulting to 0
             const expressionValues = relevantIds.map((id) => exprData[gene]?.[id] ?? 0);
+
+            if (expressionValues.length === 0) {
+                expressionValues.push(0); // Add a dummy value if there are no relevant IDs
+            }
 
             geneGroupData[groupValue] = expressionValues;
         }
@@ -127,6 +129,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, typ
 
     return (
         <Plot
+            divId={`geneview-gene-plot`}
             data={createTraces()}
             layout={createLayout()}
             style={{width: '100%', height: '100%'}}
@@ -146,9 +149,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, typ
                         {
                             name: "Save as SVG",
                             icon: Plotly.Icons.disk,
-                            click: function (gd) {
-                                Plotly.downloadImage(gd, {format: "svg", filename: `stacked_violin`});
-                            },
+                            click: function (gd) {Plotly.downloadImage(gd, {format: "svg", filename: `stacked_violin`});},
                         },
                     ],
                 ],
