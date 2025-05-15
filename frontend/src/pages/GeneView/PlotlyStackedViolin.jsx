@@ -26,11 +26,14 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, typ
         const geneGroupData = {};
 
         for (const [groupValue, cellIds] of Object.entries(groupedData)) {
-            // Decide which IDs to use based on includeZeros
-            const relevantIds = includeZeros ? cellIds : cellIds.filter((id) => exprData[gene]?.[id] !== undefined);
-
-            // Map each ID to its expression value, defaulting to 0
-            const expressionValues = relevantIds.map((id) => exprData[gene]?.[id] ?? 0);
+            const expressionValues = [];
+            for (const id of cellIds) {
+                if (exprData[gene]?.[id] !== undefined) {
+                    expressionValues.push(exprData[gene][id]);
+                } else{
+                    includeZeros && expressionValues.push(0);
+                }
+            }
 
             if (expressionValues.length === 0) {
                 expressionValues.push(0); // Add a dummy value if there are no relevant IDs
