@@ -98,7 +98,7 @@ function GeneView() {
 
     useEffect(() => {
         fetchExprData(datasetId);
-        // fetchAllMetaData(datasetId);
+        fetchAllMetaData(datasetId);
     }, [datasetId])
 
     useEffect(() => {

@@ -4,20 +4,22 @@ import {useEffect, useRef} from "react"
 import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
-const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected}) => {
+const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected, mainCluster}) => {
     // console.log("UMAPPlot", umapData, metaData, selectedCellTypes, isAllCellTypesSelected)
     const plotRef = useRef(null)
 
-    const {cell_metadata, cell_metadata_mapping, sample_metadata} = metaData
+    const {cell_metadata, sample_metadata, cell_metadata_mapping} = metaData
     const updatedCellMetaData = Object.fromEntries(
         Object.entries(cell_metadata??{}).map(([cs_id, csObj]) => {
             const newSubObj = {...csObj};  // shallow copy of inner object
-            const targetValue = csObj["MajorCellTypes"];
-            newSubObj["MajorCellTypes"] = cell_metadata_mapping["MajorCellTypes"][targetValue][0];
+            const targetValue = csObj[mainCluster];
+            newSubObj[mainCluster] = cell_metadata_mapping[mainCluster][targetValue]?.[0];
             return [cs_id, newSubObj];
         })
     );
 
+    console.log("cell_metadata", cell_metadata)
+    console.log("updatedCellMetaData", updatedCellMetaData)
 
     useEffect(() => {
         if (!umapData || !metaData || !plotRef.current) return
@@ -41,7 +43,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const cellTypeGroups = {}
 
             umapData.forEach((point) => {
-                const cellType = updatedCellMetaData[point[0]]?.MajorCellTypes || "Other"
+                const cellType = updatedCellMetaData[point[0]]?.[mainCluster] || "Other"
                 if (!cellTypeGroups[cellType]) {
                     cellTypeGroups[cellType] = {x: [], y: [], text: [], ids: []}
                 }
@@ -74,7 +76,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const colors = []
 
             umapData.forEach((point) => {
-                const cellType = updatedCellMetaData?.[point[0]]?.MajorCellTypes || "Other"
+                const cellType = updatedCellMetaData?.[point[0]]?.[mainCluster] ?? "Other"
                 const isSelected = selectedCellTypes.includes(cellType)
 
                 x.push(point[1])
@@ -129,6 +131,7 @@ UMAPPlot.propTypes = {
     metaData: PropTypes.object.isRequired,
     selectedCellTypes: PropTypes.array.isRequired,
     isAllCellTypesSelected: PropTypes.bool.isRequired,
+    mainCluster: PropTypes.string.isRequired
 }
 
 export default UMAPPlot

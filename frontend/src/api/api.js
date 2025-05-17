@@ -38,6 +38,17 @@ export const getMetaList = async (dataset,query_str) => {
     }
 }
 
+export const getMainClusterInfo = async (dataset) => {
+    try {
+        const response = await axios.get(`${API_URL}/getmainclusterinfo`,
+            {params: {dataset:dataset}});
+        return response;
+    } catch (error) {
+        console.error("Error getMainClusterInfo:", error);
+        throw error;
+    }
+}
+
 export const getCellTypeList = async (dataset) => {
     try {
         const response = await axios.get(`${API_URL}/getcelltypelist`,

@@ -1,13 +1,10 @@
 import {create} from "zustand"
-import {
-    getCellTypeList,
-    getMarkerGenes,
-    getCellCounts,
-} from "../api/api.js";
+import {getCellTypeList, getMarkerGenes, getCellCounts, getMainClusterInfo,} from "../api/api.js";
 import {toast} from "react-toastify";
 
 const useCellTypeStore = create((set, get) => ({
     // State
+    mainCluster: null,
     cellTypeList: [],
     selectedCellTypes: [],
     cellCounts: null,
@@ -20,6 +17,27 @@ const useCellTypeStore = create((set, get) => ({
 
     // Actions
     setSelectedCellTypes: (cellTypes) => set({selectedCellTypes: cellTypes}),
+
+    fetchMainClsuterInfo: async (dataset_id) => {
+        if (!dataset_id || dataset_id === "all") {
+            set({error: "fetchMainClsuterInfo: No dataset selected"});
+            return;
+        }
+        try {
+            set({loading: true})
+            const response = await getMainClusterInfo(dataset_id);
+            if (response.status === 200) {
+                const data = await response.data;
+                await set({mainCluster: data, loading: false, error: null});
+            } else {
+                const error_message = "Error fetching main cluster info: " + response.message;
+                await set({mainCluster: [], error: error_message, loading: false});
+                toast.error(response.message);
+            }
+        } catch (error) {
+            set({error: error.message, loading: false})
+        }
+    },
 
     fetchCellTypeList: async (dataset_id) => {
         if (!dataset_id || dataset_id === "all") {

@@ -133,7 +133,7 @@ const MetaPrepare = ({ onMetaDataChange }) => {
                 <Grid item xs={4}>
                     <Card elevation={0}>
                         <CardContent>
-                            <Typography variant="p" gutterBottom>Major cluster column</Typography>
+                            <Typography variant="p" gutterBottom>Main cluster column</Typography>
                             <FormControl fullWidth>
                                 <Select
                                     value={majorClusterColumn}

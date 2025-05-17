@@ -254,7 +254,13 @@ const useSampleGeneMetaStore = create((set, get) => ({
 
         try {
             const response = await getAllMetaData(dataset_id, features);
-            set({selectedMetaData: response.data}); // Update directly without loading state
+            set({
+                selectedMetaData: {
+                    cell_metadata: transformSplitFormat(response.data.cell_metadata),
+                    sample_metadata: response.data.sample_metadata,
+                    cell_metadata_mapping: response.data.cell_metadata_mapping
+                }
+            }); // Update directly without loading state
         } catch (error) {
             console.error("Failed to fetch metadata:", error);
             set({error: "Failed to fetch all metadata:" + error});

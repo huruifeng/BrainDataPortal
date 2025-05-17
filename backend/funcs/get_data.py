@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import json
+import toml
 
 def get_gene_list(dataset, query_str="AB"):
     if dataset == "all":
@@ -65,11 +66,25 @@ def get_meta_list(dataset, query_str="all"):
         print(meta_file + " not found")
         return "Error: Gene list file not found"
 
+def get_config_info(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        config_file = os.path.join("backend", "datasets", dataset, 'dataset_info.toml')
+
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            config = toml.load(f)
+        return config
+    else:
+        print(config_file + " not found")
+        return "Error: Config info file not found"
+
 def get_celltype_list(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
-        cellconuts_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_cellcounts.json')
+        cellconuts_file = os.path.join("backend", "datasets", dataset, 'clustermarkers', 'cluster_cellcounts.json')
 
     if os.path.exists(cellconuts_file):
         with open(cellconuts_file, 'r') as f:
@@ -83,7 +98,7 @@ def get_celltype_counts(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
-        cellconuts_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_cellcounts.json')
+        cellconuts_file = os.path.join("backend", "datasets", dataset, 'clustermarkers', 'cluster_cellcounts.json')
 
     if os.path.exists(cellconuts_file):
         with open(cellconuts_file, 'r') as f:
@@ -97,7 +112,7 @@ def get_marker_genes(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
-        markergene_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_markergenes_cellcounts.csv')
+        markergene_file = os.path.join("backend", "datasets", dataset, 'clustermarkers', 'cluster_markergenes_cellcounts.csv')
 
     if os.path.exists(markergene_file):
         data_df = pd.read_csv(markergene_file, index_col=None, header=0)

@@ -48,6 +48,25 @@ async def getmetalist(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting Meta list.")
     return response
 
+@router.get("/getmainclusterinfo")
+async def getmainclusterinfo(request:Request):
+    print("getmainclusterinfo() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_config_info(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting main cluster info.")
+
+    main_cluster = response['meta_features']['main_cluster_column']
+    if main_cluster is None or main_cluster == "":
+        raise HTTPException(status_code=404, detail="Error in getting main cluster info.")
+
+    if main_cluster in response['meta_features']["rename_features"]:
+        main_cluster = response['meta_features']["rename_features"][main_cluster]
+
+    return main_cluster
+
 @router.get("/getcelltypelist")
 async def getcelltypelist(request:Request):
     print("getcelltypelist() called================")
