@@ -116,7 +116,7 @@ def get_marker_genes(dataset):
 
     if os.path.exists(markergene_file):
         data_df = pd.read_csv(markergene_file, index_col=None, header=0)
-        data = data_df.to_dict(orient="records")
+        data = data_df.to_dict(orient="split")
         return data
     else:
         print(markergene_file + " not found")
@@ -126,29 +126,29 @@ def get_degs_celltype(dataset, celltype):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
-        degs_file = os.path.join("backend", "datasets", dataset, 'celltypes', 'celltype_pseudobulk_DEGs_top10.csv')
+        degs_file = os.path.join("backend", "datasets", dataset, 'clustermarkers', 'cluster_pseudobulk_DEGs_topN.csv')
 
     data = {}
     if os.path.exists(degs_file):
         degs_df = pd.read_csv(degs_file, index_col=None, header=0)
-        degs_df = degs_df.loc[degs_df["CellType_DE"].str.startswith(celltype),["CellType_DE","gene","avg_log2FC","p_val_adj"]]
+        degs_df = degs_df.loc[degs_df["cluster_DE"].str.startswith(celltype),["cluster_DE","gene","avg_log2FC","p_val_adj"]]
 
         ## keep only 4 digits for avg_log2FC
         degs_df["avg_log2FC"] = degs_df["avg_log2FC"].round(4)
         degs_df["p_val_adj"] = degs_df["p_val_adj"].round(4)
 
-        ## split CellType_DE into CellType and DE
-        # degs_df["CellType_DE"] = degs_df["CellType_DE"].astype(str)
-        # degs_df["CellType"] = [i.split(".")[0] for i in degs_df["CellType_DE"].tolist()]
-        degs_df["DE"] = [i.split(".")[1] for i in degs_df["CellType_DE"].tolist()]
-        degs_df = degs_df.drop("CellType_DE", axis=1)
+        ## split cluster_DE into CellType and DE
+        # degs_df["cluster_DE"] = degs_df["cluster_DE"].astype(str)
+        # degs_df["cluster"] = [i.split(".")[0] for i in degs_df["cluster_DE"].tolist()]
+        degs_df["DE"] = [i.split(".")[1] for i in degs_df["cluster_DE"].tolist()]
+        degs_df = degs_df.drop("cluster_DE", axis=1)
 
         ## group by DE
         degs_groups = degs_df.groupby("DE").apply(lambda g: g.drop("DE", axis=1).to_dict(orient='records')).to_dict()
 
         ## get gene expression data for each DE,format: [{sampleId: 'sample1', condition: 'PD', value: 8.1053},...]
-        sample_calletype_df = pd.read_csv(os.path.join("backend", "datasets", dataset,'celltypes', 'metadata_sample_celltype_condition.csv'), index_col=0, header=0)
-        expr_df = pd.read_csv(os.path.join("backend", "datasets", dataset,'celltypes', 'pb_expr_matrix_topN_DEGs.csv'), index_col=0, header=0)
+        sample_calletype_df = pd.read_csv(os.path.join("backend", "datasets", dataset,'clustermarkers', 'metadata_sample_cluster_condition.csv'), index_col=0, header=0)
+        expr_df = pd.read_csv(os.path.join("backend", "datasets", dataset,'clustermarkers', 'pb_expr_matrix_topN_DEGs.csv'), index_col=0, header=0)
 
         for DE, degs in degs_groups.items():
             for deg in degs:

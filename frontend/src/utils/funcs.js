@@ -89,3 +89,28 @@ export function transformSplitFormat(splitData) {
 
     return result;
 }
+
+export function transformSplitFormatToArray(splitData) {
+    // Input:
+    // {
+    //   "index": ["row1", "row2"],
+    //   "columns": ["col1", "col2"],
+    //   "data": [[1, 0.5], [2, 0.75]]
+    // }
+
+    // Output:
+    // [ { "col1": 1, "col2": 0.5 },{ "col1": 2, "col2": 0.75 }]
+
+    const {index, columns, data} = splitData;
+    const result = [];
+
+    index.forEach((rowKey, rowIndex) => {
+        const row = {};
+        columns.forEach((colKey, colIndex) => {
+            row[colKey] = data[rowIndex][colIndex];
+        });
+        result.push(row);
+    });
+
+    return result;
+}

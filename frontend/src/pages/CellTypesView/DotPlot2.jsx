@@ -4,7 +4,8 @@ import { useEffect, useRef } from "react"
 import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
-const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected }) => {
+const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected, mainCluster }) => {
+  console.log("DotPlot2", markerGenes, selectedCellTypes, isAllCellTypesSelected, mainCluster)
 
   const plotRef = useRef(null)
 
@@ -12,14 +13,14 @@ const DotPlot2 = ({ markerGenes, selectedCellTypes, isAllCellTypesSelected }) =>
     if (!markerGenes || !plotRef.current || selectedCellTypes.length === 0) return
 
     // Get all unique cell types from the data
-    const allCellTypes = Array.from(new Set(markerGenes.map((gene) => gene.MajorCellTypes))).filter(Boolean)
+    const allCellTypes = Array.from(new Set(markerGenes.map((gene) => gene[mainCluster]))).filter(Boolean)
 
     // Filter genes for selected cell types (limit to 10 per cell type)
     let pooledGenes = []
 
     selectedCellTypes.forEach((cellType) => {
       // Filter genes that are markers for this cell type
-      const cellTypeMarkers = markerGenes.filter((gene) => gene.MajorCellTypes === cellType && gene.is_marker)
+      const cellTypeMarkers = markerGenes.filter((gene) => gene[mainCluster] === cellType && gene.is_marker)
 
       // Sort by score or another metric if available, then take top 10
       const topMarkers = cellTypeMarkers.sort((a, b) => (a.score || a.avg_expr) - (b.score || b.avg_expr)).slice(0, 10)
@@ -240,6 +241,7 @@ DotPlot2.propTypes = {
   markerGenes: PropTypes.array.isRequired,
   selectedCellTypes: PropTypes.array.isRequired,
   isAllCellTypesSelected: PropTypes.bool.isRequired,
+  mainCluster: PropTypes.string.isRequired
 }
 
 export default DotPlot2

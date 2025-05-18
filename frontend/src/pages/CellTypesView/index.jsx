@@ -44,7 +44,8 @@ function CellTypesView() {
     const {selectedCellTypes, setSelectedCellTypes} = useCellTypeStore()
     const {cellTypeList, fetchCellTypeList, markerGenes, fetchMarkerGenes} = useCellTypeStore()
     const {cellCounts, fetchCellCounts, diffExpGenes, fetchDiffExpGenes} = useCellTypeStore()
-    const {mainCluster, fetchMainClsuterInfo} = useCellTypeStore()
+    const fetchMainClsuterInfo = useCellTypeStore((state) => state.fetchMainClsuterInfo);
+    const mainCluster = useCellTypeStore((state) => state.mainCluster);
     const {loading, error} = useCellTypeStore()
 
     const [cellTypeSearchText, setCellTypeSearchText] = useState("")
@@ -234,6 +235,7 @@ function CellTypesView() {
                                             markerGenes={markerGenes}
                                             selectedCellTypes={selectedCellTypes}
                                             isAllCellTypesSelected={isAllCellTypesSelected}
+                                            mainCluster={mainCluster}
                                         />
                                     )}
                                 </div>

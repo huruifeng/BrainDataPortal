@@ -1,6 +1,7 @@
 import {create} from "zustand"
 import {getCellTypeList, getMarkerGenes, getCellCounts, getMainClusterInfo,} from "../api/api.js";
 import {toast} from "react-toastify";
+import {transformSplitFormatToArray} from "../utils/funcs.js";
 
 const useCellTypeStore = create((set, get) => ({
     // State
@@ -72,7 +73,11 @@ const useCellTypeStore = create((set, get) => ({
             const response = await getMarkerGenes(dataset_id);
             if (response.status === 200) {
                 const data = await response.data;
-                await set({markerGenes: data, loading: false, error: null});
+                await set({
+                    markerGenes: transformSplitFormatToArray(data),
+                    loading: false,
+                    error: null
+                });
 
             } else {
                 const error_message = "Error fetching cell type list: " + response.message;
