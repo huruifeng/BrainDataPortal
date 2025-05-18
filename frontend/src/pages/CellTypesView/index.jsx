@@ -21,10 +21,9 @@ import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
 import useDataStore from "../../store/DatatableStore.js"
 
 import UMAPPlot from "./UMAPPlot.jsx"
-import DotPlot from "./DotPlot.jsx"
 import DotPlot2 from "./DotPlot2.jsx"
 import BarPlot from "./BarPlot.jsx"
-import HeatmapPlot from "./HeatmapPlot.jsx"
+import HeatmapPlot2 from "./HeatmapPlot2.jsx"
 
 import "./CellTypesView.css"
 
@@ -251,7 +250,7 @@ function CellTypesView() {
                                     </Grid>
                                     <Grid item xs={12} md={6}>
                                         {diffExpGenes && selectedCellTypes.length > 0 && (
-                                            <HeatmapPlot diffExpGenes={diffExpGenes} selectedCellTypes={selectedCellTypes}/>
+                                            <HeatmapPlot2 diffExpGenes={diffExpGenes} selectedCellTypes={selectedCellTypes}/>
                                         )}
                                     </Grid>
                                 </Grid>

@@ -5,7 +5,7 @@ import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 import {FormControl, InputLabel, Select, MenuItem} from "@mui/material"
 
-const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
+const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
     console.log("diffExpGenes: ", diffExpGenes)
 
     const plotRef = useRef(null)
@@ -154,15 +154,85 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
             type: "heatmap",
             colorscale: "RdBu_r", // Red for high values, blue for low values
             colorbar: {
+                orientation: 'h',
                 title: "Z-score",
                 titleside: "right",
                 len: 0.5,
                 thickness: 15,
+                x: 0.5, // Adjust position to make room for dot plot colorbar
+                xanchor: "center",
             },
         }
 
+        // Create dot plot trace for statistical significance and fold change
+        const dotSizes = genes.map((gene) => {
+            // Convert p-value to -10*log10(p) for dot size
+            // Handle p-values of 0 by setting a maximum value
+            const pValue = gene.p_val_adj || 0.000001 // Default to a small value if missing
+            const negLogP = -10 * Math.log10(Math.max(pValue, 1e-10))
+            // Scale the size for better visualization (adjust as needed)
+            return Math.min(Math.max(negLogP, 5), 25)
+        })
+
+        const dotColors = genes.map((gene) => gene.avg_log2FC)
+
+        const dotPlotTrace = {
+            x: Array(genes.length).fill(allSamples.length + 1), // Position dots to the right of heatmap
+            y: geneNames,
+            mode: "markers",
+            marker: {
+                size: dotSizes,
+                color: dotColors,
+                colorscale: "RdBu_r", // Same colorscale as heatmap but reversed
+                colorbar: {
+                    title: "log2FC",
+                    titleside: "right",
+                    len: 0.5,
+                    thickness: 15,
+                    x: 1.0, // Position at the right edge
+                },
+                sizemode: "diameter",
+                sizeref: 0.1, // Adjust for appropriate scaling
+                line: {
+                    color: "black",
+                    width: 1,
+                },
+            },
+            showlegend: false,
+            hoverinfo: "text",
+            text: genes.map(
+                (gene) =>
+                    `Gene: ${gene.gene}<br>` +
+                    `log2FC: ${gene.avg_log2FC.toFixed(2)}<br>` +
+                    `p-value: ${gene.p_val_adj.toExponential(2)}<br>` +
+                    `-10*log10(p): ${(-10 * Math.log10(Math.max(gene.p_val_adj, 1e-10))).toFixed(2)}`,
+            ),
+            xaxis: "x2",
+        }
+
+        // Add annotation for dot plot column
+        annotations.push({
+            x: allSamples.length + 1,
+            y: -0.8,
+            xref: "x2",
+            yref: "y",
+            text: "Statistics",
+            showarrow: false,
+            font: {
+                family: "Arial",
+                size: 12,
+                color: "black",
+            },
+        })
+
         const layout = {
             title: `Differentially Expressed Genes: ${selectedCellType} (${selectedCompare})`,
+            grid: {
+                rows: 1,
+                columns: 2,
+                pattern: "independent",
+                xgap: 0.1,
+            },
             xaxis: {
                 title: "Samples",
                 automargin: true,
@@ -170,6 +240,12 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
                 tickfont: {
                     size: 8,
                 },
+                domain: [0, 0.85], // Allocate 85% of width to heatmap
+            },
+            xaxis2: {
+                title: "",
+                showticklabels: false,
+                domain: [0.86, 1], // Allocate 14% of width to dot plot
             },
             yaxis: {
                 title: "Genes",
@@ -180,16 +256,16 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
             annotations: annotations,
             margin: {
                 l: 80,
-                r: 50,
+                r: 80, // Increased right margin for dot plot colorbar
                 b: 100,
-                t: 0,
+                t: 50, // Increased top margin for title
                 pad: 4,
             },
             plot_bgcolor: "rgba(0,0,0,0)",
             paper_bgcolor: "rgba(255,0,0,0)",
         }
 
-        Plotly.newPlot(plotRef.current, [trace], layout, {
+        Plotly.newPlot(plotRef.current, [trace, dotPlotTrace], layout, {
             responsive: true,
             displaylogo: false,
         })
@@ -251,14 +327,37 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
                 </FormControl>
             </div>
 
+            <div style={{display: "flex", justifyContent: "center", marginBottom: "10px"}}>
+                <div style={{display: "flex", alignItems: "center", marginRight: "20px"}}>
+                    <div style={{width: "15px", height: "15px", backgroundColor: "red", marginRight: "5px"}}></div>
+                    <span>Higher expression</span>
+                </div>
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <div style={{width: "15px", height: "15px", backgroundColor: "blue", marginRight: "5px"}}></div>
+                    <span>Lower expression</span>
+                </div>
+                <div style={{display: "flex", alignItems: "center", marginLeft: "20px"}}>
+                    <div
+                        style={{
+                            width: "20px",
+                            height: "20px",
+                            borderRadius: "50%",
+                            border: "1px solid black",
+                            marginRight: "5px",
+                        }}
+                    ></div>
+                    <span>Dot size: -10logP (significance)</span>
+                </div>
+            </div>
+
             <div ref={plotRef} style={{width: "100%", height: "600px", minHeight: "600px"}}/>
         </div>
     )
 }
 
-HeatmapPlot.propTypes = {
+HeatmapPlot2.propTypes = {
     diffExpGenes: PropTypes.object.isRequired,
     selectedCellTypes: PropTypes.array.isRequired,
 }
 
-export default HeatmapPlot
+export default HeatmapPlot2

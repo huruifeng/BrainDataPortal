@@ -18,8 +18,8 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
         })
     );
 
-    console.log("cell_metadata", cell_metadata)
-    console.log("updatedCellMetaData", updatedCellMetaData)
+    // console.log("cell_metadata", cell_metadata)
+    // console.log("updatedCellMetaData", updatedCellMetaData)
 
     useEffect(() => {
         if (!umapData || !metaData || !plotRef.current) return
