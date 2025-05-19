@@ -152,7 +152,7 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
             x: allSamples,
             y: geneNames,
             type: "heatmap",
-            colorscale: "RdBu_r", // Red for high values, blue for low values
+            colorscale: "RdBu", // Red for high values, blue for low values
             zmid:0,
             zmin:-6,
             zmax:6,
@@ -186,13 +186,12 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
             marker: {
                 size: dotSizes,
                 color: dotColors,
-                colorscale: "RdBu_r", // Same colorscale as heatmap but reversed
+                cmid: 0,
+                colorscale: "Viridis", // Same colorscale as heatmap but reversed
                 colorbar: {
                     title: { text: "log2FC", side: "top",},
                     len: 0.5,
                     thickness: 15,
-                    tickvals: [-2, -1, 0, 1, 2],
-                    ticktext: ["-2", "-1", "0", "1", "2+"],
                     x: 1.0, // Position at the right edge
                     xpad: 0,
                     ypad: 0,
