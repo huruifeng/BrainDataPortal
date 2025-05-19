@@ -58,10 +58,6 @@ function GeneView() {
         fetchUMAPData,
     } = useSampleGeneMetaStore()
 
-    useEffect(() => {
-        fetchUMAPData(datasetId);
-    }, [datasetId])
-
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore()
     const {allCellMetaData, fetchAllMetaData, exprDataDict, fetchExprData} = useSampleGeneMetaStore()
     const {allSampleMetaData, CellMetaMap} = useSampleGeneMetaStore()
@@ -73,9 +69,15 @@ function GeneView() {
 
     useEffect(() => {
         // Load these in parallel immediately
-        fetchGeneList(datasetId)
-        fetchSampleList(datasetId)
-        fetchMetaList(datasetId)
+        const fetchPrimaryData = async () => {
+            await fetchUMAPData(datasetId);
+            await fetchGeneList(datasetId)
+            await fetchSampleList(datasetId)
+            await fetchMetaList(datasetId)
+            await fetchExprData(datasetId);
+            await fetchAllMetaData(datasetId);
+        }
+        fetchPrimaryData()
     }, [datasetId])
 
     const sampleOptions = sampleList.map((sample) => sample)
@@ -96,10 +98,10 @@ function GeneView() {
         })
     }, [])
 
-    useEffect(() => {
-        fetchExprData(datasetId);
-        fetchAllMetaData(datasetId);
-    }, [datasetId])
+    // useEffect(() => {
+    //     fetchExprData(datasetId);
+    //     fetchAllMetaData(datasetId);
+    // }, [datasetId])
 
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
@@ -264,11 +266,13 @@ function GeneView() {
                             })
                         }
                         renderInput={(params) => (
-                            <TextField {...params} label="Search Sample" variant="standard" style={{margin: "10px 0px"}}/>
+                            <TextField {...params} label="Search Sample" variant="standard"
+                                       style={{margin: "10px 0px"}}/>
                         )}
                     />
 
-                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting options:</Typography>
+                    <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting
+                        options:</Typography>
                     {selectedGenes.length === 0 ? (
                         // *a dropdown to select the options on how to color the plot*/
                         <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
@@ -286,14 +290,20 @@ function GeneView() {
                                         metaList
                                         .filter((option) => !excludedKeys.has(option)) // Remove excluded keys first
                                         .map((option) => (<MenuItem key={option} value={option}>{option}</MenuItem>))
-                                    ) : (<MenuItem disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)}
+                                    ) : (<MenuItem
+                                        disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Box>
                     ) : (
                         /*a dropdown to select the options on how to group the data*/
                         <>
-                            <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px",}}>
+                            <Box sx={{
+                                display: "flex",
+                                justifyContent: "start",
+                                marginBottom: "10px",
+                                marginLeft: "20px",
+                            }}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
                                     <InputLabel id="grouping-label">Gene grouping</InputLabel>
                                     <Select
@@ -308,15 +318,22 @@ function GeneView() {
                                                 if (excludedKeys.has(option)) return null
                                                 return (<MenuItem key={option} value={option}>{option}</MenuItem>)
                                             })
-                                        ) : (<MenuItem disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)
+                                        ) : (<MenuItem
+                                            disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)
                                         }
                                     </Select>
                                 </FormControl>
                             </Box>
-                            <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
+                            <Box sx={{
+                                display: "flex",
+                                justifyContent: "start",
+                                marginBottom: "10px",
+                                marginLeft: "20px"
+                            }}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
                                     <InputLabel id="valuetype-select-label">Value type</InputLabel>
-                                    <Select labelId="valuetype-select-label" id="valuetype-select" value={exprValueType} label="Value type" onChange={handleExprValueTypeChange}>
+                                    <Select labelId="valuetype-select-label" id="valuetype-select" value={exprValueType}
+                                            label="Value type" onChange={handleExprValueTypeChange}>
                                         <MenuItem value={"celllevel"}>Cell level values</MenuItem>
                                         <MenuItem value={"pseudobulk"}>Sample level pseudobulks</MenuItem>
                                     </Select>
@@ -327,7 +344,8 @@ function GeneView() {
 
                     {/* a button to fetch data and a loading indicator*/}
                     <Box sx={{display: "flex", justifyContent: "center", margin: "20px 0px"}}>
-                        <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading} onClick={handleLoadPlot}>
+                        <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading}
+                                onClick={handleLoadPlot}>
                             {loading ? "Loading plots..." : "Load Metadata / Refresh Plots"}
                         </Button>
                     </Box>

@@ -45,7 +45,7 @@ function CellTypesView() {
     const {cellCounts, fetchCellCounts, diffExpGenes, fetchDiffExpGenes} = useCellTypeStore()
     const fetchMainClsuterInfo = useCellTypeStore((state) => state.fetchMainClsuterInfo);
     const mainCluster = useCellTypeStore((state) => state.mainCluster);
-    const {loading, error} = useCellTypeStore()
+    const {loading, error,metadataLoading } = useCellTypeStore()
 
     const [cellTypeSearchText, setCellTypeSearchText] = useState("")
     const [datasetSearchText, setDatasetSearchText] = useState("")
@@ -191,7 +191,7 @@ function CellTypesView() {
                         <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
                             No dataset selected for exploration
                         </Typography>
-                    ) : loading ? (
+                    ) : (loading || metadataLoading) ? (
                         <>
                             <Box sx={{width: "100%"}}><LinearProgress/></Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
