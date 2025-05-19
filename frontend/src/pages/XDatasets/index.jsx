@@ -70,9 +70,8 @@ function XDatasetsView() {
     const {datasetRecords, fetchDatasetList} = useDataStore()
     const {
         fetchGeneList, fetchSampleList, fetchMetaList, setDataset, loading, error,
-        fetchUMAPData, fetchExprData,fetchAllMetaData, fetchMetaDataOfSample, fetchImageData,
+        fetchUMAPData, fetchExprData,fetchAllMetaData, fetchMetaDataOfSample, fetchImageData, metadataLoading
     } = useSampleGeneMetaStore();
-    const {allCellMetaData, allSampleMetaData, CellMetaMap, metadataLoading} = useSampleGeneMetaStore()
 
     // Load initial data
     useEffect(() => {
@@ -108,7 +107,15 @@ function XDatasetsView() {
         if (!datasetId) return false
 
         const data = plotData[datasetId]
-        return !!(data?.genelist && data?.samplelist && data?.metalist && data?.allCellMetaData && data?.umapdata)
+        // return !!(data?.genelist && data?.samplelist && data?.metalist && data?.allCellMetaData && data?.umapdata)
+        return (
+            data &&
+            data.genelist &&
+            data.samplelist &&
+            data.metalist &&
+            data.umapdata &&
+            data.allCellMetaData
+        )
     }
 
     // Direct data loading function with request deduplication
@@ -195,13 +202,18 @@ function XDatasetsView() {
             if (!plotData[datasetId]?.allCellMetaData) {
                 await fetchAllMetaData(datasetId)
 
+                // Store the actual data from the store
+                const storeAllCellMetaData = useSampleGeneMetaStore.getState().allCellMetaData;
+                const storeCellMetaMap = useSampleGeneMetaStore.getState().CellMetaMap
+                const storeAllSampleMetaData = useSampleGeneMetaStore.getState().allSampleMetaData
+
                 await setPlotData((prevData) => ({
                     ...prevData,
                     [datasetId]: {
                         ...prevData[datasetId],
-                        allCellMetaData: allCellMetaData,
-                        CellMetaMap: CellMetaMap,
-                        allSampleMetaData: allSampleMetaData,
+                        allCellMetaData: storeAllCellMetaData,
+                        CellMetaMap: storeCellMetaMap,
+                        allSampleMetaData: storeAllSampleMetaData,
                     },
                 }))
             }
