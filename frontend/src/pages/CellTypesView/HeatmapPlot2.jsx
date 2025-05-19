@@ -84,7 +84,7 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
         const allSamples = [...cond1Samples, ...cond2Samples]
 
         // Create z-values matrix (expression values)
-        const zValues = genes.map((gene) => {
+        const exprValues = genes.map((gene) => {
             return allSamples.map((sampleId) => {
                 const sampleExp = gene.expression.find((exp) => exp.sampleId === sampleId)
                 return sampleExp ? sampleExp.value : 0
@@ -92,7 +92,7 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
         })
 
         // Z-score normalize the expression values for better visualization
-        const normalizedZValues = zValues.map((row) => {
+        const ZValues = exprValues.map((row) => {
             const mean = row.reduce((sum, val) => sum + val, 0) / row.length
             const stdDev = Math.sqrt(row.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / row.length)
             return row.map((val) => (val - mean) / (stdDev || 1)) // Avoid division by zero
@@ -148,11 +148,14 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
 
         // Create heatmap trace
         const trace = {
-            z: normalizedZValues,
+            z: ZValues,
             x: allSamples,
             y: geneNames,
             type: "heatmap",
             colorscale: "RdBu_r", // Red for high values, blue for low values
+            zmid:0,
+            zmin:-6,
+            zmax:6,
             colorbar: {
                 orientation: 'h',
                 title: { text: "Z-score",side: 'right' },
@@ -188,6 +191,8 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
                     title: { text: "log2FC", side: "top",},
                     len: 0.5,
                     thickness: 15,
+                    tickvals: [-2, -1, 0, 1, 2],
+                    ticktext: ["-2", "-1", "0", "1", "2+"],
                     x: 1.0, // Position at the right edge
                     xpad: 0,
                     ypad: 0,
