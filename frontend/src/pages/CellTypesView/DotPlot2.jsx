@@ -109,7 +109,7 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
                 color: colorValues,
                 colorscale: "Viridis", // Use a color scale that works well for expression data
                 colorbar: {
-                    title: "AvgExpr",
+                    // title: { text: "AvgExpr", side: "top",font: { size: 12 } },
                     thickness: 15,
                     tickvals: [0, 2, 4, 6],
                     ticktext: ["0", "2", "4", "6+"],
@@ -176,7 +176,12 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
 
 
         const layout = {
-            title: `Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} cell types)`,
+            title: {text:`Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} cell types)`},
+            grid: {
+                rows: 1,
+                columns: 2,
+                pattern: "independent",
+            },
             xaxis: {
                 title: "Cell Types",
                 tickangle: 90,
@@ -186,7 +191,7 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
                 zeroline: true,
                 showgrid: true,
                 showline: true,
-                domain: [0, 0.9], // Make more room for the legend on the right
+                domain: [0, 0.94], // Make more room for the legend on the right
             },
             yaxis: {
                 title: "Genes",
@@ -211,7 +216,7 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
                 l: 100,
                 r: 50, // Increase right margin to accommodate the size legend
                 b: 100,
-                t: 0,
+                t: 30,
                 pad: 4,
             },
             height: Math.max(400, uniqueGeneNames.length * 25 + 120), // Dynamic height based on number of genes
@@ -219,8 +224,8 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
             hovermode: "closest",
             annotations: annotations,
             // Adjust the plot padding
-            plot_bgcolor: "rgba(0,0,0,0)",
-            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(255,0,0,0)",
+            paper_bgcolor: "rgba(0,255,0,0)",
             bargap: 0,
             bargroupgap: 0,
         }
