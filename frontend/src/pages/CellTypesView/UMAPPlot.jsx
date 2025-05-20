@@ -5,7 +5,7 @@ import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
 const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected, mainCluster}) => {
-    // console.log("UMAPPlot", umapData, metaData, selectedCellTypes, isAllCellTypesSelected)
+    console.log("UMAPPlot", umapData, metaData, selectedCellTypes, isAllCellTypesSelected, mainCluster)
     const plotRef = useRef(null)
 
     const {cell_metadata, sample_metadata, cell_metadata_mapping} = metaData

@@ -169,12 +169,12 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
 
         // Create dot plot trace for statistical significance and fold change
         const dotSizes = genes.map((gene) => {
-            // Convert p-value to -10*log10(p) for dot size
+            // Convert p-value to -log10(p) for dot size
             // Handle p-values of 0 by setting a maximum value
             const pValue = gene.p_val_adj || 0.000001 // Default to a small value if missing
-            const negLogP = -10 * Math.log10(Math.max(pValue, 1e-10))
+            const negLogP = -Math.log10(Math.max(pValue, 1e-10))
             // Scale the size for better visualization (adjust as needed)
-            return Math.min(Math.max(negLogP, 1), 10)
+            return Math.min(Math.max(negLogP, 1), 10) * 0.5
         })
 
         const dotColors = genes.map((gene) => gene.avg_log2FC)
@@ -209,8 +209,8 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
                 (gene) =>
                     `Gene: ${gene.gene}<br>` +
                     `log2FC: ${gene.avg_log2FC.toFixed(2)}<br>` +
-                    `p-value: ${gene.p_val_adj.toExponential(2)}<br>` +
-                    `-10*log10(p): ${(-10 * Math.log10(Math.max(gene.p_val_adj, 1e-10))).toFixed(2)}`,
+                    `p.adj: ${gene.p_val_adj.toExponential(2)}<br>` +
+                    `-log10(p): ${(-Math.log10(Math.max(gene.p_val_adj, 1e-10))).toFixed(2)}`,
             ),
             xaxis: "x2",
         }
@@ -351,7 +351,7 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
                             marginRight: "5px",
                         }}
                     ></div>
-                    <span>Dot size: -log10(p-adj)</span>
+                    <span>Dot size: -log10(p.adj)</span>
                 </div>
             </div>
 

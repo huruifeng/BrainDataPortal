@@ -122,7 +122,53 @@ def get_marker_genes(dataset):
         print(markergene_file + " not found")
         return "Error: Marker Genes file not found"
 
-def get_degs_celltype(dataset, celltype):
+def get_degs_celllevel(dataset, celltype):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+    else:
+        degs_file = os.path.join("backend", "datasets", dataset, 'clustermarkers', 'cluster_DEGs_topN.csv')
+
+    if os.path.exists(degs_file):
+        degs_df = pd.read_csv(degs_file, index_col=None, header=0)
+        degs_df = degs_df.loc[degs_df["cluster_DE"].str.startswith(celltype),["cluster_DE","gene","avg_log2FC","p_val_adj"]]
+
+        ## keep only 4 digits for avg_log2FC
+        degs_df["avg_log2FC"] = degs_df["avg_log2FC"].round(4)
+        degs_df["p_val_adj"] = degs_df["p_val_adj"].round(4)
+
+        ## split cluster_DE into cluster name and DE
+        degs_df["DE"] = [i.split(".")[1] for i in degs_df["cluster_DE"].tolist()]
+        degs_df = degs_df.drop("cluster_DE", axis=1)
+
+        ## group by DE
+        degs_groups = degs_df.groupby("DE").apply(lambda g: g.drop("DE", axis=1).to_dict(orient='records')).to_dict()
+
+        ## get gene expression data for each DE,format: [{sampleId: 'cell1/spot1', condition: 'PD', value: 8.1053},...]
+        cluster_meta = pd.read_csv(os.path.join("backend", "datasets", dataset, 'cellspot_metadata_original.csv'), index_col=0, header=0)
+        main_cluster = get_config_info(dataset)["meta_features"]["main_cluster_column"]
+        cluster_meta = cluster_meta.loc[cluster_meta[main_cluster]==celltype,:]
+        cs_ids = cluster_meta.index.tolist()
+
+        for DE, degs in degs_groups.items():
+            for deg in degs:
+                expression = []
+                gene_name = deg["gene"]
+                expr_vals = get_expr_data(dataset, gene_name)
+
+                for cs_i in cs_ids:
+                    condation = cluster_meta.loc[cs_i,"Condition"]
+                    if condation not in DE:
+                        continue
+                    expr_val = expr_vals[cs_i] if cs_i in expr_vals else 0
+                    expression.append({"sampleId": cs_i, "condition": condation, "value": expr_val})
+                deg['expression'] = expression
+
+        return degs_groups
+    else:
+        print(degs_file + " not found")
+        return "Error: DEGs file not found"
+
+def get_degs_pseudobulk(dataset, celltype):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
