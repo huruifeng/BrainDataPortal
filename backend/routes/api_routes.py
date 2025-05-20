@@ -62,9 +62,6 @@ async def getmainclusterinfo(request:Request):
     if main_cluster is None or main_cluster == "":
         raise HTTPException(status_code=404, detail="Error in getting main cluster info.")
 
-    if main_cluster in response['meta_features']["rename_features"]:
-        main_cluster = response['meta_features']["rename_features"][main_cluster]
-
     return main_cluster
 
 @router.get("/getcelltypelist")

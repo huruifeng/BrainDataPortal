@@ -174,7 +174,7 @@ function CellTypesView() {
                                 )
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Select Cell Type" variant="standard"/>}
+                        renderInput={(params) => <TextField {...params} label="Select a cluster" variant="standard"/>}
                     />
 
                     {/* a button to fetch data and a loading indicator*/}
