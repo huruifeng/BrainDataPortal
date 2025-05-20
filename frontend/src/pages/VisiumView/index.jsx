@@ -77,14 +77,11 @@ function VisiumView() {
         const initialSelectedSamples = urlSamples.length ? urlSamples : defaultSamples;
         const initialSelectedGenes = urlGenes.length ? urlGenes : defaultGenes;
 
-        if(selectedMetaFeatures.length === 0 && datasetId !== "") {
-            setSelectedMetaFeatures(defaultFeatures);
-        }
-
         useSampleGeneMetaStore.setState({
             selectedSamples: initialSelectedSamples,
             selectedGenes: initialSelectedGenes
         });
+        setSelectedMetaFeatures(defaultFeatures);
 
         fetchExprData(); // Fetch data once after both are set
         fetchImageData();

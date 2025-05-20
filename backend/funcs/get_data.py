@@ -295,10 +295,10 @@ def get_all_metadata(dataset, cols=["all"], rows=["all"]):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=0, header=0)
 
-            if cols and cols[0]!= "all":
+            if cols and cols[0]!= "all" and cols[0] != "":
                 data_df = data_df.loc[:,cols]
 
-            if rows and rows[0] != "umap":
+            if rows and rows[0] == "umap":
                 uamp_rows = get_umapembedding(dataset)
                 data_df = data_df.loc[[r[0] for r in uamp_rows],:]
 
