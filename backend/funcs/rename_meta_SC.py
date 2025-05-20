@@ -4,7 +4,7 @@ import json
 import os
 import sys
 
-from backend.funcs.utils import  is_categorical, dumps_compact_lists
+from utils.funcs import is_categorical, dumps_compact_lists
 
 import functools
 print = functools.partial(print, flush=True)
@@ -13,11 +13,19 @@ print("============================================")
 # %% ==============================
 # Get the arguments
 dataset_path = sys.argv[1]
-# dataset_name = "SC_data"
 kept_features = sys.argv[2].split(",")
 sample_col = sys.argv[3]
 cluster_col = sys.argv[4]
 condition_col = sys.argv[5]
+
+print("Dataset path: ", dataset_path)
+print("Kept features: ", kept_features)
+print("Sample column: ", sample_col)
+print("Cluster column: ", cluster_col)
+print("Condition column: ", condition_col)
+print("============================================")
+
+# %% ==============================
 
 print("Checking inputs...")
 if sample_col not in kept_features:
@@ -27,9 +35,19 @@ if cluster_col not in kept_features:
 if condition_col not in kept_features:
     kept_features.append(condition_col)
 
+
 print("Loading metadata...")
 metadata = pd.read_csv(dataset_path + "/raw_metadata.csv", index_col=0, header=0)
 metadata = metadata.loc[:, kept_features]
+
+
+metadata = metadata.rename(columns={condition_col: "Condition"})
+kept_features.remove(condition_col)
+kept_features.append("Condition")
+
+## if the column data is float, keep 2 digits after the decimal point
+# Round only float columns to 2 decimal places
+metadata[metadata.select_dtypes(include=['float']).columns] = metadata.select_dtypes(include=['float']).round(2)
 
 ## check if "sample_id" column exists
 if "sample_id" != sample_col:
@@ -69,6 +87,10 @@ with open(f"{dataset_path}/cellspot_to_sample.json", "w") as f:
 # %% ==============================================
 ## Process cell metadata
 print("Processing cell metadata...")
+
+## save original metadata
+metadata.loc[:,kept_features].to_csv(dataset_path + "/cellspot_metadata_original.csv")
+
 sample_level_features = []
 cell_level_features = []
 sample_groups = metadata.groupby("sample_id")
@@ -81,6 +103,7 @@ for feature in kept_features:
 
 cell_meta_list = cell_level_features
 metadata_lite = metadata.loc[:, cell_meta_list]
+
 cell_meta_mapping = {}
 for cell_meta in cell_meta_list:
     # Check if the column is categorical
@@ -94,7 +117,7 @@ for cell_meta in cell_meta_list:
         metadata_lite[cell_meta] = cat_series.cat.codes
 
         # Store mapping, and calculate the number of cells in each category
-        mapping = {i: [cat, cat_counts[cat]] for i, cat in enumerate(cat_series.cat.categories)}
+        mapping = {i: [cat, cat_counts[cat]] for i, cat in enumerate(cat_series.cat.categories)} ## with counts
         cell_meta_mapping[cell_meta] = mapping
 
 # Save mapping to JSON
@@ -108,6 +131,7 @@ sample_meta_list = sample_level_features
 sample_meta = metadata.loc[:, sample_meta_list]
 sample_meta = sample_meta.drop_duplicates()
 sample_meta = sample_meta.set_index("sample_id")
+sample_meta.fillna("", inplace=True)
 sample_meta.to_csv(dataset_path + "/sample_metadata.csv")
 
 with open(dataset_path + "/meta_list.json", "w") as f:
@@ -141,6 +165,7 @@ sample_rows = 50000 if n_rows > 50000 else n_rows
 embeddings_data_nk = embeddings_data.sample(n=sample_rows, random_state=42)
 embeddings_data_nk.to_csv(dataset_path + "/umap_embeddings_50k.csv", index_label="cs_id")
 
+
 # %% ============================================================================
 ## Process expression data
 print("Loading expression data...(Takes a while...be patient...)")
@@ -155,13 +180,13 @@ expression_data.drop("Cell", axis=1, inplace=True)
 expression_data["Expression"] = expression_data["Expression"].round(2)
 
 # %% ============================================================================
-## Save gene jsons
-print("Saving gene jsons...")
-expression_data["sample_id"] = expression_data["cs_id"].map(cell_to_sample)
-
 # Group data by gene
 print("Grouping by gene... be patient...")
 grouped_by_gene = expression_data.groupby("Gene")
+
+## Save gene jsons
+print("Saving gene jsons...")
+expression_data["sample_id"] = expression_data["cs_id"].map(cell_to_sample)
 
 all_genes = grouped_by_gene.groups.keys()
 all_genes = [gene_i.replace("/", "_") for gene_i in list(set(all_genes))]

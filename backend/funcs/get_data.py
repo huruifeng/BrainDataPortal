@@ -358,3 +358,14 @@ def get_visium_coordinates(dataset, sample):
     return {"coordinates": coordinates, "scales": scales}
     # else:
     #     return "Error: Image file not found"
+
+def get_visium_defaults(dataset):
+    if dataset == "all":
+        return "Error: Dataset is not specified."
+
+    config_info = get_config_info(dataset)
+    if config_info and "visium_defaults" in config_info:
+        data = config_info["visium_defaults"]
+        return data
+    else:
+        return f"Error: visium_defaults file not found."

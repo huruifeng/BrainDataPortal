@@ -21,20 +21,22 @@ import useDataStore from "../../store/DatatableStore.js";
 import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
 import CanvasFeaturePlot from "./VisiumCanvasPlot.jsx";
 import PlotlyFeaturePlot from "./VisiumPlotlyPlot.jsx";
+import useVisiumStore from "../../store/VisiumStore.jsx";
 
 function VisiumView() {
 
     // Get all the pre-selected values
     const [queryParams, setQueryParams] = useSearchParams();
-    const initialGenes = queryParams.getAll("gene") ?? [];
-    const initialSamples = queryParams.getAll("sample") ?? [];
-    const initialMetas = queryParams.getAll("meta") ?? ["smoothed_label_s5"];
-    const initialDataset = queryParams.get("dataset") ?? "";
+    const urlGenes = queryParams.getAll("gene") ?? [];
+    const urlSamples = queryParams.getAll("sample") ?? [];
+    const urlMetas = queryParams.getAll("meta") ?? [];
+    const urlDataset = queryParams.get("dataset") ?? "";
 
     const {datasetRecords, fetchDatasetList} = useDataStore()
     useEffect(() => {
         fetchDatasetList()
     }, [])
+
     const datasetOptions = []
     datasetRecords.map((d) => {
         if (d.assay.toLowerCase() === "visiumst") {
@@ -42,7 +44,7 @@ function VisiumView() {
         }
     })
 
-    const [datasetId, setDatasetId] = useState(initialDataset)
+    const [datasetId, setDatasetId] = useState(urlDataset)
     const [datasetSearchText, setDatasetSearchText] = useState("")
 
 
@@ -60,17 +62,24 @@ function VisiumView() {
         imageDataDict, fetchImageData
     } = useSampleGeneMetaStore();
     const {loading, error} = useSampleGeneMetaStore();
+    const {defaultSamples, defaultFeatures, defaultGenes, fetchVisiumDefaults}  = useVisiumStore()
 
-    const [selectedMetaFeatures, setSelectedMetaFeatures] = useState(initialMetas);
+    const [selectedMetaFeatures, setSelectedMetaFeatures] = useState(urlMetas);
 
     useEffect(() => {
-        const initialSelectedSamples = initialSamples.length ? initialSamples : [];
-        const initialSelectedGenes = initialGenes.length ? initialGenes : [];
-
         setDataset(datasetId);
         fetchSampleList(datasetId);
         fetchGeneList(datasetId);
         fetchMetaList(datasetId);
+
+        fetchVisiumDefaults(datasetId);
+
+        const initialSelectedSamples = urlSamples.length ? urlSamples : defaultSamples;
+        const initialSelectedGenes = urlGenes.length ? urlGenes : defaultGenes;
+
+        if(selectedMetaFeatures.length === 0 && datasetId !== "") {
+            setSelectedMetaFeatures(defaultFeatures);
+        }
 
         useSampleGeneMetaStore.setState({
             selectedSamples: initialSelectedSamples,
@@ -148,7 +157,7 @@ function VisiumView() {
         fetchMetaDataOfSample();
     }
     const selectedFeatures = [...new Set([...selectedGenes, ...selectedMetaFeatures])];
-    // console.log(selectedFeatures);
+    console.log("selectedFeatures:", selectedFeatures);
     const plotClass = Object.keys(selectedFeatures).length <= 1
         ? "single-plot" : Object.keys(selectedFeatures).length === 2
             ? "two-plots" : Object.keys(selectedFeatures).length === 3
@@ -319,7 +328,8 @@ function VisiumView() {
                                         <Box display="flex" alignItems="center" justifyContent="center" sx={{mb: 1}}>
                                             <Typography variant="subtitle1">Sample: {sample_i}</Typography>
                                             <div>&nbsp;&nbsp;</div>
-                                            (<Link href={`/gsMAP/${sample_i}_PD_gsMap_Report.html`} target="_blank" rel="noopener" underline="hover">View gsMAP</Link>)
+                                            (<Link href={`/gsMAP/${sample_i}_PD_gsMap_Report.html`} target="_blank"
+                                                   rel="noopener" underline="hover">View gsMAP</Link>)
                                         </Box>
                                     </div>
 

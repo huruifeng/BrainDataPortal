@@ -10,17 +10,20 @@ library(data.table)
 library(Seurat)
 library(tidyverse)
 library(jsonlite)
+library(presto)
 
 cat("===================================================\n")
 # Check if the script is run with the correct number of arguments
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 2) {
+if (length(args) != 3) {
   stop("Please provide the Seurat object file and output directory as arguments.")
 }
 
 # Get the arguments
 seurat_obj_file <- args[1]
 output_dir <- args[2]
+cluster_col <- args[3]
+
 
 # Check if the output directory exists, if not create it
 if (!dir.exists(output_dir)) {
@@ -37,6 +40,8 @@ if (!inherits(seurat_obj, "Seurat")) {
   stop("The provided file is not a valid Seurat object.")
 }
 capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure.txt"))
+
+# seurat_obj@meta.data$SubCellTypes <- seurat_obj@meta.data$Complex_Assignment
 
 # Check if the Seurat object has the necessary assay
 if (!"RNA" %in% names(seurat_obj@assays)) {
@@ -55,6 +60,11 @@ if (!"meta.data" %in% slotNames(seurat_obj)) {
 ## Check if the Seurat object has the necessary umap embedding
 if (!"umap" %in% names(seurat_obj@reductions)) {
   stop("The Seurat object does not contain the 'umap' reduction.")
+}
+
+# Check if the cluster column exists in the metadata
+if (!cluster_col %in% colnames(seurat_obj@meta.data)) {
+  stop(paste("The cluster column", cluster_col, "does not exist in the metadata."))
 }
 
 ## ===================================================
@@ -100,6 +110,7 @@ nonzero_data <- long_data[long_data$Expression > 0, ]
 nonzero_data <- as.data.table(nonzero_data)
 # Save to CSV with index as the first column in a fast way
 fwrite(nonzero_data, file = paste0(output_dir, "/raw_normalized_counts.csv"), row.names = FALSE)
+
 
 cat("Done! Data extraction is done! ^_^ ...\n")
 
