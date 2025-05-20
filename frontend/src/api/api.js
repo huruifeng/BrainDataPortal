@@ -127,7 +127,7 @@ export const getAllSampleMetaData = async (dataset) => {
 }
 
 
-export const getAllMetaData = async (dataset_id="all",cols=["all"], rows=["all"]) => {
+export const getAllMetaData = async (dataset_id="all", cols=["all"], rows=["all"]) => {
     try {
         const response = await axios.get(`${API_URL}/getallmetadata`,
             {params: {dataset_id: dataset_id, cols: cols,  rows: rows}});

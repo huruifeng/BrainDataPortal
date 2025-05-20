@@ -235,7 +235,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         // Use a non-blocking approach
         try {
             // Start the request but don't await it here
-            const response = await getAllMetaData(dataset_id, ["all"], rows)
+            const response = await getAllMetaData(dataset_id, cols, rows)
 
             // Handle the response when it completes
             console.log(response.data)

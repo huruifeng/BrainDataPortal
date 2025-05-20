@@ -148,8 +148,8 @@ async def getpseudoexprdata(request:Request):
 @router.get("/getallmetadata")
 async def getallmetadata(request:Request):
     dataset = request.query_params.get("dataset_id")
-    cols = request.query_params.getlist ("cols")
-    rows = request.query_params.getlist("rows")
+    cols = request.query_params.getlist ("cols[]")
+    rows = request.query_params.getlist("rows[]")
     print(f"getallmetadata({dataset},{cols},{rows}) called================")
 
     metadata = get_all_metadata(dataset, cols=cols, rows=rows)
