@@ -150,17 +150,11 @@ async def getpseudoexprdata(request:Request):
 @router.get("/getallmetadata")
 async def getallmetadata(request:Request):
     dataset = request.query_params.get("dataset_id")
-    dataset_type = request.query_params.get("dataset_type")
-    features = request.query_params.getlist ("features")
-    print(f"getallmetadata({dataset},{dataset_type},{features}) called================")
+    cols = request.query_params.getlist ("cols")
+    rows = request.query_params.getlist("rows")
+    print(f"getallmetadata({dataset},{cols},{rows}) called================")
 
-
-    if dataset_type == "visiumst":
-        drop_cols = ["UMAP_1", "UMAP_2"]
-    else:
-        drop_cols = None
-
-    metadata = get_all_metadata(dataset, drop_cols=drop_cols, keep_cols=features)
+    metadata = get_all_metadata(dataset, cols=cols, rows=rows)
 
     if "Error" in metadata:
         raise HTTPException(status_code=404, detail=metadata)

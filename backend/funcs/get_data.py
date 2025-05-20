@@ -201,7 +201,7 @@ def get_sample_metadata(dataset, samples=["all"], meta="all"):
     else:
         return f"Error: Meta file not found."
 
-def get_metadata_of_sample(dataset, sample="all", meta="all"):
+def get_metadata_of_sample(dataset, sample="all", features="all"):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
@@ -210,9 +210,9 @@ def get_metadata_of_sample(dataset, sample="all", meta="all"):
         data_df = pd.read_csv(meta_file, index_col=0, header=0)
         if(sample != "all"):
             data_df = data_df.loc[data_df.index.str.startswith(sample),:]
-        if(meta != "all"):
-            data_df = data_df[meta]
-        cell_metadata = data_df.to_dict(orient="index")
+        if(features != "all"):
+            data_df = data_df[features]
+        cell_metadata = data_df.to_dict(orient="split")
 
         # get sample metadata
         sample_metadata = get_sample_metadata(dataset)
@@ -240,7 +240,7 @@ def get_metadata_mapping(dataset):
         return f"Error: cell_metadata_mapping file not found."
 
 
-def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
+def get_all_metadata(dataset, cols=["all"], rows=["all"]):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
@@ -248,11 +248,13 @@ def get_all_metadata(dataset, drop_cols=None, keep_cols=["all"]):
     if os.path.exists(meta_file):
         with open(meta_file, 'r') as f:
             data_df = pd.read_csv(meta_file, index_col=0, header=0)
-            if drop_cols is not None:
-                data_df = data_df.drop(drop_cols, axis=1)
 
-            if keep_cols and keep_cols[0] != "all":
-                data_df = data_df.loc[:,keep_cols]
+            if cols and cols[0]!= "all":
+                data_df = data_df.loc[:,cols]
+
+            if rows and rows[0] != "umap":
+                uamp_rows = get_umapembedding(dataset)
+                data_df = data_df.loc[[r[0] for r in uamp_rows],:]
 
             data_df = data_df.fillna('')
             cell_metadata = data_df.to_dict(orient="split")

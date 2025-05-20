@@ -200,7 +200,7 @@ function XDatasetsView() {
 
             // Only fetch metadata once per dataset
             if (!plotData[datasetId]?.allCellMetaData) {
-                await fetchAllMetaData(datasetId)
+                await fetchAllMetaData(datasetId, "umap")
 
                 // Store the actual data from the store
                 const storeAllCellMetaData = useSampleGeneMetaStore.getState().allCellMetaData;

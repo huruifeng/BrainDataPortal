@@ -180,7 +180,17 @@ const useSampleGeneMetaStore = create((set, get) => ({
                 if (sample === "all") continue
                 if (!get().sampleMetaDict[sample]) {
                     const response = await getMetaDataOfSample(dataset_id, sample)
-                    set({sampleMetaDict: {...get().sampleMetaDict, [sample]: response.data}})
+                    set({
+                        sampleMetaDict:
+                            {
+                                ...get().sampleMetaDict,
+                                [sample]: {
+                                    "cell_metadata":transformSplitFormat(response.data.cell_metadata),
+                                    "sample_metadata":response.data.sample_metadata,
+                                    "cell_metadata_mapping":response.data.cell_metadata_mapping
+                                }
+                            }
+                    })
                 }
             }
         } catch (error) {
@@ -205,7 +215,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
     },
 
     // In useSampleGeneMetaStore
-    fetchAllMetaData: async (dataset_id = null) => {
+    fetchAllMetaData: async (dataset_id = null, cols = ["all"], rows = ["all"]) => {
         // Set a specific loading state for metadata
         set((state) => ({
             allCellMetaData: {},
@@ -225,7 +235,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         // Use a non-blocking approach
         try {
             // Start the request but don't await it here
-            const response = await getAllMetaData(dataset_id)
+            const response = await getAllMetaData(dataset_id, ["all"], rows)
 
             // Handle the response when it completes
             console.log(response.data)
