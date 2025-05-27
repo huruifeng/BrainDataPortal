@@ -17,12 +17,16 @@ const useCellTypeStore = create((set, get) => ({
     error: null,
 
     // Actions
+
     setSelectedCellTypes: (cellTypes) => set({selectedCellTypes: cellTypes}),
+
+    setMainCluster: async (cluster) => await set({mainCluster: cluster}),
+    getMainCluster: async () => await get().mainCluster,
 
     fetchMainClsuterInfo: async (dataset_id) => {
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchMainClsuterInfo: No dataset selected"});
-            return;
+            return [];
         }
         try {
             set({loading: true})
@@ -30,13 +34,16 @@ const useCellTypeStore = create((set, get) => ({
             if (response.status === 200) {
                 const data = await response.data;
                 await set({mainCluster: data, loading: false, error: null});
+                return data
             } else {
                 const error_message = "Error fetching main cluster info: " + response.message;
                 await set({mainCluster: [], error: error_message, loading: false});
                 toast.error(response.message);
+                return []
             }
         } catch (error) {
             set({error: error.message, loading: false})
+            return []
         }
     },
 
@@ -122,7 +129,7 @@ const useCellTypeStore = create((set, get) => ({
             const selectedCellTypes = get().selectedCellTypes
 
             if (selectedCellTypes.length === 0) {
-                set({error: "fetchDiffExpGenes: No cell types selected", loading: false});
+                set({diffExpGenes: {}, loading: false});
                 return;
             }
 

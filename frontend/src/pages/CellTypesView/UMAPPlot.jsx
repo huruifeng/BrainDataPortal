@@ -13,7 +13,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
         Object.entries(cell_metadata??{}).map(([cs_id, csObj]) => {
             const newSubObj = {...csObj};  // shallow copy of inner object
             const targetValue = csObj[mainCluster];
-            newSubObj[mainCluster] = cell_metadata_mapping[mainCluster][targetValue]?.[0];
+            newSubObj[mainCluster] = cell_metadata_mapping[mainCluster]?.[targetValue]?.[0];
             return [cs_id, newSubObj];
         })
     );

@@ -43,8 +43,7 @@ function CellTypesView() {
     const {selectedCellTypes, setSelectedCellTypes} = useCellTypeStore()
     const {cellTypeList, fetchCellTypeList, markerGenes, fetchMarkerGenes} = useCellTypeStore()
     const {cellCounts, fetchCellCounts, diffExpGenes, fetchDiffExpGenes} = useCellTypeStore()
-    const fetchMainClsuterInfo = useCellTypeStore((state) => state.fetchMainClsuterInfo);
-    const mainCluster = useCellTypeStore((state) => state.mainCluster);
+    const {fetchMainClsuterInfo,mainCluster, getMainCluster } = useCellTypeStore()
     const {loading, error,metadataLoading } = useCellTypeStore()
 
     const [cellTypeSearchText, setCellTypeSearchText] = useState("")
@@ -52,12 +51,15 @@ function CellTypesView() {
 
     useEffect(() => {
         fetchDatasetList()
+        fetchMainClsuterInfo(selectedDataset);
     }, [])
 
     useEffect(() => {
         // Main data fetches (control loading state)
         const fetchPrimaryData = async () => {
             await fetchMainClsuterInfo(selectedDataset)
+            // update the mainCluster
+            const mainCluster = await getMainCluster()
             await fetchUMAPData(selectedDataset)
             await fetchSelectedMetaData(selectedDataset, [mainCluster])
             await fetchCellTypeList(selectedDataset)
