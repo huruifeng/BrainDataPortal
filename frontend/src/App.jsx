@@ -14,12 +14,13 @@ import Login from "./pages/Login/Login.jsx";
 import Test from "./pages/Test";
 import UnauthorizedPage from "./pages/Unauthorized/index.jsx";
 import {Bounce, ToastContainer} from "react-toastify";
-import GeneView from "./pages/GeneView";
+import GeneView from "./pages/GeneView/index.jsx";
 import VisiumView from "./pages/VisiumView";
 import XDatasetsView from "./pages/XDatasets";
 import CellTypesView from "./pages/CellTypesView";
 import ViewsHome from "./pages/ViewsHome";
 import DatasetManagePage from "./pages/DatasetManage";
+import LayerView from "./pages/LayerView/index.jsx";
 
 
 
@@ -59,6 +60,7 @@ function App() {
                       <Route path="/views/geneview" element={<GeneView />} />
                       <Route path="/views/visiumview" element={<VisiumView />} />
                       <Route path="/views/celltypes" element={<CellTypesView />} />
+                      <Route path="/views/layersview" element={<LayerView />} />
                       <Route path="/views/xcheck" element={<XDatasetsView />} />
 
                       <Route path="/datasetmanager" element={<DatasetManagePage />} />

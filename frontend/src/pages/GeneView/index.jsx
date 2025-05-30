@@ -1,36 +1,45 @@
-import {useEffect, useState} from "react";
+"use client"
+
+import {useEffect, useState} from "react"
 import {
-    Typography, Box, Divider, CircularProgress, Autocomplete,
-    Chip, TextField, Button,
-    LinearProgress, InputLabel, FormControl, Select, MenuItem
-} from "@mui/material";
-import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
-import {useSearchParams} from "react-router-dom";
+    Typography,
+    Box,
+    Divider,
+    Autocomplete,
+    Chip,
+    TextField,
+    Button,
+    LinearProgress,
+    InputLabel,
+    FormControl,
+    Select,
+    MenuItem,
+} from "@mui/material"
+import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
+import {useSearchParams} from "react-router-dom"
 
-import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js";
+import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
 
-import EChartScatterPlot from "./EChartScatter.jsx";
-import PlotlyScatterPlot from "./PlotlyScatter.jsx";
-import GeneMetaPlots from "./GenePlots.jsx";
+import EChartScatterPlot from "./EChartScatter.jsx"
+import GeneMetaPlots from "./GenePlots.jsx"
 
-import "./GeneView.css";
-import useDataStore from "../../store/DataStore.js";
-
+import "./GeneView.css"
+import useDataStore from "../../store/DatatableStore.js"
 
 function GeneView() {
-
     // Get all the pre-selected values
-    const [queryParams, setQueryParams] = useSearchParams();
-    const initialGenes = queryParams.getAll("gene");
-    const initialSamples = queryParams.getAll("sample") ?? ["all"];
-    const initialColoring = queryParams.get("color") ?? "";
-    const initialGrouping = queryParams.get("group") ?? "MajorCellTypes";
-    const initialDataset = queryParams.get("dataset") ?? "";
+    const [queryParams, setQueryParams] = useSearchParams()
+    const initialGenes = queryParams.getAll("gene")
+    const initialSamples = queryParams.getAll("sample") ?? ["all"]
+    const initialColoring = queryParams.get("color") ?? ""
+    const initialGrouping = queryParams.get("group") ?? "MajorCellTypes"
+    const initialDataset = queryParams.get("dataset") ?? ""
 
     const {datasetRecords, fetchDatasetList} = useDataStore()
     useEffect(() => {
         fetchDatasetList()
     }, [])
+
     const datasetOptions = datasetRecords.map((d) => d.dataset_id)
 
     const [datasetId, setDatasetId] = useState(initialDataset)
@@ -39,80 +48,81 @@ function GeneView() {
     // Prepare all the  data
     const {
         setDataset,
-        geneList, fetchGeneList,
-        sampleList, fetchSampleList,
-        metaList, fetchMetaList,
-        umapData, fetchUMAPData
-    } = useSampleGeneMetaStore();
-    const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore();
-    const {allMetaData, fetchAllMetaData, exprDataDict, fetchExprData} = useSampleGeneMetaStore();
-    const {loading, error} = useSampleGeneMetaStore();
-    const [coloring, setColoring] = useState(initialColoring);
-    const [grouping, setGrouping] = useState(initialGrouping);
+        geneList,
+        fetchGeneList,
+        sampleList,
+        fetchSampleList,
+        metaList,
+        fetchMetaList,
+        umapData,
+        fetchUMAPData,
+    } = useSampleGeneMetaStore()
 
-    const [exprValueType, setExprValueType] = useState("celllevel");
+    const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore()
+    const {allCellMetaData, fetchAllMetaData, exprDataDict, fetchExprData} = useSampleGeneMetaStore()
+    const {allSampleMetaData, CellMetaMap} = useSampleGeneMetaStore()
+    const {metadataLoading, loading, error} = useSampleGeneMetaStore()
+    const [coloring, setColoring] = useState(initialColoring)
+    const [grouping, setGrouping] = useState(initialGrouping)
+
+    const [exprValueType, setExprValueType] = useState("celllevel")
 
     useEffect(() => {
-
-        // Main data fetches (control loading state)
+        // Load these in parallel immediately
         const fetchPrimaryData = async () => {
             await fetchUMAPData(datasetId);
-            await fetchGeneList(datasetId);
-            await fetchSampleList(datasetId);
-            await fetchMetaList(datasetId);
-        };
+            await fetchGeneList(datasetId)
+            await fetchSampleList(datasetId)
+            await fetchMetaList(datasetId)
+            await fetchExprData(datasetId);
+            await fetchAllMetaData(datasetId);
+        }
+        fetchPrimaryData()
+    }, [datasetId])
 
-        fetchPrimaryData();
+    const sampleOptions = sampleList.map((sample) => sample)
+    sampleOptions.unshift("all")
 
-    }, [datasetId]);
-
-    const sampleOptions = sampleList.map((sample) => sample);
-    sampleOptions.unshift("all");
-
-    const [geneSearchText, setGeneSearchText] = useState("");
-    const [sampleSearchText, setSampleSearchText] = useState("");
+    const [geneSearchText, setGeneSearchText] = useState("")
+    const [sampleSearchText, setSampleSearchText] = useState("")
 
     useEffect(() => {
-        const initialSelectedSamples = initialSamples.length ? initialSamples : [];
-        const initialSelectedGenes = initialGenes.length ? initialGenes : [];
+        const initialSelectedSamples = initialSamples.length ? initialSamples : []
+        const initialSelectedGenes = initialGenes.length ? initialGenes : []
 
-        setDataset(datasetId);
+        setDataset(datasetId)
 
         useSampleGeneMetaStore.setState({
             selectedSamples: initialSelectedSamples,
-            selectedGenes: initialSelectedGenes
-        });
-        // fetchExprData(datasetId); // Fetch data once after both are set
-        // fetchAllMetaData(datasetId);
+            selectedGenes: initialSelectedGenes,
+        })
+    }, [])
 
-    }, []);
-
-    useEffect(() => {
-        fetchExprData(datasetId);
-        fetchAllMetaData(datasetId);
-    }, [datasetId]);
+    // useEffect(() => {
+    //     fetchExprData(datasetId);
+    //     fetchAllMetaData(datasetId);
+    // }, [datasetId])
 
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             if (geneSearchText.length >= 3) {
-                fetchGeneList(datasetId, geneSearchText);
+                fetchGeneList(datasetId, geneSearchText)
             }
-        }, 300); // adjust debounce delay if needed
+        }, 300) // adjust debounce delay if needed
 
-        return () => clearTimeout(delayDebounce);
-    }, [geneSearchText, datasetId]);
-
+        return () => clearTimeout(delayDebounce)
+    }, [geneSearchText, datasetId])
 
     /** Updates the query parameters in the URL */
     const updateQueryParams = (dataset, genes, samples, color = null, group = null) => {
-        const newParams = new URLSearchParams();
+        const newParams = new URLSearchParams()
         dataset && newParams.set("dataset", dataset)
-        genes.forEach((gene) => newParams.append("gene", gene));
-        samples.forEach((sample) => newParams.append("sample", sample));
-        if (color) newParams.append("color", color);
-        if (group) newParams.append("group", group);
-        setQueryParams(newParams);
-    };
+        genes.forEach((gene) => newParams.append("gene", gene))
+        samples.forEach((sample) => newParams.append("sample", sample))
+        if (color) newParams.append("color", color)
+        if (group) newParams.append("group", group)
+        setQueryParams(newParams)
+    }
 
     const handleDatasetChange = (event, newValue) => {
         setDataset(newValue)
@@ -122,53 +132,60 @@ function GeneView() {
 
     /** Handles sample selection change */
     const handleSampleChange = (event, newValue) => {
-        setSelectedSamples(newValue);
-        updateQueryParams(datasetId, selectedGenes, newValue); // Pass the new value instead of old state
-    };
+        setSelectedSamples(newValue)
+        updateQueryParams(datasetId, selectedGenes, newValue) // Pass the new value instead of old state
+    }
 
     /** Handles gene selection change */
     const handleGeneChange = (event, newValue) => {
-        setSelectedGenes(newValue);
-        updateQueryParams(datasetId, newValue, selectedSamples); // Pass the new value instead of old state
-        fetchExprData();
-    };
+        setSelectedGenes(newValue)
+        updateQueryParams(datasetId, newValue, selectedSamples) // Pass the new value instead of old state
+        fetchExprData()
+    }
 
     const handleGeneDelete = (delGene) => {
-        const newGenes = selectedGenes.filter(g => g !== delGene);
-        setSelectedGenes(newGenes);
-        updateQueryParams(datasetId, newGenes, selectedSamples);
-        fetchExprData();
+        const newGenes = selectedGenes.filter((g) => g !== delGene)
+        setSelectedGenes(newGenes)
+        updateQueryParams(datasetId, newGenes, selectedSamples)
+        fetchExprData(datasetId)
     }
 
     // click the button to fetch umap data
     const handleLoadPlot = () => {
         setDataset(datasetId)
-        fetchExprData();
+        fetchAllMetaData(datasetId)
+        fetchExprData(datasetId)
     }
 
     const handleGroupingChange = (event) => {
-        setGrouping(event.target.value);
-        updateQueryParams(datasetId, selectedGenes, selectedSamples, coloring, event.target.value);
+        setGrouping(event.target.value)
+        updateQueryParams(datasetId, selectedGenes, selectedSamples, coloring, event.target.value)
     }
 
     const handleColoringChange = (event) => {
-        setColoring(event.target.value);
-        updateQueryParams(datasetId, selectedGenes, selectedSamples, event.target.value, grouping);
+        setColoring(event.target.value)
+        updateQueryParams(datasetId, selectedGenes, selectedSamples, event.target.value, grouping)
     }
 
     const handleExprValueTypeChange = (event) => {
-        setExprValueType(event.target.value);
+        setExprValueType(event.target.value)
     }
 
-    const plotClass = selectedGenes.length <= 1
-        ? "single-plot" : selectedGenes.length === 2
-            ? "two-plots" : selectedGenes.length === 3
-                ? "three-plots" : "four-plots";
+    const plotClass =
+        selectedGenes.length <= 1
+            ? "single-plot"
+            : selectedGenes.length === 2
+                ? "two-plots"
+                : selectedGenes.length === 3
+                    ? "three-plots"
+                    : "four-plots"
 
-    const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
-    console.log("Dataset:", datasetId);
+    const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"])
+
+    // console.log("selectedGenes", selectedGenes, CellMetaMap, allCellMetaData, allSampleMetaData);
+
     return (
-        <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
+        <div className="plot-page-container" style={{display: "flex", flexDirection: "column", flex: 1}}>
             {/* Title Row */}
             <Box className="title-row">
                 <Typography variant="h6">Exploration of Gene Expression</Typography>
@@ -201,13 +218,12 @@ function GeneView() {
                         onChange={handleGeneChange}
                         inputValue={geneSearchText}
                         onInputChange={(event, newInputValue) => {
-                            // fetchGeneList(datasetId, newInputValue);
                             setGeneSearchText(newInputValue)
                         }}
-                        noOptionsText={'Input 3 letters to search'}
+                        noOptionsText={"Input 3 letters to search"}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => {
-                                const {key, ...tagProps} = getTagProps({index});
+                                const {key, ...tagProps} = getTagProps({index})
                                 return (
                                     <Chip
                                         key={`${key}-${option}`}
@@ -216,7 +232,7 @@ function GeneView() {
                                         color="primary"
                                         onDelete={() => handleGeneDelete(option)}
                                     />
-                                );
+                                )
                             })
                         }
                         renderInput={(params) => <TextField {...params} label="Search Gene" variant="standard"/>}
@@ -233,7 +249,7 @@ function GeneView() {
                         onInputChange={(event, newInputValue) => setSampleSearchText(newInputValue)}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => {
-                                const {key, ...tagProps} = getTagProps({index});
+                                const {key, ...tagProps} = getTagProps({index})
                                 return (
                                     <Chip
                                         key={`${key}-${option}`}
@@ -241,23 +257,23 @@ function GeneView() {
                                         {...tagProps}
                                         color="primary"
                                         onDelete={() => {
-                                            const newSamples = selectedSamples.filter(s => s !== option);
-                                            setSelectedSamples(newSamples);
-                                            updateQueryParams(datasetId, selectedGenes, newSamples);
+                                            const newSamples = selectedSamples.filter((s) => s !== option)
+                                            setSelectedSamples(newSamples)
+                                            updateQueryParams(datasetId, selectedGenes, newSamples)
                                         }}
                                     />
-                                );
+                                )
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Search Sample" variant="standard"
-                                                            style={{margin: "10px 0px"}}/>}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Search Sample" variant="standard"
+                                       style={{margin: "10px 0px"}}/>
+                        )}
                     />
-
 
                     <Typography sx={{marginTop: "10px", marginLeft: "20px"}} variant="subtitle1">Change plotting
                         options:</Typography>
-
-                    {selectedGenes.length === 0 ?
+                    {selectedGenes.length === 0 ? (
                         // *a dropdown to select the options on how to color the plot*/
                         <Box sx={{display: "flex", justifyContent: "start", marginBottom: "10px", marginLeft: "20px"}}>
                             <FormControl variant="standard" sx={{width: "100%"}}>
@@ -272,23 +288,21 @@ function GeneView() {
                                 >
                                     {metaList && metaList.length > 0 ? (
                                         metaList
-                                        .filter(option => !excludedKeys.has(option)) // Remove excluded keys first
-                                        .map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))
-                                    ) : (
-                                        <MenuItem
-                                            disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>
-                                    )}
+                                        .filter((option) => !excludedKeys.has(option)) // Remove excluded keys first
+                                        .map((option) => (<MenuItem key={option} value={option}>{option}</MenuItem>))
+                                    ) : (<MenuItem
+                                        disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Box>
-                        :
+                    ) : (
                         /*a dropdown to select the options on how to group the data*/
                         <>
                             <Box sx={{
                                 display: "flex",
                                 justifyContent: "start",
                                 marginBottom: "10px",
-                                marginLeft: "20px"
+                                marginLeft: "20px",
                             }}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
                                     <InputLabel id="grouping-label">Gene grouping</InputLabel>
@@ -298,18 +312,15 @@ function GeneView() {
                                         value={grouping}
                                         onChange={handleGroupingChange}
                                         size="small"
-                                        variant="standard"
-                                    >
+                                        variant="standard">
                                         {metaList && metaList.length > 0 ? (
                                             metaList.map((option) => {
-                                                const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"]);
-                                                if (excludedKeys.has(option)) return null;
+                                                if (excludedKeys.has(option)) return null
                                                 return (<MenuItem key={option} value={option}>{option}</MenuItem>)
                                             })
-                                        ) : (
-                                            <MenuItem
-                                                disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>
-                                        )}
+                                        ) : (<MenuItem
+                                            disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)
+                                        }
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -321,48 +332,33 @@ function GeneView() {
                             }}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
                                     <InputLabel id="valuetype-select-label">Value type</InputLabel>
-                                    <Select
-                                        labelId="valuetype-select-label"
-                                        id="valuetype-select"
-                                        value={exprValueType}
-                                        label="Value type"
-                                        onChange={handleExprValueTypeChange}
-                                    >
-                                        <MenuItem value={'celllevel'}>Cell level values</MenuItem>
-                                        <MenuItem value={'pseudobulk'}>Sample level pseudobulks</MenuItem>
+                                    <Select labelId="valuetype-select-label" id="valuetype-select" value={exprValueType}
+                                            label="Value type" onChange={handleExprValueTypeChange}>
+                                        <MenuItem value={"celllevel"}>Cell level values</MenuItem>
+                                        <MenuItem value={"pseudobulk"}>Sample level pseudobulks</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
                         </>
-                    }
+                    )}
 
                     {/* a button to fetch data and a loading indicator*/}
                     <Box sx={{display: "flex", justifyContent: "center", margin: "20px 0px"}}>
                         <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading}
                                 onClick={handleLoadPlot}>
-                            {loading ? "Loading plots..." : "Refresh Plots"}
+                            {loading ? "Loading plots..." : "Load Metadata / Refresh Plots"}
                         </Button>
                     </Box>
-
                 </div>
+
                 {/* Left UMAP Plot Area (80%) */}
                 <div className="plot-main">
-                    {loading ? (
-                        <>
-                            <Box sx={{width: '100%'}}><LinearProgress/></Box>
-                            <Box sx={{
-                                display: "flex",
-                                justifyContent: "center",
-                                paddingTop: "100px"
-                            }}><CircularProgress/></Box>
-                            <Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
-                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading
-                                    data...(100k cells/spots...)</Typography>
-                            </Box>
-                        </>
-                    ) : datasetId === "" || datasetId === null || datasetId === undefined ? (
-                        <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">Please select a
-                            dataset to view</Typography>
+                    {(metadataLoading || loading) && (<Box sx={{width: "100%"}}><LinearProgress/></Box>)}
+
+                    {datasetId === "" || datasetId === null || datasetId === undefined ? (
+                        <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
+                            Please select a dataset to view
+                        </Typography>
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : Object.keys(exprDataDict).length > 0 ? (
@@ -372,37 +368,66 @@ function GeneView() {
                                 {Object.entries(exprDataDict).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {umapData && <EChartScatterPlot gene={gene} sampleList={selectedSamples}
-                                                                            umapData={umapData} exprData={expr_data}
-                                                                            metaData={allMetaData} group={coloring}/>}
-                                            {/*{umapData && <PlotlyScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} metaData={allMetaData} group={coloring}/>}*/}
+                                            {(umapData && allCellMetaData) && (
+                                                <EChartScatterPlot
+                                                    gene={gene}
+                                                    sampleList={selectedSamples}
+                                                    umapData={umapData}
+                                                    exprData={expr_data}
+                                                    cellMetaData={allCellMetaData ?? {}}
+                                                    CellMetaMap={CellMetaMap ?? {}}
+                                                    sampleMetaData={allSampleMetaData ?? {}}
+                                                    group={coloring}
+                                                    isMetaDataLoading={metadataLoading}
+                                                />
+                                            )}
+                                            {/*{umapData && <PlotlyScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} cellMetaData={allCellMetaData} group={coloring}/>}*/}
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {Object.keys(exprDataDict).length >= 1 &&
-                                <Divider sx={{marginTop: "10px"}} flexItem>Gene Expression Plots</Divider>}
+                            {Object.keys(exprDataDict).length >= 1 && (
+                                <Divider sx={{marginTop: "10px"}} flexItem>Gene Expression Plots</Divider>
+                            )}
 
                             {/*gene expression/meta plot*/}
-                            {allMetaData && <GeneMetaPlots sampleList={selectedSamples}
-                                                           exprData={exprDataDict}
-                                                           metaData={allMetaData}
-                                                           group={grouping}
-                                                           exprValueType={exprValueType}/>}
-
+                            {allCellMetaData && (
+                                <GeneMetaPlots
+                                    geneList={selectedGenes}
+                                    sampleList={selectedSamples}
+                                    exprData={exprDataDict}
+                                    cellMetaData={allCellMetaData}
+                                    sampleMetaData={allSampleMetaData}
+                                    CellMetaMap={CellMetaMap}
+                                    group={grouping}
+                                    exprValueType={exprValueType}
+                                />
+                            )}
                         </>
-
                     ) : (
                         <div className={`umap-container single-plot`}>
-                            <div key={'all_gene'} className="umap-item">
+                            <div key={"all_gene"} className="umap-item">
                                 <div className="umap-wrapper">
-                                    {umapData &&
-                                        <EChartScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData}
-                                                           exprData={{"all": "all"}} metaData={allMetaData ?? {}}
-                                                           group={coloring}/>}
-                                    {/*{umapData && <PlotlyScatterPlot gene={"all"} sampleList={selectedSamples} umapData={umapData} exprData={{"all": "all"}} metaData={allMetaData ?? {}} group={coloring}/>}*/}
+                                    {umapData && (
+                                        <EChartScatterPlot
+                                            gene={"all"}
+                                            sampleList={selectedSamples}
+                                            umapData={umapData}
+                                            exprData={{all: "all"}}
+                                            cellMetaData={allCellMetaData ?? {}}
+                                            CellMetaMap={CellMetaMap ?? {}}
+                                            sampleMetaData={allSampleMetaData ?? {}}
+                                            group={coloring}
+                                            isMetaDataLoading={metadataLoading}
+                                        />
+                                    )}
 
+                                    {/*{umapData && <PlotlyScatterPlot gene={"all"}*/}
+                                    {/*                                sampleList={selectedSamples}*/}
+                                    {/*                                umapData={umapData} exprData={{"all": "all"}}*/}
+                                    {/*                                cellMetaData={allCellMetaData ?? {}}*/}
+                                    {/*                                group={coloring}/>}*/}
                                 </div>
                             </div>
                         </div>
@@ -411,7 +436,6 @@ function GeneView() {
             </div>
         </div>
     )
-        ;
 }
 
-export default GeneView;
+export default GeneView

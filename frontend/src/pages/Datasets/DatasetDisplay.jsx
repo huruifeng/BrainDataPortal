@@ -109,7 +109,6 @@ const DatasetDisplay = ({dataRecords}) => {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Dataset ID</TableCell>
-                                    <TableCell>Name</TableCell>
                                     <TableCell>PI</TableCell>
                                     <TableCell>First contributor</TableCell>
                                     <TableCell># Samples</TableCell>
@@ -122,11 +121,10 @@ const DatasetDisplay = ({dataRecords}) => {
                                 {displayedData.map((record) => (
                                     <TableRow key={record.dataset_id}>
                                         <TableCell><Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link></TableCell>
-                                        <TableCell>{record.name}</TableCell>
                                         <TableCell>{record.PI_full_name}</TableCell>
                                         <TableCell>{record.first_contributor}</TableCell>
                                         <TableCell>{record.n_samples}</TableCell>
-                                        <TableCell>{record.brain_regions}</TableCell>
+                                        <TableCell>{record.brain_region}</TableCell>
                                         <TableCell>{record.assay}</TableCell>
                                         <TableCell>
                                             <Box sx={{display: "flex", gap: "10px"}}>
@@ -151,7 +149,7 @@ const DatasetDisplay = ({dataRecords}) => {
                                 <Box display="flex" gap={2} sx={{fontSize: "14px", padding: "8px 0"}}>
                                     <Box><b>PI:</b> {record.PI_full_name}</Box>
                                     <Box><b>First contributor:</b> {record.first_contributor}</Box>
-                                    <Box><b>Brain Region:</b> {record.brain_regions}</Box>
+                                    <Box><b>Brain Region:</b> {record.brain_region}</Box>
                                     <Box><b># Samples:</b> {record.n_samples}</Box>
                                     <Box><b>Assay type:</b> {record.assay}</Box>
                                 </Box>

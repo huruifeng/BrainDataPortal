@@ -1,5 +1,6 @@
 import {create} from 'zustand'
 import axios from 'axios'
+import {toast} from "react-toastify";
 
 const BASE_URL = "http://localhost:8000"; // Replace with your backend URL
 // const BASE_URL = "http://10.168.236.29:8000"; // Replace with your backend URL
@@ -10,10 +11,10 @@ const useDatasetManageStore = create((set, get) => ({
     // Seurat objects
     seuratObjects: [],
     selectedSeurat: '',
-    isLoading: false,
 
     // Dataset name
     datasetName: '',
+    datasetType: '',
     isNameUnique: null,
     isCheckingName: false,
 
@@ -21,27 +22,39 @@ const useDatasetManageStore = create((set, get) => ({
     isProcessing: false,
     processingStatus: {
         status: 'idle',
-        progress: 0,
-        currentStep: '',
-        outputs: [],
+        log: '',
     },
+
+    datasetMetaFeatures: [],
 
     // Messages
     error: null,
     success: null,
-
-    // Polling
-    pollingInterval: null,
 
     // Setters
     setSelectedSeurat: (seurat) => set({selectedSeurat: seurat}),
     setDatasetName: (name) => set({datasetName: name}),
 
     // Actions
+    fetDatasetInfo: async (dataset) => {
+        set({isLoading: true, error: null});
+        try {
+            const response = await axios.get(`${dmURL}/getdatasetinfo?dataset=${dataset}`);
+            set({datasetInfo: response.data});
+        } catch (error) {
+            set({
+                error: error.response?.data?.error || 'Failed to load dataset info. Please try again later.'
+            });
+            console.error('Error fetching dataset info:', error);
+        } finally {
+            set({isLoading: false});
+        }
+    },
+
     fetchSeuratObjects: async () => {
         set({isLoading: true, error: null});
         try {
-            const response = await axios.get(`${dmURL}/seurat-objects`);
+            const response = await axios.get(`${dmURL}/getseuratobjects`);
             set({seuratObjects: response.data});
         } catch (error) {
             set({
@@ -61,7 +74,7 @@ const useDatasetManageStore = create((set, get) => ({
 
         set({isCheckingName: true});
         try {
-            const response = await axios.get(`${dmURL}/check-name?name=${encodeURIComponent(name)}`);
+            const response = await axios.get(`${dmURL}/checkdatasetname?name=${encodeURIComponent(name)}`);
             set({isNameUnique: response.data.isUnique});
         } catch (error) {
             console.error('Error checking dataset name:', error);
@@ -70,7 +83,7 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    processDataset: async () => {
+    extractSeuratData: async (payload) => {
         const {selectedSeurat, datasetName} = get();
 
         if (!selectedSeurat || !datasetName) {
@@ -84,75 +97,36 @@ const useDatasetManageStore = create((set, get) => ({
             success: null,
             processingStatus: {
                 status: 'processing',
-                progress: 0,
-                currentStep: 'Initializing...',
-                outputs: [
-                    {
-                        id: 'init',
-                        timestamp: new Date().toISOString(),
-                        message: 'Starting dataset processing...',
-                        type: 'info',
-                    },
-                ],
+                log: 'Starting dataset processing...',
             }
         });
 
         try {
-            const response = await axios.post(`${dmURL}/process`, {
-                seurat: selectedSeurat,
-                datasetName,
-            });
-
-            const jobId = response.data.jobId;
-
-            // Clear any existing polling
-            if (get().pollingInterval) {
-                clearInterval(get().pollingInterval);
-            }
-
-            // Start polling for status updates
-            const interval = setInterval(() => {
-                get().fetchProcessingStatus(jobId);
-            }, 2000);
-
-            set({pollingInterval: interval});
+            const response = await axios.post(`${dmURL}/extractseuratdata`, payload);
+            return response.data;
 
         } catch (error) {
-            const errorMessage = error.response?.data?.error || 'An error occurred while processing the dataset';
+            const errorMessage = error.response?.data?.error || 'An error occurred while running extractseuratdata.';
             set({
                 error: errorMessage,
                 isProcessing: false,
                 processingStatus: {
-                    ...get().processingStatus,
                     status: 'failed',
-                    outputs: [
-                        ...get().processingStatus.outputs,
-                        {
-                            id: `error-${Date.now()}`,
-                            timestamp: new Date().toISOString(),
-                            message: errorMessage,
-                            type: 'error',
-                        },
-                    ],
+                    log: get().processingStatus.log + '\n\n' + errorMessage,
                 }
             });
         }
     },
 
-    fetchProcessingStatus: async (jobId) => {
+    fetchProcessingStatus: async (dataset,task="extract_seurat") => {
         try {
-            const response = await axios.get(`${dmURL}/status?jobId=${jobId}`);
+            const response = await axios.get(`${dmURL}/getprocessingstatus?dataset=${dataset}&task=${task}`);
             const data = response.data;
 
             set({processingStatus: data});
 
             // If processing is complete or failed, stop polling
             if (data.status === 'completed' || data.status === 'failed') {
-                if (get().pollingInterval) {
-                    clearInterval(get().pollingInterval);
-                    set({pollingInterval: null});
-                }
-
                 if (data.status === 'completed') {
                     set({
                         success: `Dataset "${get().datasetName}" has been successfully processed!`,
@@ -170,27 +144,52 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    resetState: () => {
-        // Clear polling if it exists
-        if (get().pollingInterval) {
-            clearInterval(get().pollingInterval);
+    fetchMetaFeatures: async (dataset) => {
+        try {
+            const response = await axios.get(`${dmURL}/getdatasetfeatures?dataset=${dataset}`);
+            set({datasetMetaFeatures: response.data});
+        } catch (error) {
+            console.error('Error fetching meta features:', error);
         }
+    },
 
+    prepareMetaData: async (payload) => {
+        try {
+            console.log(payload);
+            const response = await axios.post(`${dmURL}/preparemetafeatures`, payload);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching meta features:', error);
+            return null;
+        }
+    },
+
+    resetProcessingState: () => {
         set({
-            selectedSeurat: '',
-            datasetName: '',
-            isNameUnique: null,
             error: null,
             success: null,
             isProcessing: false,
-            pollingInterval: null,
             processingStatus: {
                 status: 'idle',
-                progress: 0,
-                currentStep: '',
-                outputs: [],
+                log: '',
             }
         });
+    },
+
+    refreshDatabase: async () => {
+        try {
+            const response = await axios.get(`${dmURL}/refreshdatabase`);
+            if(response.data.success){
+                toast.success(response.data.message);
+            }else{
+                toast.error(response.data.message);
+            }
+            return response.data;
+        } catch (error) {
+            console.error('Error refreshing database:', error);
+            toast.error('Error while refreshing database.');
+            return null;
+        }
     }
 }));
 

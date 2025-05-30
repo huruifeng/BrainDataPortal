@@ -4,8 +4,22 @@ import {useEffect, useRef} from "react"
 import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
-const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected}) => {
+const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected, mainCluster}) => {
+    console.log("UMAPPlot", umapData, metaData, selectedCellTypes, isAllCellTypesSelected, mainCluster)
     const plotRef = useRef(null)
+
+    const {cell_metadata, sample_metadata, cell_metadata_mapping} = metaData
+    const updatedCellMetaData = Object.fromEntries(
+        Object.entries(cell_metadata??{}).map(([cs_id, csObj]) => {
+            const newSubObj = {...csObj};  // shallow copy of inner object
+            const targetValue = csObj[mainCluster];
+            newSubObj[mainCluster] = cell_metadata_mapping[mainCluster]?.[targetValue]?.[0];
+            return [cs_id, newSubObj];
+        })
+    );
+
+    // console.log("cell_metadata", cell_metadata)
+    // console.log("updatedCellMetaData", updatedCellMetaData)
 
     useEffect(() => {
         if (!umapData || !metaData || !plotRef.current) return
@@ -29,15 +43,15 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const cellTypeGroups = {}
 
             umapData.forEach((point) => {
-                const cellType = metaData[point.cs_id]?.MajorCellTypes || "Other"
+                const cellType = updatedCellMetaData[point[0]]?.[mainCluster] || "Other"
                 if (!cellTypeGroups[cellType]) {
                     cellTypeGroups[cellType] = {x: [], y: [], text: [], ids: []}
                 }
 
-                cellTypeGroups[cellType].x.push(point.UMAP_1)
-                cellTypeGroups[cellType].y.push(point.UMAP_2)
+                cellTypeGroups[cellType].x.push(point[1])
+                cellTypeGroups[cellType].y.push(point[2])
                 cellTypeGroups[cellType].text.push(cellType)
-                cellTypeGroups[cellType].ids.push(point.cs_id)
+                cellTypeGroups[cellType].ids.push(point[0])
             })
 
             // Create a trace for each cell type
@@ -62,11 +76,11 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             const colors = []
 
             umapData.forEach((point) => {
-                const cellType = metaData[point.cs_id]?.MajorCellTypes || "Other"
+                const cellType = updatedCellMetaData?.[point[0]]?.[mainCluster] ?? "Other"
                 const isSelected = selectedCellTypes.includes(cellType)
 
-                x.push(point.UMAP_1)
-                y.push(point.UMAP_2)
+                x.push(point[1])
+                y.push(point[2])
                 text.push(cellType)
 
                 // Highlight selected cell types
@@ -117,6 +131,7 @@ UMAPPlot.propTypes = {
     metaData: PropTypes.object.isRequired,
     selectedCellTypes: PropTypes.array.isRequired,
     isAllCellTypesSelected: PropTypes.bool.isRequired,
+    mainCluster: PropTypes.string.isRequired
 }
 
 export default UMAPPlot

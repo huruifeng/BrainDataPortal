@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import {calculateMinMax, isCategorical, sortObjectByKey} from "../../utils/funcs.js";
 
 const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
+    console.log("Rendering PlotlyFeaturePlot:", metaData);
     const containerRef = useRef(null);
     const [imageUrl, setImageUrl] = useState("");
     const [naturalDimensions, setNaturalDimensions] = useState({width: 0, height: 0});
@@ -13,6 +14,8 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     // Destructure visium data
     const {coordinates, scales, image} = visiumData;
     const {lowres} = scales; // only use lowres value
+    const {cell_metadata, cell_metadata_mapping, sample_metadata} = metaData
+    const cell_level_meta = Object.keys(cell_metadata_mapping);
 
     // Load image and extract dimensions
     useEffect(() => {
@@ -48,11 +51,16 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     const featuredData = useMemo(() => {
         if (geneData[feature]) return geneData[feature];
         const data = {};
-        Object.entries(metaData || {}).forEach(([id, item]) => {
-            data[id] = item[feature];
+        Object.entries(cell_metadata || {}).forEach(([id, item]) => {
+            if(cell_level_meta.includes(feature)){
+                data[id] = cell_metadata_mapping[feature][item[feature]][0];
+            } else{
+                const sample_id = id.split("_")[0]
+                data[id] = sample_metadata[sample_id][feature];
+            }
         });
         return data;
-    }, [geneData, metaData, feature]);
+    }, [geneData, cell_metadata, feature]);
 
     // Compute color mapping
     let minFeature = 0, maxFeature = 0, isCat = false;
@@ -68,8 +76,8 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
     // Prepare scatter plot data
     const scatterData = useMemo(() => {
         return Object.entries(coordinates).map(([id, item]) => ({
-            x: item.imagerow * lowres,  // X coordinate
-            y: item.imagecol * lowres,  // Y coordinate
+            x: item.imagecol * lowres,  // X coordinate
+            y: item.imagerow * lowres,  // Y coordinate
             value: featuredData[id] ?? (isCat ? "Other" : 0)
         }));
     }, [coordinates, lowres, featuredData]);

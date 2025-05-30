@@ -4,7 +4,7 @@ import {Box, Typography, Divider} from "@mui/material";
 import FilterPanel from "./FilterPanel";
 import SamplesDisplay from "./SamplesDisplay.jsx";
 import "./SamplesPage.css";
-import useDataStore from "../../store/DataStore.js";
+import useDataStore from "../../store/DatatableStore.js";
 import {useParams} from "react-router-dom";
 
 const SamplesPage = () => {

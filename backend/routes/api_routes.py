@@ -48,6 +48,22 @@ async def getmetalist(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting Meta list.")
     return response
 
+@router.get("/getmainclusterinfo")
+async def getmainclusterinfo(request:Request):
+    print("getmainclusterinfo() called================")
+    dataset_id = request.query_params.get("dataset")
+
+    response = get_config_info(dataset_id)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting main cluster info.")
+
+    main_cluster = response['meta_features']['main_cluster_column']
+    if main_cluster is None or main_cluster == "":
+        raise HTTPException(status_code=404, detail="Error in getting main cluster info.")
+
+    return main_cluster
+
 @router.get("/getcelltypelist")
 async def getcelltypelist(request:Request):
     print("getcelltypelist() called================")
@@ -87,7 +103,8 @@ async def getdegsofcelltype(request:Request):
     dataset_id = request.query_params.get("dataset")
     celltype = request.query_params.get("celltype")
 
-    response = get_degs_celltype(dataset_id, celltype)
+    response = get_degs_pseudobulk(dataset_id, celltype)
+    # response = get_degs_celllevel(dataset_id, celltype)
     # print (response)
     if "Error" in response:
         raise HTTPException(status_code=404, detail="Error in getting gene markers.")
@@ -130,16 +147,12 @@ async def getpseudoexprdata(request:Request):
 
 @router.get("/getallmetadata")
 async def getallmetadata(request:Request):
-    print("getallmetadata() called================")
     dataset = request.query_params.get("dataset_id")
-    dataset_type = request.query_params.get("dataset_type")
-    features = request.query_params.getlist ("features")
+    cols = request.query_params.getlist ("cols[]")
+    rows = request.query_params.getlist("rows[]")
+    print(f"getallmetadata({dataset},{cols},{rows}) called================")
 
-    if dataset_type == "visium":
-        drop_cols = ["UMAP_1", "UMAP_2"]
-    else:
-        drop_cols = None
-    metadata = get_all_metadata(dataset, drop_cols=drop_cols, keep_cols=features)
+    metadata = get_all_metadata(dataset, cols=cols, rows=rows)
 
     if "Error" in metadata:
         raise HTTPException(status_code=404, detail=metadata)
@@ -169,8 +182,8 @@ async def getmetadataofsample(request:Request):
         raise HTTPException(status_code=404, detail="Error in getting sample metadata.")
     return response
 
-@router.get("/getdata/{data_id}")
-async def getdata(data_id: str | uuid.UUID, session: SessionDep):
+@router.get("/getdatatable/{data_id}")
+async def getdatatable(data_id: str | uuid.UUID, session: SessionDep):
     if not data_id:
         raise HTTPException(status_code=400, detail="data_id is empty")
 
@@ -186,8 +199,8 @@ async def getdata(data_id: str | uuid.UUID, session: SessionDep):
         return data
 
 
-@router.get("/getsample")
-async def getsample(request:Request, session: SessionDep):
+@router.get("/getsampletable")
+async def getsampletable(request:Request, session: SessionDep):
     sample_ids = request.query_params.getlist("sample_id")
     dataset_ids = request.query_params.getlist("dataset_id")
     conditions = {k: request.query_params.getlist(k) for k, v in request.query_params.items()}
@@ -221,8 +234,8 @@ async def getsample(request:Request, session: SessionDep):
             return sample
 
 
-@router.get("/getdataset/{dataset_id}")
-async def getdataset(dataset_id: str | uuid.UUID, session: SessionDep):
+@router.get("/getdatasetlist/{dataset_id}")
+async def getdatasetlist(dataset_id: str | uuid.UUID, session: SessionDep):
     if not dataset_id:
         raise HTTPException(status_code=400, detail="dataset_id is empty")
 
@@ -234,5 +247,5 @@ async def getdataset(dataset_id: str | uuid.UUID, session: SessionDep):
     else:
         dataset = get_dataset_by_id(dataset_id,session)
         if not dataset:
-            raise HTTPException(status_code=404, detail="dataset not found")
+            raise HTTPException(status_code=404, detail=f"dataset not found with id: {dataset_id}")
         return dataset

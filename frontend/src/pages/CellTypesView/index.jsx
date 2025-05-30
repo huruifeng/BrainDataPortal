@@ -18,13 +18,12 @@ import {useSearchParams} from "react-router-dom"
 
 import useCellTypeStore from "../../store/CellTypeStore.js"
 import useSampleGeneMetaStore from "../../store/SempleGeneMetaStore.js"
-import useDataStore from "../../store/DataStore.js"
+import useDataStore from "../../store/DatatableStore.js"
 
 import UMAPPlot from "./UMAPPlot.jsx"
-import DotPlot from "./DotPlot.jsx"
 import DotPlot2 from "./DotPlot2.jsx"
 import BarPlot from "./BarPlot.jsx"
-import HeatmapPlot from "./HeatmapPlot.jsx"
+import HeatmapPlot2 from "./HeatmapPlot2.jsx"
 
 import "./CellTypesView.css"
 
@@ -44,20 +43,25 @@ function CellTypesView() {
     const {selectedCellTypes, setSelectedCellTypes} = useCellTypeStore()
     const {cellTypeList, fetchCellTypeList, markerGenes, fetchMarkerGenes} = useCellTypeStore()
     const {cellCounts, fetchCellCounts, diffExpGenes, fetchDiffExpGenes} = useCellTypeStore()
-    const {loading, error} = useCellTypeStore()
+    const {fetchMainClsuterInfo,mainCluster, getMainCluster } = useCellTypeStore()
+    const {loading, error,metadataLoading } = useCellTypeStore()
 
     const [cellTypeSearchText, setCellTypeSearchText] = useState("")
     const [datasetSearchText, setDatasetSearchText] = useState("")
 
     useEffect(() => {
         fetchDatasetList()
+        fetchMainClsuterInfo(selectedDataset);
     }, [])
 
     useEffect(() => {
         // Main data fetches (control loading state)
         const fetchPrimaryData = async () => {
+            await fetchMainClsuterInfo(selectedDataset)
+            // update the mainCluster
+            const mainCluster = await getMainCluster()
             await fetchUMAPData(selectedDataset)
-            await fetchSelectedMetaData(selectedDataset, ["MajorCellTypes"])
+            await fetchSelectedMetaData(selectedDataset, [mainCluster])
             await fetchCellTypeList(selectedDataset)
         }
 
@@ -172,7 +176,7 @@ function CellTypesView() {
                                 )
                             })
                         }
-                        renderInput={(params) => <TextField {...params} label="Select Cell Type" variant="standard"/>}
+                        renderInput={(params) => <TextField {...params} label="Select a cluster" variant="standard"/>}
                     />
 
                     {/* a button to fetch data and a loading indicator*/}
@@ -185,22 +189,24 @@ function CellTypesView() {
 
                 {/* Right Plot Area (75%) */}
                 <div className="plot-main">
+                    {(loading || metadataLoading) && (
+                        <>
+                            <Box sx={{width: "100%"}}><LinearProgress/></Box>
+                            {/*<Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>*/}
+                            {/*    <CircularProgress/>*/}
+                            {/*</Box>*/}
+                            {/*<Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>*/}
+                            {/*    <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">*/}
+                            {/*        Loading data...*/}
+                            {/*    </Typography>*/}
+                            {/*</Box>*/}
+                        </>
+                    ) }
+
                     {selectedDataset === "" ? (
                         <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
                             No dataset selected for exploration
                         </Typography>
-                    ) : loading ? (
-                        <>
-                            <Box sx={{width: "100%"}}><LinearProgress/></Box>
-                            <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>
-                                <CircularProgress/>
-                            </Box>
-                            <Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
-                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">
-                                    Loading data...
-                                </Typography>
-                            </Box>
-                        </>
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : (
@@ -216,6 +222,7 @@ function CellTypesView() {
                                                     metaData={selectedMetaData}
                                                     selectedCellTypes={selectedCellTypes}
                                                     isAllCellTypesSelected={isAllCellTypesSelected}
+                                                    mainCluster={mainCluster}
                                                 />
                                             )}
                                         </div>
@@ -231,6 +238,7 @@ function CellTypesView() {
                                             markerGenes={markerGenes}
                                             selectedCellTypes={selectedCellTypes}
                                             isAllCellTypesSelected={isAllCellTypesSelected}
+                                            mainCluster={mainCluster}
                                         />
                                     )}
                                 </div>
@@ -246,7 +254,7 @@ function CellTypesView() {
                                     </Grid>
                                     <Grid item xs={12} md={6}>
                                         {diffExpGenes && selectedCellTypes.length > 0 && (
-                                            <HeatmapPlot diffExpGenes={diffExpGenes} selectedCellTypes={selectedCellTypes}/>
+                                            <HeatmapPlot2 diffExpGenes={diffExpGenes} selectedCellTypes={selectedCellTypes}/>
                                         )}
                                     </Grid>
                                 </Grid>

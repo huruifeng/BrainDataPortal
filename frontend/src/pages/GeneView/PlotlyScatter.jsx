@@ -9,7 +9,7 @@ const PlotlyScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
     if (umapData.length === 0) return "UMAP data is loading...";
 
     if (sampleList.length >= 1 && !sampleList.includes("all")) {
-        umapData = umapData.filter((point) => sampleList.includes(point.sample_id));
+        umapData = umapData.filter((point) => sampleList.includes(point[0].split("_")[0]));
     }
 
     const createCategoryTraces = (plotData, colorGroup) => {
@@ -24,8 +24,8 @@ const PlotlyScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         const groupedData = groupBy(plotData, colorGroup);
         const groupNames = Object.keys(groupedData);
         const traces = groupNames.map((group_i, index) => ({
-            x: groupedData[group_i].map((p) => p["UMAP_1"]),
-            y: groupedData[group_i].map((p) => p["UMAP_2"]),
+            x: groupedData[group_i].map((p) => p["x"]),
+            y: groupedData[group_i].map((p) => p["y"]),
             name: group_i,
             mode: 'markers',
             type: 'scattergl',  // WebGL version,for large datasets (>10k points):
@@ -46,8 +46,8 @@ const PlotlyScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
     const createContinuousTraces = (plotData, colorGroup) => {
         const colorValues = plotData.map((p) => p[colorGroup]);
         const traces = [{
-            x: plotData.map((p) => p["UMAP_1"]),
-            y: plotData.map((p) => p["UMAP_2"]),
+            x: plotData.map((p) => p["x"]),
+            y: plotData.map((p) => p["y"]),
             mode: 'markers',
             type: 'scatter',
             marker: {
@@ -80,9 +80,9 @@ const PlotlyScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
 
         metaData = metaData ?? {};
         const plotData = umapData.map(item => ({
-            "UMAP_1": item.UMAP_1,
-            "UMAP_2": item.UMAP_2,
-            [group]: metaData?.[item.cs_id]?.[group] ?? "Point", // Works for both objects and arrays, returns 0 for undefined/null values
+            "x": item[1],
+            "y": item[2],
+            [group]: metaData?.[item[0]]?.[group] ?? "Cell/Spot", // Works for both objects and arrays, returns 0 for undefined/null values
         })) || [];
         // console.log("plotData: ", plotData);
         isCategoricalGroup = isCategorical(Object.values(metaData).map((p) => p[group]));
@@ -97,10 +97,10 @@ const PlotlyScatterPlot = ({gene, sampleList, umapData, exprData, metaData, grou
         // In this case the expression data the continuous values
         //===============================
         const plotData = umapData.map(item => ({
-            "UMAP_1": item.UMAP_1,
-            "UMAP_2": item.UMAP_2,
-            [gene]: exprData?.[item.cs_id] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
-            sample_id: item.sample_id  // Keep identifier if needed
+            "x": item[1],
+            "y": item[2],
+            [gene]: exprData?.[item[0]] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+            sample_id: item[0].split("_")[0],  // Keep identifier if needed
         })) || [];
         traces = createContinuousTraces(plotData, gene);
     }

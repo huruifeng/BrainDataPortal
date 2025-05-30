@@ -1,6 +1,8 @@
 import {Link} from "react-router-dom"
 import {Container, Typography, Grid, Card, CardContent, CardActions, Button, Box, Paper} from "@mui/material"
-import {Dna, TableCellsSplitIcon as Cells, Layers, Grid3X3, ScanSearch, CheckSquare} from "lucide-react"
+import {Dna, Layers, Grid3X3, ScanSearch, GitCompare} from "lucide-react"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHexagonNodes } from '@fortawesome/free-solid-svg-icons'
 
 export default function HomePage() {
     const viewOptions = [
@@ -10,19 +12,6 @@ export default function HomePage() {
                 "Explore gene expression patterns and analyze specific genes across different cell types and conditions.",
             icon: <Dna size={48} style={{color: "#10b981"}}/>,
             href: "geneview",
-        },
-        {
-            title: "Cell Type View",
-            description: "Visualize and compare different cell types, their markers, and distribution across samples.",
-            icon: <Cells size={48} style={{color: "#5154f1"}}/>,
-            href: "celltypes",
-        },
-        {
-            title: "Layer View",
-            description:
-                "Examine tissue layers and their composition with detailed visualization of layer-specific features.",
-            icon: <Layers size={48} style={{color: "#f59e0b"}}/>,
-            href: "layersview",
         },
         {
             title: "Visium ST View",
@@ -38,9 +27,22 @@ export default function HomePage() {
             href: "regionsview",
         },
         {
+            title: "Cell Type View",
+            description: "Visualize and compare different cell types, their markers, and distribution across samples.",
+            icon: <FontAwesomeIcon icon={faHexagonNodes} style={{color: "#3b82f6"}} size={"3x"} />,
+            href: "celltypes",
+        },
+        {
+            title: "Layer View",
+            description:
+                "Examine tissue layers and their composition with detailed visualization of layer-specific features.",
+            icon: <Layers size={48} style={{color: "#f59e0b"}}/>,
+            href: "layersview",
+        },
+        {
             title: "XCheck View",
             description: "Cross-check and compare data across different modalities, samples, or experimental conditions.",
-            icon: <CheckSquare size={48} style={{color: "#8b5cf6"}}/>,
+            icon: <GitCompare size={48} style={{color: "#8b5cf6"}}/>,
             href: "xcheck",
         },
     ]

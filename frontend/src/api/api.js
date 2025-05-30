@@ -38,6 +38,17 @@ export const getMetaList = async (dataset,query_str) => {
     }
 }
 
+export const getMainClusterInfo = async (dataset) => {
+    try {
+        const response = await axios.get(`${API_URL}/getmainclusterinfo`,
+            {params: {dataset:dataset}});
+        return response;
+    } catch (error) {
+        console.error("Error getMainClusterInfo:", error);
+        throw error;
+    }
+}
+
 export const getCellTypeList = async (dataset) => {
     try {
         const response = await axios.get(`${API_URL}/getcelltypelist`,
@@ -116,10 +127,10 @@ export const getAllSampleMetaData = async (dataset) => {
 }
 
 
-export const getAllMetaData = async (dataset_id="all",features=["all"],dataset_type="all") => {
+export const getAllMetaData = async (dataset_id="all", cols=["all"], rows=["all"]) => {
     try {
         const response = await axios.get(`${API_URL}/getallmetadata`,
-            {params: {dataset_id: dataset_id, features: features, dataset_type: dataset_type}});
+            {params: {dataset_id: dataset_id, cols: cols,  rows: rows}});
         return response;
     } catch (error) {
         console.error("Error getAllMetaData:", error);
@@ -151,9 +162,9 @@ export const getDEGsOfCellType = async (dataset,cell_type) => {
 }
 
 
-export const getData_get = async (data_id="all") => {
+export const getDatatable_get = async (data_id="all") => {
     try {
-        const response = await axios.get(`${API_URL}/getdata/${data_id}`);
+        const response = await axios.get(`${API_URL}/getdatatable/${data_id}`);
         return response;
     } catch (error) {
         console.error("Error reading data records:", error);
@@ -161,10 +172,10 @@ export const getData_get = async (data_id="all") => {
     }
 }
 
-export const getSample_get = async (conditions) => {
+export const getSampletable_get = async (conditions) => {
     // console.log(conditions);
     try {
-        const response = await axios.get(`${API_URL}/getsample`, {params: conditions});
+        const response = await axios.get(`${API_URL}/getsampletable`, {params: conditions});
         return response;
     } catch (error) {
         console.error("Error reading sample records:", error);
@@ -172,9 +183,9 @@ export const getSample_get = async (conditions) => {
     }
 }
 
-export const getDataset_get = async (dataset_id="all") => {
+export const getDatasetList = async (dataset_id="all") => {
     try {
-        const response = await axios.get(`${API_URL}/getdataset/${dataset_id}`);
+        const response = await axios.get(`${API_URL}/getdatasetlist/${dataset_id}`);
         return response;
     } catch (error) {
         console.error("Error reading dataset records:", error);

@@ -6,6 +6,8 @@ import Plotly from "plotly.js-dist-min"
 import {FormControl, InputLabel, Select, MenuItem} from "@mui/material"
 
 const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
+    console.log("diffExpGenes: ", diffExpGenes)
+
     const plotRef = useRef(null)
     const [selectedCellType, setSelectedCellType] = useState("")
     const [compareList, setCompareList] = useState([]) // List of available comparisons
@@ -163,7 +165,8 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
             title: `Differentially Expressed Genes: ${selectedCellType} (${selectedCompare})`,
             xaxis: {
                 title: "Samples",
-                tickangle: 45,
+                automargin: true,
+                tickangle: 90,
                 tickfont: {
                     size: 8,
                 },
@@ -183,7 +186,7 @@ const HeatmapPlot = ({diffExpGenes, selectedCellTypes}) => {
                 pad: 4,
             },
             plot_bgcolor: "rgba(0,0,0,0)",
-            paper_bgcolor: "rgba(0,0,0,0)",
+            paper_bgcolor: "rgba(255,0,0,0)",
         }
 
         Plotly.newPlot(plotRef.current, [trace], layout, {

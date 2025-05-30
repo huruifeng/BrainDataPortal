@@ -28,3 +28,15 @@ export const getImage = async (dataset,sample) => {
         throw error;
     }
 }
+
+export const getVisiumDefaults = async (dataset) => {
+    try {
+        const response = await axios.get(`${VISIUM_URL}/getvisiumdefaults`,
+            {params: {dataset: dataset}});
+        return response;
+    } catch (error) {
+        console.error("Error reading image data:", error);
+        throw error;
+    }
+
+}
