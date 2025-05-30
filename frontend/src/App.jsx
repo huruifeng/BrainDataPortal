@@ -21,6 +21,7 @@ import CellTypesView from "./pages/CellTypesView";
 import ViewsHome from "./pages/ViewsHome";
 import DatasetManagePage from "./pages/DatasetManage";
 import LayerView from "./pages/LayerView/index.jsx";
+import HowToUse from "./pages/Help/HowToUse.jsx";
 
 
 
@@ -62,6 +63,10 @@ function App() {
                       <Route path="/views/celltypes" element={<CellTypesView />} />
                       <Route path="/views/layersview" element={<LayerView />} />
                       <Route path="/views/xcheck" element={<XDatasetsView />} />
+
+                      <Route path="/help/howtouse" element={<HowToUse />} />
+
+
 
                       <Route path="/datasetmanager" element={<DatasetManagePage />} />
 

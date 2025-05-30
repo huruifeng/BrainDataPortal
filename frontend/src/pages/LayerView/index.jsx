@@ -251,8 +251,7 @@ function LayerView() {
                             </div>
 
                             <div className="plot-section" id="cell-counts-deg-section">
-                                <Divider sx={{marginTop: "10px"}} flexItem>Cell Counts & Differential
-                                    Expression</Divider>
+                                <Divider sx={{marginTop: "10px"}} flexItem>Spot Counts & Differential Expression</Divider>
                                 <Grid container spacing={2} className="bottom-plots-container">
                                     <Grid item xs={12} md={6}>
                                         {cellCounts && selectedCellTypes.length > 0 && (

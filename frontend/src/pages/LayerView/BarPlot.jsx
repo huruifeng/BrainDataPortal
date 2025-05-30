@@ -176,9 +176,9 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
         }
 
         const layout = {
-            title: "Cell Counts",
+            title: "Spot Counts",
             yaxis: {
-                title: "Total Cell Count",
+                title: "Total Spot Count",
                 zeroline: true,
             },
             xaxis: {
