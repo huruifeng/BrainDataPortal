@@ -70,7 +70,7 @@
     border-radius: 1rem;
     /*overflow: hidden;*/
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    margin-bottom: 3rem;
+    margin-bottom: 8rem;
 }
 
 /* Tabs Layout */
@@ -492,8 +492,8 @@
 }
 
 .env-vars-title {
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
+    margin-top: 3rem !important;
+    margin-bottom: 1.5rem !important;
 }
 
 .env-vars-grid {
@@ -534,12 +534,12 @@
 }
 
 .env-content--primary {
-    background-color: rgba(99, 102, 241, 0.05);
+    background-color: rgba(99, 102, 241, 0.05) !important;
     color: var(--primary-dark);
 }
 
 .env-content--secondary {
-    background-color: rgba(236, 72, 153, 0.05);
+    background-color: rgba(236, 72, 153, 0.05) !important;
     color: var(--secondary-dark);
 }
 

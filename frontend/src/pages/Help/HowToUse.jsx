@@ -447,8 +447,7 @@ export default function HelpPage() {
                                         <Grid item xs={12} md={6}>
                                             <Card className="env-card env-card--primary">
                                                 <CardContent>
-                                                    <Typography variant="h6"
-                                                                className="env-title env-title--primary">
+                                                    <Typography variant="h6" className="env-title env-title--primary">
                                                         Frontend (.env.local)
                                                     </Typography>
                                                     <Paper className="env-content env-content--primary">
@@ -471,7 +470,7 @@ export default function HelpPage() {
                                                         Backend (.env)
                                                     </Typography>
                                                     <Paper className="env-content env-content--secondary">
-                                                        DATABASE_URL=postgresql://user:pass@localhost/braindataportal
+                                                        DATABASE_URL=postgresql://user:pass@localhost/bdpdb
                                                         <br/>
                                                         REDIS_URL=redis://localhost:6379
                                                         <br/>
@@ -491,8 +490,7 @@ export default function HelpPage() {
                                                 <Typography variant="h5">Docker Setup (Alternative)</Typography>
                                             </Box>
                                             <Typography variant="body2" className="docker-description">
-                                                For a quicker setup, you can use Docker Compose to run both frontend
-                                                and backend:
+                                                For a quicker setup, you can use Docker Compose to run both frontend and backend:
                                             </Typography>
                                             <CodeBlock>
                                                 <div>
@@ -519,14 +517,12 @@ export default function HelpPage() {
                             <TabPanel value={value} index={2}>
                                 <Container maxWidth="lg">
                                     <Box className="section-header">
-                                        <Typography variant="h3" component="h2" gutterBottom>
+                                        <Typography variant="h4" component="h2" gutterBottom>
                                             Data Preparation Guide
                                         </Typography>
-                                        <Typography variant="body1" color="text.secondary"
-                                                    className="section-description">
+                                        <Typography variant="body1" color="text.secondary" className="section-description">
                                             Learn about supported data formats and how to prepare your datasets for
-                                            analysis in
-                                            BrainDataPortal.
+                                            analysis in BrainDataPortal.
                                         </Typography>
                                     </Box>
 
@@ -534,8 +530,8 @@ export default function HelpPage() {
                                         <Grid item xs={12} md={6}>
                                             <GradientCard color="info">
                                                 <Box className="data-format__header">
-                                                    <DataObject fontSize="large"/>
-                                                    <Typography variant="h4">Single-cell RNA-seq</Typography>
+                                                    <DataObject fontSize="medium"/>
+                                                    <Typography variant="h5">Single-cell RNA-seq</Typography>
                                                 </Box>
                                                 <Typography variant="body1" className="data-format__description">
                                                     Supported formats for single-cell RNA sequencing data:
@@ -544,8 +540,7 @@ export default function HelpPage() {
                                                     {["H5AD (AnnData format) - Recommended", "CSV/TSV (Gene expression matrix)", "MTX (Matrix Market format)", "H5 (HDF5 format)", "Seurat RDS files",].map((item, i) => (
                                                         <ListItem key={i} className="data-format__item">
                                                             <ListItemIcon className="data-format__icon">
-                                                                <CheckCircle fontSize="small"
-                                                                             className="check-icon"/>
+                                                                <CheckCircle fontSize="small" className="check-icon"/>
                                                             </ListItemIcon>
                                                             <ListItemText primary={item}/>
                                                         </ListItem>))}
@@ -555,8 +550,8 @@ export default function HelpPage() {
                                         <Grid item xs={12} md={6}>
                                             <GradientCard color="success">
                                                 <Box className="data-format__header">
-                                                    <Science fontSize="large"/>
-                                                    <Typography variant="h4">Spatial Transcriptomics</Typography>
+                                                    <Science fontSize="medium"/>
+                                                    <Typography variant="h5">Spatial Transcriptomics</Typography>
                                                 </Box>
                                                 <Typography variant="body1" className="data-format__description">
                                                     Supported formats for spatial transcriptomics data:
@@ -565,8 +560,7 @@ export default function HelpPage() {
                                                     {["H5AD with spatial coordinates", "Visium data (10x Genomics)", "MERFISH data", "seqFISH data", "Custom spatial formats",].map((item, i) => (
                                                         <ListItem key={i} className="data-format__item">
                                                             <ListItemIcon className="data-format__icon">
-                                                                <CheckCircle fontSize="small"
-                                                                             className="check-icon"/>
+                                                                <CheckCircle fontSize="small" className="check-icon"/>
                                                             </ListItemIcon>
                                                             <ListItemText primary={item}/>
                                                         </ListItem>))}
