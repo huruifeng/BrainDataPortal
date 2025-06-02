@@ -35,8 +35,8 @@
 .hero-section {
     background: linear-gradient(135deg, var(--primary-main) 0%, var(--secondary-main) 100%);
     color: #ffffff;
-    padding: 5rem 0;
-    margin-bottom: 3rem;
+    padding: 3rem 0;
+    margin-bottom: 0rem;
     position: relative;
     overflow: hidden;
 }
@@ -65,16 +65,6 @@
     opacity: 0.9;
 }
 
-.hero-section__button {
-    padding: 0.75rem 2rem;
-    background-color: #ffffff !important;
-    color: var(--primary-main) !important;
-}
-
-.hero-section__button:hover {
-    background-color: rgba(255, 255, 255, 0.9) !important;
-}
-
 /* Main Content */
 .main-content {
     border-radius: 1rem;
@@ -94,16 +84,12 @@
     width: 280px;
     background-color: var(--background-paper);
     border-right: 1px solid rgba(0, 0, 0, 0.12);
-    padding: 2rem 0;
+    padding: 1rem 0;
     flex-shrink: 0;
 }
 
 .vertical-tabs {
     width: 100%;
-}
-
-.vertical-tabs .MuiTabs-flexContainer {
-    align-items: stretch;
 }
 
 .vertical-tabs .MuiTabs-indicator {
@@ -112,13 +98,14 @@
     background: linear-gradient(135deg, var(--primary-main) 0%, var(--secondary-main) 100%);
     border-radius: 0 2px 2px 0;
 }
-
+.vertical-tabs .MuiTab-root {
+    flex-direction: row;
+    justify-content: flex-start;
+}
 .vertical-tab {
+    width: 100%;
     min-height: 64px;
     padding: 1rem 2rem;
-    text-align: left;
-    justify-content: flex-start;
-    align-items: center;
     gap: 1rem;
     font-size: 1rem;
     font-weight: 500;
@@ -230,7 +217,6 @@
 }
 
 .section-description {
-    max-width: 700px;
     margin: 0 auto;
 }
 
@@ -300,8 +286,8 @@
 }
 
 .tech-chip {
-    background-color: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
+    background-color: rgb(27, 158, 228) !important;
+    color: #f0f1f6 !important;
     font-weight: 500;
 }
 
@@ -310,7 +296,7 @@
 }
 
 .specialized-tools-title {
-    margin-bottom: 2rem;
+    margin-bottom: 2rem !important;
     text-align: center;
 }
 
@@ -402,7 +388,7 @@
 .code-block {
     background-color: #1e293b;
     color: #e2e8f0;
-    padding: 1.5rem;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
     font-family: "Fira Code", monospace;
     font-size: 0.875rem;
     overflow: auto;
@@ -437,7 +423,14 @@
 }
 
 .code-block__content {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
+    background-color: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    font-family: "Fira Code", monospace;
+    font-size: 0.875rem;
+    overflow: auto;
+    border-radius: 0.2rem;
 }
 
 .comment {
@@ -872,7 +865,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .hero-section {
-        padding: 3rem 0;
+        padding: 1rem 0;
     }
 
     .hero-section__subtitle {
