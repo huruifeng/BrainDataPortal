@@ -224,8 +224,8 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
             hovermode: "closest",
             annotations: annotations,
             // Adjust the plot padding
-            plot_bgcolor: "rgba(255,0,0,0)",
-            paper_bgcolor: "rgba(0,255,0,0)",
+            // plot_bgcolor: "rgba(255,0,0,0)",
+            // paper_bgcolor: "rgba(0,255,0,0)",
             bargap: 0,
             bargroupgap: 0,
         }
