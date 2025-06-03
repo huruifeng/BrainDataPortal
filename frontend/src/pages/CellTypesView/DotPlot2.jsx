@@ -176,7 +176,7 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
         })
 
         const layout = {
-            title: {text: `Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} cell types)`},
+            title: {text: `Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} clusters)`},
             grid: {
                 rows: 1,
                 columns: 2,
