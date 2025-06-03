@@ -94,7 +94,7 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
         // Make dots smaller by increasing the sizeref value
         // Higher sizeref = smaller dots
         const sizeref = 1
-        // Adjust this value to make dots smaller or larger
+
 
         // Create the main dot plot trace
         const mainTrace = {
