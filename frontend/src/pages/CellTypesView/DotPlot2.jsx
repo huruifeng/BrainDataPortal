@@ -93,8 +93,8 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
 
         // Make dots smaller by increasing the sizeref value
         // Higher sizeref = smaller dots
-        const sizeref = 0.25
-        // Adjust this value to make dots smaller or larger
+        const sizeref = 1
+
 
         // Create the main dot plot trace
         const mainTrace = {
@@ -109,12 +109,12 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
                 color: colorValues,
                 colorscale: "Viridis", // Use a color scale that works well for expression data
                 colorbar: {
-                    // title: { text: "AvgExpr", side: "top",font: { size: 12 } },
+                    title: {text: "AvgExpr", side: "top", font: {size: 12}},
                     thickness: 15,
                     tickvals: [0, 2, 4, 6],
                     ticktext: ["0", "2", "4", "6+"],
                     // Position the colorbar below the vertical center line
-                    y: 0.88,
+                    y: 0.85,
                     len: 1 / (selectedCellTypes.length + 1),
                     yanchor: "top",
                 },
@@ -130,12 +130,17 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
         const sizeLegendSizes = [20, 40, 60, 80, 100]
         const legendTraces = []
 
+        const bubbleSpacing = 0.12 / selectedCellTypes.length;
+        const firstDotY = 0.80;
+        const titleOffset = 0.12 / selectedCellTypes.length; // fixed distance above first dot
+
+
         // Create a separate trace for each legend dot
         sizeLegendSizes.forEach((size, i) => {
             legendTraces.push({
                 x: [1.1], // Position in the legend area
-                y: [0.85 - (i * 0.12) / (selectedCellTypes.length)], // Vertical position
-                mode: "markers",
+                y: [firstDotY - i * bubbleSpacing], // Vertical position
+                mode: "markers+text",
                 type: "scatter",
                 marker: {
                     size: [size], // Use the actual size value
@@ -143,6 +148,8 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
                     sizeref: sizeref, // Use the same sizeref as the main plot
                     color: "rgba(0,0,0,0.7)",
                 },
+                text: [`${size}%`],
+                textposition: 'right center',
                 showlegend: false,
                 hoverinfo: "none",
                 xaxis: "x2", // Use a secondary x-axis for the legend
@@ -150,33 +157,26 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
             })
         })
 
-        // Create annotations for the legend labels
-        const annotations = []
-
-        // Add percentage labels next to the dots
-        sizeLegendSizes.forEach((size, i) => {
-            annotations.push({
-                x: 0.99,
-                y: 0.85 - (i * 0.12) / selectedCellTypes.length + 0.005,
-                xref: "paper",
-                yref: "paper",
-                text: `${size}%`,
-                showarrow: false,
-                font: {size: 10, color: "black"},
-            })
+        legendTraces.push({
+            x: [1.1],
+            y: [firstDotY + titleOffset], // Adjust this based on your legend layout
+            mode: "text",
+            type: "scatter",
+            text: ["PctExpr"],
+            textposition: "bottom right",
+            showlegend: false,
+            hoverinfo: "none",
+            xaxis: "x2",
+            yaxis: "y2",
+            textfont: {
+                size: 12,
+                color: "black",
+                family: "Arial",
+            },
         })
-
-        annotations.push({x: 0.99, y: 0.9, xref: "paper", yref: "paper", text: "PctExpr", showarrow: false,
-            font: {size: 12, color: "black",},
-        })
-
-         annotations.push({x: 1.05, y: 0.9, xref: "paper", yref: "paper", text: "AvgExpr",
-            showarrow: false, font: {size: 12, color: "black",},
-        })
-
 
         const layout = {
-            title: {text:`Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} cell types)`},
+            title: {text: `Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} clusters)`},
             grid: {
                 rows: 1,
                 columns: 2,
@@ -219,13 +219,12 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
                 t: 30,
                 pad: 4,
             },
-            height: Math.max(400, uniqueGeneNames.length * 25 + 120), // Dynamic height based on number of genes
+            height: Math.max(400, uniqueGeneNames.length * 30 + 120), // Dynamic height based on number of genes
             autosize: true,
             hovermode: "closest",
-            annotations: annotations,
             // Adjust the plot padding
-            plot_bgcolor: "rgba(255,0,0,0)",
-            paper_bgcolor: "rgba(0,255,0,0)",
+            // plot_bgcolor: "rgba(255,0,0,0)",
+            // paper_bgcolor: "rgba(0,255,0,0)",
             bargap: 0,
             bargroupgap: 0,
         }

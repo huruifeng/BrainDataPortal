@@ -53,7 +53,6 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                         y.push(count_sum)
                     })
 
-
                     traces.push({
                         x: x,
                         y: y,
@@ -94,8 +93,8 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                 // PD vs Control within Male vs Female
                 let combinedIndex = 0
 
-                ConditionSet.forEach((condition) => {
-                    SexSet.forEach((sex) => {
+                ConditionSet.forEach((condition, con_index) => {
+                    SexSet.forEach((sex, sex_index) => {
                         const x = []
                         const y = []
 
@@ -108,12 +107,17 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                             y.push(count_sum)
                         })
 
+                        let color_str = color_platte[con_index % color_platte.length]
+                        if(sex_index === 1) {
+                            color_str = color_str + "99"
+                        }
+
                         traces.push({
                             x: x,
                             y: y,
                             type: "bar",
                             name: `${condition} - ${sex}`,
-                            marker: {color: color_platte[combinedIndex % color_platte.length]},
+                            marker: {color: color_str},
                         })
 
                         combinedIndex++

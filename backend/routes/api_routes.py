@@ -99,9 +99,9 @@ async def getmarkergenes(request:Request):
 
 @router.get("/getdegsofcelltype")
 async def getdegsofcelltype(request:Request):
-    print("getdegsofcelltype() called================")
     dataset_id = request.query_params.get("dataset")
     celltype = request.query_params.get("celltype")
+    print(f"getdegsofcelltype({dataset_id},{celltype}) called================")
 
     response = get_degs_pseudobulk(dataset_id, celltype)
     # response = get_degs_celllevel(dataset_id, celltype)

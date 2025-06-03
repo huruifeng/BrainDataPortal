@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import json
 import toml
+import re
 
 def get_gene_list(dataset, query_str="AB"):
     if dataset == "all":
@@ -195,18 +196,20 @@ def get_degs_pseudobulk(dataset, celltype):
         ## get gene expression data for each DE,format: [{sampleId: 'sample1', condition: 'PD', value: 8.1053},...]
         sample_calletype_df = pd.read_csv(os.path.join("backend", "datasets", dataset,'clustermarkers', 'metadata_sample_cluster_condition.csv'), index_col=0, header=0)
         expr_df = pd.read_csv(os.path.join("backend", "datasets", dataset,'clustermarkers', 'pb_expr_matrix_topN_DEGs.csv'), index_col=0, header=0)
+        escaped_celltype = re.escape(celltype)
+        pattern = rf"{escaped_celltype}"
 
         for DE, degs in degs_groups.items():
             for deg in degs:
                 expression = []
                 gene_name = deg["gene"]
-                expr_val_df = expr_df.loc[gene_name,expr_df.columns.str.contains(celltype)]
+                expr_val_df = expr_df.loc[gene_name,expr_df.columns.str.contains(pattern)]
                 samples = expr_val_df.index.tolist()
                 for sample_i in samples:
                     condation = sample_calletype_df.loc[sample_i,"condition"]
                     if condation not in DE:
                         continue
-                    expr_val = expr_val_df[sample_i]
+                    expr_val = round(expr_val_df[sample_i],2) if expr_val_df[sample_i] != 0 else expr_val_df[sample_i]
                     expression.append({"sampleId": sample_i, "condition": condation, "value": expr_val})
                 deg['expression'] = expression
 

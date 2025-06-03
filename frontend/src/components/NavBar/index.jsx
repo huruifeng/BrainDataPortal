@@ -40,10 +40,10 @@ const NavBar = () => {
                 {/*<Button color="inherit" component={Link} to="/xcheck">XCheck</Button>*/}
                 <Button color="inherit" onClick={openHelpMenu}>Help</Button>
                 <Menu anchorEl={helpMenuAnchor} open={Boolean(helpMenuAnchor)} onClose={closeHelpMenu}>
-                    <MenuItem component={Link} to="/help/how-to-use" onClick={closeHelpMenu}>How to Use</MenuItem>
+                    <MenuItem component={Link} to="/help/howtouse" onClick={closeHelpMenu}>How to Use</MenuItem>
                     <MenuItem component={Link} to="/help/faq" onClick={closeHelpMenu}>FAQ</MenuItem>
                     <MenuItem divider />
-                    <MenuItem component={Link} to="/help/rest-api" onClick={closeHelpMenu}>REST API</MenuItem>
+                    <MenuItem component={Link} to="/help/restapi" onClick={closeHelpMenu}>REST API</MenuItem>
                 </Menu>
                 <Button color="inherit" component={Link} to="/login">Login</Button>
             </Toolbar>

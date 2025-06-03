@@ -166,17 +166,17 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
             })
         })
 
-        annotations.push({x: 0.99, y: 0.9, xref: "paper", yref: "paper", text: "PctExpr", showarrow: false,
+        annotations.push({x: 0.99, y: 0.92, xref: "paper", yref: "paper", text: "PctExpr", showarrow: false,
             font: {size: 12, color: "black",},
         })
 
-         annotations.push({x: 1.05, y: 0.9, xref: "paper", yref: "paper", text: "AvgExpr",
+         annotations.push({x: 1.05, y: 0.92, xref: "paper", yref: "paper", text: "AvgExpr",
             showarrow: false, font: {size: 12, color: "black",},
         })
 
 
         const layout = {
-            title: {text:`Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} cell types)`},
+            title: {text:`Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} clusters)`},
             grid: {
                 rows: 1,
                 columns: 2,
