@@ -36,11 +36,11 @@ const SamplesDisplay = ({ dataRecords}) => {
     const filteredData = dataRecords.filter(
         (item) =>
             item.sample_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.subject_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.source_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.tissue.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.brain_region.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.region_level_1.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.data_type.toLowerCase().includes(searchQuery.toLowerCase())
+            item.assay.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Pagination logic: Get only the records for the current page
@@ -71,9 +71,9 @@ const SamplesDisplay = ({ dataRecords}) => {
                         <ToggleButton value="list" aria-label="List">
                             <ListIcon />
                         </ToggleButton>
-                        <ToggleButton value="matrix" aria-label="Matrix">
-                            <PivotTableChart />
-                        </ToggleButton>
+                        {/*<ToggleButton value="matrix" aria-label="Matrix">*/}
+                        {/*    <PivotTableChart />*/}
+                        {/*</ToggleButton>*/}
                     </ToggleButtonGroup>
                     <FormControl sx={{ m: 1, minWidth: 120, margin: "0 8px" }} size="small">
                       <InputLabel id="select-records-per-page-label">Records / Page</InputLabel>
@@ -119,14 +119,17 @@ const SamplesDisplay = ({ dataRecords}) => {
                             </TableHead>
                             <TableBody>
                                 {displayedData.map((record) => (
-                                    <TableRow key={record.sample_id}>
+                                    <TableRow key={record.id}>
                                         <TableCell>{record.sample_id}</TableCell>
-                                        <TableCell>{record.subject_id}</TableCell>
+                                        <TableCell>{record.source_id}</TableCell>
                                         <TableCell>{record.tissue}</TableCell>
                                         <TableCell>{record.brain_region}</TableCell>
                                         <TableCell>{record.region_level_1}</TableCell>
-                                        <TableCell>{record.data_type}</TableCell>
-                                        <TableCell><Link to={`/geneview/${record.dataset_id}?sample=${record.sample_id}`}>UMAP</Link></TableCell>
+                                        <TableCell>{record.assay}</TableCell>
+                                        <TableCell>
+                                            <Link to={`/views/geneview?dataset=${record.dataset_id}&sample=${record.sample_id}`}>UMAP</Link> &nbsp;&nbsp;
+                                            {record.assay === "VisiumST" && <Link to={`/views/visiumview?dataset=${record.dataset_id}&sample=${record.sample_id}`}>VisiumST</Link>}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -135,18 +138,19 @@ const SamplesDisplay = ({ dataRecords}) => {
                 ) : (
                     <Box className="data-list">
                         {displayedData.map((record) => (
-                            <Box key={record.sample_id} className="list-item">
+                            <Box key={record.id} className="list-item">
                                 <Typography variant="h6">{record.sample_id}</Typography>
                                 <Typography variant="body1">
                                   <Box display="flex" gap={2}>
-                                    <Box><b>Source subject:</b> {record.subject_id}</Box>
+                                    <Box><b>Source subject:</b> {record.source_id}</Box>
                                     <Box><b>Tissue:</b> {record.tissue}</Box>
                                     <Box><b>Brain Region:</b> {record.brain_region}</Box>
                                     <Box><b>Region Level 1:</b> {record.region_level_1}</Box>
-                                    <Box><b>Assay type:</b> {record.data_type}</Box>
+                                    <Box><b>Assay type:</b> {record.assay}</Box>
                                   </Box>
                                   <Box sx={{fontSize: "14px", padding: "8px 0"}}>
-                                    <Link to={`/geneview/${record.dataset_id}?sample=${record.sample_id}`}>View UMAP</Link>
+                                    <Link to={`/views/geneview?dataset=${record.dataset_id}&sample=${record.sample_id}`}>View UMAP</Link>
+                                      {record.assay === "VisiumST" && <Link to={`/views/visiumview?dataset=${record.dataset_id}&gene=SNCA&sample=${record.sample_id}&meta=smoothed_label_s5`}>VisiumST</Link>}
                                   </Box>
                                 </Typography>
                             </Box>

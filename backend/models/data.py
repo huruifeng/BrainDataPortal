@@ -4,7 +4,7 @@ from typing import Optional, List
 
 
 class DataBasic(SQLModel):
-    sample_id: str = Field(index=True,foreign_key="sample.sample_id")
+    sample_id: str = Field(index=True,foreign_key="sample.id")
 
     file_type: str = Field(default="NA")
     file_name_source: str = Field(default="NA")
@@ -22,10 +22,10 @@ class DataBasic(SQLModel):
     configuration_file: str = Field(default="NA")
 
 class Data(DataBasic, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4().hex), primary_key=True)
 
     # Relationship to Sample (many-to-one)
-    sample: Optional["Sample"] = Relationship(back_populates="sample_data")  # Use string reference
+    # sample: Optional["Sample"] = Relationship(back_populates="sample_data")  # Use string reference
 
 
 class DataCreate(DataBasic):
@@ -50,7 +50,7 @@ class DataUpdate(SQLModel):
 
 
 class DataPublic(DataBasic):
-    id: uuid.UUID
+    id: str
 
 class DatasPublic(SQLModel):
     data: list[DataPublic]

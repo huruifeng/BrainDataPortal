@@ -32,8 +32,8 @@ class SubjectBase(SQLModel):
     primary_diagnosis_text: Optional[str]| None = Field(default="NA")
 
 class Subject(SubjectBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    subject_samples: list["Sample"] = Relationship(back_populates="subject")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4().hex))
+    # subject_samples: list["Sample"] = Relationship(back_populates="subject")
     subject_clinpath: Optional["Clinpath"] = Relationship(back_populates="subject")
 
 class SubjectCreate(SubjectBase):
@@ -43,7 +43,7 @@ class SubjectUpdate(SubjectBase):
     pass
 
 class SubjectPublic(SubjectBase):
-    id: uuid.UUID
+    id: str
 
 class SubjectsPublic(SQLModel):
     data: list[SubjectPublic]

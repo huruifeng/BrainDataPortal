@@ -16,7 +16,7 @@ class StudyBase(SQLModel):
     submitter_email: str = Field(default="NA")
 
 class Study(StudyBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4().hex))
     dataset: list["Dataset"] = Relationship(back_populates="study")
 
 class StudyCreate(StudyBase):
@@ -32,7 +32,7 @@ class StudyUpdate(SQLModel):
     submitter_email: Optional[str] = Field(default="NA")
 
 class StudyPublic(StudyBase):
-    id: uuid.UUID
+    id: str
 
 class StudiesPublic(SQLModel):
     data: list[StudyPublic]

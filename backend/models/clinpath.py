@@ -46,7 +46,7 @@ class ClinpathBase(SQLModel):
     quant_path_avail: Optional[str]| None = Field(default="NA")
 
 class Clinpath(ClinpathBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4().hex))
     subject: Optional["Subject"] = Relationship(back_populates="subject_clinpath")
 
 class ClinpathCreate(ClinpathBase):
@@ -87,7 +87,7 @@ class ClinpathUpdate(SQLModel):
     quant_path_avail: Optional[str] = Field()
 
 class ClinpathPublic(ClinpathBase):
-    id: uuid.UUID
+    id: str
 
 class ClinpathsPublic(SQLModel):
     data: list[ClinpathPublic]

@@ -29,7 +29,7 @@ async def import_csv(table: str):
     if table == "study":
         try:
             df = pd.read_csv("backend/files/Study.csv", thousands=',')
-            df['id'] = [uuid.uuid4() for _ in range(len(df))]
+            df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
             df.to_sql(table, engine, if_exists="append", index=False)
             return {"success": True, "message": "Study data imported successfully"}
@@ -40,7 +40,7 @@ async def import_csv(table: str):
     elif table == "protocol":
         try:
             df = pd.read_csv("backend/files/Protocol.csv", thousands=',')
-            df['id'] = [uuid.uuid4() for _ in range(len(df))]
+            df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
             df.to_sql(table, engine, if_exists="append", index=False)
             return {"success": True, "message": "Protocol data was imported successfully"}
@@ -51,7 +51,7 @@ async def import_csv(table: str):
     elif table == "dataset":
         try:
             df = pd.read_csv("backend/files/Dataset.csv", thousands=',')
-            df['id'] = [uuid.uuid4() for _ in range(len(df))]
+            df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
             df.to_sql(table, engine, if_exists="append", index=False)
             return {"success": True, "message": "Dataset data imported successfully"}
@@ -62,7 +62,7 @@ async def import_csv(table: str):
     elif table == "subject":
         try:
             df = pd.read_csv("backend/files/Subject.csv", thousands=',')
-            df['id'] = [uuid.uuid4() for _ in range(len(df))]
+            df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
 
             df.loc[df['age_at_collection'] == "NA", 'age_at_collection'] = -1
@@ -81,7 +81,7 @@ async def import_csv(table: str):
     elif table == "clinpath":
         try:
             df = pd.read_csv("backend/files/Clinpath.csv", thousands=',')
-            df['id'] = [uuid.uuid4() for _ in range(len(df))]
+            df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
             df.loc[df['path_year_death'] == "NA", 'path_year_death'] = -1
             df.loc[df['age_at_death'] == "NA", 'age_at_death'] = -1
@@ -99,7 +99,7 @@ async def import_csv(table: str):
         try:
             ## read the csv file
             df = pd.read_csv("backend/files/Sample.csv", thousands=',')
-            df['id'] = [uuid.uuid4() for _ in range(len(df))]
+            df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
             df.loc[df['repeated_sample'] == "NA", 'repeated_sample'] = -1
             df.loc[df['replicate_count'] == "NA", 'replicate_count'] = -1
@@ -119,7 +119,7 @@ async def import_csv(table: str):
     elif table == "data":
         try:
             df = pd.read_csv("backend/files/Data.csv", thousands=',')
-            df['id'] = [uuid.uuid4() for _ in range(len(df))]
+            df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
             df.loc[df['replicate_count'] == "NA", 'replicate_count'] = -1
             df.loc[df['repeated_sample'] == "NA", 'repeated_sample'] = -1

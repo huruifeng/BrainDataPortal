@@ -10,9 +10,9 @@ const DiseaseSelector = () => {
   };
 
   const diseaseTypes = {
-    "Healthy": "Healthy",
+    // "Healthy": "Healthy",
     "PD": "Parkinson's Disease",
-    "AD": "Alzheimer's Disease"
+    // "AD": "Alzheimer's Disease"
   };
 
   return (

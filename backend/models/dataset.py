@@ -32,7 +32,7 @@ class DatasetBase(SQLModel):
     study_id: str = Field(foreign_key="study.study_id")
 
 class Dataset(DatasetBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4().hex))
     study: "Study" = Relationship(back_populates="dataset")
     dataset_samples: list["Sample"] = Relationship(back_populates="dataset")
 
