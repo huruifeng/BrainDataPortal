@@ -24,7 +24,7 @@ const NavBar = () => {
                 </Typography>
                 <Button color="inherit" component={Link} to="/about">About</Button>
                 <Button color="inherit" component={Link} to="/datasets">Datasets</Button>
-                <Button color="inherit" component={Link} to="/samples">Samples</Button>
+                {/*<Button color="inherit" component={Link} to="/samples">Samples</Button>*/}
                 <Button color="inherit" component={Link} to="/views">Views</Button>
                 {/*<Button color="inherit" onClick={openViewsMenu}>Views</Button>*/}
                 {/*<Menu anchorEl={viewsMenuAnchor} open={Boolean(viewsMenuAnchor)} onClose={closeViewsMenu}>*/}
@@ -45,7 +45,7 @@ const NavBar = () => {
                     <MenuItem divider />
                     <MenuItem component={Link} to="/help/restapi" onClick={closeHelpMenu}>REST API</MenuItem>
                 </Menu>
-                <Button color="inherit" component={Link} to="/login">Login</Button>
+                {/*<Button color="inherit" component={Link} to="/login">Login</Button>*/}
             </Toolbar>
         </AppBar>
     );

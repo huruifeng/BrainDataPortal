@@ -6,9 +6,9 @@ from typing import Optional, List
 
 
 class SampleBase(SQLModel):
-    sample_id: str = Field(index=True, unique=True, primary_key=True)
+    sample_id: str = Field(index=True)
     source_id: str = Field(index=True)
-    subject_id: str = Field(index=True, foreign_key="subject.subject_id")
+    # subject_id: str = Field(index=True, foreign_key="subject.subject_id")
 
     replicate: str = Field(default="NA")
     replicate_count: int = Field(default=np.nan)
@@ -45,20 +45,18 @@ class SampleBase(SQLModel):
     donor_id: Optional[str] | None  = Field(default="NA")
 
     dataset_id: str = Field(index=True, foreign_key="dataset.dataset_id")
-
     assay: str = Field(default="NA")
-    data_location: str = Field(default="NA")
 
-    data_protocol: str = Field(default="NA", foreign_key="protocol.protocol_id")
-
+    data_protocol: str = Field(default="NA")
 
 class Sample(SampleBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4().hex), primary_key=True)
     # Relationship to Sample (one-to-many)
-    sample_data: List["Data"] = Relationship(back_populates="sample")
-    subject: Optional["Subject"] = Relationship(back_populates="subject_samples")
     dataset: Optional["Dataset"] = Relationship(back_populates="dataset_samples")
-    protocol: Optional["Protocol"] = Relationship(back_populates="samples")
+
+    # sample_data: List["Data"] = Relationship(back_populates="sample")
+    # subject: Optional["Subject"] = Relationship(back_populates="subject_samples")
+    # protocol: Optional["Protocol"] = Relationship(back_populates="samples")
 
 
 
@@ -67,26 +65,29 @@ class SampleCreate(SampleBase):
 
 class SampleUpdate(SQLModel):
     sample_id: Optional[str] = Field(default="NA")
-    subject_id: Optional[str] = Field(default="NA")
-    source_sample_id: Optional[str] = Field(default="NA")
+    source_id: Optional[str] = Field(default="NA")
+
     replicate: Optional[str] = Field(default="NA")
     replicate_count: Optional[int] = Field(default="NA")
     repeated_sample: Optional[int] = Field(default="NA")
     batch: Optional[str] = Field(default="NA")
+
     tissue: Optional[str] = Field(default="NA")
     brain_region: Optional[str] = Field(default="NA")
     hemisphere: Optional[str] = Field(default="NA")
     region_level_1: Optional[str] = Field(default="NA")
     region_level_2: Optional[str] = Field(default="NA")
     region_level_3: Optional[str] = Field(default="NA")
+
     RIN: Optional[float] = Field(default="NA")
     source_RIN: Optional[float] = Field(default="NA")
     molecular_source: Optional[str] = Field(default="NA")
     input_cell_count: Optional[int] = Field(default="NA")
-    assay: Optional[str] = Field(default="NA")
+    assay_kit: Optional[str] = Field(default="NA")
     sequencing_end: Optional[str] = Field(default="NA")
     sequencing_length: Optional[str] = Field(default="NA")
     sequencing_instrument: Optional[str] = Field(default="NA")
+
     organism_ontology_term_id: Optional[str] = Field(default="NA")
     development_stage_ontology_term_id: Optional[str] = Field(default="NA")
     sex_ontology_term_id: Optional[str] = Field(default="NA")
@@ -95,6 +96,7 @@ class SampleUpdate(SQLModel):
     tissue_ontology_term_id: Optional[str] = Field(default="NA")
     cell_type_ontology_term_id: Optional[str] = Field(default="NA")
     assay_ontology_term_id: Optional[str] = Field(default="NA")
+
     suspension_type: Optional[str] = Field(default="NA")
     DV200: Optional[float] = Field(default="NA")
     pm_PH: Optional[float] = Field(default="NA")
@@ -102,7 +104,7 @@ class SampleUpdate(SQLModel):
 
 
 class SamplePublic(SampleBase):
-    id: uuid.UUID
+    id: str
 
 class SamplesPublic(SQLModel):
     data: list[SamplePublic]

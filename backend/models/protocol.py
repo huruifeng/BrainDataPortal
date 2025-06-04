@@ -15,8 +15,8 @@ class ProtocolBase(SQLModel):
     other_reference: Optional[str] | None = Field(default="NA")
 
 class Protocol(ProtocolBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    samples: list["Sample"] = Relationship(back_populates="protocol")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4().hex))
+    # samples: list["Sample"] = Relationship(back_populates="protocol")
 
 class ProtocolCreate(ProtocolBase):
     pass
@@ -25,7 +25,7 @@ class ProtocolUpdate(ProtocolBase):
     pass
 
 class ProtocolPublic(ProtocolBase):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4().hex))
 
 class ProtocolsPublic(SQLModel):
     data: list[ProtocolPublic]

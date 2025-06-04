@@ -28,32 +28,20 @@ const Home = () => {
                 {/* Left Section */}
                 <Grid2 xs={12} md={2}>
                     <Typography variant="h6" className="section-title">
-                        Cell Lines & Tissues
+                        Brain regions
                     </Typography>
                     <Paper elevation={3} className="paper">
-
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Ectoderm Tissues</strong>
+                            <strong>Temporal Lobe</strong>
                         </Typography>
                         <ul>
-                            <li>Brain: unrelated donors</li>
-                            <li>Sun-exposed skin</li>
+                            <li>Middle temporal gyrus</li>
                         </ul>
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Endoderm Tissues</strong>
+                            <strong>Brainstem</strong>
                         </Typography>
                         <ul>
-                            <li>Liver</li>
-                            <li>Lung</li>
-                            <li>Colon</li>
-                        </ul>
-                        <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Cell Line Mixtures</strong>
-                        </Typography>
-                        <ul>
-                            <li>COLO829 Mixture</li>
-                            <li>HapMap Mixture</li>
-                            <li>iPSC & Fibroblast</li>
+                            <li>Midbrain</li>
                         </ul>
                     </Paper>
                 </Grid2>
@@ -74,12 +62,8 @@ const Home = () => {
                             <strong>Omics Assays</strong>
                         </Typography>
                         <ul>
-                            <li>Bulk WGS short read</li>
-                            <li>Bulk WGS long read</li>
-                            <li>Bulk RNA-seq</li>
-                            <li>Single-cell WGS</li>
-                            <li>Single-cell RNA-Seq</li>
-                            <li>Epigenome profiling</li>
+                            <li>Single-nucleus RNA-Seq</li>
+                            <li>10X Visium ST</li>
                         </ul>
                     </Paper>
                 </Grid2>
