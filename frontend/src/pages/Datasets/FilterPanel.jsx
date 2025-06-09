@@ -35,6 +35,11 @@ const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilt
             options: ["Homo Sapiens", "Mus Musculus", "Drosophila", "C. Elegans"],
             key: "organism",
         },
+        {
+            title: "Disease",
+            options: ["PD", "AD"],
+            key: "disease",
+        },
     ]
 
     const handleCheckboxChange = (filterKey, option) => (event) => {

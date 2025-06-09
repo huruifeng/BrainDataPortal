@@ -16,6 +16,7 @@ const DatasetsPage = () => {
         assayType: searchParams.getAll("assayType") || [],
         brainRegion: searchParams.getAll("brainRegion") || [],
         organism: searchParams.getAll("organism") || [],
+        disease: searchParams.getAll("disease") || [],
     })
 
     useEffect(() => {
@@ -49,6 +50,7 @@ const DatasetsPage = () => {
             assayType: [],
             brainRegion: [],
             organism: [],
+            disease: [],
         })
     }
 
@@ -66,11 +68,12 @@ const DatasetsPage = () => {
             }
 
             // Check organism filter (assuming you have organism field in your data)
-            if (
-                selectedFilters.organism.length > 0 &&
-                record.organism &&
-                !selectedFilters.organism.includes(record.organism)
-            ) {
+            if (selectedFilters.organism.length > 0 && record.organism && !selectedFilters.organism.includes(record.organism)) {
+                return false
+            }
+
+            // Check disease filter (assuming you have disease field in your data)
+            if (selectedFilters.disease.length > 0 && record.disease && !selectedFilters.disease.includes(record.disease)) {
                 return false
             }
 

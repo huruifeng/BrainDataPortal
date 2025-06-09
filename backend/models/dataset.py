@@ -21,6 +21,7 @@ class DatasetBase(SQLModel):
     publication_DOI: str|None = Field(default="NA")
     publication_PMID: str|None = Field(default="NA")
 
+    disease: str = Field(default="NA")
     organism: str = Field(default="NA")
     n_samples: int|None = Field(default=np.nan)
     brain_super_region: str = Field(default="NA")
