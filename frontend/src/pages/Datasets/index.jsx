@@ -63,7 +63,7 @@ const DatasetsPage = () => {
             }
 
             // Check brain region filter
-            if (selectedFilters.brainRegion.length > 0 && !selectedFilters.brainRegion.includes(record.brain_region)) {
+            if (selectedFilters.brainRegion.length > 0 && !selectedFilters.brainRegion.includes(record.brain_super_region)) {
                 return false
             }
 

@@ -22,7 +22,7 @@ const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilt
     const filters = [
         {
             title: "Assay Type",
-            options: ["VisiumST", "scRNAseq", "scATACseq", "scMultiome"],
+            options: ["VisiumST", "scRNAseq","snRNAseq", "scATACseq", "scMultiome"],
             key: "assayType",
         },
         {

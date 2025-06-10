@@ -32,16 +32,16 @@ const Home = () => {
                     </Typography>
                     <Paper elevation={3} className="paper">
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Temporal Lobe</strong>
+                            <strong>Temporal Lobe(1)</strong>
                         </Typography>
                         <ul>
-                            <li>Middle temporal gyrus</li>
+                            <li>Middle temporal gyrus(1)</li>
                         </ul>
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Brainstem</strong>
+                            <strong>Brainstem(1)</strong>
                         </Typography>
                         <ul>
-                            <li>Midbrain</li>
+                            <li>Midbrain(1)</li>
                         </ul>
                     </Paper>
                 </Grid2>
@@ -62,8 +62,8 @@ const Home = () => {
                             <strong>Omics Assays</strong>
                         </Typography>
                         <ul>
-                            <li>Single-nucleus RNA-Seq</li>
-                            <li>10X Visium ST</li>
+                            <li>scRNASeq/snRNASeq(1)</li>
+                            <li>10X Visium ST(1)</li>
                         </ul>
                     </Paper>
                 </Grid2>
