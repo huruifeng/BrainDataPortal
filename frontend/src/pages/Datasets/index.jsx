@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Box, Typography, Divider} from "@mui/material";
+import {Box, Typography, Divider, Button, Link} from "@mui/material";
 
 import FilterPanel from "./FilterPanel";
 import DatasetDisplay from "./DatasetDisplay.jsx";
@@ -88,7 +88,7 @@ const DatasetsPage = () => {
     return (
         <div className="data-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
-            <Box className="title-row">
+            <Box className="title-row" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography variant="h4">
                     All datasets
                     {hasActiveFilters && (
@@ -97,6 +97,10 @@ const DatasetsPage = () => {
                         </Typography>
                     )}
                 </Typography>
+                {/* Right-side Add Button */}
+                <Button variant="contained" color="primary">
+                    <Link href="/datasetmanager" color="inherit" underline="hover">+ Add a dataset</Link>
+                </Button>
             </Box>
             <Divider/>
 

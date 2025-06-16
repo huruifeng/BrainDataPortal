@@ -76,13 +76,22 @@ class MetaFeatureData(BaseModel):
 async def dm_root():
     return {"Message": "Hello DataManager."}
 
-@router.get("/getseuratobjects")
-async def getseuratobjects():
-    file_path = "backend/Seurats"
+@router.get("/getdatasetfiles")
+async def getdatasetfiles():
+    file_path = "backend/DatasetFiles"
     file_ls = os.listdir(file_path)
-    for file in file_ls:
-        if not file.endswith(".rds"):
-            file_ls.remove(file)
+    # for file in file_ls:
+    #     if not file.endswith(".rds"):
+    #         file_ls.remove(file)
+    return file_ls
+
+@router.get("/getsamplesheets")
+async def getsamplesheets():
+    file_path = "backend/SampleSheets"
+    file_ls = os.listdir(file_path)
+    # for file in file_ls:
+    #     if not file.endswith(".rds"):
+    #         file_ls.remove(file)
     return file_ls
 
 @router.get("/checkdatasetname")
@@ -131,13 +140,13 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     log_file = open(f"{dataset_path}/extract_seurat_output.log", "w")
     if datatype.lower() in ["scrnaseq", "snrnaseq"]:
         subprocess.Popen(
-            ["Rscript", "backend/funcs/extract_SC.R", f"backend/Seurats/{seurat}", dataset_path],
+            ["Rscript", "backend/funcs/extract_SC.R", f"backend/DataFiles/{seurat}", dataset_path],
             stdout=log_file,
             stderr=log_file,
         )
     elif datatype.lower() in ["visiumst"]:
         subprocess.Popen(
-            ["Rscript", "backend/funcs/extract_Visium.R", f"backend/Seurats/{seurat}", dataset_path],
+            ["Rscript", "backend/funcs/extract_Visium.R", f"backend/DataFiles/{seurat}", dataset_path],
             stdout=log_file,
             stderr=log_file,
         )

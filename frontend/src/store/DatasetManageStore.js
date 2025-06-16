@@ -9,8 +9,12 @@ const dmURL = `${BASE_URL}/datasetmanage`;
 
 const useDatasetManageStore = create((set, get) => ({
     // Seurat objects
-    seuratObjects: [],
-    selectedSeurat: '',
+    datasetFiles: [],
+    selectedDatasetFile: '',
+
+    sampleSheets: [],
+    selectedSampleSheet: '',
+
 
     // Dataset name
     datasetName: '',
@@ -32,7 +36,8 @@ const useDatasetManageStore = create((set, get) => ({
     success: null,
 
     // Setters
-    setSelectedSeurat: (seurat) => set({selectedSeurat: seurat}),
+    setSelectedDatasetFile: (file) => set({selectedDatasetFile: file}),
+    setSelectedSampleSheet: (file) => set({selectedSampleSheet: file}),
     setDatasetName: (name) => set({datasetName: name}),
 
     // Actions
@@ -51,16 +56,31 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    fetchSeuratObjects: async () => {
+    fetchDatasetFiles: async () => {
         set({isLoading: true, error: null});
         try {
-            const response = await axios.get(`${dmURL}/getseuratobjects`);
-            set({seuratObjects: response.data});
+            const response = await axios.get(`${dmURL}/getdatasetfiles`);
+            set({datasetFiles: response.data});
         } catch (error) {
             set({
-                error: error.response?.data?.error || 'Failed to load Seurat objects. Please try again later.'
+                error: error.response?.data?.error || 'Failed to load dataset files. Please try again or contact support.'
             });
-            console.error('Error fetching Seurat objects:', error);
+            console.error('Error fetching dataset files:', error);
+        } finally {
+            set({isLoading: false});
+        }
+    },
+
+    fetchSampleSheets: async () => {
+        set({isLoading: true, error: null});
+        try {
+            const response = await axios.get(`${dmURL}/getsamplesheets`);
+            set({sampleSheets: response.data});
+        } catch (error) {
+            set({
+                error: error.response?.data?.error || 'Failed to load sample sheets files. Please try again or contact support.'
+            });
+            console.error('Error fetching sample sheets files:', error);
         } finally {
             set({isLoading: false});
         }

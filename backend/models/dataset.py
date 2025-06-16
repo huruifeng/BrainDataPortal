@@ -29,7 +29,8 @@ class DatasetBase(SQLModel):
 
     sample_info: str|None = Field(default="NA")
     assay: str = Field(default="NA")
-    seurat: str = Field(default="NA")
+    datafile: str = Field(default="NA")
+    sample_sheet: str = Field(default="NA")
 
     study_id: str = Field(foreign_key="study.study_id")
 

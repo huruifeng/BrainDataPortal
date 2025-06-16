@@ -205,6 +205,8 @@ async def getsampletable(request:Request, session: SessionDep):
     dataset_ids = request.query_params.getlist("dataset_id")
     conditions = {k: request.query_params.getlist(k) for k, v in request.query_params.items()}
 
+    print(f"getsampletable({sample_ids},{dataset_ids},{conditions}) called================")
+
     if not sample_ids and not dataset_ids:
         raise HTTPException(status_code=400, detail="Dataset_id or sample_id is empty")
 
