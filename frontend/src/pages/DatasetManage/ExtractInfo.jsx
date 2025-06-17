@@ -254,9 +254,9 @@ const ExtractInfo = forwardRef((props, ref) => {
                                     required={requiredFields[section].includes(key)}
                                     onChange={handleChange(section, setter)(key)}
                                 >
-                                    <MenuItem value="HomoSapiens">Homo Sapiens</MenuItem>
-                                    <MenuItem value="MusMusculus">Mus Musculus</MenuItem>
-                                    <MenuItem value="RattusNorvegicus">Rattus Norvegicus</MenuItem>
+                                    <MenuItem value="Homo Sapiens">Homo Sapiens</MenuItem>
+                                    <MenuItem value="Mus Musculus">Mus Musculus</MenuItem>
+                                    <MenuItem value="Rattus Norvegicus">Rattus Norvegicus</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>

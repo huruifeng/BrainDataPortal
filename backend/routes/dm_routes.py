@@ -156,6 +156,7 @@ async def extractdata(data: SubmissionData, session: Session = Depends(get_sessi
                     stderr=log_file,
                 )
             elif datatype.lower().edswith("qtl") and dataset_file.endswith(".csv"):
+                ## TODO: add qtl extraction script
                pass
             else:
                 return {"message": "Error: Invalid datatype.", "success": False}
