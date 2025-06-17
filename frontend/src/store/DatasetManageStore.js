@@ -8,7 +8,7 @@ const BASE_URL = "http://localhost:8000"; // Replace with your backend URL
 const dmURL = `${BASE_URL}/datasetmanage`;
 
 const useDatasetManageStore = create((set, get) => ({
-    // Seurat objects
+    // State
     datasetFiles: [],
     selectedDatasetFile: '',
 
@@ -103,11 +103,11 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    extractSeuratData: async (payload) => {
-        const {selectedSeurat, datasetName} = get();
+    extractData: async (payload) => {
+        const {selectedDatasetFile, datasetName} = get();
 
-        if (!selectedSeurat || !datasetName) {
-            set({error: 'Please select a Seurat object and provide a unique dataset name'});
+        if (!selectedDatasetFile || !datasetName) {
+            set({error: 'Please select a dataset file and provide a unique dataset name'});
             return;
         }
 
@@ -122,11 +122,11 @@ const useDatasetManageStore = create((set, get) => ({
         });
 
         try {
-            const response = await axios.post(`${dmURL}/extractseuratdata`, payload);
+            const response = await axios.post(`${dmURL}/extractdata`, payload);
             return response.data;
 
         } catch (error) {
-            const errorMessage = error.response?.data?.error || 'An error occurred while running extractseuratdata.';
+            const errorMessage = error.response?.data?.error || 'An error occurred while running extractdata.';
             set({
                 error: errorMessage,
                 isProcessing: false,
@@ -138,7 +138,7 @@ const useDatasetManageStore = create((set, get) => ({
         }
     },
 
-    fetchProcessingStatus: async (dataset,task="extract_seurat") => {
+    fetchProcessingStatus: async (dataset,task="extract_data") => {
         try {
             const response = await axios.get(`${dmURL}/getprocessingstatus?dataset=${dataset}&task=${task}`);
             const data = response.data;

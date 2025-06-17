@@ -13,7 +13,7 @@ import useDatasetManageStore from "../../store/DatasetManageStore.js";
 import {CheckCircle as CheckCircleIcon, Error as ErrorIcon} from "@mui/icons-material";
 
 const requiredFields = {
-    dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email', 'brain_super_region', 'brain_region', 'n_samples', 'assay', "disease", "organism","sample_sheet"],
+    dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email', 'brain_super_region', 'brain_region', "disease", "organism","sample_sheet"],
     study: ['study_name', 'team_name', 'lab_name'],
     protocol: ['protocol_id', 'protocol_name'],
 };
@@ -44,8 +44,6 @@ const ExtractInfo = forwardRef((props, ref) => {
 
     const [datasetInfo, setDatasetInfo] = useState({
         dataset_name: '',
-        assay: '',
-        n_samples: '',
         sample_sheet: '',
         description: '',
         PI_full_name: '',
@@ -62,7 +60,6 @@ const ExtractInfo = forwardRef((props, ref) => {
         publication_DOI: '',
         publication_PMID: '',
         sample_info: '',
-
     });
 
     const [studyInfo, setStudyInfo] = useState({
@@ -210,13 +207,13 @@ const ExtractInfo = forwardRef((props, ref) => {
                                         ) : isNameUnique === true ? (
                                             <CheckCircleIcon color="success"/>
                                         ) : isNameUnique === false ? (
-                                            <ErrorIcon color="error"/>
+                                            <ErrorIcon color="warning"/>
                                         ) : null,
                                     }}
                                 />
                                 <FormHelperText>
                                     {isNameUnique === false
-                                        ? "This name is already in use"
+                                        ? "This name is already in use. Existing content will be OVERWRITTEN !!!"
                                         : "The dataset name must be unique and will be used to identify this dataset in the system"}
                                 </FormHelperText>
                             </FormControl>
@@ -299,13 +296,9 @@ const ExtractInfo = forwardRef((props, ref) => {
                                     required={requiredFields[section].includes(key)}
                                     onChange={(e) => setSelectedSampleSheet(e.target.value)}
                                 >
-                                    <MenuItem key="None" value="None">
-                                        None
-                                    </MenuItem>
+                                    <MenuItem key="None" value="None">None</MenuItem>
                                     {sampleSheets.map((obj) => (
-                                        <MenuItem key={obj} value={obj}>
-                                            {obj}
-                                        </MenuItem>
+                                        <MenuItem key={obj} value={obj}>{obj}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>

@@ -1,4 +1,5 @@
 import json
+import shutil
 import subprocess
 from datetime import datetime
 import os
@@ -12,7 +13,7 @@ from typing import Optional
 from sqlmodel import Session
 
 from backend.db import get_session
-from backend.db_utils.crud import insert_study, insert_dataset
+from backend.db_utils.crud import insert_study, insert_dataset, import_sample_sheet
 from backend.models import Study, Dataset
 
 router = APIRouter()
@@ -23,7 +24,6 @@ class SeuratInfo(BaseModel):
 
 class DatasetInfo(BaseModel):
     dataset_name: str
-    assay: str
     description: Optional[str] = None
     PI_full_name: str
     PI_email: str
@@ -34,10 +34,12 @@ class DatasetInfo(BaseModel):
     other_funding_source: Optional[str] = None
     publication_DOI: Optional[str] = None
     publication_PMID: Optional[str] = None
-    n_samples: Optional[int] = None
     brain_super_region: Optional[str] = None
     brain_region: Optional[str] = None
     sample_info: Optional[str] = None
+    sample_sheet: Optional[str] = None
+    organism: Optional[str] = None
+    disease: Optional[str] = None
 
 class StudyInfo(BaseModel):
     study_name: str
@@ -101,10 +103,10 @@ async def checkdatasetname(name: str):
         return {"isUnique": False}
     return {"isUnique": True}
 
-@router.post("/extractseuratdata")
-async def extractseuratdata(data: SubmissionData, session: Session = Depends(get_session)):
-    seurat = data.seurat_info.seurat
-    datatype = data.seurat_info.datatype
+@router.post("/extractdata")
+async def extractdata(data: SubmissionData, session: Session = Depends(get_session)):
+    dataset_file = data.datasetfile_info.file
+    datatype = data.datasetfile_info.datatype
     dataset_name = data.dataset_info.dataset_name
     dataset_path = "backend/datasets/" + dataset_name
 
@@ -117,8 +119,8 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     dataset_dict = data.dataset_info.model_dump()
 
     config = {
-        "seurat": {
-            "seurat_file": seurat,
+        "datasetfile": {
+            "file": dataset_file,
             "datatype": datatype},
         "dataset": dataset_dict,
         "study": study_dict,
@@ -131,41 +133,60 @@ async def extractseuratdata(data: SubmissionData, session: Session = Depends(get
     study = Study(**study_dict)
 
     dataset_dict["dataset_id"] = dataset_name
+    dataset_dict["assay"] = datatype
     dataset_dict["study_id"] = study_dict["study_id"]
-    dataset_dict["seurat"] = seurat
+    dataset_dict["dataset_file"] = dataset_file
     dataset = Dataset(**dataset_dict)
 
-    ## process seurat
+    ## process dataset
     # Open a file to log stdout and stderr
-    log_file = open(f"{dataset_path}/extract_seurat_output.log", "w")
-    if datatype.lower() in ["scrnaseq", "snrnaseq"]:
-        subprocess.Popen(
-            ["Rscript", "backend/funcs/extract_SC.R", f"backend/DataFiles/{seurat}", dataset_path],
-            stdout=log_file,
-            stderr=log_file,
-        )
-    elif datatype.lower() in ["visiumst"]:
-        subprocess.Popen(
-            ["Rscript", "backend/funcs/extract_Visium.R", f"backend/DataFiles/{seurat}", dataset_path],
-            stdout=log_file,
-            stderr=log_file,
-        )
-    else:
-        return {"message": "Error: Invalid datatype.", "success": False}
+    with open(f"{dataset_path}/extractdata_output.log", "w") as log_file:
+        if dataset_file != "manuallyupload":
+            if datatype.lower() in ["scrnaseq", "snrnaseq"] and dataset_file.endswith(".rds"):
+                subprocess.Popen(
+                    ["Rscript", "backend/funcs/11_extract_SC.R", f"backend/DatasetFiles/{dataset_file}", dataset_path],
+                    stdout=log_file,
+                    stderr=log_file,
+                )
+            elif datatype.lower() in ["visiumst"] and dataset_file.endswith(".rds"):
+                subprocess.Popen(
+                    ["Rscript", "backend/funcs/extract_Visium.R", f"backend/DatasetFiles/{dataset_file}", dataset_path],
+                    stdout=log_file,
+                    stderr=log_file,
+                )
+            elif datatype.lower().edswith("qtl") and dataset_file.endswith(".csv"):
+               pass
+            else:
+                return {"message": "Error: Invalid datatype.", "success": False}
+        else:
+            log_file.write("Manually uploaded dataset.\n")
 
-    # print("=======insert info into database==========")
-    # insert_study(study, session)
-    # insert_dataset(dataset, session)
+        try:
+            print("=======insert info into database==========")
+            insert_study(study, session)
+            insert_dataset(dataset, session)
+
+            if dataset_dict["sample_sheet"] != "None":
+                sample_sheet_path = f"backend/SampleSheets/{dataset_dict['sample_sheet']}"
+                shutil.copyfile(sample_sheet_path, f"{dataset_path}/{dataset_dict['sample_sheet']}")
+                import_sample_sheet(sample_sheet_path, session)
+
+        except Exception as e:
+            print(e)
+            log_file.write(f"Error: {e}\n")
+            return {"message": "Error: Failed to insert dataset info into database.", "success": False}
+        finally:
+            log_file.write("Done!\n")
 
     now = datetime.now()
     return {"message": "Data received successfully", "success": True, "jobId": dataset_name + now.strftime("%Y%m%d%H%M%S")}
 
 @router.get("/getprocessingstatus")
 async def getprocessingstatus(dataset: str =  Query(...), task: str = Query(...)):
-    if task == "extract_seurat":
-        log_file_path = f"backend/datasets/{dataset}/extract_seurat_output.log"
+    if task == "extract_data":
+        log_file_path = f"backend/datasets/{dataset}/extractdata_output.log"
     if task == "prepare_metadata":
-        log_file_path = f"backend/datasets/{dataset}/prepare_meta_output.log"
+        log_file_path = f"backend/datasets/{dataset}/preparemeta_output.log"
     try:
         with open(log_file_path, "r") as f:
             log_content = f.read()
@@ -231,7 +252,7 @@ async def preparemetafeatures(data: MetaFeatureData, session: Session = Depends(
     ## process meta data
     print("=======process meta data==========")
     # Open a file to log stdout and stderr
-    log_file = open(f"{dataset_path}/prepare_meta_output.log", "w")
+    log_file = open(f"{dataset_path}/preparemeta_output.log", "w")
     if dataset_info["seurat"]["datatype"].lower() in ["scrnaseq", "snrnaseq"]:
         subprocess.Popen(
             ["python3", "backend/funcs/rename_meta_SC.py",dataset_path, ",".join(selected_features), sample_id_column, major_cluster_column, condition_column],

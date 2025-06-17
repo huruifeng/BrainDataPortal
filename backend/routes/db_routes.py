@@ -98,7 +98,7 @@ async def import_csv(table: str):
         # Logic to import sample data
         try:
             ## read the csv file
-            df = pd.read_csv("backend/files/Sample_VisiumST.csv", thousands=',')
+            df = pd.read_csv("backend/files/Sample.csv", thousands=',')
             df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
             df.replace(empty_data_lst, "NA", inplace=True)
             df.loc[df['repeated_sample'] == "NA", 'repeated_sample'] = -1

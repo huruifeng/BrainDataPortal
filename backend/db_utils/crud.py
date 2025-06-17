@@ -1,9 +1,12 @@
 import uuid
 
+import numpy as np
+import pandas as pd
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from backend.models import *
+from backend.db import engine
 
 ## ===================================================
 ## insert functions
@@ -36,6 +39,23 @@ def insert_sample(sample: Sample, session: Session):
     session.commit()
     session.refresh(sample)
     return sample
+
+def import_sample_sheet(sample_sheet: str, session: Session):
+    ## read the csv file
+    empty_data_lst = [None, "none", "Null", "null", "na", np.nan, "Unknown", "unknown", "NaN", "nan", "N/A"]
+    df = pd.read_csv(sample_sheet, thousands=',')
+    df['id'] = [str(uuid.uuid4().hex) for _ in range(len(df))]
+    df.replace(empty_data_lst, "NA", inplace=True)
+    df.loc[df['repeated_sample'] == "NA", 'repeated_sample'] = -1
+    df.loc[df['replicate_count'] == "NA", 'replicate_count'] = -1
+    df.loc[df['input_cell_count'] == "NA", 'input_cell_count'] = -1
+    df.loc[df['RIN'] == "NA", 'RIN'] = -1
+    df.loc[df['source_RIN'] == "NA", 'source_RIN'] = -1
+    df.loc[df['DV200'] == "NA", 'DV200'] = -1
+    df.loc[df['pm_PH'] == "NA", 'pm_PH'] = -1
+    df.loc[df['sequencing_length'] == "NA", 'sequencing_length'] = -1
+
+    df.to_sql("sample", engine, if_exists="append", index=False)
 
 def insert_protocol(protocol: Protocol, session: Session):
     session.add(protocol)
