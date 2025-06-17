@@ -13,7 +13,7 @@ import useDatasetManageStore from "../../store/DatasetManageStore.js";
 import {CheckCircle as CheckCircleIcon, Error as ErrorIcon} from "@mui/icons-material";
 
 const requiredFields = {
-    dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email', 'brain_super_region', 'brain_region', "disease", "organism","sample_sheet"],
+    dataset: ['dataset_name', 'PI_full_name', 'PI_email', 'first_contributor', 'first_contributor_email', 'brain_super_region', 'brain_region', "disease", "organism","sample_sheet", "n_samples"],
     study: ['study_name', 'team_name', 'lab_name'],
     protocol: ['protocol_id', 'protocol_name'],
 };
@@ -44,8 +44,9 @@ const ExtractInfo = forwardRef((props, ref) => {
 
     const [datasetInfo, setDatasetInfo] = useState({
         dataset_name: '',
-        sample_sheet: '',
         description: '',
+        n_samples: '',
+        sample_sheet: '',
         PI_full_name: '',
         PI_email: '',
         first_contributor: '',
@@ -186,7 +187,7 @@ const ExtractInfo = forwardRef((props, ref) => {
                 }
                 if (key === 'dataset_name') {
                     return (
-                        <Grid item xs={12} md={6} key={key}>
+                        <Grid item xs={12} md={8} key={key}>
                             <FormControl fullWidth error={isNameUnique === false || !!errors[errorKey]}>
                                 <TextField
                                     id="dataset-name"
@@ -291,10 +292,10 @@ const ExtractInfo = forwardRef((props, ref) => {
                                 <InputLabel id={`${key}-label`}>Sample sheet *</InputLabel>
                                 <Select
                                     labelId={`${key}-label`}
-                                    value={selectedSampleSheet}
+                                    value={value}
                                     label="Sample sheet"
                                     required={requiredFields[section].includes(key)}
-                                    onChange={(e) => setSelectedSampleSheet(e.target.value)}
+                                    onChange={handleChange(section, setter)(key)}
                                 >
                                     <MenuItem key="None" value="None">None</MenuItem>
                                     {sampleSheets.map((obj) => (
@@ -344,7 +345,7 @@ const ExtractInfo = forwardRef((props, ref) => {
                             onChange={(e) => setSelectedDatasetFile(e.target.value)}
                         >
                             <MenuItem key="manuallyupload" value="manuallyupload">
-                                Manually upload
+                                Manually process and upload
                             </MenuItem>
                             {datasetFiles.map((obj) => (
                                 <MenuItem key={obj} value={obj}>

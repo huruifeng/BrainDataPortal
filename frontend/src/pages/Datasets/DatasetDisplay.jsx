@@ -178,7 +178,7 @@ const DatasetDisplay = ({dataRecords}) => {
                                 {displayedData.map((record) => (
                                     <TableRow key={record.dataset_id}>
                                         <TableCell>
-                                            <Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link>
+                                            {record.sample_sheet === "None" ? record.dataset_id : <Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link>}
                                         </TableCell>
                                         <TableCell>{record.PI_full_name}</TableCell>
                                         <TableCell>{record.first_contributor}</TableCell>

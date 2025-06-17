@@ -18,8 +18,8 @@ from backend.models import Study, Dataset
 
 router = APIRouter()
 
-class SeuratInfo(BaseModel):
-    seurat: str
+class DatasetFileInfo(BaseModel):
+    file: str
     datatype: str
 
 class DatasetInfo(BaseModel):
@@ -38,6 +38,7 @@ class DatasetInfo(BaseModel):
     brain_region: Optional[str] = None
     sample_info: Optional[str] = None
     sample_sheet: Optional[str] = None
+    n_samples: Optional[int] = None
     organism: Optional[str] = None
     disease: Optional[str] = None
 
@@ -62,7 +63,7 @@ class ProtocolInfo(BaseModel):
     other_reference: Optional[str] = None
 
 class SubmissionData(BaseModel):
-    seurat_info: SeuratInfo
+    datasetfile_info: DatasetFileInfo
     dataset_info: DatasetInfo
     study_info: StudyInfo
     protocol_info: ProtocolInfo
@@ -150,7 +151,7 @@ async def extractdata(data: SubmissionData, session: Session = Depends(get_sessi
                 )
             elif datatype.lower() in ["visiumst"] and dataset_file.endswith(".rds"):
                 subprocess.Popen(
-                    ["Rscript", "backend/funcs/extract_Visium.R", f"backend/DatasetFiles/{dataset_file}", dataset_path],
+                    ["Rscript", "backend/funcs/11_extract_Visium.R", f"backend/DatasetFiles/{dataset_file}", dataset_path],
                     stdout=log_file,
                     stderr=log_file,
                 )
@@ -163,6 +164,7 @@ async def extractdata(data: SubmissionData, session: Session = Depends(get_sessi
 
         try:
             print("=======insert info into database==========")
+            log_file.write("Inserting dataset info into database...\n")
             insert_study(study, session)
             insert_dataset(dataset, session)
 
@@ -283,7 +285,6 @@ async def refreshdatabase(session: Session = Depends(get_session)):
 
             with open(f"{dataset_path}/dataset_info.toml", 'r') as f:
                 dataset_info = toml.load(f)
-
 
 
             print("=======insert info into database==========")
