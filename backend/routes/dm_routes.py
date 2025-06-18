@@ -142,7 +142,7 @@ async def extractdata(data: SubmissionData, session: Session = Depends(get_sessi
     ## process dataset
     # Open a file to log stdout and stderr
     with open(f"{dataset_path}/extractdata_output.log", "w") as log_file:
-        if dataset_file != "manuallyupload":
+        if not(dataset_file == "manuallyupload" or dataset_file == ""):
             if datatype.lower() in ["scrnaseq", "snrnaseq"] and dataset_file.endswith(".rds"):
                 subprocess.Popen(
                     ["Rscript", "backend/funcs/11_extract_SC.R", f"backend/DatasetFiles/{dataset_file}", dataset_path],
@@ -155,7 +155,7 @@ async def extractdata(data: SubmissionData, session: Session = Depends(get_sessi
                     stdout=log_file,
                     stderr=log_file,
                 )
-            elif datatype.lower().edswith("qtl") and dataset_file.endswith(".csv"):
+            elif datatype.lower().endswith("qtl") and dataset_file.endswith(".csv"):
                 ## TODO: add qtl extraction script
                pass
             else:
@@ -169,7 +169,7 @@ async def extractdata(data: SubmissionData, session: Session = Depends(get_sessi
             insert_study(study, session)
             insert_dataset(dataset, session)
 
-            if dataset_dict["sample_sheet"] != "None":
+            if not(dataset_dict["sample_sheet"] == "None" or dataset_dict["sample_sheet"] == ""):
                 sample_sheet_path = f"backend/SampleSheets/{dataset_dict['sample_sheet']}"
                 shutil.copyfile(sample_sheet_path, f"{dataset_path}/{dataset_dict['sample_sheet']}")
                 import_sample_sheet(sample_sheet_path, session)
@@ -295,13 +295,18 @@ async def refreshdatabase(session: Session = Depends(get_session)):
 
             dataset_dict = dataset_info["dataset"]
             dataset_dict["dataset_id"] = dataset_dict["dataset_name"]
+            dataset_dict["assay"] = dataset_info["datasetfile"]["datatype"]
             dataset_dict["study_id"] = study_dict["study_id"]
-            dataset_dict["seurat"] = dataset_info["seurat"]["seurat_file"]
-            dataset_dict["n_samples"] = int(dataset_dict["n_samples"])
+            dataset_dict["dataset_file"] = dataset_info["datasetfile"]["file"]
             dataset = Dataset(**dataset_dict)
 
             insert_study(study, session)
             insert_dataset(dataset, session)
+
+            if not(dataset_dict["sample_sheet"] == "None" or dataset_dict["sample_sheet"] == ""):
+                sample_sheet_path = f"backend/SampleSheets/{dataset_dict['sample_sheet']}"
+                shutil.copyfile(sample_sheet_path, f"{dataset_path}/{dataset_dict['sample_sheet']}")
+                import_sample_sheet(sample_sheet_path, session)
 
         return {"message": "Database refreshed successfully", "success": True}
     except Exception as e:

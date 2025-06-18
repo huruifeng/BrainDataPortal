@@ -23,6 +23,11 @@ def insert_study(study: Study, session: Session):
         return study
 
 def insert_dataset(dataset: Dataset, session: Session):
+    ## check if dataset exists
+    statement = select(Dataset).where(Dataset.dataset_id == dataset.dataset_id)  # Create a SELECT query
+    result = session.exec(statement).first()
+    if result:
+        return result
     session.add(dataset)
     session.commit()
     session.refresh(dataset)
@@ -35,6 +40,12 @@ def insert_data(data: Data, session: Session):
     return data
 
 def insert_sample(sample: Sample, session: Session):
+    ## check if sample exists
+    statement = select(Sample).where(Sample.sample_id == sample.sample_id,
+                                     Sample.dataset_id == sample.dataset_id)  # Create a SELECT query
+    result = session.exec(statement).first()
+    if result:
+        return result
     session.add(sample)
     session.commit()
     session.refresh(sample)
@@ -55,7 +66,47 @@ def import_sample_sheet(sample_sheet: str, session: Session):
     df.loc[df['pm_PH'] == "NA", 'pm_PH'] = -1
     df.loc[df['sequencing_length'] == "NA", 'sequencing_length'] = -1
 
-    df.to_sql("sample", engine, if_exists="append", index=False)
+    for index, row in df.iterrows():
+        sample = Sample(
+            sample_id=row['sample_id'],
+            source_id=row['source_id'],
+            replicate=row['replicate'],
+            replicate_count=row['replicate_count'],
+            repeated_sample=row['repeated_sample'],
+            batch=row['batch'],
+            tissue=row['tissue'],
+            brain_region=row['brain_region'],
+            hemisphere=row['hemisphere'],
+            region_level_1=row['region_level_1'],
+            region_level_2=row['region_level_2'],
+            region_level_3=row['region_level_3'],
+            RIN=row['RIN'],
+            source_RIN=row['source_RIN'],
+            molecular_source=row['molecular_source'],
+            input_cell_count=row['input_cell_count'],
+            assay_kit=row['assay_kit'],
+            sequencing_end=row['sequencing_end'],
+            sequencing_length=row['sequencing_length'],
+            sequencing_instrument=row['sequencing_instrument'],
+            organism_ontology_term_id=row['organism_ontology_term_id'],
+            development_stage_ontology_term_id=row['development_stage_ontology_term_id'],
+            sex_ontology_term_id=row['sex_ontology_term_id'],
+            self_reported_ethnicity_ontology_term_id=row['self_reported_ethnicity_ontology_term_id'],
+            disease_ontology_term_id=row['disease_ontology_term_id'],
+            tissue_ontology_term_id=row['tissue_ontology_term_id'],
+            cell_type_ontology_term_id=row['cell_type_ontology_term_id'],
+            assay_ontology_term_id=row['assay_ontology_term_id'],
+
+            suspension_type=row['suspension_type'],
+            DV200=row['DV200'],
+            pm_PH=row['pm_PH'],
+            donor_id=row['donor_id'],
+
+            dataset_id=row['dataset_id'],
+            assay=row['assay'],
+            data_protocol=row["data_protocol"]
+        )
+        insert_sample(sample, session)
 
 def insert_protocol(protocol: Protocol, session: Session):
     session.add(protocol)
