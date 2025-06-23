@@ -8,7 +8,7 @@ const StatBar = () => {
     const stats = [
         {icon: <Folders/>, value: "3", label: "Datasets", link: "/datasets"},
         {icon: <LandPlot/>, value: "3", label: "Primary sites", link: "/datasets"},
-        {icon: <Description/>, value: "535", label: "Samples", link: "/samples/all"},
+        {icon: <Description/>, value: "203", label: "Samples", link: "/samples/all"},
         {icon: <Images/>, value: "106", label: "Slices", link: "/views/visiumview"},
         {icon: <Dna/>, value: "22,534", label: "Genes", link: "/views/geneview"},
         {icon: <DnaOff/>, value: "2,940,240", label: "Mutations", link: "/views/regionsview"},

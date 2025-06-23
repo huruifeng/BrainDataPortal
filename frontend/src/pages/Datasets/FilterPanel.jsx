@@ -9,6 +9,7 @@ const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilt
     const [expandedFilters, setExpandedFilters] = useState({
         assayType: true,
         brainRegion: true,
+        brainSubregion: false,
         organism: false,
     })
 
@@ -29,6 +30,11 @@ const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilt
             title: "Brain Region",
             options: ["Frontal Lobe", "Parietal Lobe", "Occipital Lobe", "Temporal Lobe"],
             key: "brainRegion",
+        },
+        {
+            title: "Brain Sub-Region",
+            options: ["Middle temporal gyrus", "Middlebrain"],
+            key: "brainSubregion",
         },
         {
             title: "Organism",

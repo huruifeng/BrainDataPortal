@@ -15,6 +15,7 @@ const DatasetsPage = () => {
     const [selectedFilters, setSelectedFilters] = useState({
         assayType: searchParams.getAll("assayType") || [],
         brainRegion: searchParams.getAll("brainRegion") || [],
+        brainSubregion: searchParams.getAll("brainSubregion") || [],
         organism: searchParams.getAll("organism") || [],
         disease: searchParams.getAll("disease") || [],
     })
@@ -49,6 +50,7 @@ const DatasetsPage = () => {
         setSelectedFilters({
             assayType: [],
             brainRegion: [],
+            brainSubregion: [],
             organism: [],
             disease: [],
         })
@@ -64,6 +66,11 @@ const DatasetsPage = () => {
 
             // Check brain region filter
             if (selectedFilters.brainRegion.length > 0 && !selectedFilters.brainRegion.includes(record.brain_super_region)) {
+                return false
+            }
+
+            // Check brain sub-region filter
+            if (selectedFilters.brainSubregion.length > 0 && !selectedFilters.brainSubregion.includes(record.brain_region)) {
                 return false
             }
 

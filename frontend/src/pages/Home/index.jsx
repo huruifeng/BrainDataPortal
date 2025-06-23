@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Typography, Paper } from "@mui/material";
+import { Typography, Paper , Link} from "@mui/material";
 import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
 import "./Home.css"; // Import the CSS file
 
@@ -32,16 +32,16 @@ const Home = () => {
                     </Typography>
                     <Paper elevation={3} className="paper">
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Temporal Lobe(1)</strong>
+                            <strong><Link href={`datasets?brainRegion=Temporal Lobe`} underline="hover" color="inherit">Temporal Lobe(1)</Link></strong>
                         </Typography>
                         <ul>
-                            <li>Middle temporal gyrus(1)</li>
+                            <li><Link href={`datasets?brainSubregion=Middle temporal gyrus`} underline="hover">Middle temporal gyrus(1)</Link></li>
                         </ul>
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Brainstem(1)</strong>
+                            <strong><Link href={`datasets?brainRegion=Brainstem`} underline="hover" color="inherit">Brainstem(1)</Link></strong>
                         </Typography>
                         <ul>
-                            <li>Midbrain(1)</li>
+                            <li><Link href={`datasets?brainSubregion=Midbrain`} underline="hover">Midbrain(1)</Link></li>
                         </ul>
                     </Paper>
                 </Grid2>
@@ -62,8 +62,8 @@ const Home = () => {
                             <strong>Omics Assays</strong>
                         </Typography>
                         <ul>
-                            <li>scRNASeq/snRNASeq(1)</li>
-                            <li>10X Visium ST(1)</li>
+                            <li><Link href={`datasets?assayType=snRNAseq`} underline="hover">scRNASeq(1)</Link></li>
+                            <li><Link href={`datasets?assayType=VisiumST`} underline="hover">10X Visium ST(1)</Link></li>
                         </ul>
                     </Paper>
                 </Grid2>
