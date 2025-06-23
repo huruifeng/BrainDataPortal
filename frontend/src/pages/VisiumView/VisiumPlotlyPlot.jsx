@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import {calculateMinMax, isCategorical, sortObjectByKey} from "../../utils/funcs.js";
 
 const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
-    console.log("Rendering PlotlyFeaturePlot:", metaData);
+    // console.log("Rendering PlotlyFeaturePlot:", metaData);
     const containerRef = useRef(null);
     const [imageUrl, setImageUrl] = useState("");
     const [naturalDimensions, setNaturalDimensions] = useState({width: 0, height: 0});
@@ -146,7 +146,7 @@ const PlotlyFeaturePlot = ({visiumData, geneData, metaData, feature}) => {
         // automrgin: true,
         autosize: true,
         scrollZoom: true,
-        xaxis: {showgrid: false, zeroline: false, visible: false, range: [0, naturalDimensions.width], autornange: false},
+        xaxis: {showgrid: false, zeroline: false, visible: false, range: [0, naturalDimensions.width], autorange: false},
         yaxis: {showgrid: false, zeroline: false, visible: false, range: [naturalDimensions.height, 0], autorange: false},
         images: imageUrl ? [{
             source: imageUrl,
