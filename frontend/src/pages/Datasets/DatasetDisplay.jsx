@@ -114,9 +114,9 @@ const DatasetDisplay = ({dataRecords}) => {
                         <ToggleButton value="list" aria-label="List">
                             <ListIcon/>
                         </ToggleButton>
-                        <ToggleButton value="matrix" aria-label="Matrix">
-                            <PivotTableChart/>
-                        </ToggleButton>
+                        {/*<ToggleButton value="matrix" aria-label="Matrix">*/}
+                        {/*    <PivotTableChart/>*/}
+                        {/*</ToggleButton>*/}
                     </ToggleButtonGroup>
                     <FormControl sx={{m: 1, minWidth: 120, margin: "0 8px"}} size="small">
                         <InputLabel id="select-records-per-page-label">Records / Page</InputLabel>
