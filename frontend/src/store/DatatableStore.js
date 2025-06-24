@@ -2,7 +2,7 @@ import {create} from "zustand";
 import { toast } from "react-toastify";
 import {getDatatable_get, getDatasetList, getSampletable_get} from "../api/api.js";
 
-const useDataStore = create((set) => ({
+const useDatatableStore = create((set) => ({
     dataRecords: [],
     datafetchStatus: null,
 
@@ -78,4 +78,4 @@ const useDataStore = create((set) => ({
 
 }));
 
-export default useDataStore;
+export default useDatatableStore;

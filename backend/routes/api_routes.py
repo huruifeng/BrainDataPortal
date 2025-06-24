@@ -12,6 +12,15 @@ async def read_root():
     return {"Message": "Hello API."}
 
 
+@router.get("/gethomedata")
+async def gethomedata(session: SessionDep):
+    print("gethomedata() called================")
+    response = get_home_data(session)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting home data.")
+    return response
+
 @router.get("/getgenelist")
 async def getgenelist(request:Request):
     print("getgenelist() called================")
@@ -204,6 +213,8 @@ async def getsampletable(request:Request, session: SessionDep):
     sample_ids = request.query_params.getlist("sample_id")
     dataset_ids = request.query_params.getlist("dataset_id")
     conditions = {k: request.query_params.getlist(k) for k, v in request.query_params.items()}
+
+    print(f"getsampletable({sample_ids},{dataset_ids},{conditions}) called================")
 
     if not sample_ids and not dataset_ids:
         raise HTTPException(status_code=400, detail="Dataset_id or sample_id is empty")

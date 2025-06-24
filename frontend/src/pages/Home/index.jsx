@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Typography, Paper } from "@mui/material";
+import {useEffect, useState} from "react";
+import { Typography, Paper , Link} from "@mui/material";
 import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
 import "./Home.css"; // Import the CSS file
 
@@ -8,8 +8,16 @@ import BrainsideSelector from "../../components/BrainsideSelector";
 import BrainRegions from "../../components/BrainRegions";
 import StatBar from "../../components/StatBar";
 
+import useHomeStore from "../../store/HomeStore.js";
+
 const Home = () => {
-    const [disease, setDisease] = useState("Healthy");
+    const {homeData,fetchHomeData} = useHomeStore();
+
+    useEffect(() => {
+        fetchHomeData();
+    }, []);
+
+    const [disease, setDisease] = useState("PD");
 
     const handleDiseaseChange = (newDisease) => {
         setDisease(newDisease);
@@ -26,34 +34,34 @@ const Home = () => {
 
             <Grid2 container spacing={2} className="content-grid">
                 {/* Left Section */}
-                <Grid2 xs={12} md={2}>
+                <Grid2 xs={12} md={2} id="left-section">
                     <Typography variant="h6" className="section-title">
                         Brain regions
                     </Typography>
                     <Paper elevation={3} className="paper">
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Temporal Lobe</strong>
+                            <strong><Link href={`datasets?brainRegion=Temporal Lobe`} underline="hover" color="inherit">Temporal Lobe(1)</Link></strong>
                         </Typography>
                         <ul>
-                            <li>Middle temporal gyrus</li>
+                            <li><Link href={`datasets?brainSubregion=Middle temporal gyrus`} underline="hover">Middle temporal gyrus(1)</Link></li>
                         </ul>
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Brainstem</strong>
+                            <strong><Link href={`datasets?brainRegion=Brainstem`} underline="hover" color="inherit">Brainstem(1)</Link></strong>
                         </Typography>
                         <ul>
-                            <li>Midbrain</li>
+                            <li><Link href={`datasets?brainSubregion=Midbrain`} underline="hover">Midbrain(1)</Link></li>
                         </ul>
                     </Paper>
                 </Grid2>
 
                 {/* Middle Section (Brain Image) */}
-                <Grid2 xs={12} md={5} className="middle-section">
+                <Grid2 xs={12} md={5} id="middle-section">
                     <BrainsideSelector  />
                     <BrainRegions />
                 </Grid2>
 
                 {/* Right Section */}
-                <Grid2 xs={12} md={2}>
+                <Grid2 xs={12} md={2} id="right-section">
                     <Typography variant="h6" className="section-title">
                         Available Assays
                     </Typography>
@@ -62,8 +70,8 @@ const Home = () => {
                             <strong>Omics Assays</strong>
                         </Typography>
                         <ul>
-                            <li>Single-nucleus RNA-Seq</li>
-                            <li>10X Visium ST</li>
+                            <li><Link href={`datasets?assayType=snRNAseq`} underline="hover">scRNASeq(1)</Link></li>
+                            <li><Link href={`datasets?assayType=VisiumST`} underline="hover">10X Visium ST(1)</Link></li>
                         </ul>
                     </Paper>
                 </Grid2>

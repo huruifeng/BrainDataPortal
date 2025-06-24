@@ -3,7 +3,7 @@ import { Box, Typography, Button, ButtonGroup } from "@mui/material";
 import "./DiseaseSelector.css";
 
 const DiseaseSelector = () => {
-  const [selectedDisease, setSelectedDisease] = useState("Healthy");
+  const [selectedDisease, setSelectedDisease] = useState("PD");
 
   const handleDiseaseChange = (disease) => {
     setSelectedDisease(disease);
@@ -12,7 +12,7 @@ const DiseaseSelector = () => {
   const diseaseTypes = {
     // "Healthy": "Healthy",
     "PD": "Parkinson's Disease",
-    // "AD": "Alzheimer's Disease"
+    "AD": "Alzheimer's Disease"
   };
 
   return (
