@@ -210,7 +210,18 @@ const useDatasetManageStore = create((set, get) => ({
             toast.error('Error while refreshing database.');
             return null;
         }
-    }
+    },
+
+    deleteDataset: async (dataset) => {
+        try {
+            const response = await axios.delete(`${dmURL}/deletedataset?dataset=${dataset}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting dataset:', error);
+            return null;
+        }
+    },
+
 }));
 
 export default useDatasetManageStore;

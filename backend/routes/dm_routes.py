@@ -13,7 +13,7 @@ from typing import Optional
 from sqlmodel import Session
 
 from backend.db import get_session
-from backend.db_utils.crud import insert_study, insert_dataset, import_sample_sheet
+from backend.db_utils.crud import insert_study, insert_dataset, import_sample_sheet, delete_dataset
 from backend.models import Study, Dataset
 
 router = APIRouter()
@@ -349,6 +349,21 @@ async def refreshdatabase(session: Session = Depends(get_session)):
                 import_sample_sheet(sample_sheet_path, session)
 
         return {"message": "Database refreshed successfully", "success": True}
+    except Exception as e:
+        return {"message": "Error: " + str(e), "success": False}
+
+
+@router.get("/deletedataset")
+async def deletedataset(dataset: str = Query(...),session: Session = Depends(get_session)):
+    try:
+        ## remove records from database
+        if delete_dataset(dataset, session):
+            dataset_path = f"backend/datasets/{dataset}"
+            shutil.rmtree(dataset_path)
+            return {"message": "Dataset deleted successfully", "success": True}
+        else:
+            return {"message": "Error: Failed to delete database record", "success": False}
+
     except Exception as e:
         return {"message": "Error: " + str(e), "success": False}
 

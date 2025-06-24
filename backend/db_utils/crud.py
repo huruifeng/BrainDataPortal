@@ -33,6 +33,25 @@ def insert_dataset(dataset: Dataset, session: Session):
     session.refresh(dataset)
     return dataset
 
+def delete_dataset(dataset_id: str, session: Session):
+    ## check if dataset exists
+    statement = select(Dataset).where(Dataset.dataset_id == dataset_id)  # Create a SELECT query
+    result = session.exec(statement).first()
+    if result:
+        ## delete samples in this dataset
+        statement = select(Sample).where(Sample.dataset_id == dataset_id)  # Create a SELECT query
+        samples = session.exec(statement).all()
+        for sample in samples:
+            session.delete(sample)
+            session.commit()
+
+        ## delete dataset
+        session.delete(result)
+        session.commit()
+        return True
+    else:
+        return False
+
 def insert_data(data: Data, session: Session):
     session.add(data)
     session.commit()
@@ -50,6 +69,7 @@ def insert_sample(sample: Sample, session: Session):
     session.commit()
     session.refresh(sample)
     return sample
+
 
 def import_sample_sheet(sample_sheet: str, session: Session):
     ## read the csv file
