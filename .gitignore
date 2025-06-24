@@ -1,8 +1,15 @@
 docs
+
 frontend/node_modules
+frontend/.vite
+
 backend/database
 backend/venv
+backend/.env
+backend/.idea
 
 .Rproj.user
 /backend/datasets/
 /backend/dataset_bkp/
+
+/backend/DatasetFiles/
