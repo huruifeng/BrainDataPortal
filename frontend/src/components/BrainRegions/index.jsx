@@ -1,5 +1,5 @@
 import {useState} from "react";
-import RegionStore from "../../store/RegionStore.js";
+import RegionStore from "../../store/HomeStore.js";
 
 import * as brainRegions_inner from "../../assets/images/brain_inner";
 import * as brainRegions_outer from "../../assets/images/brain_outer";

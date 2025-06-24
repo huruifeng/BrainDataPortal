@@ -26,7 +26,7 @@ const Home = () => {
 
             <Grid2 container spacing={2} className="content-grid">
                 {/* Left Section */}
-                <Grid2 xs={12} md={2}>
+                <Grid2 xs={12} md={2} id="left-section">
                     <Typography variant="h6" className="section-title">
                         Brain regions
                     </Typography>
@@ -47,13 +47,13 @@ const Home = () => {
                 </Grid2>
 
                 {/* Middle Section (Brain Image) */}
-                <Grid2 xs={12} md={5} className="middle-section">
+                <Grid2 xs={12} md={5} id="middle-section">
                     <BrainsideSelector  />
                     <BrainRegions />
                 </Grid2>
 
                 {/* Right Section */}
-                <Grid2 xs={12} md={2}>
+                <Grid2 xs={12} md={2} id="right-section">
                     <Typography variant="h6" className="section-title">
                         Available Assays
                     </Typography>
