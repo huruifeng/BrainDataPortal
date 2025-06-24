@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import { Typography, Paper , Link} from "@mui/material";
+import {Typography, Paper, Box, Button, Link} from "@mui/material";
 import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
 import "./Home.css"; // Import the CSS file
 
@@ -11,16 +11,17 @@ import StatBar from "../../components/StatBar";
 import useHomeStore from "../../store/HomeStore.js";
 
 const Home = () => {
-    const {homeData,fetchHomeData} = useHomeStore();
+    const {homeData, fetchHomeData} = useHomeStore();
 
     useEffect(() => {
-        fetchHomeData();
+        const res = fetchHomeData();
+        console.log(res);
     }, []);
 
-    const [disease, setDisease] = useState("PD");
+    const [selectedDisease, setSelectedDisease] = useState("PD");
 
-    const handleDiseaseChange = (newDisease) => {
-        setDisease(newDisease);
+    const handleDiseaseChange = (disease) => {
+        setSelectedDisease(disease);
     };
 
     return (
@@ -39,25 +40,41 @@ const Home = () => {
                         Brain regions
                     </Typography>
                     <Paper elevation={3} className="paper">
-                        <Typography variant="subtitle1" className="subsection-title">
-                            <strong><Link href={`datasets?brainRegion=Temporal Lobe`} underline="hover" color="inherit">Temporal Lobe(1)</Link></strong>
-                        </Typography>
-                        <ul>
-                            <li><Link href={`datasets?brainSubregion=Middle temporal gyrus`} underline="hover">Middle temporal gyrus(1)</Link></li>
-                        </ul>
-                        <Typography variant="subtitle1" className="subsection-title">
-                            <strong><Link href={`datasets?brainRegion=Brainstem`} underline="hover" color="inherit">Brainstem(1)</Link></strong>
-                        </Typography>
-                        <ul>
-                            <li><Link href={`datasets?brainSubregion=Midbrain`} underline="hover">Midbrain(1)</Link></li>
-                        </ul>
+                        {/*<Typography variant="subtitle1" className="subsection-title">*/}
+                        {/*    <strong><Link href={`datasets?brainRegion=Temporal Lobe`} underline="hover" color="inherit">Temporal Lobe(1)</Link></strong>*/}
+                        {/*</Typography>*/}
+                        {/*<ul>*/}
+                        {/*    <li><Link href={`datasets?brainSubregion=Middle temporal gyrus`} underline="hover">Middle temporal gyrus(1)</Link></li>*/}
+                        {/*</ul>*/}
+                        {homeData && homeData[selectedDisease] && homeData[selectedDisease].brain_super_region ? (
+                            Object.entries(homeData[selectedDisease]["brain_super_region"]).map(([key, value]) => {
+                                const total_num = Object.values(value).reduce((acc, n) => acc + n, 0);
+                                return (
+                                    <Box key={key}>
+                                        <Typography variant="subtitle1" className="subsection-title">
+                                            <strong><Link href={`datasets?brainRegion=${key}`} underline="hover" color="inherit">{key + " (" + total_num + ")"}</Link></strong>
+                                        </Typography>
+                                        <ul>
+                                            {Object.entries(value).map(([subregion, n]) => (
+                                                <li key={subregion}>
+                                                    <Link href={`datasets?brainSubregion=${subregion}`} underline="hover">{subregion + " (" + n + ")"}</Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </Box>
+                                );
+                            })
+                        ) : (
+                            <Typography variant="subtitle1">Loading brain regions data...</Typography>
+                        )}
+
                     </Paper>
                 </Grid2>
 
                 {/* Middle Section (Brain Image) */}
                 <Grid2 xs={12} md={5} id="middle-section">
-                    <BrainsideSelector  />
-                    <BrainRegions />
+                    <BrainsideSelector/>
+                    <BrainRegions/>
                 </Grid2>
 
                 {/* Right Section */}
@@ -70,39 +87,21 @@ const Home = () => {
                             <strong>Omics Assays</strong>
                         </Typography>
                         <ul>
-                            <li><Link href={`datasets?assayType=snRNAseq`} underline="hover">scRNASeq(1)</Link></li>
-                            <li><Link href={`datasets?assayType=VisiumST`} underline="hover">10X Visium ST(1)</Link></li>
+                            {/*<li><Link href={`datasets?assayType=snRNAseq`} underline="hover">scRNASeq(1)</Link></li>*/}
+                            {/*<li><Link href={`datasets?assayType=VisiumST`} underline="hover">10X Visium ST(1)</Link></li>*/}
+                            {homeData && homeData[selectedDisease] && homeData[selectedDisease].assay ? (
+                                Object.entries(homeData[selectedDisease]["assay"]).map(([key, value]) => (
+                                    <li key={key}><Link href={`datasets?assayType=${key}`} underline="hover">{key + " (" + value + ")"}</Link></li>
+                                ))
+                            ) : (
+                                <Typography variant="subtitle1">Loading assay data...</Typography>
+                            )}
                         </ul>
                     </Paper>
                 </Grid2>
             </Grid2>
-
-            {/* Disease Selection */}
-            {/*<Box className="disease-selection">*/}
-            {/*  <Typography variant="h6" className="disease-title">Select a disease type to see more data</Typography>*/}
-            {/*  <Box className="disease-buttons">*/}
-            {/*    <Button*/}
-            {/*      variant={disease === "Healthy" ? "contained" : "outlined"}*/}
-            {/*      onClick={() => handleDiseaseChange("Healthy")}*/}
-            {/*    >*/}
-            {/*      Healthy*/}
-            {/*    </Button>*/}
-            {/*    <Button*/}
-            {/*      variant={disease === "Alzheimer Disease" ? "contained" : "outlined"}*/}
-            {/*      onClick={() => handleDiseaseChange("Alzheimer Disease")}*/}
-            {/*    >*/}
-            {/*      Alzheimer Disease*/}
-            {/*    </Button>*/}
-            {/*    <Button*/}
-            {/*      variant={disease === "Parkinson's Disease" ? "contained" : "outlined"}*/}
-            {/*      onClick={() => handleDiseaseChange("Parkinson's Disease")}*/}
-            {/*    >*/}
-            {/*      Parkinson&#39;s Disease*/}
-            {/*    </Button>*/}
-            {/*  </Box>*/}
-            {/*</Box>*/}
-            <DiseaseSelector  />
-            <StatBar />
+            <DiseaseSelector homeData={homeData} selectedDisease={selectedDisease} onDiseaseChange={handleDiseaseChange}/>
+            <StatBar disease={selectedDisease}/>
         </div>
     );
 };

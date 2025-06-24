@@ -3,7 +3,7 @@ import {Description} from "@mui/icons-material";
 import "./StatBar.css";
 import {Dna, DnaOff, Images, Folders,LandPlot} from "lucide-react";
 
-const StatBar = () => {
+const StatBar = ({disease}) => {
 
     const stats = [
         {icon: <Folders/>, value: "3", label: "Datasets", link: "/datasets"},

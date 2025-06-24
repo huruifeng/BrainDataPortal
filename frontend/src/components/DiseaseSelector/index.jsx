@@ -2,12 +2,7 @@ import { useState } from "react";
 import { Box, Typography, Button, ButtonGroup } from "@mui/material";
 import "./DiseaseSelector.css";
 
-const DiseaseSelector = () => {
-  const [selectedDisease, setSelectedDisease] = useState("PD");
-
-  const handleDiseaseChange = (disease) => {
-    setSelectedDisease(disease);
-  };
+const DiseaseSelector = ({ homeData,selectedDisease, onDiseaseChange }) => {
 
   const diseaseTypes = {
     // "Healthy": "Healthy",
@@ -21,10 +16,10 @@ const DiseaseSelector = () => {
         Select a disease type below to see the available data.
       </Typography>
       <ButtonGroup variant="outlined" className="disease-buttons">
-        {Object.keys(diseaseTypes).map((disease) => (
+        {Object.keys(homeData).map((disease) => (
           <Button
             key={disease}
-            onClick={() => handleDiseaseChange(disease)}
+            onClick={() => onDiseaseChange(disease)}
             className={selectedDisease === disease ? "selected" : ""}
           >
             {diseaseTypes[disease]}
