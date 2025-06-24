@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Typography, Paper, Box, Button, Link} from "@mui/material";
+import {Typography, Paper, Box, Link} from "@mui/material";
 import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
 import "./Home.css"; // Import the CSS file
 
@@ -52,12 +52,12 @@ const Home = () => {
                                 return (
                                     <Box key={key}>
                                         <Typography variant="subtitle1" className="subsection-title">
-                                            <strong><Link href={`datasets?brainRegion=${key}`} underline="hover" color="inherit">{key + " (" + total_num + ")"}</Link></strong>
+                                            <strong><Link href={`datasets?disease=${selectedDisease}&brainRegion=${key}`} underline="hover" color="inherit">{key + " (" + total_num + ")"}</Link></strong>
                                         </Typography>
                                         <ul>
                                             {Object.entries(value).map(([subregion, n]) => (
                                                 <li key={subregion}>
-                                                    <Link href={`datasets?brainSubregion=${subregion}`} underline="hover">{subregion + " (" + n + ")"}</Link>
+                                                    <Link href={`datasets?disease=${selectedDisease}&brainSubregion=${subregion}`} underline="hover">{subregion + " (" + n + ")"}</Link>
                                                 </li>
                                             ))}
                                         </ul>
@@ -74,7 +74,7 @@ const Home = () => {
                 {/* Middle Section (Brain Image) */}
                 <Grid2 xs={12} md={5} id="middle-section">
                     <BrainsideSelector/>
-                    <BrainRegions/>
+                    <BrainRegions disease={selectedDisease}/>
                 </Grid2>
 
                 {/* Right Section */}
@@ -91,7 +91,7 @@ const Home = () => {
                             {/*<li><Link href={`datasets?assayType=VisiumST`} underline="hover">10X Visium ST(1)</Link></li>*/}
                             {homeData && homeData[selectedDisease] && homeData[selectedDisease].assay ? (
                                 Object.entries(homeData[selectedDisease]["assay"]).map(([key, value]) => (
-                                    <li key={key}><Link href={`datasets?assayType=${key}`} underline="hover">{key + " (" + value + ")"}</Link></li>
+                                    <li key={key}><Link href={`datasets?disease=${selectedDisease}&assayType=${key}`} underline="hover">{key + " (" + value + ")"}</Link></li>
                                 ))
                             ) : (
                                 <Typography variant="subtitle1">Loading assay data...</Typography>
