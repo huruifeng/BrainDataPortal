@@ -91,11 +91,16 @@ const DatasetsPage = () => {
     const filteredRecords = getFilteredRecords()
     const hasActiveFilters = Object.values(selectedFilters).some((filters) => filters.length > 0)
 
+    const [deleteMode, setDeleteMode] = useState(false);
+    // Toggle delete mode
+    const toggleDeleteMode = () => {
+        setDeleteMode(!deleteMode);
+    }
 
     return (
         <div className="data-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
-            <Box className="title-row" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box className="title-row" sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Typography variant="h4">
                     All datasets
                     {hasActiveFilters && (
@@ -105,9 +110,15 @@ const DatasetsPage = () => {
                     )}
                 </Typography>
                 {/* Right-side Add Button */}
-                <Button variant="contained" color="primary">
-                    <Link href="/datasetmanager" color="inherit" underline="hover">+ Add a dataset</Link>
-                </Button>
+                <Box sx={{display: 'flex', gap: 2}}>
+                    <Button variant="contained" color="error" onClick={toggleDeleteMode}>
+                        {deleteMode ? "Cancel Delete" : "- Delete Dataset"}
+                    </Button>
+
+                    <Button variant="contained" color="primary">
+                        <Link href="/datasetmanager" color="inherit" underline="hover">+ Add Dataset</Link>
+                    </Button>
+                </Box>
             </Box>
             <Divider/>
 
@@ -121,7 +132,7 @@ const DatasetsPage = () => {
                     hasActiveFilters={hasActiveFilters}
                 />
                 {/* Right Sample Display Area */}
-                <DatasetDisplay dataRecords={filteredRecords}/>
+                <DatasetDisplay dataRecords={filteredRecords} deleteMode={deleteMode}/>
             </Box>
         </div>
     );

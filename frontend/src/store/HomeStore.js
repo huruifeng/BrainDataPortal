@@ -11,13 +11,16 @@ const useHomeStore = create((set) => ({
   setSide: (newSide) => set(() => ({ side: newSide })),
   setRegion: (side, region, assays) => set({ selectedRegion: side, region, assays }),
 
+  setHomeData: (homeData) => set(() => ({ homeData: homeData })),
+
   fetchHomeData: async () => {
     try {
       const response = await getHomeData();
-      console.log(response);
       set({ homeData: response.data });
+      return response.data;
     } catch (error) {
       console.error("Error fetching data:", error);
+      throw error;
     }
   },
 

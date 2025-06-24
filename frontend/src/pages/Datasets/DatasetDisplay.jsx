@@ -3,31 +3,23 @@
 import {useState, useEffect} from "react"
 import {useSearchParams} from "react-router-dom"
 import {
-    Box,
-    Typography,
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Paper,
-    Pagination,
-    ToggleButtonGroup,
-    ToggleButton,
-    TextField,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
+    Box, Typography, Paper, Pagination,
+    Table, TableHead, TableBody, TableRow, TableCell,
+    ToggleButtonGroup, ToggleButton,
+    TextField, FormControl, InputLabel,
+    Select, MenuItem, Button,
 } from "@mui/material"
 import "./DatasetDisplay.css"
 import TableChartIcon from "@mui/icons-material/TableChart"
 import ListIcon from "@mui/icons-material/List"
 import PivotTableChart from "@mui/icons-material/PivotTableChart"
 import {Link} from "react-router-dom"
+import useDatasetManageStore from "../../store/DatasetManageStore.js";
+import {toast} from "react-toastify";
 
-const DatasetDisplay = ({dataRecords}) => {
+const DatasetDisplay = ({dataRecords, deleteMode}) => {
     const [searchParams, setSearchParams] = useSearchParams()
+    const {deleteDataset} = useDatasetManageStore()
 
     // Get initial values from URL params
     const [page, setPage] = useState(Number.parseInt(searchParams.get("page")) || 1)
@@ -97,6 +89,44 @@ const DatasetDisplay = ({dataRecords}) => {
         }
     }, [totalPages, page])
 
+    const handleDeleteDataset = (datasetId) => {
+        // Confirm deletion
+        if (window.confirm(`Are you sure you want to delete dataset ${datasetId}?`)) {
+            // Call your API or store method to delete the dataset
+            console.log(`Deleting dataset: ${datasetId}`);
+            const response = deleteDataset(datasetId);
+            if (response.success) {
+                toast.success(`Dataset ${datasetId} deleted successfully!`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                });
+            } else {
+                toast.error(`Failed to delete dataset ${datasetId}: ${response.message}`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                });
+            }
+
+            // You might want to refresh the dataset list after deletion
+            // refresh the page
+            // window.location.reload();
+        } else {
+            console.log("Deletion canceled");
+        }
+    }
+
     return (
         <Box className="data-display-area" style={{flex: 1, display: "flex", flexDirection: "column"}}>
             <Box className="data-toolbar">
@@ -114,9 +144,9 @@ const DatasetDisplay = ({dataRecords}) => {
                         <ToggleButton value="list" aria-label="List">
                             <ListIcon/>
                         </ToggleButton>
-                        <ToggleButton value="matrix" aria-label="Matrix">
-                            <PivotTableChart/>
-                        </ToggleButton>
+                        {/*<ToggleButton value="matrix" aria-label="Matrix">*/}
+                        {/*    <PivotTableChart/>*/}
+                        {/*</ToggleButton>*/}
                     </ToggleButtonGroup>
                     <FormControl sx={{m: 1, minWidth: 120, margin: "0 8px"}} size="small">
                         <InputLabel id="select-records-per-page-label">Records / Page</InputLabel>
@@ -172,13 +202,15 @@ const DatasetDisplay = ({dataRecords}) => {
                                     <TableCell>Brain region</TableCell>
                                     <TableCell>Assay</TableCell>
                                     <TableCell>View</TableCell>
+                                    {deleteMode && <TableCell>Delete</TableCell>}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {displayedData.map((record) => (
                                     <TableRow key={record.dataset_id}>
                                         <TableCell>
-                                            {record.sample_sheet === "None" ? record.dataset_id : <Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link>}
+                                            {record.sample_sheet === "None" ? record.dataset_id :
+                                                <Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link>}
                                         </TableCell>
                                         <TableCell>{record.PI_full_name}</TableCell>
                                         <TableCell>{record.first_contributor}</TableCell>
@@ -195,6 +227,14 @@ const DatasetDisplay = ({dataRecords}) => {
                                                 )}
                                             </Box>
                                         </TableCell>
+                                        {deleteMode && (
+                                            <TableCell>
+                                                <Button variant="outlined" color="error" size="small"
+                                                        onClick={() => handleDeleteDataset(record.dataset_id)}>
+                                                    Delete
+                                                </Button>
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -204,10 +244,9 @@ const DatasetDisplay = ({dataRecords}) => {
                     <Box className="data-list">
                         {displayedData.map((record) => (
                             <Box key={record.dataset_id} className="list-item">
-                                <Typography variant="h6">
+                                <Typography variant="h6" color="text.secondary">
                                     <Link to={`/samples/${record.dataset_id}`}>{record.dataset_id}</Link>
                                 </Typography>
-                                <Box>{record.name}</Box>
                                 <Box display="flex" gap={2} sx={{fontSize: "14px", padding: "8px 0"}}>
                                     <Box>
                                         <b>PI:</b> {record.PI_full_name}
@@ -229,6 +268,14 @@ const DatasetDisplay = ({dataRecords}) => {
                                     <Link to={`/views/geneview?dataset=${record.dataset_id}&sample=all`}>UMAP</Link>
                                     {record.assay === "VisiumST" && (
                                         <Link to={`/views/visiumview?dataset=${record.dataset_id}`}>Visium</Link>
+                                    )}
+                                </Box>
+                                <Box sx={{fontSize: "14px", display: "flex", gap: "8px", justifyContent: "flex-end"}}>
+                                    {deleteMode && (
+                                        <Button variant="outlined" color="error" size="small"
+                                                onClick={() => handleDeleteDataset(record.dataset_id)}>
+                                            Delete
+                                        </Button>
                                     )}
                                 </Box>
                             </Box>

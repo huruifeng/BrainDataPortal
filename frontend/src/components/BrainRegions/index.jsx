@@ -6,6 +6,8 @@ import * as brainRegions_outer from "../../assets/images/brain_outer";
 
 import "./BrainRegions.css";
 import {useNavigate} from "react-router-dom";
+import PropTypes from "prop-types";
+import StatBar from "../StatBar/index.jsx";
 
 const brainRegions = {
     // Outermost regions
@@ -30,7 +32,7 @@ const brainRegions = {
 };
 
 
-const BrainRegions = () => {
+const BrainRegions = ({disease}) => {
     const {side, region, setSide, setRegion} = useHomeStore();
     const navigate = useNavigate();
 
@@ -120,7 +122,7 @@ const BrainRegions = () => {
         setClickedRegion(region);
         // alert(`Region: ${region.name}`);
         // 👇 navigate to a dataset page for the selected region
-        navigate(`/datasets?brainRegion=${region.name}`); // or region.name, slug, etc.
+        navigate(`/datasets?disease=${disease}&brainRegion=${region.name}`); // or region.name, slug, etc.
 
     };
 
@@ -184,3 +186,7 @@ const BrainRegions = () => {
 };
 
 export default BrainRegions;
+
+BrainRegions.propTypes = {
+    disease: PropTypes.string.isRequired,
+};

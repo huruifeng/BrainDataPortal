@@ -2,14 +2,15 @@ import {Box, Typography, Link} from "@mui/material";
 import {Description} from "@mui/icons-material";
 import "./StatBar.css";
 import {Dna, DnaOff, Images, Folders,LandPlot} from "lucide-react";
+import PropTypes from "prop-types";
 
-const StatBar = () => {
+const StatBar = ({disease, homeData}) => {
 
     const stats = [
-        {icon: <Folders/>, value: "3", label: "Datasets", link: "/datasets"},
-        {icon: <LandPlot/>, value: "3", label: "Primary sites", link: "/datasets"},
-        {icon: <Description/>, value: "203", label: "Samples", link: "/samples/all"},
-        {icon: <Images/>, value: "106", label: "Slices", link: "/views/visiumview"},
+        {icon: <Folders/>, value: homeData?.[disease]["n_datasets"], label: "Datasets", link: "/datasets"},
+        {icon: <LandPlot/>, value: Object.keys(homeData?.[disease]["brain_super_region"]).length, label: "Primary sites", link: "/datasets"},
+        {icon: <Description/>, value: homeData?.[disease]["n_samples"], label: "Samples", link: "/samples/all"},
+        {icon: <Images/>, value: homeData?.[disease]["n_visiumst"], label: "Slices", link: "/views/visiumview"},
         {icon: <Dna/>, value: "> 30,000", label: "Genes", link: "/views/geneview"},
         {icon: <DnaOff/>, value: "> 400,000", label: "Mutations", link: "/views/regionsview"},
     ];
@@ -30,3 +31,7 @@ const StatBar = () => {
 };
 
 export default StatBar;
+StatBar.propTypes = {
+    disease: PropTypes.string.isRequired,
+    homeData: PropTypes.object.isRequired,
+};

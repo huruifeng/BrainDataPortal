@@ -13,7 +13,7 @@ from typing import Optional
 from sqlmodel import Session
 
 from backend.db import get_session
-from backend.db_utils.crud import insert_study, insert_dataset, import_sample_sheet
+from backend.db_utils.crud import insert_study, insert_dataset, import_sample_sheet, delete_dataset
 from backend.models import Study, Dataset
 
 router = APIRouter()
@@ -273,6 +273,42 @@ async def preparemetafeatures(data: MetaFeatureData, session: Session = Depends(
 
     return {"message": "Data received successfully", "success": True}
 
+def check_toml_file(toml_data):
+    if "datasetfile" not in toml_data:
+        return {"message": "Error: Missing [datasetfile] config.", "success": False}
+    else:
+        required_keys = ["datatype"]
+        for key in required_keys:
+            if key not in toml_data["datasetfile"] or toml_data["datasetfile"][key].strip() == "":
+                return {"message": f"Error: Missing [datasetfile - {key}] config.", "success": False}
+
+    if "dataset" not in toml_data:
+        return {"message": "Error: Missing [dataset] config.", "success": False}
+    else:
+        required_keys = ["dataset_name", "n_samples", "brain_super_region", "brain_region", "organism", "disease"]
+        for key in required_keys:
+            if key not in toml_data["dataset"] or str(toml_data["dataset"][key]).strip() == "":
+                return {"message": f"Error: Missing [dataset - {key}] config.", "success": False}
+
+    if "study" not in toml_data:
+        return {"message": "Error: Missing [study] config.", "success": False}
+    else:
+        required_keys = ["study_name"]
+        for key in required_keys:
+            if key not in toml_data["study"] or toml_data["study"][key].strip() == "":
+                return {"message": f"Error: Missing [study - {key}] config.", "success": False}
+
+    if "protocol" not in toml_data:
+        return {"message": "Error: Missing [protocol] config.", "success": False}
+    else:
+        required_keys = ["protocol_id"]
+        for key in required_keys:
+            if key not in toml_data["protocol"] or toml_data["protocol"][key].strip() == "":
+                return {"message": f"Error: Missing [protocol - {key}] config.", "success": False}
+
+    return {"message": "Config file is valid", "success": True}
+
+
 @router.get("/refreshdatabase")
 async def refreshdatabase(session: Session = Depends(get_session)):
     try:
@@ -287,6 +323,10 @@ async def refreshdatabase(session: Session = Depends(get_session)):
             with open(f"{dataset_path}/dataset_info.toml", 'r') as f:
                 dataset_info = toml.load(f)
 
+            ## check if dataset configuration is valid
+            check_result = check_toml_file(dataset_info)
+            if not check_result["success"]:
+                return check_result
 
             print("=======insert info into database==========")
             study_dict= dataset_info["study"]
@@ -310,7 +350,22 @@ async def refreshdatabase(session: Session = Depends(get_session)):
 
         return {"message": "Database refreshed successfully", "success": True}
     except Exception as e:
-        return {"message": str(e), "success": False}
+        return {"message": "Error: " + str(e), "success": False}
+
+
+@router.get("/deletedataset")
+async def deletedataset(dataset: str = Query(...),session: Session = Depends(get_session)):
+    try:
+        ## remove records from database
+        if delete_dataset(dataset, session):
+            dataset_path = f"backend/datasets/{dataset}"
+            shutil.rmtree(dataset_path)
+            return {"message": "Dataset deleted successfully", "success": True}
+        else:
+            return {"message": "Error: Failed to delete database record", "success": False}
+
+    except Exception as e:
+        return {"message": "Error: " + str(e), "success": False}
 
 
 

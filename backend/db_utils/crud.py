@@ -33,6 +33,25 @@ def insert_dataset(dataset: Dataset, session: Session):
     session.refresh(dataset)
     return dataset
 
+def delete_dataset(dataset_id: str, session: Session):
+    ## check if dataset exists
+    statement = select(Dataset).where(Dataset.dataset_id == dataset_id)  # Create a SELECT query
+    result = session.exec(statement).first()
+    if result:
+        ## delete samples in this dataset
+        statement = select(Sample).where(Sample.dataset_id == dataset_id)  # Create a SELECT query
+        samples = session.exec(statement).all()
+        for sample in samples:
+            session.delete(sample)
+            session.commit()
+
+        ## delete dataset
+        session.delete(result)
+        session.commit()
+        return True
+    else:
+        return False
+
 def insert_data(data: Data, session: Session):
     session.add(data)
     session.commit()
@@ -50,6 +69,7 @@ def insert_sample(sample: Sample, session: Session):
     session.commit()
     session.refresh(sample)
     return sample
+
 
 def import_sample_sheet(sample_sheet: str, session: Session):
     ## read the csv file
@@ -184,6 +204,11 @@ def get_home_data(session):
             diseases[dataset.disease]["brain_super_region"] = {dataset.brain_super_region: {dataset.brain_region: 1}}
             diseases[dataset.disease]["assay"] = {dataset.assay: 1}
             diseases[dataset.disease]["n_samples"] = dataset.n_samples
+            diseases[dataset.disease]["n_datasets"] = 1
+            if dataset.assay.lower() == "visiumst":
+                diseases[dataset.disease]["n_visiumst"] = dataset.n_samples
+            else:
+                diseases[dataset.disease]["n_visiumst"] = 0
         else:
             if dataset.brain_super_region not in diseases[dataset.disease]["brain_super_region"]:
                 diseases[dataset.disease]["brain_super_region"][dataset.brain_super_region] = {dataset.brain_region: 1}
@@ -199,6 +224,12 @@ def get_home_data(session):
                 diseases[dataset.disease]["assay"][dataset.assay] += 1
 
             diseases[dataset.disease]["n_samples"] += dataset.n_samples
+            diseases[dataset.disease]["n_datasets"] += 1
+
+            if dataset.assay.lower() == "visiumst":
+                diseases[dataset.disease]["n_visiumst"] += dataset.n_samples
+            else:
+                diseases[dataset.disease]["n_visiumst"] += 0
 
     return diseases
 
