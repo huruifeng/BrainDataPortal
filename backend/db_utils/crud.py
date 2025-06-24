@@ -204,6 +204,11 @@ def get_home_data(session):
             diseases[dataset.disease]["brain_super_region"] = {dataset.brain_super_region: {dataset.brain_region: 1}}
             diseases[dataset.disease]["assay"] = {dataset.assay: 1}
             diseases[dataset.disease]["n_samples"] = dataset.n_samples
+            diseases[dataset.disease]["n_datasets"] = 1
+            if dataset.assay.lower() == "visiumst":
+                diseases[dataset.disease]["n_visiumst"] = dataset.n_samples
+            else:
+                diseases[dataset.disease]["n_visiumst"] = 0
         else:
             if dataset.brain_super_region not in diseases[dataset.disease]["brain_super_region"]:
                 diseases[dataset.disease]["brain_super_region"][dataset.brain_super_region] = {dataset.brain_region: 1}
@@ -219,6 +224,12 @@ def get_home_data(session):
                 diseases[dataset.disease]["assay"][dataset.assay] += 1
 
             diseases[dataset.disease]["n_samples"] += dataset.n_samples
+            diseases[dataset.disease]["n_datasets"] += 1
+
+            if dataset.assay.lower() == "visiumst":
+                diseases[dataset.disease]["n_visiumst"] += dataset.n_samples
+            else:
+                diseases[dataset.disease]["n_visiumst"] += 0
 
     return diseases
 

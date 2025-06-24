@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Typography, Button, ButtonGroup } from "@mui/material";
 import "./DiseaseSelector.css";
+import PropTypes from "prop-types";
 
 const DiseaseSelector = ({ homeData,selectedDisease, onDiseaseChange }) => {
 
@@ -31,4 +32,8 @@ const DiseaseSelector = ({ homeData,selectedDisease, onDiseaseChange }) => {
 };
 
 export default DiseaseSelector;
-
+DiseaseSelector.propTypes = {
+    homeData: PropTypes.object.isRequired,
+    selectedDisease: PropTypes.string.isRequired,
+    onDiseaseChange: PropTypes.func.isRequired,
+};
