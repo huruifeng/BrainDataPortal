@@ -173,6 +173,37 @@ def get_all_datasets(session):
     result = session.exec(statement)
     return result.all()
 
+
+def get_home_data(session):
+    datasets = get_all_datasets(session)
+
+    diseases = {}
+    for dataset in datasets:
+        if dataset.disease not in diseases:
+            diseases[dataset.disease] = {}
+            diseases[dataset.disease]["brain_super_region"] = {dataset.brain_super_region: {dataset.brain_region: 1}}
+            diseases[dataset.disease]["assay"] = {dataset.assay: 1}
+            diseases[dataset.disease]["n_samples"] = dataset.n_samples
+        else:
+            if dataset.brain_super_region not in diseases[dataset.disease]["brain_super_region"]:
+                diseases[dataset.disease]["brain_super_region"][dataset.brain_super_region] = {dataset.brain_region: 1}
+            else:
+                if dataset.brain_region not in diseases[dataset.disease]["brain_super_region"][dataset.brain_super_region]:
+                    diseases[dataset.disease]["brain_super_region"][dataset.brain_super_region][dataset.brain_region] = 1
+                else:
+                    diseases[dataset.disease]["brain_super_region"][dataset.brain_super_region][dataset.brain_region] += 1
+
+            if dataset.assay not in diseases[dataset.disease]["assay"]:
+                diseases[dataset.disease]["assay"][dataset.assay] = 1
+            else:
+                diseases[dataset.disease]["assay"][dataset.assay] += 1
+
+            diseases[dataset.disease]["n_samples"] += dataset.n_samples
+
+    return diseases
+
+
+
 ## ===================================================
 ## update functions
 

@@ -1,6 +1,8 @@
 import { create } from "zustand";
+import {getHomeData} from "../api/api.js";
 
 const useHomeStore = create((set) => ({
+  homeData: {},
   side: "outer",
   region: null,
   assays: [],
@@ -11,11 +13,9 @@ const useHomeStore = create((set) => ({
 
   fetchHomeData: async () => {
     try {
-      const response = await fetch("/api/home");
-      if (response.ok) {
-        const data = await response.json();
-        set({ side: data.side, region: data.region, assays: data.assays });
-      }
+      const response = await getHomeData();
+      console.log(response);
+      set({ homeData: response.data });
     } catch (error) {
       console.error("Error fetching data:", error);
     }

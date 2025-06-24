@@ -12,6 +12,15 @@ async def read_root():
     return {"Message": "Hello API."}
 
 
+@router.get("/gethomedata")
+async def gethomedata(session: SessionDep):
+    print("gethomedata() called================")
+    response = get_home_data(session)
+    # print (response)
+    if "Error" in response:
+        raise HTTPException(status_code=404, detail="Error in getting home data.")
+    return response
+
 @router.get("/getgenelist")
 async def getgenelist(request:Request):
     print("getgenelist() called================")

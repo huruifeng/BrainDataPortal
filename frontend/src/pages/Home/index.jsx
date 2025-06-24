@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Typography, Paper , Link} from "@mui/material";
 import Grid2 from "@mui/material/Grid2"; // Correct Grid2 import
 import "./Home.css"; // Import the CSS file
@@ -8,8 +8,16 @@ import BrainsideSelector from "../../components/BrainsideSelector";
 import BrainRegions from "../../components/BrainRegions";
 import StatBar from "../../components/StatBar";
 
+import useHomeStore from "../../store/HomeStore.js";
+
 const Home = () => {
-    const [disease, setDisease] = useState("Healthy");
+    const {homeData,fetchHomeData} = useHomeStore();
+
+    useEffect(() => {
+        fetchHomeData();
+    }, []);
+
+    const [disease, setDisease] = useState("PD");
 
     const handleDiseaseChange = (newDisease) => {
         setDisease(newDisease);
