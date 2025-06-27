@@ -39,6 +39,18 @@ class Dataset(DatasetBase, table=True):
     study: "Study" = Relationship(back_populates="dataset")
     dataset_samples: list["Sample"] = Relationship(back_populates="dataset")
 
+    def get_super_region_list(self):
+        return [i.strip() for i in self.brain_super_region.split(",")]
+
+    def set_super_region_list(self, regions_list):
+        self.brain_super_region = ",".join([i.strip() for i in regions_list])
+
+    def get_region_list(self):
+        return [i.strip() for i in self.brain_region.split(",")]
+
+    def set_region_list(self, regions_list):
+        self.brain_region = ",".join([i.strip() for i in regions_list])
+
 
 class DatasetCreate(DatasetBase):
     pass
