@@ -78,7 +78,7 @@ const DatasetsPage = () => {
             // Check brain sub-region filter
             if (
                 selectedFilters.brainSubregion.length > 0 &&
-                !record.brain_super_region
+                !record.brain_region
                 .split(',')
                 .map(region => region.trim())
                 .some(region => selectedFilters.brainSubregion.includes(region))
