@@ -8,7 +8,8 @@ const StatBar = ({disease, homeData}) => {
 
     const stats = [
         {icon: <Folders/>, value: homeData?.[disease]["n_datasets"], label: "Datasets", link: "/datasets"},
-        {icon: <LandPlot/>, value: Object.keys(homeData?.[disease]["brain_super_region"]).length, label: "Primary sites", link: "/datasets"},
+        {icon: <LandPlot/>, value: Object.keys(homeData?.[disease]["brain_super_region"]).length, label: "Primary regions", link: "/datasets"},
+        // {icon: <LandPlot/>, value: homeData?.[disease]["n_regions"], label: "Primary regions", link: "/datasets"},
         {icon: <Description/>, value: homeData?.[disease]["n_samples"], label: "Samples", link: "/samples/all"},
         {icon: <Images/>, value: homeData?.[disease]["n_visiumst"], label: "Slices", link: "/views/visiumview"},
         {icon: <Dna/>, value: "> 30,000", label: "Genes", link: "/views/geneview"},

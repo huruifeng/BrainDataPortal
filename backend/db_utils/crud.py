@@ -194,11 +194,21 @@ def get_all_datasets(session):
     return result.all()
 
 
-def get_home_data(session):
+def get_home_data_1(session):
     datasets = get_all_datasets(session)
 
     diseases = {}
     for dataset in datasets:
+        # Split regions and zip them
+        super_regions = [x.strip() for x in dataset.brain_super_region.split(',')]
+        sub_regions = [x.strip() for x in dataset.brain_region.split(',')]
+
+        if len(super_regions) != len(sub_regions):
+            # Skip or log if mismatch; or raise an error
+            continue
+
+        region_pairs = list(zip(super_regions, sub_regions))
+
         if dataset.disease not in diseases:
             diseases[dataset.disease] = {}
             diseases[dataset.disease]["brain_super_region"] = {dataset.brain_super_region: {dataset.brain_region: 1}}
@@ -233,6 +243,57 @@ def get_home_data(session):
 
     return diseases
 
+def get_home_data(session):
+    datasets = get_all_datasets(session)
+
+    diseases = {}
+
+    for dataset in datasets:
+        # Split regions and zip them
+        super_regions = [x.strip() for x in dataset.brain_super_region.split(',')]
+        sub_regions = [x.strip() for x in dataset.brain_region.split(',')]
+
+        if len(super_regions) != len(sub_regions):
+            # Skip or log if mismatch; or raise an error
+            continue
+
+        region_pairs = list(zip(super_regions, sub_regions))
+
+        if dataset.disease not in diseases:
+            diseases[dataset.disease] = {
+                "brain_super_region": {},
+                "assay": {dataset.assay: 1},
+                "n_samples": dataset.n_samples,
+                "n_datasets": 1,
+                "n_regions": len(region_pairs),
+                "n_visiumst": dataset.n_samples if dataset.assay.lower() == "visiumst" else 0
+            }
+
+            # Initialize brain regions
+            for super_r, sub_r in region_pairs:
+                diseases[dataset.disease]["brain_super_region"].setdefault(super_r, {})[sub_r] = 1
+
+        else:
+            for super_r, sub_r in region_pairs:
+                brain_dict = diseases[dataset.disease]["brain_super_region"]
+                if super_r not in brain_dict:
+                    brain_dict[super_r] = {sub_r: 1}
+                else:
+                    brain_dict[super_r][sub_r] = brain_dict[super_r].get(sub_r, 0) + 1
+
+            # Update assay count
+            assay_dict = diseases[dataset.disease]["assay"]
+            assay_dict[dataset.assay] = assay_dict.get(dataset.assay, 0) + 1
+
+            # Update sample and dataset count
+            diseases[dataset.disease]["n_samples"] += dataset.n_samples
+            diseases[dataset.disease]["n_regions"] += len(region_pairs)
+            diseases[dataset.disease]["n_datasets"] += 1
+
+            if dataset.assay.lower() == "visiumst":
+                diseases[dataset.disease]["n_visiumst"] += dataset.n_samples
+
+    return diseases
 
 
 ## ===================================================

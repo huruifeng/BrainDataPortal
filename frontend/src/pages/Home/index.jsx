@@ -80,11 +80,11 @@ const Home = () => {
                 {/* Right Section */}
                 <Grid2 xs={12} md={2} id="right-section">
                     <Typography variant="h6" className="section-title">
-                        Available Assays
+                        Available assays
                     </Typography>
                     <Paper elevation={3} className="paper">
                         <Typography variant="subtitle1" className="subsection-title">
-                            <strong>Omics Assays</strong>
+                            <strong>Omics assays</strong>
                         </Typography>
                         <ul>
                             {/*<li><Link href={`datasets?assayType=snRNAseq`} underline="hover">scRNASeq(1)</Link></li>*/}

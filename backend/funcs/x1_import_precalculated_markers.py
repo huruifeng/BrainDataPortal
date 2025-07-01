@@ -6,19 +6,20 @@ import numpy as np
 
 
 #%% ============================================
-data_file = "Seurats/PrestoFindAllMarkersTop_renamed.tsv"
+data_file = "Seurats/Jie/pseudobulk_layer_all_deseq2_contsonly_12052023.csv"
 
-cluster_col = "group"
-gene_col = "feature"
-log2fc_col = "logFC"
+cluster_col = "layer"
+gene_col = "gene"
+log2fc_col = "log2FoldChange"
 padj_col = "padj"
-avg_expr_col = "avgExpr"
+avg_expr_col = "baseMean"
 
 
-dataset_folder = "datasets/PD5D_MTG_snRNAseq"
-meta_cluster_col = "SubCellTypes"
-meta_condition_col = "Condition"
+dataset_folder = "datasets/PD5D_MTG_VisiumST"
+meta_cluster_col = "smoothed_label_s5"
 meta_sex_col = "sex"
+
+meta_condition_col = "Condition"
 
 output_folder = dataset_folder + "/clustermarkers"
 if os.path.exists(output_folder) is False:
@@ -28,7 +29,10 @@ if os.path.exists(output_folder) is False:
 
 #%% ============================================
 # Load the data
-df = pd.read_csv(data_file, sep="\t", header=0)
+df = pd.read_csv(data_file, sep=",", header=0)
+
+## fileter out the rows where the padj value is greater than 0.05
+df = df[df[padj_col] <= 0.05]
 
 ## get th top 10 markers for each cluster ordered by log2fc
 df = df.sort_values(by=[cluster_col, log2fc_col], ascending=[True, False])
@@ -47,7 +51,7 @@ df_top = df_top.rename(columns={
 df_top["avg_log2FC"] = df_top["avg_log2FC"].round(2)
 df_top["p_val_adj"] = df_top["p_val_adj"].round(2)
 ## save the top markers to a CSV file
-df_top.to_csv(output_folder + "/cluster_markergenes_TopN.csv", index=False)
+df_top.to_csv(output_folder + "/cluster_markergenes_topN.csv", index=False)
 
 
 #%% ============================================
@@ -58,7 +62,7 @@ for cluster, group in df_top.groupby("cluster"):
     marker_genes_dict[cluster] = group[["gene", "avg_log2FC", "p_val_adj"]].values.tolist()
 
 # Save the markers dictionary to a JSON file
-with open(output_folder + "/cluster_markergenes.json", "w") as f:
+with open(output_folder + "/cluster_markergenes_topN.json", "w") as f:
     json.dump(marker_genes_dict, f, indent=2)
 
 #%% ============================================

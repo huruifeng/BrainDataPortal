@@ -4,6 +4,7 @@ import {useState} from "react"
 import {Typography, Divider, Checkbox, FormControlLabel, Button, Chip, Box} from "@mui/material"
 import {ExpandLess, ExpandMore, Clear} from "@mui/icons-material"
 import "./FilterPanel.css"
+import useDatatableStore from "../../store/DatatableStore.js";
 
 const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilters}) => {
     const [expandedFilters, setExpandedFilters] = useState({
@@ -11,6 +12,7 @@ const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilt
         brainRegion: true,
         brainSubregion: false,
         organism: false,
+        disease: false,
     })
 
     const toggleFilter = (filter) => {
@@ -20,33 +22,7 @@ const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilt
         }))
     }
 
-    const filters = [
-        {
-            title: "Assay Type",
-            options: ["VisiumST", "scRNAseq","snRNAseq", "scATACseq", "scMultiome"],
-            key: "assayType",
-        },
-        {
-            title: "Brain Region",
-            options: ["Frontal Lobe", "Parietal Lobe", "Occipital Lobe", "Temporal Lobe"],
-            key: "brainRegion",
-        },
-        {
-            title: "Brain Sub-Region",
-            options: ["Middle temporal gyrus", "Middlebrain"],
-            key: "brainSubregion",
-        },
-        {
-            title: "Organism",
-            options: ["Homo Sapiens", "Mus Musculus", "Drosophila", "C. Elegans"],
-            key: "organism",
-        },
-        {
-            title: "Disease",
-            options: ["PD", "AD"],
-            key: "disease",
-        },
-    ]
+    const {datasetFilters} = useDatatableStore();
 
     const handleCheckboxChange = (filterKey, option) => (event) => {
         onFilterChange(filterKey, option, event.target.checked)
@@ -82,7 +58,7 @@ const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilt
                 )}
             </div>
 
-            {filters.map((filter, index) => (
+            {datasetFilters.map((filter, index) => (
                 <div key={filter.key} className="filter-section">
                     {/* Filter Header */}
                     <div className="filter-header" onClick={() => toggleFilter(filter.key)}>
@@ -119,7 +95,7 @@ const FilterPanel = ({selectedFilters, onFilterChange, onClearAll, hasActiveFilt
                     )}
 
                     {/* Separator */}
-                    {index < filters.length - 1 && <Divider/>}
+                    {index < datasetFilters.length - 1 && <Divider/>}
                 </div>
             ))}
         </div>

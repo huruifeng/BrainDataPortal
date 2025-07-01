@@ -65,13 +65,25 @@ const DatasetsPage = () => {
             }
 
             // Check brain region filter
-            if (selectedFilters.brainRegion.length > 0 && !selectedFilters.brainRegion.includes(record.brain_super_region)) {
-                return false
+            if (
+                selectedFilters.brainRegion.length > 0 &&
+                !record.brain_super_region
+                .split(',')
+                .map(region => region.trim())
+                .some(region => selectedFilters.brainRegion.includes(region))
+            ) {
+                return false;
             }
 
             // Check brain sub-region filter
-            if (selectedFilters.brainSubregion.length > 0 && !selectedFilters.brainSubregion.includes(record.brain_region)) {
-                return false
+            if (
+                selectedFilters.brainSubregion.length > 0 &&
+                !record.brain_region
+                .split(',')
+                .map(region => region.trim())
+                .some(region => selectedFilters.brainSubregion.includes(region))
+            ) {
+                return false;
             }
 
             // Check organism filter (assuming you have organism field in your data)

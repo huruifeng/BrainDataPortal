@@ -56,28 +56,28 @@ const BrainRegions = ({disease}) => {
 
     const regions = {
         frontalLobe_outer: {
-            name: "Frontal Lobe",
+            name: "Frontal lobe",
             side: "outer",
             image: brainRegions.outer.frontalLobe,
             assays: ["Assay 1", "Assay 2", "Assay 4"],
             points: brainRegions.outer.regionPoints.FrontalLobe,
         },
         parietalLobe_outer: {
-            name: "Parietal Lobe",
+            name: "Parietal lobe",
             side: "outer",
             image: brainRegions.outer.parietalLobe,
             assays: ["Assay A", "Assay B"],
             points: brainRegions.outer.regionPoints.ParietalLobe,
         },
         occipitalLobe_outer: {
-            name: "Occipital Lobe",
+            name: "Occipital lobe",
             side: "outer",
             image: brainRegions.outer.occipitalLobe,
             assays: ["Assay C", "Assay D"],
             points: brainRegions.outer.regionPoints.OccipitalLobe,
         },
         temporalLobe_outer: {
-            name: "Temporal Lobe",
+            name: "Temporal lobe",
             side: "outer",
             image: brainRegions.outer.temporalLobe,
             assays: ["Assay E", "Assay F"],
@@ -85,28 +85,28 @@ const BrainRegions = ({disease}) => {
         },
 
         frontalLobe_inner: {
-            name: "Frontal Lobe",
+            name: "Frontal lobe",
             side: "inner",
             image: brainRegions.inner.frontalLobe,
             assays: ["Assay 1", "Assay 2", "Assay 4"],
             points: brainRegions.inner.regionPoints.FrontalLobe,
         },
         parietalLobe_inner: {
-            name: "Parietal Lobe",
+            name: "Parietal lobe",
             side: "inner",
             image: brainRegions.inner.parietalLobe,
             assays: ["Assay A", "Assay B"],
             points: brainRegions.inner.regionPoints.ParietalLobe,
         },
         occipitalLobe_inner: {
-            name: "Occipital Lobe",
+            name: "Occipital lobe",
             side: "inner",
             image: brainRegions.inner.occipitalLobe,
             assays: ["Assay C", "Assay D"],
             points: brainRegions.inner.regionPoints.OccipitalLobe,
         },
         temporalLobe_inner: {
-            name: "Temporal Lobe",
+            name: "Temporal lobe",
             side: "inner",
             image: brainRegions.inner.temporalLobe,
             assays: ["Assay E", "Assay F"],

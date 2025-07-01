@@ -12,6 +12,8 @@ const useDatatableStore = create((set) => ({
     datasetRecords: [],
     datasetfetchStatus: null,
 
+    datasetFilters: [],
+
     fetchDataTable: async (dataset_id="all") => {
         try {
             const response = await getDatatable_get(dataset_id);
@@ -61,7 +63,7 @@ const useDatatableStore = create((set) => ({
             // console.log(response);
             if(response.status === 200){
                 const data = await response.data;
-                await set({ datasetRecords: data, datasetfetchStatus: "success" });
+                await set({ datasetRecords: data[0], datasetFilters: data[1], datasetfetchStatus: "success" });
                 // toast.success("Sample loaded successfully!");
             }else{
                 console.error("Error fetching data:", response.data);
