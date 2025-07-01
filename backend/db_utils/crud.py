@@ -194,7 +194,7 @@ def get_all_datasets(session):
     return result.all()
 
 
-def get_home_data(session):
+def get_home_data_1(session):
     datasets = get_all_datasets(session)
 
     diseases = {}
@@ -243,7 +243,7 @@ def get_home_data(session):
 
     return diseases
 
-def get_home_data_2(session):
+def get_home_data(session):
     datasets = get_all_datasets(session)
 
     diseases = {}
@@ -265,6 +265,7 @@ def get_home_data_2(session):
                 "assay": {dataset.assay: 1},
                 "n_samples": dataset.n_samples,
                 "n_datasets": 1,
+                "n_regions": len(region_pairs),
                 "n_visiumst": dataset.n_samples if dataset.assay.lower() == "visiumst" else 0
             }
 
@@ -286,6 +287,7 @@ def get_home_data_2(session):
 
             # Update sample and dataset count
             diseases[dataset.disease]["n_samples"] += dataset.n_samples
+            diseases[dataset.disease]["n_regions"] += len(region_pairs)
             diseases[dataset.disease]["n_datasets"] += 1
 
             if dataset.assay.lower() == "visiumst":

@@ -9,21 +9,20 @@ import numpy as np
 
 # %% ============================================================================
 ## top 10 marker genes in each cell type
-dataset_folder = sys.argv[1]  # e.g. "datasets/PD5D_MTG_snRNAseq"
-cluster_col = sys.argv[2]  # e.g. "SubCellTypes"
-condition_col = sys.argv[3]  # e.g. "Condition"
-sex_col = sys.argv[4]  # e.g. "sex"
+# dataset_folder = sys.argv[1]  # e.g. "datasets/PD5D_MTG_snRNAseq"
+# cluster_col = sys.argv[2]  # e.g. "SubCellTypes"
+# sex_col = sys.argv[3]  # e.g. "sex"
 
-# dataset_folder = "datasets/PD5D_MTG_snRNAseq"
-# cluster_col = "SubCellTypes"
-# condition_col = "Condition"
-# sex_col = "sex"
+dataset_folder = "datasets/PMDBS_SN_snRNAseq"
+cluster_col = "cell_type"
+sex_col = "sex"
 
 # dataset_folder = "datasets/PD5D_MTG_VisiumST"
 # cluster_col = "smoothed_label_s5"
-# condition_col = "Condition"
 # sex_col = "sex"
 
+
+condition_col = "Condition"
 
 output_folder = dataset_folder + "/clustermarkers"
 
@@ -44,16 +43,16 @@ top_genes = (
 )
 
 # Save or inspect the result
-top_genes.loc[:,["cluster","gene","avg_log2FC","p_val_adj"]].to_csv(output_folder+'/cluster_markergenes_TopN.csv', index=False)
+top_genes.loc[:,["cluster","gene","avg_log2FC","p_val_adj"]].to_csv(output_folder+'/cluster_markergenes_topN.csv', index=False)
 
 ## save marker genes of each cell type into a dictionary
 marker_genes_dict = defaultdict(list)
 for index, row in top_genes.iterrows():
     marker_genes_dict[row["cluster"]].append([row["gene"], row["avg_log2FC"], row["p_val_adj"]])
-print("marker genes dictionary:")
-print(marker_genes_dict)
+# print("marker genes dictionary:")
+# print(marker_genes_dict)
 # Save the dictionary to a JSON file
-with open(output_folder + "/cluster_markergenes.json", "w") as f:
+with open(output_folder + "/cluster_markergenes_topN.json", "w") as f:
     json.dump(marker_genes_dict, f, indent=4)
 
 # %%============================================================================
