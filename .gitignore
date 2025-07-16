@@ -1,0 +1,18 @@
+/docs
+
+/frontend/node_modules
+/frontend/.vite
+
+/backend/.idea/
+
+/backend/datasets/**
+!/backend/datasets/.gitkeep
+
+/backend/SampleSheets/**
+!/backend/SampleSheets/.gitkeep
+
+
+/backend/DatasetFiles/
+
+# Project exclude paths
+/backend/datasets/
