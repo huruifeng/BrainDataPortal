@@ -101,7 +101,7 @@ const Home = () => {
                 </Grid2>
             </Grid2>
             <DiseaseSelector homeData={homeData} selectedDisease={selectedDisease} onDiseaseChange={handleDiseaseChange}/>
-            {homeData && homeData[selectedDisease] ? <StatBar disease={selectedDisease} homeData={homeData} />: <Typography variant="subtitle1">Loading assay data...</Typography>}
+            {homeData && homeData[selectedDisease] ? <StatBar disease={selectedDisease} homeData={homeData} />: <Box className="stat-bar-container"> <Typography variant="subtitle1">Loading stats data...</Typography> </Box>}
         </div>
     );
 };
