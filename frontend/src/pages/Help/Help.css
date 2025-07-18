@@ -497,7 +497,7 @@
 }
 
 .env-vars-grid {
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
 }
 
 .env-card {
@@ -543,7 +543,7 @@
     color: var(--secondary-dark);
 }
 
-.docker-card {
+.docker-card{
     background-color: rgba(59, 130, 246, 0.05);
     border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 0.75rem;

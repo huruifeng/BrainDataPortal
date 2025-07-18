@@ -213,8 +213,10 @@ export default function HelpPage() {
                                         <Typography variant="h4" component="h2" gutterBottom>
                                             Technology Stack
                                         </Typography>
-                                        <Typography variant="body1" color="text.secondary" className="section-description">
-                                            {import.meta.env.VITE_APP_TITLE} is built with modern technologies to provide a powerful and flexible platform
+                                        <Typography variant="body1" color="text.secondary"
+                                                    className="section-description">
+                                            {import.meta.env.VITE_APP_TITLE} is built with modern technologies to
+                                            provide a powerful and flexible platform
                                             for single-cell and spatial transcriptomics data analysis.
                                         </Typography>
                                     </Box>
@@ -228,7 +230,8 @@ export default function HelpPage() {
                                                 </Box>
                                                 <Divider/>
                                                 <Typography variant="body1" className="tech-stack__description">
-                                                    Modern React-based frontend with powerful visualization capabilities for complex biological data.
+                                                    Modern React-based frontend with powerful visualization capabilities
+                                                    for complex biological data.
                                                 </Typography>
                                                 <Grid container spacing={1}>
                                                     {[
@@ -241,7 +244,8 @@ export default function HelpPage() {
                                                     ].map((tech, i) => (<Grid item xs={6} key={i}>
                                                         <Box className="tech-item">
                                                             <Chip label={tech.name} size="small" className="tech-chip"/>
-                                                            <Typography variant="caption" className="tech-description">{tech.desc}</Typography>
+                                                            <Typography variant="caption"
+                                                                        className="tech-description">{tech.desc}</Typography>
                                                         </Box>
                                                     </Grid>))}
                                                 </Grid>
@@ -255,18 +259,30 @@ export default function HelpPage() {
                                                 </Box>
                                                 <Divider/>
                                                 <Typography variant="body1" className="tech-stack__description">
-                                                    High-performance Python backend optimized for bioinformatics and large-scale data processing.
+                                                    High-performance Python backend optimized for bioinformatics and
+                                                    large-scale data processing.
                                                 </Typography>
                                                 <Grid container spacing={1}>
                                                     {[
-                                                        {name: "FastAPI", desc: "API Framework"}, {name: "Python 3.8+", desc: "Language"},
-                                                        {name: "Pandas", desc: "Data Processing"}, {name: "NumPy", desc: "Numerical Computing"},
-                                                        {name: "Seurat", desc: "Single-cell Analysis"}, {name: "SQLAlchemy", desc: "Database ORM"},
+                                                        {name: "FastAPI", desc: "API Framework"}, {
+                                                            name: "Python 3.8+",
+                                                            desc: "Language"
+                                                        },
+                                                        {name: "Pandas", desc: "Data Processing"}, {
+                                                            name: "NumPy",
+                                                            desc: "Numerical Computing"
+                                                        },
+                                                        {
+                                                            name: "Seurat",
+                                                            desc: "Single-cell Analysis"
+                                                        }, {name: "SQLAlchemy", desc: "Database ORM"},
                                                     ].map((tech, i) => (
                                                         <Grid item xs={6} key={i}>
                                                             <Box className="tech-item">
-                                                                <Chip label={tech.name} size="small" className="tech-chip"/>
-                                                                <Typography variant="caption" className="tech-description">
+                                                                <Chip label={tech.name} size="small"
+                                                                      className="tech-chip"/>
+                                                                <Typography variant="caption"
+                                                                            className="tech-description">
                                                                     {tech.desc}
                                                                 </Typography>
                                                             </Box>
@@ -317,8 +333,10 @@ export default function HelpPage() {
                                         <Typography variant="h4" component="h2" gutterBottom>
                                             Environment Setup & Running the Project
                                         </Typography>
-                                        <Typography variant="body1" color="text.secondary" className="section-description">
-                                            Follow these steps to set up your development environment and get{import.meta.env.VITE_APP_TITLE} running locally or in the cloud.
+                                        <Typography variant="body1" color="text.secondary"
+                                                    className="section-description">
+                                            Follow these steps to set up your development environment and
+                                            get{import.meta.env.VITE_APP_TITLE} running locally or in the cloud.
                                         </Typography>
                                     </Box>
 
@@ -330,7 +348,8 @@ export default function HelpPage() {
                                         <Grid container spacing={2} className="prerequisites-grid">
                                             <Grid item xs={12} sm={4}>
                                                 <Paper className="prerequisite-item">
-                                                    <Typography variant="subtitle2" gutterBottom>Node.js v18+</Typography>
+                                                    <Typography variant="subtitle2" gutterBottom>Node.js
+                                                        v18+</Typography>
                                                     <Typography variant="body2" color="text.secondary">
                                                         Required for the frontend
                                                     </Typography>
@@ -338,7 +357,8 @@ export default function HelpPage() {
                                             </Grid>
                                             <Grid item xs={12} sm={4}>
                                                 <Paper className="prerequisite-item">
-                                                    <Typography variant="subtitle2" gutterBottom>Python v3.8+</Typography>
+                                                    <Typography variant="subtitle2" gutterBottom>Python
+                                                        v3.8+</Typography>
                                                     <Typography variant="body2" color="text.secondary">
                                                         Required for the backend
                                                     </Typography>
@@ -355,155 +375,317 @@ export default function HelpPage() {
                                         </Grid>
                                     </Alert>
 
-                                    <Card className="docker-card">
+                                    <Card className="setup-card">
                                         <CardContent>
-                                            <Box className="docker-header">
-                                                <GitHub fontSize="large" className="docker-icon"/>
+                                            <Box className="setup-header setup-header--primary">
+                                                <GitHub fontSize="large" className="setup-icon setup-icon--primary"/>
                                                 <Typography variant="h5">Setup from GitHub</Typography>
                                             </Box>
-                                            <Typography variant="body1" className="docker-description">
-                                                Please follow the instructions below to set up the project from GitHub.
+                                            <Typography variant="h6" className="setup-description">
+                                                1. Clone the repository
                                             </Typography>
                                             <CodeBlock>
                                                 <div>
-                                                    <span className="comment"># Clone the repository or Download the Zipped repository</span>
+                                                    <span className="comment"># Clone the repository or Download the Zipped repository</span><br/>
+                                                    git clone https://github.com/huruifeng/BrainDataPortal.git<br/>
+
                                                     <br/>
-                                                    git clone https://github.com/huruifeng/BrainDataPortal.git
-                                                    <br/>
-                                                    (Or, Download the zipped repository from <a href="https://github.com/huruifeng/BrainDataPortal" target="_blank" style={{color:"#2196f3"}}>https://github.com/huruifeng/BrainDataPortal</a>)
+                                                    <span className="comment"># Or</span><br/>
+                                                    (Download the zipped repository from <a href="https://github.com/huruifeng/BrainDataPortal" target="_blank" style={{color: "#2196f3"}}>https://github.com/huruifeng/BrainDataPortal</a>)
                                                 </div>
                                             </CodeBlock>
+                                            <br/>
+                                            <Typography variant="h6" className="setup-description">
+                                                2. Setup backend
+                                            </Typography>
+                                            <Grid container spacing={3} className="env-vars-grid">
+                                                <Grid item xs={12} md={12}>
+                                                    <Card className="env-card env-card--secondary">
+                                                        <CardContent>
+                                                            <Typography variant="h6" className="env-title env-title--secondary">
+                                                                2.1 [Optional]  Conda environment
+                                                            </Typography>
+                                                            <CodeBlock>
+                                                                <div>
+                                                                    <span className="comment"># Use the terminal for the following steps:</span><br/>
+                                                                    <span className="comment"># Create a conda environment</span><br/>
+                                                                    conda create -n braindataportal python=3.10<br/>
+                                                                    <br/>
+                                                                    <span className="comment"># Activate the environment</span><br/>
+                                                                    conda activate braindataportal<br/>
+                                                                    <br/>
+                                                                    <span className="comment"># Install the required dependencies (In the backend folder)</span><br/>
+                                                                    pip install -r requirements.txt
+                                                                </div>
+                                                            </CodeBlock>
+                                                            <br />
+                                                            <Typography variant="h6" className="env-title env-title--secondary">
+                                                                2.2 Start the backend server
+                                                            </Typography>
+                                                            <CodeBlock>
+                                                                <div>
+                                                                    <span className="comment" style={{color: "#ffcc00"}}># Make sure you are in the <strong>ROOT (e.g., BrainDataPortal)</strong> directory, NOT the backend folder</span><br/>
+                                                                     <span className="comment"># ================================================</span><br/>
+                                                                    <span className="comment"># [Option 1] Run the backend server in the terminal:</span><br/>
+                                                                    uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers
+                                                                    <br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}># The above command will start the backend server on port 8000</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}># The --proxy-headers option is required to enable CORS</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}># The --workers option specifies the number of worker processes</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}># The --host option specifies the host IP address, Default is 127.0.0.1</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0.0.0 means listening on all IP addresses.</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use 127.0.0.1 for listening on localhost.</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}># The --port option specifies the port number, Default is 8000</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This port number is used to access the backend server</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It will be used in the frontend code, or in proxy server setup</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAKE SURE THE PORT IS NOT BLOCKED.</span><br/>
+
+                                                                    <br/>
+                                                                    <span className="comment"># Stop the backend server</span><br/>
+                                                                    &lt;Ctrl + C&gt; - Press Ctrl+C in the terminal to stop the backend server<br/>
+                                                                    <br/>
+                                                                    <span className="comment"># ================================================</span><br/>
+                                                                    <span className="comment"># [Option 2] Run the backend server in the background using nohup</span><br/>
+                                                                    nohup uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers &gt;&gt; backend.log 2&gt;&1 &
+                                                                    <br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}># The &apos;&gt;&gt; backend.log 2&gt;&1 &&apos; redirects the output to a log file</span><br/>
+                                                                    <span className="comment" style={{color: "#ffcc99"}}># The & runs the command in the background</span><br/>
+                                                                    <br/>
+                                                                    <span className="comment"># To stop the backend server, use the following command:</span><br/>
+                                                                    kill -9 $(lsof -t -i:8000)
+                                                                    <br/>
+                                                                </div>
+                                                            </CodeBlock>
+                                                        </CardContent>
+                                                    </Card>
+                                                </Grid>
+                                            </Grid>
+                                            <Typography variant="h6" className="setup-description">
+                                                3. Setup frontend
+                                            </Typography>
+                                            <Grid item xs={12} md={12}>
+                                                <Card className="env-card env-card--primary">
+                                                    <CardContent>
+                                                        <Typography variant="h6" className="env-title">
+                                                            Option A: Run the frontend in the <u>development</u> mode
+                                                        </Typography>
+                                                         <Typography variant="h6" className="env-title env-title--primary">
+                                                           A3.1 Check the <u>.env</u> and <u>.env.development</u> files (In the frontend/env folder).
+                                                        </Typography>
+                                                        <Paper className="env-content env-content--primary">
+                                                            <span className="comment"># <u>.env</u> - Global settings, always loaded</span><br/>
+                                                            VITE_APP_TITLE = {import.meta.env.VITE_APP_TITLE}<br/>
+                                                            VITE_PORT = {import.meta.env.VITE_PORT}<br/>
+                                                            <span className="comment" style={{color: "#e87c10"}}># This port number is used to access the frontend server, it is different from the backend port</span><br/>
+
+                                                            <br/>
+                                                            <span className="comment"># <u>.env.development</u> - Development settings</span><br/>
+                                                            <span className="comment"># Run the App locally or in the cloud in dev mode </span><br/>
+                                                            VITE_BACKEND_URL = http://&lt;backend-running-ip&gt;:8000 <br/>
+                                                            <span className="comment" style={{color: "#e87c10"}}># The &lt;backend-running-ip&gt; is the IP address where the backend server is running</span><br/>
+                                                            <span className="comment" style={{color: "#e87c10"}}># If the backend server is running locally, use 127.0.0.1 or localhost</span><br/>
+                                                            <span className="comment" style={{color: "#e87c10"}}># The 8000 is the port number where the backend server is running on, adjust it if needed</span><br/>
+                                                        </Paper>
+                                                        <br/>
+                                                        <Typography variant="h6" className="env-title env-title--primary">
+                                                           A3.2 Run the frontend locally or in the cloud
+                                                        </Typography>
+                                                        <CodeBlock>
+                                                            <div>
+                                                                <span className="comment"># Navigate to the frontend directory</span><br/>
+                                                                cd {import.meta.env.VITE_APP_TITLE}/frontend<br/>
+                                                                <br/>
+                                                                <span className="comment"># Install dependencies</span><br/>
+                                                                npm install<br/>
+                                                                <br/>
+                                                                <span className="comment"># ==============================</span><br/>
+                                                                <span className="comment"># [Option 1] Running the frontend server in terminal:</span><br/>
+                                                                <span className="comment"># Start development server</span><br/>
+                                                                npm run dev
+                                                                <br/>
+                                                                <span className="comment" style={{color: "#ffcc99"}}># The above command will start the frontend server on port {import.meta.env.VITE_PORT}</span><br/>
+                                                                <span className="comment" style={{color: "#ffcc99"}}># you can access the frontend at http://&lt;frontend-running-ip&gt;:{import.meta.env.VITE_PORT}</span><br/>
+                                                                <br/>
+                                                                <span className="comment"># Stop the frontend server</span><br/>
+                                                                &lt;Ctrl + C&gt; - Press Ctrl+C in the terminal to stop the frontend server
+                                                                <br/>
+                                                                <br/>
+                                                                <span className="comment"># ==============================</span><br/>
+                                                                <span className="comment"># [Option 2] Running the frontend server in the background:</span><br/>
+                                                                nohup npm run dev &gt;&gt; frontend.log 2&gt;&1 &
+                                                                <br/>
+                                                                <br/>
+                                                                <span className="comment"># To stop the frontend serverrunning in the background, use the following command:</span><br/>
+                                                                kill -9 $(lsof -t -i:{import.meta.env.VITE_PORT})
+                                                            </div>
+                                                        </CodeBlock>
+                                                    </CardContent>
+                                                    <Divider/>
+                                                    <CardContent>
+                                                        <Typography variant="h6" className="env-title">
+                                                            Option B: Run the frontend in <u>production</u> mode (Without proxy server)
+                                                        </Typography>
+                                                         <Typography variant="h6" className="env-title env-title--primary">
+                                                           B3.1 Check the <u>.env</u> and <u>.env.production</u> files (In the frontend/env folder).
+                                                        </Typography>
+                                                        <Paper className="env-content env-content--primary">
+                                                            <span className="comment"># <u>.env</u> - Global settings, always loaded</span><br/>
+                                                            VITE_APP_TITLE = {import.meta.env.VITE_APP_TITLE}<br/>
+                                                            <br/>
+                                                            <span className="comment"># <u>.env.production</u> - Production settings</span><br/>
+                                                            <span className="comment"># Run the App in the cloud in production mode </span><br/>
+                                                            VITE_BACKEND_URL = http://&lt;backend-running-ip&gt;:8000 <br/>
+                                                            <span className="comment" style={{color: "#e87c10"}}># The &lt;backend-running-ip&gt; is the IP address where the backend server is running</span><br/>
+                                                            <span className="comment" style={{color: "#e87c10"}}># If the backend server is running locally, use 127.0.0.1 or localhost</span><br/>
+                                                            <span className="comment" style={{color: "#e87c10"}}># The 8000 is the port number where the backend server is running on, adjust it if needed</span><br/>
+                                                        </Paper>
+                                                        <br/>
+                                                        <Typography variant="h6" className="env-title env-title--primary">
+                                                           B3.2 Build the frontend pages
+                                                        </Typography>
+                                                        <CodeBlock>
+                                                            <div>
+                                                                <span className="comment"># Navigate to the frontend directory</span><br/>
+                                                                cd {import.meta.env.VITE_APP_TITLE}/frontend<br/>
+                                                                <br/>
+                                                                <span className="comment"># Install dependencies</span><br/>
+                                                                npm install<br/>
+                                                                <br/>
+                                                                <span className="comment"># Build the frontend pages</span><br/>
+                                                                npm run build
+                                                                <br/>
+                                                                <span className="comment" style={{color: "#ffcc99"}}># This command will build the frontend pages in the frontend/dist folder</span><br/>
+                                                            </div>
+                                                        </CodeBlock>
+                                                        <br/>
+                                                        <Typography variant="h6" className="env-title env-title--primary">
+                                                           B3.3 Deploy the frontend pages (Apache server or Nginx server)
+                                                        </Typography>
+                                                        <CodeBlock>
+                                                            <div>
+                                                                <span className="comment"># Navigate to the frontend directory</span><br/>
+                                                                cd {import.meta.env.VITE_APP_TITLE}/frontend<br/>
+                                                                <br/>
+                                                                <span className="comment"># Copy the built frontend pages to the Apache server or Nginx server</span><br/>
+                                                                cp -r dist/* /var/www/html <br/>
+                                                                <span className="comment" style={{color: "#ffcc99"}}># This command will copy the built frontend pages to the Apache server or Nginx server root directory</span><br/>
+                                                                <span className="comment" style={{color: "#ffcc99"}}># You may need to adjust the path (/var/www/html) depending on your Apache server or Nginx server configuration.</span><br/>
+                                                                <span className="comment" style={{color: "#ffcc99"}}># You may create a subdirectory(e.g. /var/www/html/{import.meta.env.VITE_APP_TITLE}) in the root directory.</span><br/>
+                                                                <span className="comment" style={{color: "#ffcc99"}}># cp -r dist/* /var/www/html/{import.meta.env.VITE_APP_TITLE}.</span><br/>
+                                                                <br/>
+                                                                <span className="comment"># Restart the Apache server or Nginx server</span><br/>
+                                                                sudo systemctl restart apache2 <br/> sudo systemctl restart nginx<br/>
+
+                                                            </div>
+                                                        </CodeBlock>
+                                                    </CardContent>
+
+                                                    <Divider/>
+                                                    <CardContent>
+                                                        <Typography variant="h6" className="env-title">
+                                                            Option C: Run the frontend in <u>production</u> mode (Nginx server with proxy service)
+                                                        </Typography>
+                                                         <Typography variant="h6" className="env-title env-title--primary">
+                                                           C3.1 Check the <u>.env</u> and <u>.env.nginx</u> files (In the frontend/env folder).
+                                                        </Typography>
+                                                        <Paper className="env-content env-content--primary">
+                                                            <span className="comment"># <u>.env</u> - Global settings, always loaded</span><br/>
+                                                            VITE_APP_TITLE = {import.meta.env.VITE_APP_TITLE}<br/>
+                                                            <br/>
+                                                            <span className="comment"># <u>.env.nginx</u> - Production settings</span><br/>
+                                                            <span className="comment"># Run the App in the cloud in production mode </span><br/>
+                                                            VITE_BACKEND_URL = &apos;&apos;<br/>
+                                                            <span className="comment" style={{color: "#e87c10"}}># The backend URL is an empty string, we will use the proxy service to proxy the requests to the backend</span><br/>
+                                                        </Paper>
+                                                        <br/>
+                                                        <Typography variant="h6" className="env-title env-title--primary">
+                                                           C3.2 Build the frontend pages
+                                                        </Typography>
+                                                        <CodeBlock>
+                                                            <div>
+                                                                <span className="comment"># Navigate to the frontend directory</span><br/>
+                                                                cd {import.meta.env.VITE_APP_TITLE}/frontend<br/>
+                                                                <br/>
+                                                                <span className="comment"># Install dependencies</span><br/>
+                                                                npm install<br/>
+                                                                <br/>
+                                                                <span className="comment"># Build the frontend pages</span><br/>
+                                                                npm run build:nginx
+                                                                <br/>
+                                                                <span className="comment" style={{color: "#ffcc99"}}># This command will build the frontend pages in the frontend/dist folder</span><br/>
+                                                            </div>
+                                                        </CodeBlock>
+                                                        <br/>
+                                                        <Typography variant="h6" className="env-title env-title--primary">
+                                                           C3.3 Setup the proxy service (Nginx server, Ubuntu/Debian)
+                                                        </Typography>
+                                                        <Paper className="env-content env-content--primary">
+                                                            <span className="comment"> # Create and edit /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE}</span>
+                                                            <pre>
+{`server {
+    listen 80;
+    server_name localhost;
+
+    # Replace with the actual path to your frontend production folder, e.g., /var/www/html/BrainDataPortal/dist;
+    root <path-to-your-frontend-production-folder> 
+    index index.html;
+
+    # frontend pages
+    location / {
+        try_files $uri /index.html;
+    }
+
+    # API requests - proxy to FastAPI
+    location /api/ {
+        proxy_pass http://localhost:8000; # Replace with your FastAPI server address (e.g., http://localhost:8000)
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # QTL requests - proxy to FastAPI
+    location /qtl/ {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /visium/ {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /datasetmanage/ {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}`}
+
+                                                            </pre>
+                                                        </Paper>
+                                                        <CodeBlock>
+                                                            <div>
+                                                                <span className="comment"># Link the configuration file to sites-enabled</span><br/>
+                                                                sudo ln -s /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE} /etc/nginx/sites-enabled/ <br/>
+                                                                <br/>
+                                                                <span className="comment"># Reload Nginx</span><br/>
+                                                                sudo nginx -t   # Test the configuration file for syntax errors <br/>
+                                                                sudo systemctl reload nginx
+                                                            </div>
+                                                        </CodeBlock>
+                                                    </CardContent>
+                                                </Card>
+                                            </Grid>
                                         </CardContent>
                                     </Card>
-
-                                    <Grid container spacing={4}>
-                                        <Grid item xs={12} md={6}>
-                                            <Card className="setup-card">
-                                                <CardContent>
-                                                    <Box className="setup-header setup-header--primary">
-                                                        <Box className="setup-icon setup-icon--primary">
-                                                            <Terminal fontSize="medium"/>
-                                                        </Box>
-                                                        <Typography variant="h5">Frontend Setup</Typography>
-                                                    </Box>
-                                                    <CodeBlock>
-                                                        <div>
-                                                            <span className="comment"># Clone the repository</span>
-                                                            <br/>
-                                                            git clone
-                                                            https://github.com/your-org/braindataportal.git
-                                                            <br/>
-                                                            cd {import.meta.env.VITE_APP_TITLE}/frontend
-                                                            <br/>
-                                                            <br/>
-                                                            <span className="comment"># Install dependencies</span>
-                                                            <br/>
-                                                            npm install
-                                                            <br/>
-                                                            <br/>
-                                                            <span
-                                                                className="comment"># Set up environment variables</span>
-                                                            <br/>
-                                                            cp .env.example .env.local
-                                                            <br/>
-                                                            <br/>
-                                                            <span
-                                                                className="comment"># Start development server</span>
-                                                            <br/>
-                                                            npm run dev
-                                                        </div>
-                                                    </CodeBlock>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <Card className="setup-card">
-                                                <CardContent>
-                                                    <Box className="setup-header setup-header--secondary">
-                                                        <Box className="setup-icon setup-icon--secondary">
-                                                            <Api fontSize="medium"/>
-                                                        </Box>
-                                                        <Typography variant="h5">Backend Setup</Typography>
-                                                    </Box>
-                                                    <CodeBlock>
-                                                        <div>
-                                                            <span
-                                                                className="comment"># Navigate to backend directory</span>
-                                                            <br/>
-                                                            cd ../backend
-                                                            <br/>
-                                                            <br/>
-                                                            <span
-                                                                className="comment"># Create virtual environment</span>
-                                                            <br/>
-                                                            python -m venv venv
-                                                            <br/>
-                                                            source venv/bin/activate{" "}
-                                                            <span className="comment"># On Windows: venv\Scripts\activate</span>
-                                                            <br/>
-                                                            <br/>
-                                                            <span className="comment"># Install dependencies</span>
-                                                            <br/>
-                                                            pip install -r requirements.txt
-                                                            <br/>
-                                                            <br/>
-                                                            <span className="comment"># Set up database</span>
-                                                            <br/>
-                                                            alembic upgrade head
-                                                            <br/>
-                                                            <br/>
-                                                            <span className="comment"># Start the server</span>
-                                                            <br/>
-                                                            uvicorn main:app --reload --host 0.0.0.0 --port 8000
-                                                        </div>
-                                                    </CodeBlock>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                    </Grid>
-
-                                    <Typography variant="h5" className="env-vars-title">
-                                        Environment Variables
-                                    </Typography>
-                                    <Grid container spacing={3} className="env-vars-grid">
-                                        <Grid item xs={12} md={6}>
-                                            <Card className="env-card env-card--primary">
-                                                <CardContent>
-                                                    <Typography variant="h6" className="env-title env-title--primary">
-                                                        Frontend (.env.local)
-                                                    </Typography>
-                                                    <Paper className="env-content env-content--primary">
-                                                        NEXT_PUBLIC_API_URL=http://localhost:8000
-                                                        <br/>
-                                                        NEXT_PUBLIC_APP_NAME=BrainDataPortal
-                                                        <br/>
-                                                        NEXTAUTH_SECRET=your-secret-key
-                                                        <br/>
-                                                        NEXTAUTH_URL=http://localhost:3000
-                                                    </Paper>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <Card className="env-card env-card--secondary">
-                                                <CardContent>
-                                                    <Typography variant="h6"
-                                                                className="env-title env-title--secondary">
-                                                        Backend (.env)
-                                                    </Typography>
-                                                    <Paper className="env-content env-content--secondary">
-                                                        DATABASE_URL=postgresql://user:pass@localhost/bdpdb
-                                                        <br/>
-                                                        REDIS_URL=redis://localhost:6379
-                                                        <br/>
-                                                        SECRET_KEY=your-secret-key
-                                                        <br/>
-                                                        CORS_ORIGINS=http://localhost:3000
-                                                    </Paper>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                    </Grid>
 
                                     <Card className="docker-card">
                                         <CardContent>
@@ -512,7 +694,8 @@ export default function HelpPage() {
                                                 <Typography variant="h5">Docker Setup (Alternative)</Typography>
                                             </Box>
                                             <Typography variant="body2" className="docker-description">
-                                                For a quicker setup, you can use Docker Compose to run both frontend and backend:
+                                                For a quicker setup, you can use Docker Compose to run both frontend and
+                                                backend:
                                             </Typography>
                                             <CodeBlock>
                                                 <div>
@@ -542,7 +725,8 @@ export default function HelpPage() {
                                         <Typography variant="h4" component="h2" gutterBottom>
                                             Data Preparation Guide
                                         </Typography>
-                                        <Typography variant="body1" color="text.secondary" className="section-description">
+                                        <Typography variant="body1" color="text.secondary"
+                                                    className="section-description">
                                             Learn about supported data formats and how to prepare your datasets for
                                             analysis in {import.meta.env.VITE_APP_TITLE}.
                                         </Typography>
@@ -733,7 +917,8 @@ export default function HelpPage() {
                                         </Typography>
                                         <Typography variant="body1" color="text.secondary"
                                                     className="section-description">
-                                            Complete guide to using {import.meta.env.VITE_APP_TITLE} for data analysis and
+                                            Complete guide to using {import.meta.env.VITE_APP_TITLE} for data analysis
+                                            and
                                             visualization of single-cell and
                                             spatial transcriptomics data.
                                         </Typography>
