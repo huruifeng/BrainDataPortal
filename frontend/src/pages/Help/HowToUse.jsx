@@ -623,6 +623,8 @@ export default function HelpPage() {
                                                             <span className="comment"> # Create and edit /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE}</span>
                                                             <pre>
 {`server {
+
+    # Make sure THE PORT IS NOT USED!
     listen 80;
     server_name localhost;
 

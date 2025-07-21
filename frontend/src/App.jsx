@@ -25,6 +25,7 @@ import LayerView from "./pages/LayerView/index.jsx";
 import HowToUse from "./pages/Help/HowToUse.jsx";
 import FAQPage from "./pages/Help/FAQ.jsx";
 import RESTAPIPage from "./pages/Help/RESTAPI.jsx";
+import Home_HM from "./pages/Home_HM/index.jsx";
 
 
 
@@ -54,6 +55,7 @@ function App() {
                       <Route path="/test" element={<Test />} />
 
                       <Route path="/" element={<Home />} />
+                      <Route path="/home_hm" element={<Home_HM />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/datasets" element={<DatasetsPage />} />
 
