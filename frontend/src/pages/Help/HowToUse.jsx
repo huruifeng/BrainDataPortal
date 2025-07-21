@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, {useEffect} from "react"
 import {
     Box,
     Card,
@@ -49,7 +49,11 @@ import {
     GitHub,
     Visibility,
 } from "@mui/icons-material"
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
 import "./Help.css"
+import {useSearchParams} from "react-router-dom";
 
 // Create a custom theme with better colors
 const theme = createTheme({
@@ -57,18 +61,10 @@ const theme = createTheme({
         primary: {main: "#6366f1", light: "#818cf8", dark: "#4f46e5",},
         secondary: {main: "#ec4899", light: "#f472b6", dark: "#db2777",},
         background: {default: "#f9fafb", paper: "#ffffff",},
-        success: {
-            main: "#10b981", light: "#34d399", dark: "#059669",
-        },
-        info: {
-            main: "#3b82f6", light: "#60a5fa", dark: "#2563eb",
-        },
-        warning: {
-            main: "#f59e0b", light: "#fbbf24", dark: "#d97706",
-        },
-        error: {
-            main: "#ef4444", light: "#f87171", dark: "#dc2626",
-        },
+        success: {main: "#10b981", light: "#34d399", dark: "#059669",},
+        info: {main: "#3b82f6", light: "#60a5fa", dark: "#2563eb",},
+        warning: {main: "#f59e0b", light: "#fbbf24", dark: "#d97706",},
+        error: {main: "#ef4444", light: "#f87171", dark: "#dc2626",},
     },
     typography: {
         fontFamily: "'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif",
@@ -79,15 +75,11 @@ const theme = createTheme({
         h5: {fontWeight: 600},
         h6: {fontWeight: 600},
     },
-    shape: {
-        borderRadius: 12,
-    },
+    shape: {borderRadius: 12,},
     components: {
         MuiButton: {
             styleOverrides: {
-                root: {
-                    textTransform: "none", borderRadius: 8, padding: "10px 16px", fontWeight: 500,
-                },
+                root: {textTransform: "none", borderRadius: 8, padding: "10px 16px", fontWeight: 500,},
             },
         },
         MuiCard: {
@@ -99,18 +91,10 @@ const theme = createTheme({
             },
         },
         MuiChip: {
-            styleOverrides: {
-                root: {
-                    borderRadius: 8,
-                },
-            },
+            styleOverrides: {root: {borderRadius: 8,},},
         },
         MuiTab: {
-            styleOverrides: {
-                root: {
-                    textTransform: "none", fontWeight: 500, fontSize: "1rem",
-                },
-            },
+            styleOverrides: {root: {textTransform: "none", fontWeight: 500, fontSize: "1rem",},},
         },
     },
 })
@@ -118,15 +102,13 @@ const theme = createTheme({
 function TabPanel(props) {
     const {children, value, index, ...other} = props
 
-    return (<div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`help-tabpanel-${index}`}
-        aria-labelledby={`help-tab-${index}`}
-        {...other}
-    >
-        {value === index && <Box className="tab-panel-content">{children}</Box>}
-    </div>)
+    return (
+        <div role="tabpanel" hidden={value !== index} id={`help-tabpanel-${index}`}
+             aria-labelledby={`help-tab-${index}`}
+             {...other}
+        >
+            {value === index && <Box className="tab-panel-content">{children}</Box>}
+        </div>)
 }
 
 const GradientCard = ({children, color = "primary", ...props}) => {
@@ -162,9 +144,20 @@ const CodeBlock = ({children}) => (<Paper elevation={4} className="code-block">
 
 export default function HelpPage() {
     const [value, setValue] = React.useState(0)
+    const [queryParams, setQueryParams] = useSearchParams()
+
+    const initialTab = queryParams.get("tab") ?? ""
+    useEffect(() => {
+        setValue(initialTab === "0" ? 0 : initialTab === "1" ? 1 : initialTab === "2" ? 2 : initialTab === "3" ? 3 : 0)
+    }, [])
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue)
+
+        const newParams = new URLSearchParams()
+        newParams.set("tab", newValue)
+        setQueryParams(newParams)
     }
 
     return (<ThemeProvider theme={theme}>
@@ -391,7 +384,9 @@ export default function HelpPage() {
 
                                                     <br/>
                                                     <span className="comment"># Or</span><br/>
-                                                    (Download the zipped repository from <a href="https://github.com/huruifeng/BrainDataPortal" target="_blank" style={{color: "#2196f3"}}>https://github.com/huruifeng/BrainDataPortal</a>)
+                                                    (Download the zipped repository from <a
+                                                    href="https://github.com/huruifeng/BrainDataPortal" target="_blank"
+                                                    style={{color: "#2196f3"}}>https://github.com/huruifeng/BrainDataPortal</a>)
                                                 </div>
                                             </CodeBlock>
                                             <br/>
@@ -402,8 +397,9 @@ export default function HelpPage() {
                                                 <Grid item xs={12} md={12}>
                                                     <Card className="env-card env-card--secondary">
                                                         <CardContent>
-                                                            <Typography variant="h6" className="env-title env-title--secondary">
-                                                                2.1 [Optional]  Conda environment
+                                                            <Typography variant="h6"
+                                                                        className="env-title env-title--secondary">
+                                                                2.1 [Optional] Conda environment
                                                             </Typography>
                                                             <CodeBlock>
                                                                 <div>
@@ -411,45 +407,65 @@ export default function HelpPage() {
                                                                     <span className="comment"># Create a conda environment</span><br/>
                                                                     conda create -n braindataportal python=3.10<br/>
                                                                     <br/>
-                                                                    <span className="comment"># Activate the environment</span><br/>
+                                                                    <span
+                                                                        className="comment"># Activate the environment</span><br/>
                                                                     conda activate braindataportal<br/>
                                                                     <br/>
                                                                     <span className="comment"># Install the required dependencies (In the backend folder)</span><br/>
                                                                     pip install -r requirements.txt
                                                                 </div>
                                                             </CodeBlock>
-                                                            <br />
-                                                            <Typography variant="h6" className="env-title env-title--secondary">
+                                                            <br/>
+                                                            <Typography variant="h6"
+                                                                        className="env-title env-title--secondary">
                                                                 2.2 Start the backend server
                                                             </Typography>
                                                             <CodeBlock>
                                                                 <div>
-                                                                    <span className="comment" style={{color: "#ffcc00"}}># Make sure you are in the <strong>ROOT (e.g., BrainDataPortal)</strong> directory, NOT the backend folder</span><br/>
-                                                                     <span className="comment"># ================================================</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc00"}}># Make sure you are in the <strong>ROOT (e.g., BrainDataPortal)</strong> directory, NOT the backend folder</span><br/>
+                                                                    <span className="comment"># ================================================</span><br/>
                                                                     <span className="comment"># [Option 1] Run the backend server in the terminal:</span><br/>
-                                                                    uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers
+                                                                    uvicorn backend.main:app --host 0.0.0.0 --port 8000
+                                                                    --workers 4 --proxy-headers
                                                                     <br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}># The above command will start the backend server on port 8000</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}># The --proxy-headers option is required to enable CORS</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}># The --workers option specifies the number of worker processes</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}># The --host option specifies the host IP address, Default is 127.0.0.1</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0.0.0 means listening on all IP addresses.</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use 127.0.0.1 for listening on localhost.</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}># The --port option specifies the port number, Default is 8000</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This port number is used to access the backend server</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It will be used in the frontend code, or in proxy server setup</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAKE SURE THE PORT IS NOT BLOCKED.</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}># The above command will start the backend server on port 8000</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}># The --proxy-headers option is required to enable CORS</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}># The --workers option specifies the number of worker processes</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}># The --host option specifies the host IP address, Default is 127.0.0.1</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0.0.0 means listening on all IP addresses.</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use 127.0.0.1 for listening on localhost.</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}># The --port option specifies the port number, Default is 8000</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This port number is used to access the backend server</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It will be used in the frontend code, or in proxy server setup</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAKE SURE THE PORT IS NOT BLOCKED.</span><br/>
 
                                                                     <br/>
-                                                                    <span className="comment"># Stop the backend server</span><br/>
-                                                                    &lt;Ctrl + C&gt; - Press Ctrl+C in the terminal to stop the backend server<br/>
+                                                                    <span
+                                                                        className="comment"># Stop the backend server</span><br/>
+                                                                    &lt;Ctrl + C&gt; - Press Ctrl+C in the terminal to
+                                                                    stop the backend server<br/>
                                                                     <br/>
                                                                     <span className="comment"># ================================================</span><br/>
                                                                     <span className="comment"># [Option 2] Run the backend server in the background using nohup</span><br/>
-                                                                    nohup uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers &gt;&gt; backend.log 2&gt;&1 &
+                                                                    nohup uvicorn backend.main:app --host 0.0.0.0 --port
+                                                                    8000 --workers 4
+                                                                    --proxy-headers &gt;&gt; backend.log 2&gt;&1 &
                                                                     <br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}># The &apos;&gt;&gt; backend.log 2&gt;&1 &&apos; redirects the output to a log file</span><br/>
-                                                                    <span className="comment" style={{color: "#ffcc99"}}># The & runs the command in the background</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}># The &apos;&gt;&gt; backend.log 2&gt;&1 &&apos; redirects the output to a log file</span><br/>
+                                                                    <span className="comment"
+                                                                          style={{color: "#ffcc99"}}># The & runs the command in the background</span><br/>
                                                                     <br/>
                                                                     <span className="comment"># To stop the backend server, use the following command:</span><br/>
                                                                     kill -9 $(lsof -t -i:8000)
@@ -469,8 +485,10 @@ export default function HelpPage() {
                                                         <Typography variant="h6" className="env-title">
                                                             Option A: Run the frontend in the <u>development</u> mode
                                                         </Typography>
-                                                         <Typography variant="h6" className="env-title env-title--primary">
-                                                           A3.1 Check the <u>.env</u> and <u>.env.development</u> files (In the frontend/env folder).
+                                                        <Typography variant="h6"
+                                                                    className="env-title env-title--primary">
+                                                            A3.1 Check the <u>.env</u> and <u>.env.development</u> files
+                                                            (In the frontend/env folder).
                                                         </Typography>
                                                         <Paper className="env-content env-content--primary">
                                                             <span className="comment"># <u>.env</u> - Global settings, always loaded</span><br/>
@@ -481,33 +499,40 @@ export default function HelpPage() {
                                                             <br/>
                                                             <span className="comment"># <u>.env.development</u> - Development settings</span><br/>
                                                             <span className="comment"># Run the App locally or in the cloud in dev mode </span><br/>
-                                                            VITE_BACKEND_URL = http://&lt;backend-running-ip&gt;:8000 <br/>
-                                                            <span className="comment" style={{color: "#e87c10"}}># The &lt;backend-running-ip&gt; is the IP address where the backend server is running</span><br/>
+                                                            VITE_BACKEND_URL =
+                                                            http://&lt;backend-running-ip&gt;:8000 <br/>
+                                                            <span className="comment"
+                                                                  style={{color: "#e87c10"}}># The &lt;backend-running-ip&gt; is the IP address where the backend server is running</span><br/>
                                                             <span className="comment" style={{color: "#e87c10"}}># If the backend server is running locally, use 127.0.0.1 or localhost</span><br/>
                                                             <span className="comment" style={{color: "#e87c10"}}># The 8000 is the port number where the backend server is running on, adjust it if needed</span><br/>
                                                         </Paper>
                                                         <br/>
-                                                        <Typography variant="h6" className="env-title env-title--primary">
-                                                           A3.2 Run the frontend locally or in the cloud
+                                                        <Typography variant="h6"
+                                                                    className="env-title env-title--primary">
+                                                            A3.2 Run the frontend locally or in the cloud
                                                         </Typography>
                                                         <CodeBlock>
                                                             <div>
                                                                 <span className="comment"># Navigate to the frontend directory</span><br/>
                                                                 cd {import.meta.env.VITE_APP_TITLE}/frontend<br/>
                                                                 <br/>
-                                                                <span className="comment"># Install dependencies</span><br/>
+                                                                <span
+                                                                    className="comment"># Install dependencies</span><br/>
                                                                 npm install<br/>
                                                                 <br/>
                                                                 <span className="comment"># ==============================</span><br/>
                                                                 <span className="comment"># [Option 1] Running the frontend server in terminal:</span><br/>
-                                                                <span className="comment"># Start development server</span><br/>
+                                                                <span
+                                                                    className="comment"># Start development server</span><br/>
                                                                 npm run dev
                                                                 <br/>
                                                                 <span className="comment" style={{color: "#ffcc99"}}># The above command will start the frontend server on port {import.meta.env.VITE_PORT}</span><br/>
                                                                 <span className="comment" style={{color: "#ffcc99"}}># you can access the frontend at http://&lt;frontend-running-ip&gt;:{import.meta.env.VITE_PORT}</span><br/>
                                                                 <br/>
-                                                                <span className="comment"># Stop the frontend server</span><br/>
-                                                                &lt;Ctrl + C&gt; - Press Ctrl+C in the terminal to stop the frontend server
+                                                                <span
+                                                                    className="comment"># Stop the frontend server</span><br/>
+                                                                &lt;Ctrl + C&gt; - Press Ctrl+C in the terminal to stop
+                                                                the frontend server
                                                                 <br/>
                                                                 <br/>
                                                                 <span className="comment"># ==============================</span><br/>
@@ -523,10 +548,13 @@ export default function HelpPage() {
                                                     <Divider/>
                                                     <CardContent>
                                                         <Typography variant="h6" className="env-title">
-                                                            Option B: Run the frontend in <u>production</u> mode (Without proxy server)
+                                                            Option B: Run the frontend in <u>production</u> mode
+                                                            (Without proxy server)
                                                         </Typography>
-                                                         <Typography variant="h6" className="env-title env-title--primary">
-                                                           B3.1 Check the <u>.env</u> and <u>.env.production</u> files (In the frontend/env folder).
+                                                        <Typography variant="h6"
+                                                                    className="env-title env-title--primary">
+                                                            B3.1 Check the <u>.env</u> and <u>.env.production</u> files
+                                                            (In the frontend/env folder).
                                                         </Typography>
                                                         <Paper className="env-content env-content--primary">
                                                             <span className="comment"># <u>.env</u> - Global settings, always loaded</span><br/>
@@ -534,32 +562,39 @@ export default function HelpPage() {
                                                             <br/>
                                                             <span className="comment"># <u>.env.production</u> - Production settings</span><br/>
                                                             <span className="comment"># Run the App in the cloud in production mode </span><br/>
-                                                            VITE_BACKEND_URL = http://&lt;backend-running-ip&gt;:8000 <br/>
-                                                            <span className="comment" style={{color: "#e87c10"}}># The &lt;backend-running-ip&gt; is the IP address where the backend server is running</span><br/>
+                                                            VITE_BACKEND_URL =
+                                                            http://&lt;backend-running-ip&gt;:8000 <br/>
+                                                            <span className="comment"
+                                                                  style={{color: "#e87c10"}}># The &lt;backend-running-ip&gt; is the IP address where the backend server is running</span><br/>
                                                             <span className="comment" style={{color: "#e87c10"}}># If the backend server is running locally, use 127.0.0.1 or localhost</span><br/>
                                                             <span className="comment" style={{color: "#e87c10"}}># The 8000 is the port number where the backend server is running on, adjust it if needed</span><br/>
                                                         </Paper>
                                                         <br/>
-                                                        <Typography variant="h6" className="env-title env-title--primary">
-                                                           B3.2 Build the frontend pages
+                                                        <Typography variant="h6"
+                                                                    className="env-title env-title--primary">
+                                                            B3.2 Build the frontend pages
                                                         </Typography>
                                                         <CodeBlock>
                                                             <div>
                                                                 <span className="comment"># Navigate to the frontend directory</span><br/>
                                                                 cd {import.meta.env.VITE_APP_TITLE}/frontend<br/>
                                                                 <br/>
-                                                                <span className="comment"># Install dependencies</span><br/>
+                                                                <span
+                                                                    className="comment"># Install dependencies</span><br/>
                                                                 npm install<br/>
                                                                 <br/>
-                                                                <span className="comment"># Build the frontend pages</span><br/>
+                                                                <span
+                                                                    className="comment"># Build the frontend pages</span><br/>
                                                                 npm run build
                                                                 <br/>
                                                                 <span className="comment" style={{color: "#ffcc99"}}># This command will build the frontend pages in the frontend/dist folder</span><br/>
                                                             </div>
                                                         </CodeBlock>
                                                         <br/>
-                                                        <Typography variant="h6" className="env-title env-title--primary">
-                                                           B3.3 Deploy the frontend pages (Apache server or Nginx server)
+                                                        <Typography variant="h6"
+                                                                    className="env-title env-title--primary">
+                                                            B3.3 Deploy the frontend pages (Apache server or Nginx
+                                                            server)
                                                         </Typography>
                                                         <CodeBlock>
                                                             <div>
@@ -574,7 +609,8 @@ export default function HelpPage() {
                                                                 <span className="comment" style={{color: "#ffcc99"}}># cp -r dist/* /var/www/html/{import.meta.env.VITE_APP_TITLE}.</span><br/>
                                                                 <br/>
                                                                 <span className="comment"># Restart the Apache server or Nginx server</span><br/>
-                                                                sudo systemctl restart apache2 <br/> sudo systemctl restart nginx<br/>
+                                                                sudo systemctl restart apache2 <br/> sudo systemctl
+                                                                restart nginx<br/>
 
                                                             </div>
                                                         </CodeBlock>
@@ -583,10 +619,13 @@ export default function HelpPage() {
                                                     <Divider/>
                                                     <CardContent>
                                                         <Typography variant="h6" className="env-title">
-                                                            Option C: Run the frontend in <u>production</u> mode (Nginx server with proxy service)
+                                                            Option C: Run the frontend in <u>production</u> mode (Nginx
+                                                            server with proxy service)
                                                         </Typography>
-                                                         <Typography variant="h6" className="env-title env-title--primary">
-                                                           C3.1 Check the <u>.env</u> and <u>.env.nginx</u> files (In the frontend/env folder).
+                                                        <Typography variant="h6"
+                                                                    className="env-title env-title--primary">
+                                                            C3.1 Check the <u>.env</u> and <u>.env.nginx</u> files (In
+                                                            the frontend/env folder).
                                                         </Typography>
                                                         <Paper className="env-content env-content--primary">
                                                             <span className="comment"># <u>.env</u> - Global settings, always loaded</span><br/>
@@ -598,30 +637,34 @@ export default function HelpPage() {
                                                             <span className="comment" style={{color: "#e87c10"}}># The backend URL is an empty string, we will use the proxy service to proxy the requests to the backend</span><br/>
                                                         </Paper>
                                                         <br/>
-                                                        <Typography variant="h6" className="env-title env-title--primary">
-                                                           C3.2 Build the frontend pages
+                                                        <Typography variant="h6"
+                                                                    className="env-title env-title--primary">
+                                                            C3.2 Build the frontend pages
                                                         </Typography>
                                                         <CodeBlock>
                                                             <div>
                                                                 <span className="comment"># Navigate to the frontend directory</span><br/>
                                                                 cd {import.meta.env.VITE_APP_TITLE}/frontend<br/>
                                                                 <br/>
-                                                                <span className="comment"># Install dependencies</span><br/>
+                                                                <span
+                                                                    className="comment"># Install dependencies</span><br/>
                                                                 npm install<br/>
                                                                 <br/>
-                                                                <span className="comment"># Build the frontend pages</span><br/>
+                                                                <span
+                                                                    className="comment"># Build the frontend pages</span><br/>
                                                                 npm run build:nginx
                                                                 <br/>
                                                                 <span className="comment" style={{color: "#ffcc99"}}># This command will build the frontend pages in the frontend/dist folder</span><br/>
                                                             </div>
                                                         </CodeBlock>
                                                         <br/>
-                                                        <Typography variant="h6" className="env-title env-title--primary">
-                                                           C3.3 Setup the proxy service (Nginx server, Ubuntu/Debian)
+                                                        <Typography variant="h6"
+                                                                    className="env-title env-title--primary">
+                                                            C3.3 Setup the proxy service (Nginx server, Ubuntu/Debian)
                                                         </Typography>
                                                         <Paper className="env-content env-content--primary">
                                                             <span className="comment"> # Create and edit /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE}</span>
-                                                            <pre>
+                                                            <SyntaxHighlighter language="toml" style={oneLight}>
 {`server {
 
     # Make sure THE PORT IS NOT USED!
@@ -671,15 +714,17 @@ export default function HelpPage() {
     }
 }`}
 
-                                                            </pre>
+                                                            </SyntaxHighlighter>
                                                         </Paper>
                                                         <CodeBlock>
                                                             <div>
                                                                 <span className="comment"># Link the configuration file to sites-enabled</span><br/>
-                                                                sudo ln -s /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE} /etc/nginx/sites-enabled/ <br/>
+                                                                sudo ln -s
+                                                                /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE} /etc/nginx/sites-enabled/ <br/>
                                                                 <br/>
                                                                 <span className="comment"># Reload Nginx</span><br/>
-                                                                sudo nginx -t   # Test the configuration file for syntax errors <br/>
+                                                                sudo nginx -t # Test the configuration file for syntax
+                                                                errors <br/>
                                                                 sudo systemctl reload nginx
                                                             </div>
                                                         </CodeBlock>
@@ -734,179 +779,190 @@ export default function HelpPage() {
                                         </Typography>
                                     </Box>
 
-                                    <Grid container spacing={4} className="data-formats-grid">
-                                        <Grid item xs={12} md={6}>
-                                            <GradientCard color="info">
-                                                <Box className="data-format__header">
-                                                    <DataObject fontSize="medium"/>
-                                                    <Typography variant="h5">Single-cell RNA-seq</Typography>
-                                                </Box>
-                                                <Typography variant="body1" className="data-format__description">
-                                                    Supported formats for single-cell RNA sequencing data:
-                                                </Typography>
-                                                <List className="data-format__list">
-                                                    {["H5AD (AnnData format) - Recommended", "CSV/TSV (Gene expression matrix)", "MTX (Matrix Market format)", "H5 (HDF5 format)", "Seurat RDS files",].map((item, i) => (
-                                                        <ListItem key={i} className="data-format__item">
-                                                            <ListItemIcon className="data-format__icon">
-                                                                <CheckCircle fontSize="small" className="check-icon"/>
-                                                            </ListItemIcon>
-                                                            <ListItemText primary={item}/>
-                                                        </ListItem>))}
-                                                </List>
-                                            </GradientCard>
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <GradientCard color="success">
-                                                <Box className="data-format__header">
-                                                    <Science fontSize="medium"/>
-                                                    <Typography variant="h5">Spatial Transcriptomics</Typography>
-                                                </Box>
-                                                <Typography variant="body1" className="data-format__description">
-                                                    Supported formats for spatial transcriptomics data:
-                                                </Typography>
-                                                <List className="data-format__list">
-                                                    {["H5AD with spatial coordinates", "Visium data (10x Genomics)", "MERFISH data", "seqFISH data", "Custom spatial formats",].map((item, i) => (
-                                                        <ListItem key={i} className="data-format__item">
-                                                            <ListItemIcon className="data-format__icon">
-                                                                <CheckCircle fontSize="small" className="check-icon"/>
-                                                            </ListItemIcon>
-                                                            <ListItemText primary={item}/>
-                                                        </ListItem>))}
-                                                </List>
-                                            </GradientCard>
-                                        </Grid>
-                                    </Grid>
-
-                                    <Card className="file-structure-card">
-                                        <CardContent>
-                                            <Typography variant="h5" className="file-structure__title">
-                                                Required File Structure
-                                            </Typography>
-                                            <Paper className="file-structure__content">
-                                                <Box className="file-structure__tree">
-                                                    <Box className="file-structure__folder">
-                                                        <Folder className="folder-icon"/>
-                                                        <span>your-dataset/</span>
-                                                    </Box>
-                                                    <Box className="file-structure__files">
-                                                        ├── expression_matrix.h5ad <span className="file-comment"># Main data file</span>
-                                                        <br/>
-                                                        ├── metadata.csv <span className="file-comment"># Cell/sample metadata</span>
-                                                        <br/>
-                                                        ├── features.csv <span className="file-comment"># Gene/feature information</span>
-                                                        <br/>
-                                                        ├── spatial/ <span className="file-comment"># Spatial data (if applicable)</span>
-                                                        <br/>│ ├── coordinates.csv
-                                                        <br/>│ └── tissue_image.png
-                                                        <br/>
-                                                        └── config.json <span className="file-comment"># Dataset configuration</span>
-                                                    </Box>
-                                                </Box>
-                                            </Paper>
-                                        </CardContent>
-                                    </Card>
-
-                                    <Typography variant="h4" className="data-requirements-title">
-                                        Data Requirements
+                                    <Typography variant="h5" className="data-requirements-title">
+                                        Dataset requirements
                                     </Typography>
 
                                     <Alert severity="success" icon={<CheckCircle color="success"/>}
                                            className="requirements-alert">
-                                        <AlertTitle className="alert-title">Expression Matrix
-                                            Requirements</AlertTitle>
+                                        <AlertTitle className="alert-title" variant="h6">Required files:</AlertTitle>
                                         <List dense>
-                                            <ListItem>
-                                                <ListItemText
-                                                    primary="Genes as rows, cells as columns (or vice versa with proper annotation)"/>
-                                            </ListItem>
-                                            <ListItem>
-                                                <ListItemText
-                                                    primary="Unique gene identifiers (Ensembl IDs or gene symbols)"/>
-                                            </ListItem>
-                                            <ListItem>
-                                                <ListItemText primary="Unique cell barcodes"/>
-                                            </ListItem>
-                                            <ListItem>
-                                                <ListItemText primary="Raw or normalized counts accepted"/>
-                                            </ListItem>
+                                            <ListItem><ListItemText
+                                                primary="Single-cell RNA-seq data: (1) A processed Seurat RDS file or H5AD file, (2) CSV file for sample metadata"/></ListItem>
+                                            <ListItem><ListItemText
+                                                primary="Spatial transcriptomics data: (1) A processed Seurat RDS file or H5AD file, (2) CSV file for sample metadata"/></ListItem>
+                                            <ListItem><ListItemText
+                                                primary="xQTL data: (1)CSV file for gene-snp pairs with p-values,beta values, (2) SNP/Gene annotations, (3) CSV file for sample metadata"/></ListItem>
                                         </List>
                                     </Alert>
 
-                                    <Grid container spacing={3} className="format-examples-grid">
-                                        <Grid item xs={12} md={6}>
-                                            <Card className="format-card">
-                                                <CardContent>
-                                                    <Typography variant="h6"
-                                                                className="format-title format-title--primary">
-                                                        Metadata Format (CSV)
-                                                    </Typography>
-                                                    <Paper className="format-content format-content--primary">
-                                                        cell_id,cell_type,condition,batch
-                                                        <br/>
-                                                        CELL_001,T_cell,control,batch1
-                                                        <br/>
-                                                        CELL_002,B_cell,treatment,batch1
-                                                        <br/>
-                                                        CELL_003,NK_cell,control,batch2
-                                                    </Paper>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <Card className="format-card">
-                                                <CardContent>
-                                                    <Typography variant="h6"
-                                                                className="format-title format-title--secondary">
-                                                        Features Format (CSV)
-                                                    </Typography>
-                                                    <Paper className="format-content format-content--secondary">
-                                                        gene_id,gene_symbol,gene_type
-                                                        <br/>
-                                                        ENSG00000000003,TSPAN6,protein_coding
-                                                        <br/>
-                                                        ENSG00000000005,TNMD,protein_coding
-                                                        <br/>
-                                                        ENSG00000000419,DPM1,protein_coding
-                                                    </Paper>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                    </Grid>
-
-                                    <Card className="config-card">
+                                    <Card className="file-structure-card">
                                         <CardContent>
-                                            <Typography variant="h5" className="config-title">
-                                                Dataset Configuration
+                                            <Typography variant="h6" className="file-structure__title">
+                                                Required file ftructure (Seurat RDS)
                                             </Typography>
-                                            <Paper className="config-content">
-                                                {"{"}
-                                                <br/>
-                                                &nbsp;&nbsp;"name": "My Dataset",
-                                                <br/>
-                                                &nbsp;&nbsp;"description": "Single-cell RNA-seq of brain tissue",
-                                                <br/>
-                                                &nbsp;&nbsp;"data_type": "single_cell_rna_seq",
-                                                <br/>
-                                                &nbsp;&nbsp;"organism": "homo_sapiens",
-                                                <br/>
-                                                &nbsp;&nbsp;"tissue": "brain",
-                                                <br/>
-                                                &nbsp;&nbsp;"technology": "10x_genomics",
-                                                <br/>
-                                                &nbsp;&nbsp;"has_spatial": false,
-                                                <br/>
-                                                &nbsp;&nbsp;"preprocessing": {"{"}
-                                                <br/>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;"normalized": true,
-                                                <br/>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;"log_transformed": false
-                                                <br/>
-                                                &nbsp;&nbsp;{"}"}
-                                                <br/>
-                                                {"}"}
+
+                                            <Grid container spacing={4} className="data-formats-grid">
+                                                <Grid item xs={12} md={6}>
+                                                    <GradientCard color="info">
+                                                        <Box className="data-format__header">
+                                                            <DataObject fontSize="medium" className="format-title--primary"/>
+                                                            <Typography variant="subtitle1" className="format-title--primary">Single-cell RNA-seq</Typography>
+                                                        </Box>
+                                                        <Box className="file-structure__tree">
+                                                            <Box className="file-structure__folder"><Folder className="folder-icon"/><span>your-dataset/</span></Box>
+                                                            <Box className="file-structure__files">
+                                                                ├── expression_matrix.h5ad <span
+                                                                className="file-comment"># Main data file</span>
+                                                                <br/>
+                                                                ├── metadata.csv <span className="file-comment"># Cell/sample metadata</span>
+                                                                <br/>
+                                                                ├── features.csv <span className="file-comment"># Gene/feature information</span>
+                                                                <br/>
+                                                                ├── spatial/ <span className="file-comment"># Spatial data (if applicable)</span>
+                                                                <br/>│ ├── coordinates.csv
+                                                                <br/>│ └── tissue_image.png
+                                                                <br/>
+                                                                └── config.json <span className="file-comment"># Dataset configuration</span>
+                                                            </Box>
+                                                        </Box>
+                                                    </GradientCard>
+                                                </Grid>
+                                                <Grid item xs={12} md={6}>
+                                                    <GradientCard color="success">
+                                                        <Box className="data-format__header">
+                                                            <Science fontSize="medium"  className="format-title--primary"/>
+                                                            <Typography variant="subtitle1" className="format-title--primary">Spatial Transcriptomics</Typography>
+                                                        </Box>
+                                                        <Box className="file-structure__tree">
+                                                            <Box className="file-structure__folder"><Folder className="folder-icon"/><span>your-dataset/</span></Box>
+                                                            <Box className="file-structure__files">
+                                                                ├── expression_matrix.h5ad <span
+                                                                className="file-comment"># Main data file</span>
+                                                                <br/>
+                                                                ├── metadata.csv <span className="file-comment"># Cell/sample metadata</span>
+                                                                <br/>
+                                                                ├── features.csv <span className="file-comment"># Gene/feature information</span>
+                                                                <br/>
+                                                                ├── spatial/ <span className="file-comment"># Spatial data (if applicable)</span>
+                                                                <br/>│ ├── coordinates.csv
+                                                                <br/>│ └── tissue_image.png
+                                                                <br/>
+                                                                └── config.json <span className="file-comment"># Dataset configuration</span>
+                                                            </Box>
+                                                        </Box>
+                                                    </GradientCard>
+                                                </Grid>
+                                            </Grid>
+
+                                            <Paper className="format-examples-grid" sx={{mt: 2}}>
+                                                <Typography variant="subtitle1" className="format-title format-title--primary">
+                                                        Metadata Format (CSV)
+                                                </Typography>
+                                                <Box className="format-content format-content--primary">
+                                                    cell_id,cell_type,condition,batch
+                                                    <br/>
+                                                    CELL_001,T_cell,control,batch1
+                                                    <br/>
+                                                    CELL_002,B_cell,treatment,batch1
+                                                    <br/>
+                                                    CELL_003,NK_cell,control,batch2
+                                                </Box>
                                             </Paper>
                                         </CardContent>
                                     </Card>
+
+                                    <Card className="config-card">
+                                        <CardContent>
+                                            <Typography variant="h6" className="config-title">
+                                                Dataset configuration: dataset_info.toml
+                                            </Typography>
+                                            <Paper className="config-content">
+                                                <SyntaxHighlighter language="toml" style={oneLight}>
+{`
+[datasetfile]
+file = ""                               ## Path to the Seurat object file
+datatype = ""                           ## Type of the data. Options: scRNAseq, scATACseq, VisiumST, xQTL
+
+[dataset]
+dataset_name = ""                       ## Required: Dataset name, MUST BE UNIQUE, used to identify the dataset in the database
+description = ""                        ## Dataset description
+PI_full_name = ""                       ## Principal Investigator (PI) full name
+PI_email = ""                           ## PI email
+first_contributor = ""                  ## First contributor name
+first_contributor_email = ""            ## First contributor email
+other_contributors = ""                 ## Other contributors
+support_grants = ""                     ## Support grants
+other_funding_source = ""               ## Other funding source
+publication_DOI = ""                    ## DOI of the publication
+publication_PMID = ""                   ## PMID of the publication
+brain_super_region = ""                 ## Brain super region
+brain_region = ""                       ## Brain region
+sample_info = ""                        ## Sample information
+sample_sheet = ""                       ## Sample sheet file name (Not the path, just the file name)
+n_samples = 96                          ## Number of samples
+organism = "Homo Sapiens"               ## Organism
+disease = "PD"                          ## Disease
+
+[study]
+study_name = "Parkinson5D"              ## Study name, the dataset belongs to
+description = ""                        ## Study description
+team_name = "Team Scherzer"             ## Team name
+lab_name = "NeuroGenomics"               ## Lab name
+submitter_name = ""                     ## Submitter name
+submitter_email = ""                    ## Submitter email
+
+[protocol]
+protocol_id = "P002"                    ## Protocol ID
+protocol_name = "P001_VisiumST"         ## Protocol name
+version = ""                            ## Protocol version
+github_url = ""                         ## GitHub URL
+sample_collection_summary = ""          ## Sample collection summary
+cell_extraction_summary = ""            ## Cell extraction summary
+lib_prep_summary = ""                   ## Library preparation summary
+data_processing_summary = ""            ## Data processing summary
+protocols_io_DOI = ""                   ## protocols.io DOI
+other_reference = ""                    ## Other reference
+
+[meta_features]
+selected_features = ["nCount_Spatial",...] ## List of selected features will be shown in the page
+sample_id_column = "sample_name"        ## Sample ID column in Seurat object metadata
+major_cluster_column = "CellType"       ## Major cluster column in Seurat object metadata
+condition_column = "diagnosis"          ## Condition column in Seurat object metadata        
+
+[visium_defaults]
+samples = [ "BN2023", "BN1076",]         ## List of sample names
+features = [ "smoothed_label_s5",...]    ## List of default feature names
+genes = [ "SNCA",...]                    ## List of default gene names
+`}
+                                                </SyntaxHighlighter>
+                                            </Paper>
+                                        </CardContent>
+                                    </Card>
+                                     <Typography variant="h5" className="data-requirements-title">
+                                        Dataset processing
+                                    </Typography>
+                                    <Alert severity="primary" icon={<CheckCircle color="primary"/>} className="requirements-alert">
+                                        <AlertTitle className="alert-title" variant="h6">Data processing scripts were provided:</AlertTitle>
+                                        <List dense>
+                                            <ListItem>Single-cell RNA-seq data: <a href='https://github.com/BrainDataPortal/BrainDataPortal_DatasetProcessing'>BrainDataPortal_DatasetProcessing</a></ListItem>
+                                            <ListItem>Spatial transcriptomics data: <a href='https://github.com/BrainDataPortal/BrainDataPortal_DatasetProcessing'>BrainDataPortal_DatasetProcessing</a></ListItem>
+                                            <ListItem>xQTL data: <a href='https://github.com/BrainDataPortal/BrainDataPortal_xQTLProcessing'>BrainDataPortal_xQTLProcessing </a></ListItem>
+                                        </List>
+                                    </Alert>
+                                     <Typography variant="h5" className="data-requirements-title">
+                                        Dataset uploading
+                                    </Typography>
+                                     <Alert severity="info" icon={<CheckCircle color="info"/>} className="requirements-alert">
+                                        <AlertTitle className="alert-title" variant="h6">Uploading data:</AlertTitle>
+                                        <List dense>
+                                            <ListItem>Upload the whole dataset folder to the server backend/datasets/ folder. The gene expression matrix file is not required(raw_normalized_counts.csv), Files with name starting with &apos;raw_&apos; are not needed to be uploaded.</ListItem>
+                                            <ListItem>The sample sheet file is required(e.g., DatasetName_sample_sheet.csv) and must be uploaded to the backend/SampleSheets/ folder.</ListItem>
+                                            <ListItem>The dataset configuration file is required, the file name must be &apos;dataset_info.yaml&apos; and must be put in the backend/datasets/&lt;your_dataset_name&gt;/ folder.</ListItem>
+                                            <ListItem>Refresh the database: <a href="/datasetmanager">Dataset Manager</a></ListItem>
+                                        </List>
+                                    </Alert>
+
                                 </Container>
                             </TabPanel>
 
