@@ -12,7 +12,6 @@ import useHomeStore from "../../store/HomeStore.js";
 
 const Home = () => {
     const {homeData, fetchHomeData} = useHomeStore();
-    const theme = useTheme();
 
     useEffect(() => {
         const res = fetchHomeData();

@@ -187,22 +187,14 @@ export default function Home_HM() {
         <Container maxWidth="xl" sx={{py: 4}}>
             <Grid container spacing={3}>
                 {/* Header */}
-                <Grid item xs={12}>
-                    <Paper
-                        elevation={2}
-                        sx={{
-                            p: 3,
-                            mb: 3,
-                            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                        }}
-                    >
-                        <Typography variant="h3" component="h1" gutterBottom sx={{color: "white", fontWeight: "bold"}}>
-                            BrainDataPortal
+                <Grid item xs={12} textAlign="center">
+                        <Typography variant="h3" component="h1" gutterBottom sx={{color: "primary.main", fontWeight: "bold"}}>
+                            {/*{import.meta.env.VITE_APP_TITLE}*/}
+                            MODE: Multi-Omics Data Exploration
                         </Typography>
-                        <Typography variant="h6" sx={{color: "white", opacity: 0.9}}>
+                        <Typography variant="h6" sx={{color: "text.secondary", opacity: 0.9}}>
                             Single-cell, Spatial Transcriptomics and Multi-omics Data Analysis Platform
                         </Typography>
-                    </Paper>
                 </Grid>
 
                 {/* Main Content */}
