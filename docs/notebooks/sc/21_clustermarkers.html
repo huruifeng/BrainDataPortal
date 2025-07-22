@@ -13,7 +13,7 @@
 
 <meta name="date" content="2025-07-22" />
 
-<title>Extract Data from Seurat Object</title>
+<title>Cell Type Marker Analysis</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -368,7 +368,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Extract Data from Seurat Object</h1>
+<h1 class="title toc-ignore">Cell Type Marker Analysis</h1>
 <h4 class="author">Ruifeng Hu</h4>
 <h4 class="date">2025-07-22</h4>
 
@@ -377,132 +377,285 @@ display: none;
 <div id="TOC">
 <ul>
 <li><a href="#overview" id="toc-overview">Overview</a></li>
-<li><a href="#usage" id="toc-usage">Usage</a></li>
-<li><a href="#load-libraries" id="toc-load-libraries">Load
-Libraries</a></li>
-<li><a href="#set-arguments" id="toc-set-arguments">Set
-Arguments</a></li>
-<li><a href="#create-output-directory" id="toc-create-output-directory">Create Output Directory</a></li>
-<li><a href="#load-seurat-object" id="toc-load-seurat-object">Load
-Seurat Object</a></li>
-<li><a href="#check-seurat-object-structure" id="toc-check-seurat-object-structure">Check Seurat Object
-Structure</a></li>
-<li><a href="#extract-and-save-metadata" id="toc-extract-and-save-metadata">Extract and Save Metadata</a></li>
-<li><a href="#save-umap-embedding" id="toc-save-umap-embedding">Save
-UMAP Embedding</a></li>
-<li><a href="#extract-and-save-normalized-counts" id="toc-extract-and-save-normalized-counts">Extract and Save Normalized
-Counts</a></li>
+<li><a href="#load-required-libraries" id="toc-load-required-libraries">Load Required Libraries</a></li>
+<li><a href="#set-parameters" id="toc-set-parameters">Set
+Parameters</a></li>
+<li><a href="#load-and-validate-seurat-object" id="toc-load-and-validate-seurat-object">Load and Validate Seurat
+Object</a></li>
+<li><a href="#find-cell-type-markers" id="toc-find-cell-type-markers">Find Cell Type Markers</a></li>
+<li><a href="#differential-expression-analysis" id="toc-differential-expression-analysis">Differential Expression
+Analysis</a></li>
+<li><a href="#pseudo-bulk-analysis" id="toc-pseudo-bulk-analysis">Pseudo-bulk Analysis</a></li>
 </ul>
 </div>
 
 <div id="overview" class="section level2">
 <h2>Overview</h2>
-<p>This notebook extracts data from a Seurat object and saves it in
-formats suitable for downstream analysis.</p>
+<p>This notebook performs cell type marker analysis on a Seurat object,
+including: - Finding cell type specific markers - Calculating
+differential expression within cell types - Performing pseudo-bulk
+analysis</p>
 </div>
-<div id="usage" class="section level2">
-<h2>Usage</h2>
-<p>Run as an R script:</p>
-<pre><code>Rscript extract_SC_v5.R seurat_obj.rds output_directory cluster_column</code></pre>
-<hr />
-</div>
-<div id="load-libraries" class="section level2">
-<h2>Load Libraries</h2>
+<div id="load-required-libraries" class="section level2">
+<h2>Load Required Libraries</h2>
 <pre class="r"><code>library(jsonlite)
 library(Matrix)
 library(data.table)
 library(Seurat)
-library(tidyverse)
-library(presto)</code></pre>
+library(tidyverse)</code></pre>
 </div>
-<div id="set-arguments" class="section level2">
-<h2>Set Arguments</h2>
-<p>You can set these manually for interactive use:</p>
-<pre class="r"><code># Set these manually for notebook use
-seurat_obj_file &lt;- &quot;example_data/pmdbs_lee_obj_updated_SN.rds&quot;  # Path to your Seurat object fil
-output_dir &lt;- &quot;example_data/PMDBS_snRNAseq&quot;  # Directory to save output files, usually the dataset name
-cluster_col &lt;- &quot;cell_type&quot;  # Column name in metadata for clustering information</code></pre>
-</div>
-<div id="create-output-directory" class="section level2">
-<h2>Create Output Directory</h2>
-<pre class="r"><code>if (!dir.exists(output_dir)) {
-  dir.create(output_dir, recursive = TRUE)
+<div id="set-parameters" class="section level2">
+<h2>Set Parameters</h2>
+<pre class="r"><code>seurat_obj_file &lt;- &quot;example_data/pmdbs_lee_obj_updated_SN.rds&quot; # Path to your Seurat object file
+output_dir &lt;- &quot;example_data/PMDBS_snRNAseq&quot; # Directory to save output files, usually the dataset name
+cluster_col &lt;- &quot;cell_type&quot; # Column name in metadata for clustering information
+condition_col &lt;- &quot;case&quot; # Column name in metadata for condition information
+sample_col &lt;- &quot;sample_id&quot; # Column name in metadata for sample information
+seurat_type &lt;- &quot;snrnaseq&quot; # Type of Seurat object: scrnaseq, snrnaseq, snatacseq, scatacseq, visiumst
+
+# Create output directory
+clustermarkers_folder = paste0(output_dir, &quot;/clustermarkers&quot;)
+if (!dir.exists(clustermarkers_folder)) {
+  dir.create(clustermarkers_folder, recursive = TRUE)
 }</code></pre>
 </div>
-<div id="load-seurat-object" class="section level2">
-<h2>Load Seurat Object</h2>
+<div id="load-and-validate-seurat-object" class="section level2">
+<h2>Load and Validate Seurat Object</h2>
 <pre class="r"><code>cat(&quot;Loading RDS data...\n&quot;)</code></pre>
 <pre><code>## Loading RDS data...</code></pre>
 <pre class="r"><code>seurat_obj &lt;- readRDS(seurat_obj_file)
+
+# Validation checks
 if (!inherits(seurat_obj, &quot;Seurat&quot;)) {
   stop(&quot;The provided file is not a valid Seurat object.&quot;)
 }
-capture.output(str(seurat_obj), file = paste0(output_dir, &quot;/seurat_obj_structure.txt&quot;))</code></pre>
-</div>
-<div id="check-seurat-object-structure" class="section level2">
-<h2>Check Seurat Object Structure</h2>
-<p>v5 Seurat objects have a different structure compared to v4, so we
-need to ensure the object contains the expected slots and layers.</p>
-<pre class="r"><code>if (!&quot;RNA&quot; %in% names(seurat_obj@assays)) {
-  stop(&quot;The Seurat object does not contain the &#39;RNA&#39; assay.&quot;)
+
+if(seurat_type == &quot;scrnaseq&quot; | seurat_type == &quot;snrnaseq&quot;){
+      # Check if the Seurat object has the necessary assay
+    if (!&quot;RNA&quot; %in% names(seurat_obj@assays)) {
+        stop(&quot;The Seurat object does not contain the &#39;RNA&#39; assay.&quot;)
+    }
+    # Check if the Seurat object has the necessary assay data
+    if (!&quot;data&quot; %in% names(seurat_obj@assays$RNA@layers)) {
+        stop(&quot;The Seurat object does not contain the &#39;data&#39; slot in the &#39;RNA&#39; assay.&quot;)
+    }
+} else if (seurat_type == &quot;snatacseq&quot; | seurat_type == &quot;scatacseq&quot;) {
+    # Check if the Seurat object has the necessary assay
+    if (!&quot;ATAC&quot; %in% names(seurat_obj@assays)) {
+        stop(&quot;The Seurat object does not contain the &#39;ATAC&#39; assay.&quot;)
+    }
+    # Check if the Seurat object has the necessary assay data
+    if (!&quot;counts&quot; %in% slotNames(seurat_obj@assays$ATAC)) {
+        stop(&quot;The Seurat object does not contain the &#39;counts&#39; slot in the &#39;ATAC&#39; assay.&quot;)
+    }
+} else if (seurat_type == &quot;visiumst&quot;) {
+    # Check if the Seurat object has the necessary assay
+    if (!&quot;Spatial&quot; %in% names(seurat_obj@assays)) {
+        stop(&quot;The Seurat object does not contain the &#39;Spatial&#39; assay.&quot;)
+    }
+    # Check if the Seurat object has the necessary assay data
+    if (!&quot;data&quot; %in% slotNames(seurat_obj@assays$Spatial)) {
+        stop(&quot;The Seurat object does not contain the &#39;data&#39; slot in the &#39;Spatial&#39; assay.&quot;)
+    }
 }
-if (!&quot;data&quot; %in% names(seurat_obj@assays$RNA@layers)) {
-  stop(&quot;The Seurat object does not contain the &#39;data&#39; slot in the &#39;RNA&#39; assay.&quot;)
-}
-if (!&quot;meta.data&quot; %in% slotNames(seurat_obj)) {
-  stop(&quot;The Seurat object does not contain the &#39;meta.data&#39; slot.&quot;)
-}
-if (!&quot;umap&quot; %in% names(seurat_obj@reductions)) {
-  stop(&quot;The Seurat object does not contain the &#39;umap&#39; reduction.&quot;)
-}
-if (!cluster_col %in% colnames(seurat_obj@meta.data)) {
-  stop(paste(&quot;The cluster column&quot;, cluster_col, &quot;does not exist in the metadata.&quot;))
+
+# Check required columns exist in metadata
+required_cols &lt;- c(cluster_col, condition_col, sample_col)
+missing_cols &lt;- required_cols[!required_cols %in% colnames(seurat_obj@meta.data)]
+if (length(missing_cols) &gt; 0) {
+  stop(paste(&quot;Missing required columns in metadata:&quot;, paste(missing_cols, collapse = &quot;, &quot;)))
 }</code></pre>
 </div>
-<div id="extract-and-save-metadata" class="section level2">
-<h2>Extract and Save Metadata</h2>
-<pre class="r"><code>cat(&quot;Saving metadata...\n&quot;)</code></pre>
-<pre><code>## Saving metadata...</code></pre>
-<pre class="r"><code>metadata &lt;- seurat_obj@meta.data
-write.csv(metadata, file = paste0(output_dir, &quot;/raw_metadata.csv&quot;), row.names = TRUE)
+<div id="find-cell-type-markers" class="section level2">
+<h2>Find Cell Type Markers</h2>
+<pre class="r"><code>print(&quot;Extracting cell type specific markers...&quot;)</code></pre>
+<pre><code>## [1] &quot;Extracting cell type specific markers...&quot;</code></pre>
+<pre class="r"><code># Find markers for each cell type
+cell_type_markers &lt;- FindAllMarkers(
+  seurat_obj,
+  group.by = cluster_col,
+  only.pos = TRUE
+)
 
-cat(&quot;Saving metadata feature names...\n&quot;)</code></pre>
-<pre><code>## Saving metadata feature names...</code></pre>
-<pre class="r"><code>column_names &lt;- colnames(metadata)
-write_json(column_names, path = file.path(output_dir, &quot;raw_metadata_columns.json&quot;), pretty = TRUE)</code></pre>
+# Convert to data.table and save
+cell_type_markers_dt &lt;- as.data.table(cell_type_markers)
+fwrite(cell_type_markers_dt, 
+       paste0(clustermarkers_folder,&quot;/cluster_FindAllMarkers.csv&quot;), 
+       row.names = FALSE)</code></pre>
 </div>
-<div id="save-umap-embedding" class="section level2">
-<h2>Save UMAP Embedding</h2>
-<pre class="r"><code>cat(&quot;Saving UMAP embedding...\n&quot;)</code></pre>
-<pre><code>## Saving UMAP embedding...</code></pre>
-<pre class="r"><code>umap_embeddings &lt;- seurat_obj@reductions$umap@cell.embeddings
-colnames(umap_embeddings) &lt;- toupper(colnames(umap_embeddings))
-write.csv(umap_embeddings, file = paste0(output_dir, &quot;/raw_umap_embeddings.csv&quot;), row.names = TRUE)</code></pre>
+<div id="differential-expression-analysis" class="section level2">
+<h2>Differential Expression Analysis</h2>
+<pre class="r"><code>print(&quot;Calculating differential expression within each cell type...&quot;)</code></pre>
+<pre><code>## [1] &quot;Calculating differential expression within each cell type...&quot;</code></pre>
+<pre class="r"><code># Define the cell types
+cell_types &lt;- unique(seurat_obj@meta.data[[cluster_col]])
+# Initialize an empty list to store results
+de_results_list &lt;- list()
+de_results_topN_list &lt;- list()
+
+# Loop through each cell type
+for (cell_type in cell_types) {
+    # Print the current cell type # nolint: whitespace_linter, indentation_linter.
+    print(paste(&quot;Processing cell type:&quot;, cell_type))
+    # Subset the Seurat object to the current cell type # nolint
+    subset_obj &lt;- seurat_obj[, seurat_obj@meta.data[[cluster_col]] == cell_type]
+
+    # Calculate differential expression between conditions
+    condition_ls &lt;- unique(seurat_obj@meta.data[[condition_col]])
+    # if there are more than 2 conditions, compare all possible combinations
+    if (length(condition_ls) &gt; 2) {
+        combinations &lt;- combn(condition_ls, 2)
+        for (i in 1:ncol(combinations)) {
+            c1 &lt;- combinations[1, i]
+            c2 &lt;- combinations[2, i]
+            de_results &lt;- FindMarkers(subset_obj, ident.1 = c1, ident.2 = c2, group.by = condition_col)
+            ## add a column for the gene names
+            de_results$gene &lt;- rownames(de_results)
+            
+            ## filter out genes with padj &gt; 0.05
+            # de_results &lt;- de_results[de_results$p_val_adj &lt; 0.05, ]
+            
+            ## get top 10 upregulated DE genes and downregulated, base on logFC
+            de_results_topN &lt;- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
+        
+            # Store the results in the list
+            de_results_list[[paste(cell_type, paste(c1, c2, sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results
+            de_results_topN_list[[paste(cell_type, paste(c1, c2, sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results_topN
+        }
+    } else {
+        de_results &lt;- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = condition_col)
+        ## add a column for the gene names
+        de_results$gene &lt;- rownames(de_results)
+
+        ## filter out genes with padj &gt; 0.05
+        # de_results &lt;- de_results[de_results$p_val_adj &lt; 0.05, ]
+        
+        ## get top 10 upregulated DE genes and downregulated, base on logFC
+        de_results_topN &lt;- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
+        
+        de_results_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results
+        de_results_topN_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results_topN
+
+    }
+}</code></pre>
+<pre><code>## [1] &quot;Processing cell type: Oligo&quot;
+## [1] &quot;Processing cell type: Astro&quot;
+## [1] &quot;Processing cell type: VC&quot;
+## [1] &quot;Processing cell type: OPC&quot;
+## [1] &quot;Processing cell type: ExN&quot;
+## [1] &quot;Processing cell type: MG&quot;
+## [1] &quot;Processing cell type: InN&quot;</code></pre>
+<pre class="r"><code># Convert the list to a data.table
+de_results_dt &lt;- rbindlist(de_results_list, idcol = &quot;cluster_DE&quot;)
+de_results_topN_dt &lt;- rbindlist(de_results_topN_list, idcol = &quot;cluster_DE&quot;)
+# Save to CSV
+fwrite(de_results_dt, paste0(clustermarkers_folder, &quot;/cluster_DEGs.csv&quot;), row.names = FALSE)
+fwrite(de_results_topN_dt, paste0(clustermarkers_folder, &quot;/cluster_DEGs_topN.csv&quot;), row.names = FALSE)</code></pre>
 </div>
-<div id="extract-and-save-normalized-counts" class="section level2">
-<h2>Extract and Save Normalized Counts</h2>
-<pre class="r"><code>cat(&quot;Saving normalized counts...\n&quot;)</code></pre>
-<pre><code>## Saving normalized counts...</code></pre>
-<pre class="r"><code>normalized_counts &lt;- seurat_obj[[&quot;RNA&quot;]]@layers[[&quot;data&quot;]] # Sparse matrix
+<div id="pseudo-bulk-analysis" class="section level2">
+<h2>Pseudo-bulk Analysis</h2>
+<pre class="r"><code>print(&quot;Calculating pseudo-bulk differential expression within each cell type...&quot;)</code></pre>
+<pre><code>## [1] &quot;Calculating pseudo-bulk differential expression within each cell type...&quot;</code></pre>
+<pre class="r"><code># Set assay based on data type
+assay &lt;- switch(seurat_type,
+               &quot;scrnaseq&quot; = &quot;RNA&quot;,
+               &quot;snrnaseq&quot; = &quot;RNA&quot;,
+               &quot;snATACseq&quot; = &quot;ATAC&quot;,
+               &quot;visiumst&quot; = &quot;Spatial&quot;,
+               stop(&quot;Invalid seurat_type&quot;))
 
-gene_names &lt;- dimnames(seurat_obj[[&quot;RNA&quot;]]@features)[[1]]
-cell_names &lt;- dimnames(seurat_obj[[&quot;RNA&quot;]]@cells)[[1]]
+## use the counts assay
+pb_obj &lt;- PseudobulkExpression(seurat_obj,assays = assay, layer = &quot;counts&quot;, method= &quot;aggregate&quot;, return.seurat = T, group.by = c(sample_col, cluster_col, condition_col))
 
-triplet &lt;- summary(normalized_counts)
-triplet$Gene &lt;- gene_names[triplet$i]
-triplet$Cell &lt;- cell_names[triplet$j]
+pb_obj@meta.data[[cluster_col]] &lt;- gsub(&quot;-&quot;, &quot;_&quot;, pb_obj@meta.data[[cluster_col]])
+pb_obj@meta.data[[&quot;orig.ident&quot;]] &lt;- gsub(&quot;-&quot;, &quot;_&quot;, pb_obj@meta.data[[&quot;orig.ident&quot;]])
 
-long_data &lt;- triplet %&gt;%
-  select(Cell, Gene, Expression = x)
+metadata = pb_obj@meta.data
+## rename sample_id to sampleId
+colnames(metadata)[colnames(metadata) == sample_col] &lt;- &quot;sampleId&quot;
+colnames(metadata)[colnames(metadata) == condition_col] &lt;- &quot;condition&quot;
 
-nonzero_data &lt;- long_data[long_data$Expression &gt; 0, ]
-nonzero_data &lt;- as.data.table(nonzero_data)
-fwrite(nonzero_data, file = paste0(output_dir, &quot;/raw_normalized_counts.csv&quot;), row.names = FALSE)</code></pre>
-<hr />
-<pre class="r"><code>cat(&quot;Done! Data extraction is complete!
-You can find the output files in the directory:&quot;, output_dir, &quot;\n&quot;)</code></pre>
-<pre><code>## Done! Data extraction is complete!
-## You can find the output files in the directory: example_data/PMDBS_snRNAseq</code></pre>
+write.csv(metadata, paste0(clustermarkers_folder, &quot;/metadata_sample_cluster_condition.csv&quot;), row.names = FALSE)
+
+expr_matrix &lt;- GetAssayData(pb_obj, assay = assay, layer = &quot;data&quot;)
+colnames(expr_matrix) &lt;- gsub(&quot;-&quot;, &quot;_&quot;, colnames(expr_matrix))
+write.csv(expr_matrix, paste0(clustermarkers_folder, &quot;/pb_expr_matrix.csv&quot;), row.names = TRUE)</code></pre>
+<pre class="r"><code># Define the cell types
+cell_types &lt;- unique(pb_obj@meta.data[[cluster_col]])
+
+# Initialize an empty list to store results
+pseudo_bulk_list &lt;- list()
+pseudo_bulk_topN_list &lt;- list()
+# Loop through each cell type
+for (cell_type in cell_types) {
+    # Print the current cell type # nolint: whitespace_linter, indentation_linter.
+    print(paste(&quot;Processing cell type:&quot;, cell_type))
+    # Subset the Seurat object to the current cell type # nolint
+    subset_obj &lt;- pb_obj[, pb_obj@meta.data[[cluster_col]] == cell_type]
+
+    # Calculate differential expression between conditions
+    # Here, we assume that the conditions are stored in the &quot;Condition&quot; metadata column 
+    # You may need to adjust this based on your actual metadata structure
+    condition_ls &lt;- unique(subset_obj@meta.data[[condition_col]])
+    # if there are more than 2 conditions, compare all possible combinations
+    if (length(condition_ls) &gt; 2) {
+        combinations &lt;- combn(condition_ls, 2)
+        for (i in 1:ncol(combinations)) {
+            c1 &lt;- combinations[1, i]
+            c2 &lt;- combinations[2, i]
+            de_results &lt;- FindMarkers(subset_obj, ident.1 = c1, ident.2 = c2, group.by = condition_col, test.use = &quot;wilcox&quot;)
+            ## add a column for the gene names
+            de_results$gene &lt;- rownames(de_results)
+            
+            ## filter out genes with padj &gt; 0.05
+            # de_results &lt;- de_results[de_results$p_val_adj &lt; 0.1, ]
+
+            ## get top 10 upregulated DE genes and downregulated, base on logFC
+            de_results_topN &lt;- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
+            
+            # Store the results in the list
+            pseudo_bulk_list[[paste(cell_type, paste(c1, c2, sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results
+            pseudo_bulk_topN_list[[paste(cell_type, paste(c1, c2, sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results_topN
+        }
+    } else {
+        de_results &lt;- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = condition_col,test.use = &quot;wilcox&quot;)
+        ## add a column for the gene names
+        de_results$gene &lt;- rownames(de_results)
+        
+        ## filter out genes with padj &gt; 0.05
+        # de_results &lt;- de_results[de_results$p_val_adj &lt; 0.05, ]
+        
+        ## get top 10 upregulated DE genes and downregulated, base on logFC
+        de_results_topN &lt;- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
+        
+        # Store the results in the list
+        pseudo_bulk_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results
+        pseudo_bulk_topN_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results_topN
+    }
+}</code></pre>
+<pre><code>## [1] &quot;Processing cell type: Astro&quot;
+## [1] &quot;Processing cell type: ExN&quot;
+## [1] &quot;Processing cell type: MG&quot;
+## [1] &quot;Processing cell type: OPC&quot;
+## [1] &quot;Processing cell type: Oligo&quot;
+## [1] &quot;Processing cell type: VC&quot;
+## [1] &quot;Processing cell type: InN&quot;</code></pre>
+<pre class="r"><code># Convert the list to a data.table
+pseudo_bulk_dt &lt;- rbindlist(pseudo_bulk_list, idcol = &quot;cluster_DE&quot;)
+pseudo_bulk_topN_dt &lt;- rbindlist(pseudo_bulk_topN_list, idcol = &quot;cluster_DE&quot;)
+# Save to CSV
+fwrite(pseudo_bulk_dt, paste0(clustermarkers_folder, &quot;/cluster_pb_DEGs.csv&quot;), row.names = FALSE)
+fwrite(pseudo_bulk_topN_dt, paste0(clustermarkers_folder, &quot;/cluster_pb_DEGs_topN.csv&quot;), row.names = FALSE)</code></pre>
+<pre class="r"><code>pooled_topN_DEGs = pseudo_bulk_topN_dt$gene
+## remove duplicates
+pooled_topN_DEGs &lt;- unique(pooled_topN_DEGs)
+## subset expr_matrix to only include pooled_topN_DEGs
+expr_matrix_pooled_topN_DGEs &lt;- expr_matrix[pooled_topN_DEGs, ]
+## save the pooled_topN_DEGs expression matrix
+write.csv(expr_matrix_pooled_topN_DGEs, paste0(clustermarkers_folder, &quot;/pb_expr_matrix_DEGs_topN.csv&quot;), row.names = TRUE)
+
+cat(&quot;Done! cluster markers is done! ^_^ ...\n&quot;)</code></pre>
+<pre><code>## Done! cluster markers is done! ^_^ ...</code></pre>
 </div>
 
 

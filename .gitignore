@@ -17,6 +17,7 @@
 
 
 /backend/DatasetFiles/
-
-# Project exclude paths
 /backend/datasets/
+
+/docs/notebooks/sc/example_data/**
+!/docs/notebooks/sc/example_data/dataset_info.toml

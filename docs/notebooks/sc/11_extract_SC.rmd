@@ -3,25 +3,18 @@ title: "Extract Data from Seurat Object"
 author: "Ruifeng Hu"
 date: "`r Sys.Date()`"
 description: "This notebook extracts data from a Seurat object and saves it in formats suitable for downstream analysis."
-format:
-  html:
+output:
+  html_document:
     toc: true
     toc_depth: 2
-    code_folding: show
-    self_contained: true
     theme: cosmo
-    highlight: tango
-    number_sections: true
-    fig_caption: true
-    df_print: paged
-output: html_document
 ---
 
 ## Overview
 
 This notebook extracts data from a Seurat object and saves it in formats suitable for downstream analysis.
 
-### Usage
+## Usage
 
 Run as an R script:
 
@@ -35,7 +28,7 @@ Rscript extract_SC_v5.R seurat_obj.rds output_directory cluster_column
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Load Libraries
+## Load Libraries
 
 ```{r load-libraries, message=FALSE, warning=FALSE}
 library(jsonlite)
@@ -46,7 +39,7 @@ library(tidyverse)
 library(presto)
 ```
 
-### Set Arguments
+## Set Arguments
 
 You can set these manually for interactive use:
 
@@ -57,7 +50,7 @@ output_dir <- "example_data/PMDBS_snRNAseq"  # Directory to save output files, u
 cluster_col <- "cell_type"  # Column name in metadata for clustering information
 ```
 
-### Create Output Directory
+## Create Output Directory
 
 ```{r create-output_dir}
 if (!dir.exists(output_dir)) {
@@ -65,7 +58,7 @@ if (!dir.exists(output_dir)) {
 }
 ```
 
-### Load Seurat Object
+## Load Seurat Object
 
 ```{r load-seurat-object}
 cat("Loading RDS data...\n")
@@ -76,7 +69,7 @@ if (!inherits(seurat_obj, "Seurat")) {
 capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure.txt"))
 ```
 
-### Check Seurat Object Structure
+## Check Seurat Object Structure
 v5 Seurat objects have a different structure compared to v4, so we need to ensure the object contains the expected slots and layers.
 ```{r check-seurat-structure}
 if (!"RNA" %in% names(seurat_obj@assays)) {
@@ -96,7 +89,7 @@ if (!cluster_col %in% colnames(seurat_obj@meta.data)) {
 }
 ```
 
-### Extract and Save Metadata
+## Extract and Save Metadata
 
 ```{r save-metadata}
 cat("Saving metadata...\n")
@@ -108,7 +101,7 @@ column_names <- colnames(metadata)
 write_json(column_names, path = file.path(output_dir, "raw_metadata_columns.json"), pretty = TRUE)
 ```
 
-### Save UMAP Embedding
+## Save UMAP Embedding
 
 ```{r save-umap}
 cat("Saving UMAP embedding...\n")
@@ -117,7 +110,7 @@ colnames(umap_embeddings) <- toupper(colnames(umap_embeddings))
 write.csv(umap_embeddings, file = paste0(output_dir, "/raw_umap_embeddings.csv"), row.names = TRUE)
 ```
 
-### Extract and Save Normalized Counts
+## Extract and Save Normalized Counts
 
 ```{r save-normalized-counts}
 cat("Saving normalized counts...\n")
