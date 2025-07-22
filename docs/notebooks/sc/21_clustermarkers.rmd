@@ -33,7 +33,7 @@ library(tidyverse)
 ## Set Parameters
 
 ```{r parameters}
-seurat_obj_file <- "docs/notebooks/sc/example_data/pmdbs_lee_obj_updated_SN.rds" # Path to your Seurat object file
+seurat_obj_file <- "example_data/pmdbs_lee_obj_updated_SN.rds" # Path to your Seurat object file
 output_dir <- "example_data/PMDBS_snRNAseq" # Directory to save output files, usually the dataset name
 cluster_col <- "cell_type" # Column name in metadata for clustering information
 condition_col <- "case" # Column name in metadata for condition information
