@@ -9,6 +9,8 @@
       <excludeFolder url="file://$MODULE_DIR$/backend/datasets" />
       <excludeFolder url="file://$MODULE_DIR$/backend/DatasetFiles" />
       <excludeFolder url="file://$MODULE_DIR$/backend/dataset_bkp" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/data" />
     </content>
     <orderEntry type="jdk" jdkName="BrainDataPortal" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
