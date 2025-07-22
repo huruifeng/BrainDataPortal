@@ -20,6 +20,7 @@ brain_region = "Hippocampus,Middle frontal gyrus,Substantia nigra"
 sample_info = ""
 sample_sheet = "PMDBS_snRNAseq.csv"
 disease = "PD"
+tissue = "Brain"
 organism = "Homo Sapiens"
 
 [study]
