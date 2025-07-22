@@ -28,6 +28,8 @@ import {
     Pets as PetsIcon,
 } from "@mui/icons-material"
 
+import * as Body from "../../components/BodyModel"
+
 // Mock data for tissues
 const tissueData = {
     human: [
@@ -106,64 +108,64 @@ const BodyDiagram = ({species, onTissueClick, hoveredTissue, setHoveredTissue}) 
 
     return (
         <Box sx={{display: "flex", justifyContent: "center", my: 2}}>
-            <svg width="300" height="400" viewBox="0 0 300 400">
-                {/* Body outline */}
-                <ellipse
-                    cx="150"
-                    cy="200"
-                    rx="80"
-                    ry="150"
-                    fill={alpha(theme.palette.primary.light, 0.1)}
-                    stroke={theme.palette.primary.main}
-                    strokeWidth="2"
-                />
+            {species === "human" ? <img src={Body.Human} alt="Body diagram" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/> : <img src={Body.Mouse} alt="Body diagram" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>}
+            {/*<svg width="300" height="400" viewBox="0 0 300 400">*/}
+            {/*    /!* Body outline *!/*/}
+            {/*    <ellipse*/}
+            {/*        cx="150"*/}
+            {/*        cy="200"*/}
+            {/*        rx="80"*/}
+            {/*        ry="150"*/}
+            {/*        fill={alpha(theme.palette.primary.light, 0.1)}*/}
+            {/*        stroke={theme.palette.primary.main}*/}
+            {/*        strokeWidth="2"*/}
+            {/*    />*/}
 
-                {/* Head */}
-                <circle
-                    cx="150"
-                    cy="80"
-                    r="40"
-                    fill={alpha(theme.palette.primary.light, 0.1)}
-                    stroke={theme.palette.primary.main}
-                    strokeWidth="2"
-                />
+            {/*    /!* Head *!/*/}
+            {/*    <circle*/}
+            {/*        cx="150"*/}
+            {/*        cy="80"*/}
+            {/*        r="40"*/}
+            {/*        fill={alpha(theme.palette.primary.light, 0.1)}*/}
+            {/*        stroke={theme.palette.primary.main}*/}
+            {/*        strokeWidth="2"*/}
+            {/*    />*/}
 
-                {/* Interactive tissue areas */}
-                {bodyParts.map((part, index) => (
-                    <g key={part.name}>
-                        <rect
-                            x={part.x}
-                            y={part.y}
-                            width={part.width}
-                            height={part.height}
-                            fill={hoveredTissue === part.name ? part.color : alpha(part.color, 0.6)}
-                            stroke={theme.palette.common.white}
-                            strokeWidth="1"
-                            rx="3"
-                            style={{cursor: "pointer"}}
-                            onMouseEnter={() => setHoveredTissue(part.name)}
-                            onMouseLeave={() => setHoveredTissue(null)}
-                            onClick={() => onTissueClick(part)}
-                        />
-                        <text
-                            x={part.x + part.width / 2}
-                            y={part.y + part.height / 2 + 3}
-                            textAnchor="middle"
-                            fontSize="8"
-                            fill={theme.palette.common.white}
-                            style={{pointerEvents: "none", fontWeight: "bold"}}
-                        >
-                            {part.name.slice(0, 4)}
-                        </text>
-                    </g>
-                ))}
+            {/*    /!* Interactive tissue areas *!/*/}
+            {/*    {bodyParts.map((part, index) => (*/}
+            {/*        <g key={part.name}>*/}
+            {/*            <rect*/}
+            {/*                x={part.x}*/}
+            {/*                y={part.y}*/}
+            {/*                width={part.width}*/}
+            {/*                height={part.height}*/}
+            {/*                fill={hoveredTissue === part.name ? part.color : alpha(part.color, 0.6)}*/}
+            {/*                stroke={theme.palette.common.white}*/}
+            {/*                strokeWidth="1"*/}
+            {/*                rx="3"*/}
+            {/*                style={{cursor: "pointer"}}*/}
+            {/*                onMouseEnter={() => setHoveredTissue(part.name)}*/}
+            {/*                onMouseLeave={() => setHoveredTissue(null)}*/}
+            {/*                onClick={() => onTissueClick(part)}*/}
+            {/*            />*/}
+            {/*            <text*/}
+            {/*                x={part.x + part.width / 2}*/}
+            {/*                y={part.y + part.height / 2 + 3}*/}
+            {/*                textAnchor="middle"*/}
+            {/*                fontSize="8"*/}
+            {/*                fill={theme.palette.common.white}*/}
+            {/*                style={{pointerEvents: "none", fontWeight: "bold"}}*/}
+            {/*            >*/}
+            {/*                {part.name.slice(0, 4)}*/}
+            {/*            </text>*/}
+            {/*        </g>*/}
+            {/*    ))}*/}
 
-                {/* Species label */}
-                <text x="150" y="380" textAnchor="middle" fontSize="16" fill={theme.palette.text.primary}
-                      fontWeight="bold">
-                    {species.charAt(0).toUpperCase() + species.slice(1)} Model
-                </text>
-            </svg>
+            {/*    /!* Species label *!/*/}
+            {/*    <text x="150" y="380" textAnchor="middle" fontSize="16" fill={theme.palette.text.primary} fontWeight="bold">*/}
+            {/*        {species.charAt(0).toUpperCase() + species.slice(1)} Model*/}
+            {/*    </text>*/}
+            {/*</svg>*/}
         </Box>
     )
 }
