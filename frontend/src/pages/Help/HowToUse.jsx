@@ -902,6 +902,7 @@ sample_info = ""                        ## Sample information
 sample_sheet = ""                       ## Sample sheet file name (Not the path, just the file name)
 n_samples = 96                          ## Number of samples
 organism = "Homo Sapiens"               ## Organism
+tissue = "Brain"                        ## Tissue
 disease = "PD"                          ## Disease
 
 [study]
