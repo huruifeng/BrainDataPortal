@@ -108,7 +108,11 @@ const BodyDiagram = ({species, onTissueClick, hoveredTissue, setHoveredTissue}) 
 
     return (
         <Box sx={{display: "flex", justifyContent: "center", my: 2}}>
-            {species === "human" ? <img src={Body.Human} alt="Body diagram" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/> : <img src={Body.Mouse} alt="Body diagram" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>}
+            {
+                species === "human" ?
+                <img src={Body.Human} alt="Body diagram" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/> :
+                <img src={Body.Mouse} alt="Body diagram" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+            }
             {/*<svg width="300" height="400" viewBox="0 0 300 400">*/}
             {/*    /!* Body outline *!/*/}
             {/*    <ellipse*/}
