@@ -73,8 +73,6 @@ if (!cluster_col %in% colnames(seurat_obj@meta.data)) {
 ## ===================================================
 # Extract the data
 cat("Extract data...\n")
-
-cat("Save metadata...\n")
 # Save to CSV with index as the first column
 metadata <- seurat_obj@meta.data
 write.csv(metadata, file = paste0(output_dir, "/raw_metadata.csv"), row.names = TRUE)

@@ -1,9 +1,36 @@
-## This script is used to extract the data from the Seurat object.
-## it will extract the data from the Seurat object and save it in a format that can be used for downstream analysis.
+---
+title: "Extract Data from Seurat Object"
+author: "Ruifeng Hu"
+date: "`r Sys.Date()`"
+description: "This notebook extracts data from a Seurat object and saves it in formats suitable for downstream analysis."
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: cosmo
+---
 
-## Run R script as follows:
-## Rscript extract_data_SC.R seurat_obj.rds output_directory
+## Overview
 
+This notebook extracts data from a Seurat object and saves it in formats suitable for downstream analysis.
+
+## Usage
+
+Run as an R script:
+
+```
+Rscript extract_Visium_v5.R seurat_obj.rds output_directory cluster_column
+```
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Libraries
+
+```{r load-libraries, message=FALSE, warning=FALSE}
 library(jsonlite)
 library(Matrix)
 library(data.table)
@@ -11,36 +38,41 @@ library(Seurat)
 library(tidyverse)
 library(jsonlite)
 library(png)
+```
 
-cat("===================================================\n")
-# Check if the script is run with the correct number of arguments
-args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 3) {
-  stop("Please provide the Seurat object file and output directory as arguments.")
-}
+## Set Arguments
 
-# Get the arguments
-seurat_obj_file <- args[1]
-output_dir <- args[2]
-cluster_col <- args[3]
+You can set these manually for interactive use:
 
+```{r input-args}
+# Set these manually for notebook use
+seurat_obj_file <- "example_data/pmdbs_lee_obj_updated_SN.rds"  # Path to your Seurat object fil
+output_dir <- "example_data/PMDBS_snRNAseq"  # Directory to save output files, usually the dataset name
+cluster_col <- "cell_type"  # Column name in metadata for clustering information
+```
 
-# Check if the output directory exists, if not create it
+## Create Output Directory
+
+```{r create-output_dir}
 if (!dir.exists(output_dir)) {
   dir.create(output_dir, recursive = TRUE)
 }
+```
 
-## ====================================================
-# Load the Seurat object
-cat("load RDS data...\n")
-## Read the rds onject
+## Load Seurat Object
+
+```{r load-seurat-object}
+cat("Loading RDS data...\n")
 seurat_obj <- readRDS(seurat_obj_file)
-# Check if the Seurat object is valid
 if (!inherits(seurat_obj, "Seurat")) {
   stop("The provided file is not a valid Seurat object.")
 }
 capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure.txt"))
+```
 
+## Check Seurat Object Structure
+v5 Seurat objects have a different structure compared to v4, so we need to ensure the object contains the expected slots and layers.
+```{r check-seurat-structure}
 # Check if the Seurat object has the necessary assay
 if (!"Spatial" %in% names(seurat_obj@assays)) {
   stop("The Seurat object does not contain the 'Spatial' assay.")
@@ -64,28 +96,53 @@ if (!"umap" %in% names(seurat_obj@reductions)) {
 if (!cluster_col %in% colnames(seurat_obj@meta.data)) {
   stop(paste("The cluster column", cluster_col, "does not exist in the metadata."))
 }
+```
 
-## ===================================================
-# Extract the data
-cat("Extract data...\n")
-# Save to CSV with index as the first column
+## Extract and Save Metadata
+
+```{r save-metadata}
+cat("Saving metadata...\n")
 metadata <- seurat_obj@meta.data
 write.csv(metadata, file = paste0(output_dir, "/raw_metadata.csv"), row.names = TRUE)
 
-## Save the metadata column names in a JSON file
-cat("Save metadata feature names...\n")
-# Extract metadata column names
+cat("Saving metadata feature names...\n")
 column_names <- colnames(metadata)
-# Save column names to JSON
 write_json(column_names, path = file.path(output_dir, "raw_metadata_columns.json"), pretty = TRUE)
+```
 
-# save the umap embedding
-cat("Save umap embedding...\n")
+## Save UMAP Embedding
+
+```{r save-umap}
+cat("Saving UMAP embedding...\n")
 umap_embeddings <- seurat_obj@reductions$umap@cell.embeddings
+colnames(umap_embeddings) <- toupper(colnames(umap_embeddings))
 write.csv(umap_embeddings, file = paste0(output_dir, "/raw_umap_embeddings.csv"), row.names = TRUE)
+```
 
+## Extract and Save Normalized Counts
 
-## ===================================================
+```{r save-normalized-counts}
+cat("Saving normalized counts...\n")
+normalized_counts <- seurat_obj[["RNA"]]@layers[["data"]] # Sparse matrix
+
+gene_names <- dimnames(seurat_obj[["RNA"]]@features)[[1]]
+cell_names <- dimnames(seurat_obj[["RNA"]]@cells)[[1]]
+
+triplet <- summary(normalized_counts)
+triplet$Gene <- gene_names[triplet$i]
+triplet$Cell <- cell_names[triplet$j]
+
+long_data <- triplet %>%
+  select(Cell, Gene, Expression = x)
+
+nonzero_data <- long_data[long_data$Expression > 0, ]
+nonzero_data <- as.data.table(nonzero_data)
+fwrite(nonzero_data, file = paste0(output_dir, "/raw_normalized_counts.csv"), row.names = FALSE)
+```
+
+## Extract and Save Spatial Information
+
+```{r save-spatial-info}
 cat("Save images and coordinates...\n")
 images = seurat_obj@images
 all_names = names(images)
@@ -122,30 +179,9 @@ for (i in 1:length(all_names)) {
     # Save as PNG (best for analysis)
     png::writePNG(img_array, target = paste0(images_dir, "/raw_image_", image_name, ".png"))
 }
+```
 
-# Extract the normalized counts
-cat("Save normalized counts...\n")
-## Extract normalized data
-normalized_counts <- seurat_obj@assays$Spatial@data  # This is a sparse matrix
-
-# Convert sparse matrix to triplet format (long format)
-long_data <- summary(normalized_counts)
-# Get row (gene) and column (spot) names
-long_data$Gene <- rownames(normalized_counts)[long_data$i]
-long_data$Spot <- colnames(normalized_counts)[long_data$j]
-long_data$Expression <- long_data$x
-# Keep only necessary columns
-long_data <- long_data[, c("Gene", "Spot", "Expression")]
-
-# Filter out zero values
-nonzero_data <- long_data[long_data$Expression > 0, ]
-
-# Convert to data.table for efficiency
-nonzero_data <- as.data.table(nonzero_data)
-# Save to CSV with index as the first column in a fast way
-fwrite(nonzero_data, file = paste0(output_dir, "/raw_normalized_counts.csv"), row.names = FALSE)
-
-cat("Done! Data extraction is done! ^_^ ...\n")
-
-
-
+```{r Done, echo=TRUE}
+cat("Done! Data extraction is complete!
+You can find the output files in the directory:", output_dir, "\n")
+```

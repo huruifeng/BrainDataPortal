@@ -21,3 +21,6 @@
 
 /docs/notebooks/sc/example_data/**
 !/docs/notebooks/sc/example_data/dataset_info.toml
+
+/docs/notebooks/visiumst/example_data/**
+!/docs/notebooks/visiumst/example_data/dataset_info.toml

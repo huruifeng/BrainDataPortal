@@ -1,55 +1,63 @@
-## This script is used to extract the data from the Seurat object.
-## it will extract the data from the Seurat object and save it in a format that can be used for downstream analysis.
+---
+title: "Cluster Marker Analysis"
+author: "Ruifeng Hu"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: cosmo
+---
 
-## Run R script as follows:
-## Rscript extract_data_SC.R seurat_obj.rds output_directory
+## Overview
 
+This notebook performs cluster marker analysis on a Seurat object, including:
+- Finding cluster specific markers
+- Calculating differential expression within clusters
+- Performing pseudo-bulk analysis
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Load Required Libraries
+
+```{r libraries}
 library(jsonlite)
 library(Matrix)
 library(data.table)
 library(Seurat)
 library(tidyverse)
-library(jsonlite)
-library(presto)
+```
 
-cat("===================================================\n")
-# Check if the script is run with the correct number of arguments
-# args <- commandArgs(trailingOnly = TRUE)
-# if (length(args) != 6) {
-# 	stop("Please provide the correct arguments.")
-# }
+## Set Parameters
 
-# # Get the arguments
-# seurat_obj_file <- args[1]
-# output_dir <- args[2]
-# cluster_col <- args[3]
-# condition_col <- args[4]
-# sample_col <- args[5]
-# seurat_type <- args[6]
+```{r parameters}
+seurat_obj_file <- "example_data/PD5D_MTG_10samples.rds" # Path to your Seurat object file
+output_dir <- "example_data/PMDBS_snRNAseq" # Directory to save output files, usually the dataset name
+cluster_col <- "cell_type" # Column name in metadata for clustering information
+condition_col <- "case" # Column name in metadata for condition information
+sample_col <- "sample_id" # Column name in metadata for sample information
+seurat_type <- "snrnaseq" # Type of Seurat object: scrnaseq, snrnaseq, snatacseq, scatacseq, visiumst
 
-
-seurat_obj_file <- "Seurats/pmdbs/pmdbs_lee_obj_updated_SN.rds"
-output_dir <- "datasets/PMDBS_SN_snRNAseq"
-cluster_col <- "cell_type"
-condition_col <- "case"
-sample_col <- "sample_id"
-seurat_type <- "snrnaseq"
-
-
+# Create output directory
 clustermarkers_folder = paste0(output_dir, "/clustermarkers")
 if (!dir.exists(clustermarkers_folder)) {
   dir.create(clustermarkers_folder, recursive = TRUE)
 }
+```
 
-## ====================================================
-# Load the Seurat object
-cat("load RDS data...\n")
-## Read the rds onject
+## Load and Validate Seurat Object
+
+```{r load-seurat}
+cat("Loading RDS data...\n")
 seurat_obj <- readRDS(seurat_obj_file)
-# Check if the Seurat object is valid
+
+# Validation checks
 if (!inherits(seurat_obj, "Seurat")) {
   stop("The provided file is not a valid Seurat object.")
 }
+
 if(seurat_type == "scrnaseq" | seurat_type == "snrnaseq"){
 	  # Check if the Seurat object has the necessary assay
 	if (!"RNA" %in% names(seurat_obj@assays)) {
@@ -79,33 +87,32 @@ if(seurat_type == "scrnaseq" | seurat_type == "snrnaseq"){
 	}
 }
 
-
-# Check if the Seurat object has the necessary metadata
-if (!"meta.data" %in% slotNames(seurat_obj)) {
-  stop("The Seurat object does not contain the 'meta.data' slot.")
+# Check required columns exist in metadata
+required_cols <- c(cluster_col, condition_col, sample_col)
+missing_cols <- required_cols[!required_cols %in% colnames(seurat_obj@meta.data)]
+if (length(missing_cols) > 0) {
+  stop(paste("Missing required columns in metadata:", paste(missing_cols, collapse = ", ")))
 }
+```
 
-# Check if the cluster column exists in the metadata
-if (!cluster_col %in% colnames(seurat_obj@meta.data)) {
-  stop(paste("The cluster column", cluster_col, "does not exist in the metadata."))
-}
+## Find cluster Markers
 
-
-## ===========================================================
-# cluster specific markers
-print("=====================================================")
+```{r find-markers}
 print("Extracting cluster specific markers...")
 
-# Extract cluster specific markers
-cluster_markers <- FindAllMarkers(seurat_obj, group.by =  cluster_col)
-# Convert to data.table
-cluster_markers_dt <- as.data.table(cluster_markers)
-# Save to CSV
-fwrite(cluster_markers_dt, paste0(clustermarkers_folder,"/cluster_FindAllMarkers.csv"), row.names = FALSE)
+# Find markers for each cluster
+cluster_markers <- FindAllMarkers(seurat_obj,group.by = cluster_col)
 
-## ============================================================
-# Ecalcaulate differential expression within each cluster between the conditions # nolint
-print("=====================================================")
+# Convert to data.table and save
+cluster_markers_dt <- as.data.table(cluster_markers)
+fwrite(cluster_markers_dt,
+       paste0(clustermarkers_folder,"/cluster_FindAllMarkers.csv"), 
+       row.names = FALSE)
+```
+
+## Differential Expression Analysis
+
+```{r diff-expression}
 print("Calculating differential expression within each cluster...")
 
 # Define the clusters
@@ -166,24 +173,21 @@ de_results_topN_dt <- rbindlist(de_results_topN_list, idcol = "cluster_DE")
 fwrite(de_results_dt, paste0(clustermarkers_folder, "/cluster_DEGs.csv"), row.names = FALSE)
 fwrite(de_results_topN_dt, paste0(clustermarkers_folder, "/cluster_DEGs_topN.csv"), row.names = FALSE)
 
-## ============================================================
-print("=====================================================")
-# pseudo-bulk DE analysis in each cluster
+```
+
+## Pseudo-bulk Analysis
+
+```{r pseudo-bulk}
 print("Calculating pseudo-bulk differential expression within each cluster...")
-# Create a new Seurat object for pseudo-bulk analysis
-# pb_obj <- AggregateExpression(seurat_obj, assays = "RNA", slot = "counts", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
-if(seurat_type == "scrnaseq" | seurat_type == "snrnaseq"){
-	## use the RNA assay
-	assay = "RNA"
-} else if (seurat_type == "snATACseq") {
-	## use the ATAC assay
-	assay = "ATAC"
-} else if (seurat_type == "visiumst") {
-	## use the Spatial assay
-	assay = "Spatial"
-} else {
-	stop("Invalid seurat_type. Please choose from 'scrnaseq', 'snrnaseq', 'snATACseq', or 'visiumst'.")
-}
+
+# Set assay based on data type
+assay <- switch(seurat_type,
+               "scrnaseq" = "RNA",
+               "snrnaseq" = "RNA",
+               "snATACseq" = "ATAC",
+               "visiumst" = "Spatial",
+               stop("Invalid seurat_type"))
+
 ## use the counts assay
 pb_obj <- PseudobulkExpression(seurat_obj,assays = assay, layer = "counts", method= "aggregate", return.seurat = T, group.by = c(sample_col, cluster_col, condition_col))
 
@@ -200,8 +204,9 @@ write.csv(metadata, paste0(clustermarkers_folder, "/metadata_sample_cluster_cond
 expr_matrix <- GetAssayData(pb_obj, assay = assay, layer = "data")
 colnames(expr_matrix) <- gsub("-", "_", colnames(expr_matrix))
 write.csv(expr_matrix, paste0(clustermarkers_folder, "/pb_expr_matrix.csv"), row.names = TRUE)
+```
 
-
+```{r pseudo-bulk-de}
 # Define the clusters
 clusters <- unique(pb_obj@meta.data[[cluster_col]])
 
@@ -261,7 +266,9 @@ pseudo_bulk_topN_dt <- rbindlist(pseudo_bulk_topN_list, idcol = "cluster_DE")
 # Save to CSV
 fwrite(pseudo_bulk_dt, paste0(clustermarkers_folder, "/cluster_pb_DEGs.csv"), row.names = FALSE)
 fwrite(pseudo_bulk_topN_dt, paste0(clustermarkers_folder, "/cluster_pb_DEGs_topN.csv"), row.names = FALSE)
+```
 
+```{r pseudo-bulk-topN}
 pooled_topN_DEGs = pseudo_bulk_topN_dt$gene
 ## remove duplicates
 pooled_topN_DEGs <- unique(pooled_topN_DEGs)
@@ -272,5 +279,4 @@ write.csv(expr_matrix_pooled_topN_DGEs, paste0(clustermarkers_folder, "/pb_expr_
 
 cat("Done! cluster markers is done! ^_^ ...\n")
 
-
-
+```
