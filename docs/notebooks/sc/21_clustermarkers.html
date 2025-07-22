@@ -471,11 +471,7 @@ if (length(missing_cols) &gt; 0) {
 <pre class="r"><code>print(&quot;Extracting cell type specific markers...&quot;)</code></pre>
 <pre><code>## [1] &quot;Extracting cell type specific markers...&quot;</code></pre>
 <pre class="r"><code># Find markers for each cell type
-cell_type_markers &lt;- FindAllMarkers(
-  seurat_obj,
-  group.by = cluster_col,
-  only.pos = TRUE
-)
+cell_type_markers &lt;- FindAllMarkers(seurat_obj,group.by = cluster_col)
 
 # Convert to data.table and save
 cell_type_markers_dt &lt;- as.data.table(cell_type_markers)

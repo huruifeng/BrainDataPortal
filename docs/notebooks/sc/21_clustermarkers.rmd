@@ -33,7 +33,7 @@ library(tidyverse)
 ## Set Parameters
 
 ```{r parameters}
-seurat_obj_file <- "example_data/pmdbs_lee_obj_updated_SN.rds" # Path to your Seurat object file
+seurat_obj_file <- "docs/notebooks/sc/example_data/pmdbs_lee_obj_updated_SN.rds" # Path to your Seurat object file
 output_dir <- "example_data/PMDBS_snRNAseq" # Directory to save output files, usually the dataset name
 cluster_col <- "cell_type" # Column name in metadata for clustering information
 condition_col <- "case" # Column name in metadata for condition information
@@ -101,11 +101,7 @@ if (length(missing_cols) > 0) {
 print("Extracting cell type specific markers...")
 
 # Find markers for each cell type
-cell_type_markers <- FindAllMarkers(
-  seurat_obj,
-  group.by = cluster_col,
-  only.pos = TRUE
-)
+cell_type_markers <- FindAllMarkers(seurat_obj,group.by = cluster_col)
 
 # Convert to data.table and save
 cell_type_markers_dt <- as.data.table(cell_type_markers)
