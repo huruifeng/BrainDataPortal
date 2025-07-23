@@ -33,7 +33,7 @@ Before you begin, ensure you have the following installed on your system:
        ```conda create -n braindataportal python=3.10```
    
        ```conda activate braindataportal```
-   - Change to the __BrainDataPortal__ directory.
+   - Change to the __BrainDataPortal/backend__ directory.
    - Install dependencies.
    
        ```pip install -r requirements.txt```
