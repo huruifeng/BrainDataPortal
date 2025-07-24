@@ -2,6 +2,9 @@
 .DS_Store
 *.pyc
 
+*.rds
+*.RData
+
 /data
 
 /frontend/node_modules
@@ -19,8 +22,8 @@
 /backend/DatasetFiles/
 /backend/datasets/
 
-/docs/notebooks/sc/example_data/**
-!/docs/notebooks/sc/example_data/dataset_info.toml
+/frontend/public/Demos/notebooks/sc/example_data/**
+!/frontend/public/Demos/notebooks/sc/example_data/dataset_info.toml
 
-/docs/notebooks/visiumst/example_data/**
-!/docs/notebooks/visiumst/example_data/dataset_info.toml
+/frontend/public/Demos/notebooks/visiumst/example_data/**
+!/frontend/public/Demos/notebooks/visiumst/example_data/dataset_info.toml
