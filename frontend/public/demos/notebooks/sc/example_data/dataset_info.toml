@@ -20,6 +20,7 @@ brain_region = "Middle temporal gyrus"
 sample_info = ""
 sample_sheet = ""
 disease = "PD"
+tissue = "Brain"
 organism = "Homo Sapiens"
 
 [study]
