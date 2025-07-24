@@ -165,9 +165,14 @@ Before you begin, ensure you have the following installed on your system:
        npm run build:nginx
        # This command will build the frontend pages in the frontend/dist folder
        ```
-     - Setup the proxy service (Nginx server, Ubuntu/Debian) (Example configuration for Ubuntu [bdpvite_nginx](bdpvite_nginx)):
+     - Setup the proxy service (Nginx server) (Example configuration file [bdpvite_nginx](bdpvite_nginx)):
        ```bash
+       # if you are using the Ubuntu/Debian system
        # Create and edit /etc/nginx/sites-available/BrainDataPortal
+       
+       # if you are using the RHEL/CentOS system
+       # Create and edit /etc/nginx/conf.d/BrainDataPortal.conf
+       
        server {
 
            # Make sure THE PORT IS NOT USED!
@@ -219,7 +224,7 @@ Before you begin, ensure you have the following installed on your system:
        ```
      - Enable the site  
        ```bash
-       # Create a symbolic link to enable the site
+       # Create a symbolic link to enable the site [for Ubuntu/Debian]
        sudo ln -s /etc/nginx/sites-available/BrainDataPortal /etc/nginx/sites-enabled/BrainDataPortal
        
        # Check Nginx configuration
@@ -233,8 +238,11 @@ Before you begin, ensure you have the following installed on your system:
        ```
      - Disable the site  
        ```bash
-       # Remove the symbolic link
+       # Remove the symbolic link [for Ubuntu/Debian]
        sudo rm /etc/nginx/sites-enabled/BrainDataPortal
+       
+       # Remove the configuration file [for RHEL/CentOS]
+       sudo rm /etc/nginx/conf.d/BrainDataPortal.conf
     
        # Restart Nginx
        sudo systemctl restart nginx
