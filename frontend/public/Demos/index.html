@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>%VITE_APP_TITLE% Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="docs-container">
+    <header class="docs-header">
+        <div class="container">
+            <h1>%VITE_APP_TITLE% Documentation</h1>
+            <p class="subtitle">Comprehensive guides for omics data preparation and visualization</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro-section">
+            <h2>Welcome to %VITE_APP_TITLE%</h2>
+            <p>
+                %VITE_APP_TITLE% is a comprehensive platform for single-cell, spatial transcriptomics, and other omics data
+                analysis and visualization. This documentation will guide you through the data preparation processes for
+                different data types.
+            </p>
+        </section>
+
+        <div class="docs-grid">
+            <section class="docs-card">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+                        <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+                        <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+                        <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+                    </svg>
+                </div>
+                <h3>Single-Cell Data Preparation</h3>
+                <p>
+                    Learn how to prepare and process single-cell RNA sequencing data for analysis in %VITE_APP_TITLE%.
+                    This
+                    section covers quality control, normalization, feature selection, and data formatting.
+                </p>
+                <a href="singlecell.html" class="docs-link">
+                    View Documentation
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            </section>
+
+            <section class="docs-card">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <rect x="7" y="7" width="3" height="3"></rect>
+                        <rect x="14" y="7" width="3" height="3"></rect>
+                        <rect x="7" y="14" width="3" height="3"></rect>
+                        <rect x="14" y="14" width="3" height="3"></rect>
+                    </svg>
+                </div>
+                <h3>Visium ST Data Preparation</h3>
+                <p>
+                    Explore the workflow for preparing spatial transcriptomics data from 10x Genomics Visium platform.
+                    This
+                    guide covers tissue image processing, spot detection, and data integration.
+                </p>
+                <a href="visiumst.html" class="docs-link">
+                    View Documentation
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            </section>
+
+            <section class="docs-card">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 2l20 20"></path>
+                        <path d="M14.5 9.5L9.5 14.5"></path>
+                        <path d="M8.5 8.5l7 7"></path>
+                        <path d="M6.5 6.5l11 11"></path>
+                        <path d="M2 12h4"></path>
+                        <path d="M12 2v4"></path>
+                        <path d="M22 12h-4"></path>
+                        <path d="M12 22v-4"></path>
+                    </svg>
+                </div>
+                <h3>xQTL Data Preparation</h3>
+                <p>
+                    Understand how to prepare expression quantitative trait loci (xQTL) data for analysis. This section
+                    covers
+                    genotype data processing, expression data normalization, and QTL mapping preparation.
+                </p>
+                <a href="xqtl.html" class="docs-link">
+                    View Documentation
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            </section>
+        </div>
+
+        <section class="additional-resources">
+            <h2>Additional Resources</h2>
+            <div class="resources-grid">
+                <div class="resource-item">
+                    <h4>API Reference</h4>
+                    <p>Complete API documentation for programmatic access to %VITE_APP_TITLE%</p>
+                    <a href="api.html" class="resource-link">
+                        View API Docs
+                    </a>
+                </div>
+                <div class="resource-item">
+                    <h4>Tutorials</h4>
+                    <p>Step-by-step tutorials for common analysis workflows</p>
+                    <a href="tutorials.html" class="resource-link">
+                        Browse Tutorials
+                    </a>
+                </div>
+                <div class="resource-item">
+                    <h4>FAQ</h4>
+                    <p>Frequently asked questions about data preparation and analysis</p>
+                    <a href="faq.html" class="resource-link">
+                        Read FAQ
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="docs-footer">
+        <div class="container">
+            <p>&copy;
+                <script>document.write(new Date().getFullYear())</script>
+                %VITE_APP_TITLE%. All rights reserved.
+            </p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

@@ -250,7 +250,7 @@ Before you begin, ensure you have the following installed on your system:
        # Check Nginx status
        sudo systemctl status nginx
        ```
-### 3. Docker setup
+### 3. Docker setup (Coming soon...)
 1. pull the docker image
    ```bash
    docker pull braindataportal
@@ -269,11 +269,11 @@ Before you begin, ensure you have the following installed on your system:
 ## Demo page
 
 ### Home Page
-![Home Page](demo/home.png)
+![Home Page](screenshots/home.png)
 
 ### Single Cell UMAP clustering
-![UMAP Page](demo/sc_page.png)
+![UMAP Page](screenshots/sc_page.png)
 
 ### Spatial Transcriptomics
-![VisiumST Page](demo/Visium_page.png)
+![VisiumST Page](screenshots/Visium_page.png)
 
