@@ -1,6 +1,7 @@
 "use client"
 
 import React, {useEffect} from "react"
+import { Link } from "react-router-dom"
 import {
     Box,
     Card,
@@ -397,8 +398,7 @@ export default function HelpPage() {
                                                 <Grid item xs={12} md={12}>
                                                     <Card className="env-card env-card--secondary">
                                                         <CardContent>
-                                                            <Typography variant="h6"
-                                                                        className="env-title env-title--secondary">
+                                                            <Typography variant="h6" className="env-title env-title--secondary">
                                                                 2.1 [Optional] Conda environment
                                                             </Typography>
                                                             <CodeBlock>
@@ -609,7 +609,7 @@ export default function HelpPage() {
                                                                 <span className="comment" style={{color: "#ffcc99"}}># cp -r dist/* /var/www/html/{import.meta.env.VITE_APP_TITLE}.</span><br/>
                                                                 <br/>
                                                                 <span className="comment"># Restart the Apache server or Nginx server</span><br/>
-                                                                sudo systemctl restart apache2 <br/> sudo systemctl
+                                                                [Apache2] sudo systemctl restart apache2 <br/> [Nginx] sudo systemctl
                                                                 restart nginx<br/>
 
                                                             </div>
@@ -663,7 +663,12 @@ export default function HelpPage() {
                                                             C3.3 Setup the proxy service (Nginx server, Ubuntu/Debian)
                                                         </Typography>
                                                         <Paper className="env-content env-content--primary">
-                                                            <span className="comment"> # Create and edit /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE}</span>
+                                                            <span className="comment"> # If you are using the Ubuntu/Debian system</span><br/>
+                                                            <span className="comment"> # Create and edit /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE}</span><br/>
+                                                        <br/>
+                                                            <span className="comment"> # If you are using the RHEL/CentOS system</span><br/>
+                                                            <span className="comment"> # Create and edit /etc/nginx/conf.d/{import.meta.env.VITE_APP_TITLE}.conf</span>
+
                                                             <SyntaxHighlighter language="toml" style={oneLight}>
 {`server {
 
@@ -718,7 +723,7 @@ export default function HelpPage() {
                                                         </Paper>
                                                         <CodeBlock>
                                                             <div>
-                                                                <span className="comment"># Link the configuration file to sites-enabled</span><br/>
+                                                                <span className="comment"># Link the configuration file to sites-enabled [for Ubuntu/Debian]</span><br/>
                                                                 sudo ln -s
                                                                 /etc/nginx/sites-available/{import.meta.env.VITE_APP_TITLE} /etc/nginx/sites-enabled/ <br/>
                                                                 <br/>
@@ -788,9 +793,9 @@ export default function HelpPage() {
                                         <AlertTitle className="alert-title" variant="h6">Required files:</AlertTitle>
                                         <List dense>
                                             <ListItem><ListItemText
-                                                primary="Single-cell RNA-seq data: (1) A processed Seurat RDS file or H5AD file, (2) CSV file for sample metadata"/></ListItem>
+                                                primary="Single-cell RNAseq data: (1) A processed Seurat RDS file, (2) CSV file for sample metadata"/></ListItem>
                                             <ListItem><ListItemText
-                                                primary="Spatial transcriptomics data: (1) A processed Seurat RDS file or H5AD file, (2) CSV file for sample metadata"/></ListItem>
+                                                primary="Spatial transcriptomics data: (1) A processed Seurat RDS file, (2) CSV file for sample metadata"/></ListItem>
                                             <ListItem><ListItemText
                                                 primary="xQTL data: (1)CSV file for gene-snp pairs with p-values,beta values, (2) SNP/Gene annotations, (3) CSV file for sample metadata"/></ListItem>
                                         </List>
@@ -799,7 +804,7 @@ export default function HelpPage() {
                                     <Card className="file-structure-card">
                                         <CardContent>
                                             <Typography variant="h6" className="file-structure__title">
-                                                Required file ftructure (Seurat RDS)
+                                                Required file structure (Seurat, CSV)
                                             </Typography>
 
                                             <Grid container spacing={4} className="data-formats-grid">
@@ -810,20 +815,24 @@ export default function HelpPage() {
                                                             <Typography variant="subtitle1" className="format-title--primary">Single-cell RNA-seq</Typography>
                                                         </Box>
                                                         <Box className="file-structure__tree">
-                                                            <Box className="file-structure__folder"><Folder className="folder-icon"/><span>your-dataset/</span></Box>
+                                                            <Box className="file-structure__folder"><Folder className="folder-icon"/><span>Seurat RDS</span></Box>
                                                             <Box className="file-structure__files">
-                                                                ├── expression_matrix.h5ad <span
-                                                                className="file-comment"># Main data file</span>
-                                                                <br/>
-                                                                ├── metadata.csv <span className="file-comment"># Cell/sample metadata</span>
-                                                                <br/>
-                                                                ├── features.csv <span className="file-comment"># Gene/feature information</span>
-                                                                <br/>
-                                                                ├── spatial/ <span className="file-comment"># Spatial data (if applicable)</span>
-                                                                <br/>│ ├── coordinates.csv
-                                                                <br/>│ └── tissue_image.png
-                                                                <br/>
-                                                                └── config.json <span className="file-comment"># Dataset configuration</span>
+                                                                ├── @assays <span className="file-comment"># List of Assays</span><br/>
+                                                                │ ├── RNA <span className="file-comment"># RNA Assay</span><br/>
+                                                                │ │ ├── @counts <span className="file-comment"># Raw counts</span><br/>
+                                                                │ │ ├── @data <span className="file-comment"># Normalized data </span><br/>
+                                                                │ │ ├── @features <span className="file-comment"># Gene names</span><br/>
+                                                                │ │ └── @cells <span className="file-comment"># Cell names/IDs</span><br/>
+                                                                ├── @meta.data <span className="file-comment"># Cell metadata</span><br/>
+                                                                │ ├── cell_id <span className="file-comment"># Cell ID</span><br/>
+                                                                │ ├── sample_id <span className="file-comment"># Sample ID</span><br/>
+                                                                │ ├── cell_type <span className="file-comment"># Cell type annotation</span><br/>
+                                                                │ ├── nCount_RNA <span className="file-comment"># Total UMI count per cell</span><br/>
+                                                                │ ├── nFeature_RNA <span className="file-comment"># Number of genes detected per cell</span><br/>
+                                                                ├── @reductions <span className="file-comment"># Dimensionality reduction results</span><br/>
+                                                                │ ├── umap <span className="file-comment"># UMAP results</span><br/>
+                                                                │ │ ├── @cell.embeddings <span className="file-comment"># UMAP coordinates per cell</span><br/>
+                                                                ├── ...
                                                             </Box>
                                                         </Box>
                                                     </GradientCard>
@@ -837,18 +846,29 @@ export default function HelpPage() {
                                                         <Box className="file-structure__tree">
                                                             <Box className="file-structure__folder"><Folder className="folder-icon"/><span>your-dataset/</span></Box>
                                                             <Box className="file-structure__files">
-                                                                ├── expression_matrix.h5ad <span
-                                                                className="file-comment"># Main data file</span>
-                                                                <br/>
-                                                                ├── metadata.csv <span className="file-comment"># Cell/sample metadata</span>
-                                                                <br/>
-                                                                ├── features.csv <span className="file-comment"># Gene/feature information</span>
-                                                                <br/>
-                                                                ├── spatial/ <span className="file-comment"># Spatial data (if applicable)</span>
-                                                                <br/>│ ├── coordinates.csv
-                                                                <br/>│ └── tissue_image.png
-                                                                <br/>
-                                                                └── config.json <span className="file-comment"># Dataset configuration</span>
+                                                                ├── @assays <span className="file-comment"># List of assays</span><br/>
+                                                                │ ├── Spatial <span className="file-comment"># Spatial assay</span><br/>
+                                                                │ │ ├── @counts <span className="file-comment"># Raw counts</span><br/>
+                                                                │ │ ├── @data <span className="file-comment"># Normalized data </span><br/>
+                                                                │ │ ├── @features <span className="file-comment"># Gene names</span><br/>
+                                                                │ │ └── @cells <span className="file-comment"># Cell names/IDs</span><br/>
+                                                                ├── @meta.data <span className="file-comment"># Cell metadata</span><br/>
+                                                                │ ├── cell_id <span className="file-comment"># Cell ID</span><br/>
+                                                                │ ├── sample_id <span className="file-comment"># Sample ID</span><br/>
+                                                                │ ├── cell_type <span className="file-comment"># Cell type annotation</span><br/>
+                                                                │ ├── nCount_RNA <span className="file-comment"># Total UMI count per cell</span><br/>
+                                                                │ ├── nFeature_RNA <span className="file-comment"># Number of genes detected per cell</span><br/>
+                                                                ├── @reductions <span className="file-comment"># Dimensionality reduction results</span><br/>
+                                                                │ ├── umap <span className="file-comment"># UMAP results</span><br/>
+                                                                │ │ ├── @cell.embeddings <span className="file-comment"># UMAP coordinates per cell</span><br/>
+                                                                ├── @images <span className="file-comment"># Image data</span><br/>
+                                                                │ ├── sample1 <span className="file-comment"># Image of sample 1</span><br/>
+                                                                │ │ ├── @image <span className="file-comment"># Tissue image</span><br/>
+                                                                │ │ ├── @coordinates <span className="file-comment"># Spot coordinates</span><br/>
+                                                                │ │ ├── @scale.factors <span className="file-comment"># Scale factors for spot alignment</span><br/>
+                                                                │ ├── sample2 <span className="file-comment"># Image of sample 2</span><br/>
+                                                                │ │ ├── ...
+                                                                ├── ...
                                                             </Box>
                                                         </Box>
                                                     </GradientCard>
@@ -857,16 +877,52 @@ export default function HelpPage() {
 
                                             <Paper className="format-examples-grid" sx={{mt: 2}}>
                                                 <Typography variant="subtitle1" className="format-title format-title--primary">
-                                                        Metadata Format (CSV)
+                                                        Sample sheet format (CSV)
                                                 </Typography>
                                                 <Box className="format-content format-content--primary">
-                                                    cell_id,cell_type,condition,batch
-                                                    <br/>
-                                                    CELL_001,T_cell,control,batch1
-                                                    <br/>
-                                                    CELL_002,B_cell,treatment,batch1
-                                                    <br/>
-                                                    CELL_003,NK_cell,control,batch2
+                                                    Please refer to the <Link href="/sample-sheet-format" target="_blank" rel="noopener noreferrer"> Example sample sheet file</Link>
+                                                </Box>
+                                            </Paper>
+                                            <Paper className="format-examples-grid" sx={{mt: 1}}>
+                                                <Typography variant="subtitle1" className="format-title format-title--primary">
+                                                        xQTL format (CSV)
+                                                </Typography>
+                                                <Box className="format-content format-content--primary">
+                                                    Please refer to the <Link href="/sample-sheet-format" target="_blank" rel="noopener noreferrer"> Example xQTL file</Link><br />
+                                                    <Box sx={{mt: 1}}>
+                                                        <Box className="format-content format-content--primary">
+                                                            <Typography variant="subtitle1" className="format-title format-title--secondary">
+                                                                Example xQTL file format (For each cell type,e.g. Astrocytes_eQTL.csv):
+                                                            </Typography>
+                                                            Gene,SNP,p-value,beta<br />
+                                                            A1BG,rs1234567,0.02,0.213<br />
+                                                            A1BG,rs1234568,0.03,0.314<br />
+                                                            A1BG,rs1234569,0.01,0.615<br />
+                                                        </Box>
+                                                    </Box>
+                                                    <Box sx={{mt: 1}} xs={12} md={6}>
+                                                        <Grid container>
+                                                            <Grid className="format-content format-content--primary" item md={6} xs={12}>
+                                                                <Typography variant="subtitle1" className="format-title format-title--secondary">
+                                                                    Gene annotation file format
+                                                                </Typography>
+                                                                gene,chromosome,start,end,strand<br />
+                                                                A1BG,1,1234567,1234568,-<br />
+                                                                A1BG,1,1234568,1234569,-<br />
+                                                                A1BG,1,1234569,1234570,-<br />
+                                                            </Grid>
+                                                             <Grid className="format-content format-content--primary" item md={6} xs={12}>
+                                                                 <Typography variant="subtitle1" className="format-title format-title--secondary">
+                                                                    SNP annotation file format
+                                                                </Typography>
+                                                                SNP,chromosome,position<br />
+                                                                rs1234567,1,1234567<br />
+                                                                rs1234568,1,1234568<br />
+                                                                rs1234569,1,1234569<br />
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Box>
+
                                                 </Box>
                                             </Paper>
                                         </CardContent>
