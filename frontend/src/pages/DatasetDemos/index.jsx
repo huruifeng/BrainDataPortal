@@ -48,7 +48,7 @@ const DatasetDemosPage = () => {
               Learn how to prepare and process single-cell/nuclei RNA sequencing data for visualization in {import.meta.env.VITE_APP_TITLE}. This
               section covers seurat object processing, gene expression data splitting, metadata table preparation and data formatting.
             </p>
-            <Link to="/docs/single-cell" className="docs-link">
+            <Link to="/dataset-demos/single-cell" className="docs-link">
               View Documentation
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@ const DatasetDemosPage = () => {
               Explore the workflow for preparing spatial transcriptomics data from 10x Genomics Visium platform. This
               guide covers data extraction, metadata preparation, and data integration.
             </p>
-            <Link to="/docs/visium-st" className="docs-link">
+            <Link to="/dataset-demos/visium-st" className="docs-link">
               View Documentation
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +139,7 @@ const DatasetDemosPage = () => {
               Understand how to prepare expression quantitative trait loci (xQTL) data for visualization in {import.meta.env.VITE_APP_TITLE}. This section covers
               raw data conversion, Gene-SNP pair fitering, and data formatting.
             </p>
-            <Link to="/docs/xqtl" className="docs-link">
+            <Link to="/dataset-demos/xqtl" className="docs-link">
               View Documentation
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -159,7 +159,7 @@ const DatasetDemosPage = () => {
           </section>
         </div>
 
-        <section className="additional-resources">
+        <section className="additional-resources" style={{ marginBottom: "150px" }}>
           <h2>Additional Resources</h2>
           <div className="resources-grid">
             {/*<div className="resource-item">*/}

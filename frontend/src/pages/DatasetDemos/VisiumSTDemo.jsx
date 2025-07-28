@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom"
 
-const VisiumSTDocs = () => {
+const VisiumSTDemo = () => {
   return (
     <div className="docs-container">
       <header className="docs-header">
         <div className="container">
-          <Link to="/" className="back-link">
+          <Link to="/help/howtouse/demos" className="back-link">
             ← Back to Documentation
           </Link>
           <h1>Visium ST Data Preparation</h1>
@@ -24,4 +24,4 @@ const VisiumSTDocs = () => {
   )
 }
 
-export default VisiumSTDocs
+export default VisiumSTDemo

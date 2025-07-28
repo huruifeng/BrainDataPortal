@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom"
 
-const XQTLDocs = () => {
+const XQTLDemo = () => {
   return (
     <div className="docs-container">
       <header className="docs-header">
         <div className="container">
-          <Link to="/" className="back-link">
+          <Link to="/help/howtouse/demos" className="back-link">
             ← Back to Documentation
           </Link>
           <h1>xQTL Data Preparation</h1>
@@ -25,4 +25,4 @@ const XQTLDocs = () => {
   )
 }
 
-export default XQTLDocs
+export default XQTLDemo
