@@ -867,7 +867,7 @@ export default function HelpPage() {
                                                                 │ │ ├── @coordinates <span className="file-comment"># Spot coordinates</span><br/>
                                                                 │ │ ├── @scale.factors <span className="file-comment"># Scale factors for spot alignment</span><br/>
                                                                 │ ├── sample2 <span className="file-comment"># Image of sample 2</span><br/>
-                                                                │ │ ├── ...
+                                                                │ │ ├── ...<br/>
                                                                 ├── ...
                                                             </Box>
                                                         </Box>

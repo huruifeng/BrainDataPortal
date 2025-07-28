@@ -106,8 +106,7 @@ const Home = () => {
                     </Grid2>
                 </Grid2>
                 {homeData && homeData[selectedDisease] ? <StatBar disease={selectedDisease} homeData={homeData}/> :
-                    <Box className="stat-bar-container"> <Typography variant="subtitle1">Loading stats
-                        data...</Typography> </Box>}
+                    <Box className="stat-bar-container"> <Typography variant="subtitle1">Loading stats data...</Typography> </Box>}
             </Grid2>
         </Container>
     );
