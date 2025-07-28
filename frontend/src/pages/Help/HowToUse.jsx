@@ -773,15 +773,17 @@ export default function HelpPage() {
                             {/* Data Preparation Section */}
                             <TabPanel value={value} index={2}>
                                 <Container maxWidth="lg">
-                                    <Box className="section-header">
+                                    <Box className="section-header" mb={2}>
                                         <Typography variant="h4" component="h2" gutterBottom>
                                             Data Preparation Guide
                                         </Typography>
-                                        <Typography variant="body1" color="text.secondary"
-                                                    className="section-description">
+                                        <Typography variant="body1" color="text.secondary" className="section-description">
                                             Learn about supported data formats and how to prepare your datasets for
                                             analysis in {import.meta.env.VITE_APP_TITLE}.
                                         </Typography>
+                                        <Button component='a' href="/help/howtouse/demos" variant="outlined" color="primary" mt={4} target="_blank" rel="noopener noreferrer">
+                                          Step by step guide with demos for data preparation
+                                        </Button>
                                     </Box>
 
                                     <Typography variant="h5" className="data-requirements-title">
@@ -881,6 +883,7 @@ export default function HelpPage() {
                                                 </Typography>
                                                 <Box className="format-content format-content--primary">
                                                     Please refer to the <Link href="/sample-sheet-format" target="_blank" rel="noopener noreferrer"> Example sample sheet file</Link>
+                                                    <Typography variant="subtitle1" className="format-title format-title--secondary">(PLEASE KEEP ALL THE COLUMN NAMES AND ORDER AS IS, JUST FILL IN YOUR DATA)</Typography>
                                                 </Box>
                                             </Paper>
                                             <Paper className="format-examples-grid" sx={{mt: 1}}>
@@ -891,9 +894,10 @@ export default function HelpPage() {
                                                     Please refer to the <Link href="/sample-sheet-format" target="_blank" rel="noopener noreferrer"> Example xQTL file</Link><br />
                                                     <Box sx={{mt: 1}}>
                                                         <Box className="format-content format-content--primary">
-                                                            <Typography variant="subtitle1" className="format-title format-title--secondary">
+                                                            <Typography variant="subtitle1" className="format-title">
                                                                 Example xQTL file format (For each cell type,e.g. Astrocytes_eQTL.csv):
                                                             </Typography>
+                                                            <Divider />
                                                             Gene,SNP,p-value,beta<br />
                                                             A1BG,rs1234567,0.02,0.213<br />
                                                             A1BG,rs1234568,0.03,0.314<br />
@@ -903,18 +907,20 @@ export default function HelpPage() {
                                                     <Box sx={{mt: 1}} xs={12} md={6}>
                                                         <Grid container>
                                                             <Grid className="format-content format-content--primary" item md={6} xs={12}>
-                                                                <Typography variant="subtitle1" className="format-title format-title--secondary">
+                                                                <Typography variant="subtitle1" className="format-title">
                                                                     Gene annotation file format
                                                                 </Typography>
+                                                                <Divider />
                                                                 gene,chromosome,start,end,strand<br />
                                                                 A1BG,1,1234567,1234568,-<br />
                                                                 A1BG,1,1234568,1234569,-<br />
                                                                 A1BG,1,1234569,1234570,-<br />
                                                             </Grid>
                                                              <Grid className="format-content format-content--primary" item md={6} xs={12}>
-                                                                 <Typography variant="subtitle1" className="format-title format-title--secondary">
+                                                                 <Typography variant="subtitle1" className="format-title">
                                                                     SNP annotation file format
                                                                 </Typography>
+                                                                 <Divider />
                                                                 SNP,chromosome,position<br />
                                                                 rs1234567,1,1234567<br />
                                                                 rs1234568,1,1234568<br />
@@ -965,7 +971,7 @@ disease = "PD"                          ## Disease
 study_name = "Parkinson5D"              ## Study name, the dataset belongs to
 description = ""                        ## Study description
 team_name = "Team Scherzer"             ## Team name
-lab_name = "NeuroGenomics"               ## Lab name
+lab_name = "NeuroGenomics"              ## Lab name
 submitter_name = ""                     ## Submitter name
 submitter_email = ""                    ## Submitter email
 
@@ -1030,12 +1036,9 @@ genes = [ "SNCA",...]                    ## List of default gene names
                                         <Typography variant="h3" component="h2" gutterBottom>
                                             How to Use the Application
                                         </Typography>
-                                        <Typography variant="body1" color="text.secondary"
-                                                    className="section-description">
+                                        <Typography variant="body1" color="text.secondary" className="section-description">
                                             Complete guide to using {import.meta.env.VITE_APP_TITLE} for data analysis
-                                            and
-                                            visualization of single-cell and
-                                            spatial transcriptomics data.
+                                            and visualization of single-cell and spatial transcriptomics data.
                                         </Typography>
                                     </Box>
 

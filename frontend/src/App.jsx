@@ -26,6 +26,7 @@ import HowToUse from "./pages/Help/HowToUse.jsx";
 import FAQPage from "./pages/Help/FAQ.jsx";
 import RESTAPIPage from "./pages/Help/RESTAPI.jsx";
 import Home_HM from "./pages/Home_HM/index.jsx";
+import DatasetDemosPage from "./pages/DatasetDemos/index.jsx";
 
 
 
@@ -71,6 +72,7 @@ function App() {
                       <Route path="/views/xcheck" element={<XDatasetsView />} />
 
                       <Route path="/help/howtouse" element={<HowToUse />} />
+                      <Route path="/help/howtouse/demos" element={<DatasetDemosPage />} />
                       <Route path="/help/faq" element={<FAQPage />} />
                       <Route path="/help/restapi" element={<RESTAPIPage />} />
 
