@@ -1,9 +1,3 @@
-## This script is used to extract the data from the Seurat object.
-## it will extract the data from the Seurat object and save it in a format that can be used for downstream analysis.
-
-## Run R script as follows:
-## Rscript extract_data_SC.R seurat_obj.rds output_directory
-
 library(jsonlite)
 library(Matrix)
 library(data.table)
@@ -28,9 +22,9 @@ cat("===================================================\n")
 # seurat_type <- args[6]
 
 
-seurat_obj_file <- "Seurats/pmdbs/pmdbs_lee_obj_updated_SN.rds"
-output_dir <- "datasets/PMDBS_SN_snRNAseq"
-cluster_col <- "cell_type"
+seurat_obj_file <- "Seurats/snRNAseq_MTG_10samples.rds"
+output_dir <- "datasets/snRNA_MTG_10Samples"
+cluster_col <- "MajorCellTypes"
 condition_col <- "case"
 sample_col <- "sample_id"
 seurat_type <- "snrnaseq"
@@ -56,7 +50,7 @@ if(seurat_type == "scrnaseq" | seurat_type == "snrnaseq"){
 		stop("The Seurat object does not contain the 'RNA' assay.")
 	}
 	# Check if the Seurat object has the necessary assay data
-	if (!"data" %in% names(seurat_obj@assays$RNA@layers)) {
+	if (!"data" %in% slotNames(seurat_obj@assays$RNA)) {
 		stop("The Seurat object does not contain the 'data' slot in the 'RNA' assay.")
 	}
 } else if (seurat_type == "snatacseq" | seurat_type == "scatacseq") {
@@ -92,34 +86,34 @@ if (!cluster_col %in% colnames(seurat_obj@meta.data)) {
 
 
 ## ===========================================================
-# cluster specific markers
+# cell type specific markers
 print("=====================================================")
-print("Extracting cluster specific markers...")
+print("Extracting cell type specific markers...")
 
-# Extract cluster specific markers
-cluster_markers <- FindAllMarkers(seurat_obj, group.by =  cluster_col)
+# Extract cell type specific markers
+cell_type_markers <- FindAllMarkers(seurat_obj, group.by =  cluster_col)
 # Convert to data.table
-cluster_markers_dt <- as.data.table(cluster_markers)
+cell_type_markers_dt <- as.data.table(cell_type_markers)
 # Save to CSV
-fwrite(cluster_markers_dt, paste0(clustermarkers_folder,"/cluster_FindAllMarkers.csv"), row.names = FALSE)
+fwrite(cell_type_markers_dt, paste0(clustermarkers_folder,"/cluster_FindAllMarkers.csv"), row.names = FALSE)
 
 ## ============================================================
-# Ecalcaulate differential expression within each cluster between the conditions # nolint
+# Ecalcaulate differential expression within each cell type between the conditions # nolint
 print("=====================================================")
-print("Calculating differential expression within each cluster...")
+print("Calculating differential expression within each cell type...")
 
-# Define the clusters
-clusters <- unique(seurat_obj@meta.data[[cluster_col]])
+# Define the cell types
+cell_types <- unique(seurat_obj@meta.data[[cluster_col]])
 # Initialize an empty list to store results
 de_results_list <- list()
 de_results_topN_list <- list()
 
-# Loop through each cluster
-for (cluster in clusters) {
-	# Print the current cluster # nolint: whitespace_linter, indentation_linter.
-	print(paste("Processing cluster:", cluster))
-	# Subset the Seurat object to the current cluster # nolint
-	subset_obj <- seurat_obj[, seurat_obj@meta.data[[cluster_col]] == cluster]
+# Loop through each cell type
+for (cell_type in cell_types) {
+	# Print the current cell type # nolint: whitespace_linter, indentation_linter.
+	print(paste("Processing cell type:", cell_type))
+	# Subset the Seurat object to the current cell type # nolint
+	subset_obj <- seurat_obj[, seurat_obj@meta.data[[cluster_col]] == cell_type]
 
 	# Calculate differential expression between conditions
 	condition_ls <- unique(seurat_obj@meta.data[[condition_col]])
@@ -140,8 +134,8 @@ for (cluster in clusters) {
 			de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
 		
 			# Store the results in the list
-			de_results_list[[paste(cluster, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results
-			de_results_topN_list[[paste(cluster, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results_topN
+			de_results_list[[paste(cell_type, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results
+			de_results_topN_list[[paste(cell_type, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results_topN
 		}
 	} else {
 		de_results <- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = condition_col)
@@ -154,8 +148,8 @@ for (cluster in clusters) {
 		## get top 10 upregulated DE genes and downregulated, base on logFC
 		de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
 		
-		de_results_list[[paste(cluster, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results
-		de_results_topN_list[[paste(cluster, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results_topN
+		de_results_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results
+		de_results_topN_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results_topN
 
 	}
 }
@@ -168,8 +162,8 @@ fwrite(de_results_topN_dt, paste0(clustermarkers_folder, "/cluster_DEGs_topN.csv
 
 ## ============================================================
 print("=====================================================")
-# pseudo-bulk DE analysis in each cluster
-print("Calculating pseudo-bulk differential expression within each cluster...")
+# pseudo-bulk DE analysis in each cell type
+print("Calculating pseudo-bulk differential expression within each cell type...")
 # Create a new Seurat object for pseudo-bulk analysis
 # pb_obj <- AggregateExpression(seurat_obj, assays = "RNA", slot = "counts", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
 if(seurat_type == "scrnaseq" | seurat_type == "snrnaseq"){
@@ -191,7 +185,7 @@ pb_obj@meta.data[[cluster_col]] <- gsub("-", "_", pb_obj@meta.data[[cluster_col]
 pb_obj@meta.data[["orig.ident"]] <- gsub("-", "_", pb_obj@meta.data[["orig.ident"]])
 
 metadata = pb_obj@meta.data
-## rename sample_id to sampleId
+## rename, this is needed for the visualization in the data portal
 colnames(metadata)[colnames(metadata) == sample_col] <- "sampleId"
 colnames(metadata)[colnames(metadata) == condition_col] <- "condition"
 
@@ -202,18 +196,18 @@ colnames(expr_matrix) <- gsub("-", "_", colnames(expr_matrix))
 write.csv(expr_matrix, paste0(clustermarkers_folder, "/pb_expr_matrix.csv"), row.names = TRUE)
 
 
-# Define the clusters
-clusters <- unique(pb_obj@meta.data[[cluster_col]])
+# Define the cell types
+cell_types <- unique(pb_obj@meta.data[[cluster_col]])
 
 # Initialize an empty list to store results
 pseudo_bulk_list <- list()
 pseudo_bulk_topN_list <- list()
-# Loop through each cluster
-for (cluster in clusters) {
-	# Print the current cluster # nolint: whitespace_linter, indentation_linter.
-	print(paste("Processing cluster:", cluster))
-	# Subset the Seurat object to the current cluster # nolint
-	subset_obj <- pb_obj[, pb_obj@meta.data[[cluster_col]] == cluster]
+# Loop through each cell type
+for (cell_type in cell_types) {
+	# Print the current cell type # nolint: whitespace_linter, indentation_linter.
+	print(paste("Processing cell type:", cell_type))
+	# Subset the Seurat object to the current cell type # nolint
+	subset_obj <- pb_obj[, pb_obj@meta.data[[cluster_col]] == cell_type]
 
 	# Calculate differential expression between conditions
 	# Here, we assume that the conditions are stored in the "Condition" metadata column 
@@ -236,8 +230,8 @@ for (cluster in clusters) {
 			de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
 			
 			# Store the results in the list
-			pseudo_bulk_list[[paste(cluster, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results
-			pseudo_bulk_topN_list[[paste(cluster, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results_topN
+			pseudo_bulk_list[[paste(cell_type, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results
+			pseudo_bulk_topN_list[[paste(cell_type, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results_topN
 		}
 	} else {
 		de_results <- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = condition_col,test.use = "wilcox")
@@ -251,8 +245,8 @@ for (cluster in clusters) {
 		de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
 		
 		# Store the results in the list
-		pseudo_bulk_list[[paste(cluster, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results
-		pseudo_bulk_topN_list[[paste(cluster, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results_topN
+		pseudo_bulk_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results
+		pseudo_bulk_topN_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results_topN
 	}
 }
 # Convert the list to a data.table

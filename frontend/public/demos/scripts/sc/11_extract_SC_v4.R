@@ -20,9 +20,9 @@ if (length(args) != 3) {
 }
 
 # Get the arguments
-seurat_obj_file <- args[1]
-output_dir <- args[2]
-cluster_col <- args[3]
+seurat_obj_file <- "Seurats/snRNAseq_MTG_10samples.rds" #args[1]
+output_dir <- "datasets/snRNA_MTG_10Samples" #args[2]
+cluster_col <- "MajorCellTypes" #args[3]
 
 
 # Check if the output directory exists, if not create it

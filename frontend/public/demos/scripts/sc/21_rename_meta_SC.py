@@ -18,10 +18,10 @@ print("============================================")
 # cluster_col = sys.argv[4]
 # condition_col = sys.argv[5]
 
-dataset_path = "datasets/PMDBS_SN_snRNAseq"
-kept_features =["nCount_RNA", "nFeature_RNA", "sex",  "cell_type", "phase", "G2M_score", "S_score","leiden_res_0.10","leiden_res_0.20", "case", "sample_id"]
+dataset_path = "datasets/snRNA_MTG_10Samples"
+kept_features =[ "nCount_RNA", "nFeature_RNA", "sex", "MajorCellTypes", "updrs", "Complex_Assignment", "mmse", "sample_id", "case",]
 sample_col = "sample_id"
-cluster_col = "cell_type"
+cluster_col = "MajorCellTypes"
 condition_col = "case"
 
 print("Dataset path: ", dataset_path)
@@ -192,6 +192,8 @@ grouped_by_gene = expression_data.groupby("Gene")
 
 ## Save gene jsons
 print("Saving gene jsons...")
+expression_data["sample_id"] = expression_data["cs_id"].map(cell_to_sample)
+
 all_genes = grouped_by_gene.groups.keys()
 all_genes = [gene_i.replace("/", "_") for gene_i in list(set(all_genes))]
 with open(dataset_path + "/gene_list.json", "w") as f:
@@ -229,9 +231,7 @@ for gene, df in grouped_by_gene:
 print("Calculating pseudo count...")
 os.makedirs(dataset_path + "/gene_pseudobulk", exist_ok=True)
 
-expression_data["sample_id"] = expression_data["cs_id"].map(cell_to_sample)
-
-print("Grouping by gene and sample... be patient...")
+print("Grouping by gene... be patient...")
 # Compute pseudo-bulk counts by summing expression values per (sample, gene)
 pseudo_bulk = expression_data.groupby(["sample_id", "Gene"])["Expression"].sum().reset_index()
 # Rename the expression value column

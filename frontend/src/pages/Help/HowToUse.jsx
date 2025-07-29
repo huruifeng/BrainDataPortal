@@ -570,8 +570,7 @@ export default function HelpPage() {
                                                             <span className="comment" style={{color: "#e87c10"}}># The 8000 is the port number where the backend server is running on, adjust it if needed</span><br/>
                                                         </Paper>
                                                         <br/>
-                                                        <Typography variant="h6"
-                                                                    className="env-title env-title--primary">
+                                                        <Typography variant="h6" className="env-title env-title--primary">
                                                             B3.2 Build the frontend pages
                                                         </Typography>
                                                         <CodeBlock>
@@ -579,20 +578,17 @@ export default function HelpPage() {
                                                                 <span className="comment"># Navigate to the frontend directory</span><br/>
                                                                 cd {import.meta.env.VITE_APP_TITLE}/frontend<br/>
                                                                 <br/>
-                                                                <span
-                                                                    className="comment"># Install dependencies</span><br/>
+                                                                <span className="comment"># Install dependencies</span><br/>
                                                                 npm install<br/>
                                                                 <br/>
-                                                                <span
-                                                                    className="comment"># Build the frontend pages</span><br/>
+                                                                <span className="comment"># Build the frontend pages</span><br/>
                                                                 npm run build
                                                                 <br/>
                                                                 <span className="comment" style={{color: "#ffcc99"}}># This command will build the frontend pages in the frontend/dist folder</span><br/>
                                                             </div>
                                                         </CodeBlock>
                                                         <br/>
-                                                        <Typography variant="h6"
-                                                                    className="env-title env-title--primary">
+                                                        <Typography variant="h6" className="env-title env-title--primary">
                                                             B3.3 Deploy the frontend pages (Apache server or Nginx
                                                             server)
                                                         </Typography>
@@ -779,7 +775,7 @@ export default function HelpPage() {
                                         </Typography>
                                         <Typography variant="body1" color="text.secondary" className="section-description">
                                             Learn about supported data formats and how to prepare your datasets for
-                                            analysis in {import.meta.env.VITE_APP_TITLE}.
+                                            visualization in {import.meta.env.VITE_APP_TITLE}.
                                         </Typography>
                                         <Button component='a' href="/help/howtouse/demos" variant="outlined" color="primary" mt={4} target="_blank" rel="noopener noreferrer">
                                           Step by step guide with demos for data preparation
@@ -823,8 +819,8 @@ export default function HelpPage() {
                                                                 │ ├── RNA <span className="file-comment"># RNA Assay</span><br/>
                                                                 │ │ ├── @counts <span className="file-comment"># Raw counts</span><br/>
                                                                 │ │ ├── @data <span className="file-comment"># Normalized data </span><br/>
-                                                                │ │ ├── @features <span className="file-comment"># Gene names</span><br/>
-                                                                │ │ └── @cells <span className="file-comment"># Cell names/IDs</span><br/>
+                                                                │ │ ├── @features <span className="file-comment" style={{color: "red"}}># Gene names, v5 format</span><br/>
+                                                                │ │ └── @cells <span className="file-comment" style={{color: "red"}}># Cell names/IDs, v5 format</span><br/>
                                                                 ├── @meta.data <span className="file-comment"># Cell metadata</span><br/>
                                                                 │ ├── cell_id <span className="file-comment"># Cell ID</span><br/>
                                                                 │ ├── sample_id <span className="file-comment"># Sample ID</span><br/>
@@ -852,8 +848,8 @@ export default function HelpPage() {
                                                                 │ ├── Spatial <span className="file-comment"># Spatial assay</span><br/>
                                                                 │ │ ├── @counts <span className="file-comment"># Raw counts</span><br/>
                                                                 │ │ ├── @data <span className="file-comment"># Normalized data </span><br/>
-                                                                │ │ ├── @features <span className="file-comment"># Gene names</span><br/>
-                                                                │ │ └── @cells <span className="file-comment"># Cell names/IDs</span><br/>
+                                                                │ │ ├── @features <span className="file-comment" style={{color: "red"}}># Gene names, v5 format</span><br/>
+                                                                │ │ └── @cells <span className="file-comment" style={{color: "red"}}># Cell names/IDs, v5 format</span><br/>
                                                                 ├── @meta.data <span className="file-comment"># Cell metadata</span><br/>
                                                                 │ ├── cell_id <span className="file-comment"># Cell ID</span><br/>
                                                                 │ ├── sample_id <span className="file-comment"># Sample ID</span><br/>
@@ -1019,10 +1015,10 @@ genes = [ "SNCA",...]                    ## List of default gene names
                                      <Alert severity="info" icon={<CheckCircle color="info"/>} className="requirements-alert">
                                         <AlertTitle className="alert-title" variant="h6">Uploading data:</AlertTitle>
                                         <List dense>
-                                            <ListItem>Upload the whole dataset folder to the server backend/datasets/ folder. The gene expression matrix file is not required(raw_normalized_counts.csv), Files with name starting with &apos;raw_&apos; are not needed to be uploaded.</ListItem>
-                                            <ListItem>The sample sheet file is required(e.g., DatasetName_sample_sheet.csv) and must be uploaded to the backend/SampleSheets/ folder.</ListItem>
-                                            <ListItem>The dataset configuration file is required, the file name must be &apos;dataset_info.yaml&apos; and must be put in the backend/datasets/&lt;your_dataset_name&gt;/ folder.</ListItem>
-                                            <ListItem>Refresh the database: <a href="/datasetmanager">Dataset Manager</a></ListItem>
+                                            <ListItem>1. Upload the whole dataset folder to the server backend/datasets/ folder. The gene expression matrix file is not required(raw_normalized_counts.csv), Files with name starting with &apos;raw_&apos; are not needed to be uploaded.</ListItem>
+                                            <ListItem>2. The sample sheet file is required(e.g., DatasetName_sample_sheet.csv) and must be uploaded to the backend/SampleSheets/ folder.</ListItem>
+                                            <ListItem>3. The dataset configuration file is required, the file name must be &apos;dataset_info.yaml&apos; and must be put in the backend/datasets/&lt;your_dataset_name&gt;/ folder.</ListItem>
+                                            <ListItem>4. Refresh the database: <a href="/datasetmanager">Dataset Manager</a></ListItem>
                                         </List>
                                     </Alert>
 
