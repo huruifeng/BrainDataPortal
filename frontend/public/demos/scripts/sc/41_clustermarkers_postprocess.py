@@ -13,16 +13,9 @@ import numpy as np
 # cluster_col = sys.argv[2]  # e.g. "SubCellTypes"
 # sex_col = sys.argv[3]  # e.g. "sex"
 
-dataset_folder = "datasets/snRNA_MTG_10Samples"
+dataset_folder = "datasets/snRNAseq_MTG_10samples"
 cluster_col = "MajorCellTypes"
 sex_col = "sex"
-
-# dataset_folder = "datasets/PD5D_MTG_VisiumST"
-# cluster_col = "smoothed_label_s5"
-# sex_col = "sex"
-
-
-condition_col = "Condition"
 
 output_folder = dataset_folder + "/clustermarkers"
 
@@ -62,7 +55,7 @@ metadata = pd.read_csv(dataset_folder + "/cellspot_metadata_original.csv", index
 
 #%% ============================================================================
 ## calculate the percentage of cells where the gene is detected in that cell type
-
+condition_col = "Condition"
 pct_detected = {}
 
 marker_genes_df = pd.DataFrame()

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Ruifeng Hu" />
 
-<meta name="date" content="2025-07-29" />
+<meta name="date" content="2025-07-31" />
 
 <title>Extract Data from Seurat Object</title>
 
@@ -370,7 +370,7 @@ display: none;
 
 <h1 class="title toc-ignore">Extract Data from Seurat Object</h1>
 <h4 class="author">Ruifeng Hu</h4>
-<h4 class="date">2025-07-29</h4>
+<h4 class="date">2025-07-31</h4>
 
 </div>
 
@@ -421,7 +421,7 @@ library(presto)</code></pre>
 <p>You can set these manually for interactive use:</p>
 <pre class="r"><code># Set these manually for notebook use
 seurat_obj_file &lt;- &quot;example_data/snRNAseq_MTG_10samples.rds&quot;  # Path to your Seurat object fil
-output_dir &lt;- &quot;example_data/snRNA_MTG_10Samples&quot;  # Directory to save output files, usually the dataset name
+output_dir &lt;- &quot;example_data/snRNAseq_MTG_10samples&quot;  # Directory to save output files, usually the dataset name
 cluster_col &lt;- &quot;MajorCellTypes&quot;  # Column name in metadata for clustering information</code></pre>
 </div>
 <div id="create-output-directory" class="section level2">
@@ -508,7 +508,7 @@ fwrite(nonzero_data, file = paste0(output_dir, &quot;/raw_normalized_counts.csv&
 <pre class="r"><code>cat(&quot;Done! Data extraction is complete!
 You can find the output files in the directory:&quot;, output_dir, &quot;\n&quot;)</code></pre>
 <pre><code>## Done! Data extraction is complete!
-## You can find the output files in the directory: example_data/snRNA_MTG_10Samples</code></pre>
+## You can find the output files in the directory: example_data/snRNAseq_MTG_10samples</code></pre>
 </div>
 
 

@@ -18,7 +18,7 @@ print("============================================")
 # cluster_col = sys.argv[4]
 # condition_col = sys.argv[5]
 
-dataset_path = "datasets/snRNA_MTG_10Samples"
+dataset_path = "datasets/snRNAseq_MTG_10samples"
 kept_features =[ "nCount_RNA", "nFeature_RNA", "sex", "MajorCellTypes", "updrs", "Complex_Assignment", "mmse", "sample_id", "case",]
 sample_col = "sample_id"
 cluster_col = "MajorCellTypes"

@@ -7567,14 +7567,13 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-python"><pre><span></span><span class="c1"># Define dataset and metadata column names</span>
-<span class="n">dataset_folder</span> <span class="o">=</span> <span class="s2">"example_data/PMDBS_snRNAseq"</span>
-<span class="n">cluster_col</span> <span class="o">=</span> <span class="s2">"cell_type"</span>
+<span class="n">dataset_folder</span> <span class="o">=</span> <span class="s2">"example_data/snRNA_MTG_10Samples"</span>
+<span class="n">cluster_col</span> <span class="o">=</span> <span class="s2">"MajorCellTypes"</span>
 <span class="n">sex_col</span> <span class="o">=</span> <span class="s2">"sex"</span>
-<span class="n">condition_col</span> <span class="o">=</span> <span class="s2">"Condition"</span>
 <span class="n">output_folder</span> <span class="o">=</span> <span class="n">dataset_folder</span> <span class="o">+</span> <span class="s2">"/clustermarkers"</span>
 </pre></div>
 </div>
@@ -7698,7 +7697,8 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="n">pct_detected</span> <span class="o">=</span> <span class="p">{}</span>
+<div class="highlight hl-python"><pre><span></span><span class="n">condition_col</span> <span class="o">=</span> <span class="s2">"Condition"</span>
+<span class="n">pct_detected</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">marker_genes_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
 <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">cluster_list</span><span class="p">:</span>

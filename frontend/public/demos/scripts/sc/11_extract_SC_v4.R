@@ -21,7 +21,7 @@ if (length(args) != 3) {
 
 # Get the arguments
 seurat_obj_file <- "Seurats/snRNAseq_MTG_10samples.rds" #args[1]
-output_dir <- "datasets/snRNA_MTG_10Samples" #args[2]
+output_dir <- "datasets/snRNAseq_MTG_10samples" #args[2]
 cluster_col <- "MajorCellTypes" #args[3]
 
 

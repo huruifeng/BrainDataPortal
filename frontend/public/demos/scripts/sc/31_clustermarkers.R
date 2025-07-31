@@ -23,7 +23,7 @@ cat("===================================================\n")
 
 
 seurat_obj_file <- "Seurats/snRNAseq_MTG_10samples.rds"
-output_dir <- "datasets/snRNA_MTG_10Samples"
+output_dir <- "datasets/snRNAseq_MTG_10samples"
 cluster_col <- "MajorCellTypes"
 condition_col <- "case"
 sample_col <- "sample_id"

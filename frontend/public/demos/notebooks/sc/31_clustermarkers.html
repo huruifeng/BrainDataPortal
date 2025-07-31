@@ -11,7 +11,7 @@
 
 <meta name="author" content="Ruifeng Hu" />
 
-<meta name="date" content="2025-07-22" />
+<meta name="date" content="2025-07-31" />
 
 <title>Cell Type Marker Analysis</title>
 
@@ -370,7 +370,7 @@ display: none;
 
 <h1 class="title toc-ignore">Cell Type Marker Analysis</h1>
 <h4 class="author">Ruifeng Hu</h4>
-<h4 class="date">2025-07-22</h4>
+<h4 class="date">2025-07-31</h4>
 
 </div>
 
@@ -406,9 +406,9 @@ library(tidyverse)</code></pre>
 </div>
 <div id="set-parameters" class="section level2">
 <h2>Set Parameters</h2>
-<pre class="r"><code>seurat_obj_file &lt;- &quot;example_data/pmdbs_lee_obj_updated_SN.rds&quot; # Path to your Seurat object file
-output_dir &lt;- &quot;example_data/PMDBS_snRNAseq&quot; # Directory to save output files, usually the dataset name
-cluster_col &lt;- &quot;cell_type&quot; # Column name in metadata for clustering information
+<pre class="r"><code>seurat_obj_file &lt;- &quot;example_data/snRNAseq_MTG_10samples.rds&quot; # Path to your Seurat object file
+output_dir &lt;- &quot;example_data/snRNAseq_MTG_10samples&quot; # Directory to save output files, usually the dataset name
+cluster_col &lt;- &quot;MajorCellTypes&quot; # Column name in metadata for clustering information
 condition_col &lt;- &quot;case&quot; # Column name in metadata for condition information
 sample_col &lt;- &quot;sample_id&quot; # Column name in metadata for sample information
 seurat_type &lt;- &quot;snrnaseq&quot; # Type of Seurat object: scrnaseq, snrnaseq, snatacseq, scatacseq, visiumst
@@ -436,7 +436,7 @@ if(seurat_type == &quot;scrnaseq&quot; | seurat_type == &quot;snrnaseq&quot;){
         stop(&quot;The Seurat object does not contain the &#39;RNA&#39; assay.&quot;)
     }
     # Check if the Seurat object has the necessary assay data
-    if (!&quot;data&quot; %in% names(seurat_obj@assays$RNA@layers)) {
+    if (!&quot;data&quot; %in% slotNames(seurat_obj@assays$RNA)) {
         stop(&quot;The Seurat object does not contain the &#39;data&#39; slot in the &#39;RNA&#39; assay.&quot;)
     }
 } else if (seurat_type == &quot;snatacseq&quot; | seurat_type == &quot;scatacseq&quot;) {
@@ -534,13 +534,16 @@ for (cell_type in cell_types) {
 
     }
 }</code></pre>
-<pre><code>## [1] &quot;Processing cell type: Oligo&quot;
-## [1] &quot;Processing cell type: Astro&quot;
-## [1] &quot;Processing cell type: VC&quot;
-## [1] &quot;Processing cell type: OPC&quot;
-## [1] &quot;Processing cell type: ExN&quot;
-## [1] &quot;Processing cell type: MG&quot;
-## [1] &quot;Processing cell type: InN&quot;</code></pre>
+<pre><code>## [1] &quot;Processing cell type: GLU_Neurons&quot;
+## [1] &quot;Processing cell type: GABA_Neurons&quot;
+## [1] &quot;Processing cell type: Astrocytes&quot;
+## [1] &quot;Processing cell type: Microglia&quot;
+## [1] &quot;Processing cell type: Endothelial_Cells&quot;
+## [1] &quot;Processing cell type: Pericytes&quot;
+## [1] &quot;Processing cell type: Oligodendrocytes&quot;
+## [1] &quot;Processing cell type: OPCs&quot;
+## [1] &quot;Processing cell type: Fibroblast_Like_Cells&quot;
+## [1] &quot;Processing cell type: T_Cells&quot;</code></pre>
 <pre class="r"><code># Convert the list to a data.table
 de_results_dt &lt;- rbindlist(de_results_list, idcol = &quot;cluster_DE&quot;)
 de_results_topN_dt &lt;- rbindlist(de_results_topN_list, idcol = &quot;cluster_DE&quot;)
@@ -629,13 +632,16 @@ for (cell_type in cell_types) {
         pseudo_bulk_topN_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = &quot;vs&quot;), sep = &quot;.&quot;)]] &lt;- de_results_topN
     }
 }</code></pre>
-<pre><code>## [1] &quot;Processing cell type: Astro&quot;
-## [1] &quot;Processing cell type: ExN&quot;
-## [1] &quot;Processing cell type: MG&quot;
-## [1] &quot;Processing cell type: OPC&quot;
-## [1] &quot;Processing cell type: Oligo&quot;
-## [1] &quot;Processing cell type: VC&quot;
-## [1] &quot;Processing cell type: InN&quot;</code></pre>
+<pre><code>## [1] &quot;Processing cell type: Astrocytes&quot;
+## [1] &quot;Processing cell type: Endothelial_Cells&quot;
+## [1] &quot;Processing cell type: Fibroblast_Like_Cells&quot;
+## [1] &quot;Processing cell type: GABA_Neurons&quot;
+## [1] &quot;Processing cell type: GLU_Neurons&quot;
+## [1] &quot;Processing cell type: Microglia&quot;
+## [1] &quot;Processing cell type: Oligodendrocytes&quot;
+## [1] &quot;Processing cell type: OPCs&quot;
+## [1] &quot;Processing cell type: Pericytes&quot;
+## [1] &quot;Processing cell type: T_Cells&quot;</code></pre>
 <pre class="r"><code># Convert the list to a data.table
 pseudo_bulk_dt &lt;- rbindlist(pseudo_bulk_list, idcol = &quot;cluster_DE&quot;)
 pseudo_bulk_topN_dt &lt;- rbindlist(pseudo_bulk_topN_list, idcol = &quot;cluster_DE&quot;)

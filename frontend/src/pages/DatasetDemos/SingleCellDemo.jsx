@@ -1,4 +1,5 @@
 import {Link} from "react-router-dom"
+import {Divider} from "@mui/material";
 
 const SingleCellDemo = () => {
     return (
@@ -24,7 +25,7 @@ const SingleCellDemo = () => {
                             <li><a href="#data-extraction">3. Data Extraction from Seurat Object</a></li>
                             <li><a href="#metadata-processing">4. Metadata Processing</a></li>
                             <li><a href="#cluster-markers">5. Computing cluster markers</a></li>
-                            <li><a href="#feature-selection">6. Feature Selection</a></li>
+                            <li><a href="#post-markerprocessing">6. Post-marker processing and selection</a></li>
                             <li><a href="#data-export">7. Data Export for BrainDataPortal</a></li>
                             <li><a href="#troubleshooting">Troubleshooting</a></li>
                         </ul>
@@ -73,7 +74,7 @@ const SingleCellDemo = () => {
                         <h2>2. Data Loading and Initial Inspection</h2>
                         <p>
                             Once you have the data, Load it and perform initial inspection to understand the dataset structure. <br/>
-                            Full code in Notebook: <a href="/demos/notebooks/sc/11_extract_SC.html" target="_blank">11.extract_SC_v5.R</a>. <br/>
+                            Full code in Notebook: <a href="/demos/notebooks/sc/11_extract_SC_v4.html" target="_blank">11.extract_SC_v4.R</a>. <br/>
                             You may need to pay attention to the input arguments: <strong>seurat_obj_file</strong>, <strong>output_dir</strong>, <strong>cluster_col</strong>
                         </p>
 
@@ -84,7 +85,7 @@ const SingleCellDemo = () => {
 # Get the arguments
 seurat_obj_file <- "snRNAseq_MTG_10samples.rds"
 output_dir <- "snRNAseq_MTG_10samples"
-cluster_col <- "Complex_Assignment"
+cluster_col <- "MajorCellTypes"
 
 # Load the Seurat object
 seurat_obj <- readRDS(seurat_obj_file)
@@ -98,7 +99,7 @@ capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure
                         <div className="warning-box">
                             <h4>Important Note</h4>
                             <p>
-                                The above code will generate a file named<strong>seurat_obj_structure.txt</strong> in the output directory. Check this file to see the structure of the Seurat object, Make sure the the necessary data is present.
+                                The above code will generate a file named <strong>seurat_obj_structure.txt</strong> in the output directory. Check this file to see the structure of the Seurat object, Make sure the the necessary data is present.
                             </p>
                         </div>
                     </section>
@@ -107,7 +108,7 @@ capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure
                         <h2>3. Data Extraction from Seurat Object</h2>
                         <p>
                             After check the structure of the Seurat object, we can extract the data and metadata from the object. <br />
-                            Full code in Notebook: <a href="/demos/notebooks/sc/11_extract_SC.html" target="_blank">11.extract_SC_v5.R</a>.<br/>
+                            Full code in Notebook: <a href="/demos/notebooks/sc/11_extract_SC_v4.html" target="_blank">11.extract_SC_v4.R</a>.<br/>
 
                         </p>
                         <div className="warning-box">
@@ -115,6 +116,28 @@ capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure
                             <p>
                                  Seurat v5 has a different structure compared to v4, you may need to adjust the following codes accordingly.
                             </p>
+                        </div>
+
+                        <h3>v4 Seurat Object</h3>
+                        <div className="code-block">
+              <pre>
+                <code>{`
+## 1. Extract the normalized counts
+normalized_counts <- seurat_obj@assays$RNA@data  # This is a sparse matrix
+
+## 2. Convert sparse matrix to triplet format (long format)
+long_data <- summary(normalized_counts)
+
+## 3. Get row (gene) and column (cell) names
+long_data$Gene <- rownames(normalized_counts)[long_data$i]
+long_data$Cell <- colnames(normalized_counts)[long_data$j]
+long_data$Expression <- long_data$x
+
+## 4. Keep only necessary columns
+long_data <- long_data[, c("Gene", "Cell", "Expression")]
+
+`}</code>
+              </pre>
                         </div>
 
                         <h3>v5 Seurat Object</h3>
@@ -140,27 +163,7 @@ long_data <- triplet %>% select(Cell, Gene, Expression = x)
 `}</code>
               </pre>
                         </div>
-                        <h3>v4 Seurat Object</h3>
-                        <div className="code-block">
-              <pre>
-                <code>{`
-## 1. Extract the normalized counts
-normalized_counts <- seurat_obj@assays$RNA@data  # This is a sparse matrix
 
-## 2. Convert sparse matrix to triplet format (long format)
-long_data <- summary(normalized_counts)
-
-## 3. Get row (gene) and column (cell) names
-long_data$Gene <- rownames(normalized_counts)[long_data$i]
-long_data$Cell <- colnames(normalized_counts)[long_data$j]
-long_data$Expression <- long_data$x
-
-## 4. Keep only necessary columns
-long_data <- long_data[, c("Gene", "Cell", "Expression")]
-
-`}</code>
-              </pre>
-                        </div>
                     </section>
 
                     <section id="metadata-processing" className="tutorial-section">
@@ -173,7 +176,7 @@ long_data <- long_data[, c("Gene", "Cell", "Expression")]
                             - Pseudo-bulk level expression calculation<br />
                         </p>
                         <p>
-                            Full code in Notebook: <a href="/demos/notebooks/sc/31_rename_meta.html" target="_blank">31_rename_meta.ipynb</a>.
+                            Full code in Notebook: <a href="/demos/notebooks/sc/21_rename_meta.html" target="_blank">21_rename_meta.ipynb</a>.
                         </p>
 
                         <div className="code-block">
@@ -181,11 +184,10 @@ long_data <- long_data[, c("Gene", "Cell", "Expression")]
                 <code>{`dataset_path = "snRNAseq_MTG_10samples"  ## This is the output directory from the previous step 
 
 ## a list of metadata columns to keep, pick features that you want to visualize
-kept_features =["nCount_RNA", "nFeature_RNA", "sex", "cell_type", "phase", 
-                "G2M_score", "S_score","leiden_res_0.10","leiden_res_0.20", 
-                "case", "sample_id"]
+kept_features =[ "nCount_RNA", "nFeature_RNA", "sex", "MajorCellTypes", 
+                "updrs", "Complex_Assignment", "mmse", "sample_id", "case",]
 sample_col = "sample_id"
-cluster_col = "Complex_Assignment"
+cluster_col = "MajorCellTypes"
 condition_col = "case"`}</code>
               </pre>
                         </div>
@@ -195,24 +197,60 @@ condition_col = "case"`}</code>
                         <h2>5. Computing cluster markers</h2>
                         <p>This step includes:<br/>- Finding cell type specific markers<br/>- Calculating differential expression within cell types<br/>- Performing pseudo-bulk analysis</p>
                         <p>
-                            Full code in Notebook: <a href="/demos/notebooks/sc/21_clustermarkers.html" target="_blank">21_clustermarkers.R</a>.<br/>
+                            Full code in Notebook: <a href="/demos/notebooks/sc/31_clustermarkers.html" target="_blank">31_clustermarkers.R</a>.<br/>
                         </p>
                         <div className="code-block">
               <pre>
                 <code>{`seurat_obj_file <- "snRNAseq_MTG_10samples.rds"
 output_dir <- "snRNAseq_MTG_10samples"
-cluster_col <- "Complex_Assignment"
+cluster_col <- "MajorCellTypes"
 condition_col <- "case"
 sample_col <- "sample_id"
 seurat_type <- "snrnaseq"`}</code>
               </pre>
                         </div>
+                        <Divider />
+                        <div className="warning-box">
+                            <h4>Important Note</h4>
+                            <p>
+                                You may need to adjust the following codes for your specific dataset.<br/>
+                            </p>
+                        </div>
+                        <div className="code-block">
+              <pre>
+                <code>{`if (!"data" %in% slotNames(seurat_obj@assays$RNA)) {
+    stop("The Seurat object does not contain the 'data' slot in the 'RNA' assay.")
+}
+... ...
+# Check if the Seurat object has the necessary assay
+if (!"ATAC" %in% names(seurat_obj@assays)) {
+    stop("The Seurat object does not contain the 'ATAC' assay.")
+}
+# Check if the Seurat object has the necessary assay data
+if (!"counts" %in% slotNames(seurat_obj@assays$ATAC)) {
+    stop("The Seurat object does not contain the 'counts' slot in the 'ATAC' assay.")
+}
+... ...
+# Check if the Seurat object has the necessary assay
+if (!"Spatial" %in% names(seurat_obj@assays)) {
+    stop("The Seurat object does not contain the 'Spatial' assay.")
+}
+# Check if the Seurat object has the necessary assay data
+if (!"data" %in% slotNames(seurat_obj@assays$Spatial)) {
+    stop("The Seurat object does not contain the 'data' slot in the 'Spatial' assay.")
+}
+`}</code>
+              </pre>
+                        </div>
                     </section>
 
 
-                    <section id="feature-selection" className="tutorial-section">
-                        <h2>6. Feature Selection</h2>
-                        <p>Identify highly variable genes that capture the most biological variation in the dataset.</p>
+                    <section id="post-markerprocessing" className="tutorial-section">
+                        <h2>6. Post-marker processing and selection</h2>
+                        <p> This step identifies and analyzes top marker genes for each cell type (or cluster) from single-cell data. <br/>
+                            It also calculates detection frequency and average expression for selected marker genes across conditions and sexes.<br/>
+                            Full code in Notebook: <a href="/demos/notebooks/sc/41_postmarker.html" target="_blank">41_postmarker.R</a>.
+                        </p>
 
                         <div className="code-block">
               <pre>

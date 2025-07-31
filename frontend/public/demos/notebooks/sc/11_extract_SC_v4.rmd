@@ -47,7 +47,7 @@ You can set these manually for interactive use:
 ```{r input-args}
 # Set these manually for notebook use
 seurat_obj_file <- "example_data/snRNAseq_MTG_10samples.rds"  # Path to your Seurat object fil
-output_dir <- "example_data/snRNA_MTG_10Samples"  # Directory to save output files, usually the dataset name
+output_dir <- "example_data/snRNAseq_MTG_10samples"  # Directory to save output files, usually the dataset name
 cluster_col <- "MajorCellTypes"  # Column name in metadata for clustering information
 ```
 

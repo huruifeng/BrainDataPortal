@@ -33,9 +33,9 @@ library(tidyverse)
 ## Set Parameters
 
 ```{r parameters}
-seurat_obj_file <- "example_data/pmdbs_lee_obj_updated_SN.rds" # Path to your Seurat object file
-output_dir <- "example_data/PMDBS_snRNAseq" # Directory to save output files, usually the dataset name
-cluster_col <- "cell_type" # Column name in metadata for clustering information
+seurat_obj_file <- "example_data/snRNAseq_MTG_10samples.rds" # Path to your Seurat object file
+output_dir <- "example_data/snRNAseq_MTG_10samples" # Directory to save output files, usually the dataset name
+cluster_col <- "MajorCellTypes" # Column name in metadata for clustering information
 condition_col <- "case" # Column name in metadata for condition information
 sample_col <- "sample_id" # Column name in metadata for sample information
 seurat_type <- "snrnaseq" # Type of Seurat object: scrnaseq, snrnaseq, snatacseq, scatacseq, visiumst
@@ -64,7 +64,7 @@ if(seurat_type == "scrnaseq" | seurat_type == "snrnaseq"){
 		stop("The Seurat object does not contain the 'RNA' assay.")
 	}
 	# Check if the Seurat object has the necessary assay data
-	if (!"data" %in% names(seurat_obj@assays$RNA@layers)) {
+	if (!"data" %in% slotNames(seurat_obj@assays$RNA)) {
 		stop("The Seurat object does not contain the 'data' slot in the 'RNA' assay.")
 	}
 } else if (seurat_type == "snatacseq" | seurat_type == "scatacseq") {
