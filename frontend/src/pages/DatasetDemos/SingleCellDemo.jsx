@@ -1,5 +1,8 @@
 import {Link} from "react-router-dom"
-import {Divider} from "@mui/material";
+import {Divider, Paper} from "@mui/material";
+import {Prism as SyntaxHighlighter} from "react-syntax-highlighter";
+import {oneLight} from "react-syntax-highlighter/dist/cjs/styles/prism/index.js";
+import React from "react";
 
 const SingleCellDemo = () => {
     return (
@@ -24,9 +27,12 @@ const SingleCellDemo = () => {
                             <li><a href="#data-loading">2. Data Loading and Initial Inspection</a></li>
                             <li><a href="#data-extraction">3. Data Extraction from Seurat Object</a></li>
                             <li><a href="#metadata-processing">4. Metadata Processing</a></li>
-                            <li><a href="#cluster-markers">5. Computing cluster markers</a></li>
-                            <li><a href="#post-markerprocessing">6. Post-marker processing and selection</a></li>
-                            <li><a href="#data-export">7. Data Export for BrainDataPortal</a></li>
+                            <li><a href="#cluster-markers">5. Computing Cluster Markers</a></li>
+                            <li><a href="#post-markerprocessing">6. Post-marker Processing and Selection</a></li>
+                            <li><a href="#prepare-sample-sheet">7. Preparing Sample Sheet</a></li>
+                            <li><a href="#prepare-dataset-info">8. Preparing Dataset Information</a></li>
+                            <li><a href="#upload-dataset">9. Uploading Dataset</a></li>
+                            <li><a href="#use-precomputed-markers">10. Use Pre-Computed Cluster Markers</a></li>
                             <li><a href="#troubleshooting">Troubleshooting</a></li>
                         </ul>
                     </div>
@@ -61,13 +67,6 @@ const SingleCellDemo = () => {
                             2. Sample metadata file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">Sample_snRNAseq_MTG_10samples.csv</a><br/>
                             3. Dataset configuration file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">dataset_info.toml</a>
                         </div>
-                        <div className="alert-box">
-                            <h4>Important Note</h4>
-                            <p>
-                                Dataset configuration file name must be <strong>dataset_info.toml</strong>
-                            </p>
-                        </div>
-
                     </section>
 
                     <section id="data-loading" className="tutorial-section">
@@ -249,104 +248,152 @@ if (!"data" %in% slotNames(seurat_obj@assays$Spatial)) {
                         <h2>6. Post-marker processing and selection</h2>
                         <p> This step identifies and analyzes top marker genes for each cell type (or cluster) from single-cell data. <br/>
                             It also calculates detection frequency and average expression for selected marker genes across conditions and sexes.<br/>
-                            Full code in Notebook: <a href="/demos/notebooks/sc/41_postmarker.html" target="_blank">41_postmarker.R</a>.
+                            Full code in Notebook: <a href="/demos/notebooks/sc/41_clustermarkers_postprocess.html" target="_blank">41_clustermarkers_postprocess.ipynb</a>.<br/>
+                            Modify the following codes for your specific dataset.
                         </p>
 
                         <div className="code-block">
               <pre>
-                <code>{`# Find highly variable genes
-sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+                <code>{`# Define dataset and metadata column names
+dataset_folder = "example_data/snRNA_MTG_10Samples"
+cluster_col = "MajorCellTypes"
+sex_col = "sex"
+output_folder = dataset_folder + "/clustermarkers"
+... ...
 
-# Plot highly variable genes
-sc.pl.highly_variable_genes(adata)
-plt.show()
+# Filter for significant genes
+filtered_df = marker_genes[marker_genes['p_val_adj'] < 0.05]
 
-# Print statistics
-n_hvg = sum(adata.var.highly_variable)
-print(f"Number of highly variable genes: {n_hvg}")
-print(f"Percentage of total genes: {n_hvg/adata.n_vars*100:.1f}%")
-
-# Keep only highly variable genes for downstream analysis
-adata_hvg = adata[:, adata.var.highly_variable].copy()
-print(f"Dataset after HVG selection: {adata_hvg.shape}")
-
-# Scale data to unit variance
-sc.pp.scale(adata_hvg, max_value=10)
-print("Data scaling completed")`}</code>
+# Rank by absolute log2FC and select top 10 per cluster
+top_genes = (
+    filtered_df
+    .assign(abs_log2FC = filtered_df['avg_log2FC'])  ## chenge to abs(filtered_df['avg_log2FC']) will include negative log2FC genes
+    .sort_values(['cluster', 'abs_log2FC'], ascending=[True, False])
+    .groupby('cluster')
+    .head(10)
+    .drop(columns='abs_log2FC')  # Optional: remove helper column
+)
+... ...
+`}</code>
               </pre>
                         </div>
                     </section>
 
-                    <section id="data-export" className="tutorial-section">
-                        <h2>7. Data Export for BrainDataPortal</h2>
+                    <section id="prepare-sample-sheet" className="tutorial-section">
+                        <h2>7. Prepare sample sheet file</h2>
                         <p>
-                            Export the processed data in formats compatible with BrainDataPortal for further analysis
-                            and visualization.
+                            This step generates a sample sheet file for the dataset. <br/>
+                            It includes information about the samples, such as condition, sex, and other relevant metadata.<br/>
+                            Download the demo sample sheet file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">Sample_snRNAseq_MTG_10samples.csv</a><br/>
                         </p>
-
-                        <div className="code-block">
-              <pre>
-                <code>{`# Create output directory
-import os
-output_dir = "processed_data"
-os.makedirs(output_dir, exist_ok=True)
-
-# Export processed data as H5AD (recommended format)
-adata.write(f"{output_dir}/processed_data.h5ad")
-print("Saved processed data as H5AD file")
-
-# Export as CSV files for compatibility
-# Expression matrix (normalized)
-pd.DataFrame(
-    adata.X.toarray() if hasattr(adata.X, 'toarray') else adata.X,
-    index=adata.obs_names,
-    columns=adata.var_names
-).to_csv(f"{output_dir}/expression_matrix.csv")
-
-# Cell metadata
-adata.obs.to_csv(f"{output_dir}/cell_metadata.csv")
-
-# Gene metadata
-adata.var.to_csv(f"{output_dir}/gene_metadata.csv")
-
-# Export highly variable genes list
-hvg_genes = adata.var_names[adata.var.highly_variable].tolist()
-pd.DataFrame({'gene': hvg_genes}).to_csv(f"{output_dir}/highly_variable_genes.csv", index=False)
-
-print("\\nExported files:")
-print("- processed_data.h5ad (main file)")
-print("- expression_matrix.csv")
-print("- cell_metadata.csv") 
-print("- gene_metadata.csv")
-print("- highly_variable_genes.csv")
-
-# Create a summary report
-summary = {
-    'original_cells': adata_raw.n_obs,
-    'original_genes': adata_raw.n_vars,
-    'filtered_cells': adata.n_obs,
-    'filtered_genes': adata.n_vars,
-    'highly_variable_genes': n_hvg,
-    'mitochondrial_threshold': 20,
-    'min_genes_per_cell': 200,
-    'min_cells_per_gene': 3
-}
-
-pd.DataFrame([summary]).to_csv(f"{output_dir}/processing_summary.csv", index=False)
-print("- processing_summary.csv")
-
-print(f"\\nProcessing complete! Files saved in '{output_dir}/' directory")`}</code>
-              </pre>
-                        </div>
-
-                        <div className="success-box">
-                            <h4>Upload to BrainDataPortal</h4>
+                        <div className="alert-box">
+                            <h4>Important Note</h4>
                             <p>
-                                Your processed data is now ready for upload to BrainDataPortal. Use
-                                the <code>processed_data.h5ad</code>
-                                file as the primary input, along with the metadata files for additional annotations.
+                                PLEASE KEEP ALL THE COLUMN NAMES AND ORDER AS IS, JUST FILL IN YOUR DATA.
                             </p>
                         </div>
+
+                    </section>
+
+                    <section id="prepare-dataset-info" className="tutorial-section">
+                        <h2>8. Prepare dataset information</h2>
+                        <p>
+                            This step prepares the dataset information. <br/>
+                            Download the demo dataset information file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">dataset_info.toml</a>
+
+                        </p>
+                        <div className="alert-box">
+                            <h4>Important Note</h4>
+                            <p>
+                                Dataset configuration file name must be <strong>dataset_info.toml</strong>
+                            </p>
+                        </div>
+                         <p>
+                            Here is an example of the dataset configuration file content:
+                        </p>
+                        <Paper className="config-content">
+                                                <SyntaxHighlighter language="toml" style={oneLight}>
+{`
+[datasetfile]
+file = ""                               ## Path to the Seurat object file
+datatype = ""                           ## Type of the data. Options: scRNAseq, scATACseq, VisiumST, xQTL
+
+[dataset]
+dataset_name = ""                       ## Required: Dataset name, MUST BE UNIQUE, used to identify the dataset in the database
+description = ""                        ## Dataset description
+PI_full_name = ""                       ## Principal Investigator (PI) full name
+PI_email = ""                           ## PI email
+first_contributor = ""                  ## First contributor name
+first_contributor_email = ""            ## First contributor email
+other_contributors = ""                 ## Other contributors
+support_grants = ""                     ## Support grants
+other_funding_source = ""               ## Other funding source
+publication_DOI = ""                    ## DOI of the publication
+publication_PMID = ""                   ## PMID of the publication
+brain_super_region = ""                 ## Brain super region
+brain_region = ""                       ## Brain region
+sample_info = ""                        ## Sample information
+sample_sheet = ""                       ## Sample sheet file name (Not the path, just the file name)
+n_samples = 96                          ## Number of samples
+organism = "Homo Sapiens"               ## Organism
+tissue = "Brain"                        ## Tissue
+disease = "PD"                          ## Disease
+
+[study]
+study_name = "Parkinson5D"              ## Study name, the dataset belongs to
+description = ""                        ## Study description
+team_name = "Team Scherzer"             ## Team name
+lab_name = "NeuroGenomics"              ## Lab name
+submitter_name = ""                     ## Submitter name
+submitter_email = ""                    ## Submitter email
+
+[protocol]
+protocol_id = "P002"                    ## Protocol ID
+protocol_name = "P001_VisiumST"         ## Protocol name
+version = ""                            ## Protocol version
+github_url = ""                         ## GitHub URL
+sample_collection_summary = ""          ## Sample collection summary
+cell_extraction_summary = ""            ## Cell extraction summary
+lib_prep_summary = ""                   ## Library preparation summary
+data_processing_summary = ""            ## Data processing summary
+protocols_io_DOI = ""                   ## protocols.io DOI
+other_reference = ""                    ## Other reference
+
+[meta_features]
+selected_features = ["nCount_Spatial",...] ## List of selected features will be shown in the page
+sample_id_column = "sample_name"        ## Sample ID column in Seurat object metadata
+major_cluster_column = "CellType"       ## Major cluster column in Seurat object metadata
+condition_column = "diagnosis"          ## Condition column in Seurat object metadata        
+
+[visium_defaults]
+samples = [ "BN2023", "BN1076",]         ## List of sample names
+features = [ "smoothed_label_s5",...]    ## List of default feature names
+genes = [ "SNCA",...]                    ## List of default gene names
+`}
+                                                </SyntaxHighlighter>
+                                            </Paper>
+                    </section>
+
+                    <section id="upload-dataset" className="tutorial-section">
+                        <h2>9. Uploading Dataset</h2>
+                        <p>
+                            Upload the dataset to server folder.
+                        </p>
+                        <div className="info-box">
+                            <h4>Upload Note</h4>
+                            <p>
+                                After running the pipeline, there will be a dataset folder that contains the all necessary files:
+                                <ul>
+                                    <li>1. the files with names starting with <code>raw_</code> are not necessary for upload.</li>
+                                    <li>2. the file named &apos;pb_expr_matrix.csv&apos; in the folder &apos;&lt;data_name&gt;/clustermarkers&apos; is necessary for upload.</li>
+                                    <li>3. Upload the dataset folder named <b>&apos;&lt;data_name&gt;&apos;</b> to the server at <b>&apos;backend/datasets&apos;</b>.</li>
+                                    <li>4. Put the dataset configuration file named <b>&apos;dataset_info.toml&apos;</b> to your dataset folder at <b>&apos;backend/datasets/&lt;data_name&gt;&apos;</b>.</li>
+                                    <li>5. Upload <b>samplesheet file</b> to the server at <b>&apos;backend/SampleSheet&apos;</b>.</li>
+                                    <li>6. Refresh the database: Go to <b>&apos;<a href="/datasetmanager?dataset=&stepidx=0">Datasets Management Page</a> &apos;</b>(DATASETS -&gt; +ADD DATASET) and click <b>&apos;REFRESH DB&apos;</b>.</li>
+                                </ul>
+                            </p>
+                        </div>
+
                     </section>
 
                     <section id="troubleshooting" className="tutorial-section">
