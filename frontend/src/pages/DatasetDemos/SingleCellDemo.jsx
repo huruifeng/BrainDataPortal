@@ -61,11 +61,12 @@ const SingleCellDemo = () => {
                             contains 10 subjects, approximately 50,000 cells from brain middle temporal gyrus region.
                         </p>
 
-                        <h3>Download the demo dataset</h3>
+                        <h3>Download the demo dataset and scripts</h3>
                         <div className="troubleshooting-item">
-                            1. Seurat object file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">snRNAseq_MTG_10samples.rds</a> <br/>
-                            2. Sample metadata file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">Sample_snRNAseq_MTG_10samples.csv</a><br/>
-                            3. Dataset configuration file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">dataset_info.toml</a>
+                            1. Seurat object file: <a href="/demos/notebooks/sc/example_data/snRNAseq_MTG_10samples.rds" target="_blank">snRNAseq_MTG_10samples.rds</a> <br/>
+                            2. Sample metadata file: <a href="/demos/notebooks/sc/example_data/Sample_snRNAseq_10Samples.csv" target="_blank">Sample_snRNAseq_MTG_10samples.csv</a><br/>
+                            3. Dataset configuration file: <a href="/demos/notebooks/sc/example_data/dataset_info.toml" target="_blank">dataset_info.toml</a><br/>
+                            4. Dataset processing scripts: <a href="/demos/scripts/sc.zip" target="_blank">sc_scripts.zip</a>
                         </div>
                     </section>
 
@@ -284,7 +285,7 @@ top_genes = (
                         <p>
                             This step generates a sample sheet file for the dataset. <br/>
                             It includes information about the samples, such as condition, sex, and other relevant metadata.<br/>
-                            Download the demo sample sheet file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">Sample_snRNAseq_MTG_10samples.csv</a><br/>
+                            Download the demo sample sheet file: <a href="/demos/notebooks/sc/example_data/Sample_snRNAseq_10Samples.csv" target="_blank">Sample_snRNAseq_MTG_10samples.csv</a><br/>
                         </p>
                         <div className="alert-box">
                             <h4>Important Note</h4>
@@ -299,7 +300,7 @@ top_genes = (
                         <h2>8. Prepare dataset information</h2>
                         <p>
                             This step prepares the dataset information. <br/>
-                            Download the demo dataset information file: <a href="https://github.com/braindataportal/braindataportal.github.io/blob/main/data/pbmc3k_filtered_gene_bc_matrices.tar.gz" target="_blank">dataset_info.toml</a>
+                            Download the demo dataset information file: <a href="/demos/notebooks/sc/example_data/dataset_info.toml" target="_blank">dataset_info.toml</a>
 
                         </p>
                         <div className="alert-box">
