@@ -22,8 +22,8 @@ const SingleCellDemo = () => {
                             <li><a href="#demo-data">1. Obtaining Demo Data</a></li>
                             <li><a href="#data-loading">2. Data Loading and Initial Inspection</a></li>
                             <li><a href="#data-extraction">3. Data Extraction from Seurat Object</a></li>
-                            <li><a href="#cluster-markers">4. Cell and Gene Filtering</a></li>
-                            <li><a href="#metadata-processing">5. Metadata Processing</a></li>
+                            <li><a href="#metadata-processing">4. Metadata Processing</a></li>
+                            <li><a href="#cluster-markers">5. Computing cluster markers</a></li>
                             <li><a href="#feature-selection">6. Feature Selection</a></li>
                             <li><a href="#data-export">7. Data Export for BrainDataPortal</a></li>
                             <li><a href="#troubleshooting">Troubleshooting</a></li>
@@ -163,26 +163,8 @@ long_data <- long_data[, c("Gene", "Cell", "Expression")]
                         </div>
                     </section>
 
-                    <section id="cluster-markers" className="tutorial-section">
-                        <h2>4. Computing cluster markers</h2>
-                        <p>This step includes:<br/>- Finding cell type specific markers<br/>- Calculating differential expression within cell types<br/>- Performing pseudo-bulk analysis</p>
-                        <p>
-                            Full code in Notebook: <a href="/demos/notebooks/sc/21_clustermarkers.html" target="_blank">21_clustermarkers.R</a>.<br/>
-                        </p>
-                        <div className="code-block">
-              <pre>
-                <code>{`seurat_obj_file <- "snRNAseq_MTG_10samples.rds"
-output_dir <- "snRNAseq_MTG_10samples"
-cluster_col <- "Complex_Assignment"
-condition_col <- "case"
-sample_col <- "sample_id"
-seurat_type <- "snrnaseq"`}</code>
-              </pre>
-                        </div>
-                    </section>
-
                     <section id="metadata-processing" className="tutorial-section">
-                        <h2>5. Metadata processing</h2>
+                        <h2>4. Metadata processing</h2>
                         <p>
                             This step processes single cell metadata for visualization, including: <br />
                             - Metadata filtering and renaming <br />
@@ -208,6 +190,25 @@ condition_col = "case"`}</code>
               </pre>
                         </div>
                     </section>
+
+                    <section id="cluster-markers" className="tutorial-section">
+                        <h2>5. Computing cluster markers</h2>
+                        <p>This step includes:<br/>- Finding cell type specific markers<br/>- Calculating differential expression within cell types<br/>- Performing pseudo-bulk analysis</p>
+                        <p>
+                            Full code in Notebook: <a href="/demos/notebooks/sc/21_clustermarkers.html" target="_blank">21_clustermarkers.R</a>.<br/>
+                        </p>
+                        <div className="code-block">
+              <pre>
+                <code>{`seurat_obj_file <- "snRNAseq_MTG_10samples.rds"
+output_dir <- "snRNAseq_MTG_10samples"
+cluster_col <- "Complex_Assignment"
+condition_col <- "case"
+sample_col <- "sample_id"
+seurat_type <- "snrnaseq"`}</code>
+              </pre>
+                        </div>
+                    </section>
+
 
                     <section id="feature-selection" className="tutorial-section">
                         <h2>6. Feature Selection</h2>

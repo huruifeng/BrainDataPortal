@@ -11,7 +11,7 @@
 
 <meta name="author" content="Ruifeng Hu" />
 
-<meta name="date" content="2025-07-22" />
+<meta name="date" content="2025-07-29" />
 
 <title>Extract Data from Seurat Object</title>
 
@@ -370,7 +370,7 @@ display: none;
 
 <h1 class="title toc-ignore">Extract Data from Seurat Object</h1>
 <h4 class="author">Ruifeng Hu</h4>
-<h4 class="date">2025-07-22</h4>
+<h4 class="date">2025-07-29</h4>
 
 </div>
 
@@ -413,15 +413,16 @@ library(Matrix)
 library(data.table)
 library(Seurat)
 library(tidyverse)
+library(jsonlite)
 library(presto)</code></pre>
 </div>
 <div id="set-arguments" class="section level2">
 <h2>Set Arguments</h2>
 <p>You can set these manually for interactive use:</p>
 <pre class="r"><code># Set these manually for notebook use
-seurat_obj_file &lt;- &quot;example_data/pmdbs_lee_obj_updated_SN.rds&quot;  # Path to your Seurat object fil
-output_dir &lt;- &quot;example_data/PMDBS_snRNAseq&quot;  # Directory to save output files, usually the dataset name
-cluster_col &lt;- &quot;cell_type&quot;  # Column name in metadata for clustering information</code></pre>
+seurat_obj_file &lt;- &quot;example_data/snRNAseq_MTG_10samples.rds&quot;  # Path to your Seurat object fil
+output_dir &lt;- &quot;example_data/snRNA_MTG_10Samples&quot;  # Directory to save output files, usually the dataset name
+cluster_col &lt;- &quot;MajorCellTypes&quot;  # Column name in metadata for clustering information</code></pre>
 </div>
 <div id="create-output-directory" class="section level2">
 <h2>Create Output Directory</h2>
@@ -446,7 +447,7 @@ need to ensure the object contains the expected slots and layers.</p>
 <pre class="r"><code>if (!&quot;RNA&quot; %in% names(seurat_obj@assays)) {
   stop(&quot;The Seurat object does not contain the &#39;RNA&#39; assay.&quot;)
 }
-if (!&quot;data&quot; %in% names(seurat_obj@assays$RNA@layers)) {
+if (!&quot;data&quot; %in% slotNames(seurat_obj@assays$RNA)) {
   stop(&quot;The Seurat object does not contain the &#39;data&#39; slot in the &#39;RNA&#39; assay.&quot;)
 }
 if (!&quot;meta.data&quot; %in% slotNames(seurat_obj)) {
@@ -483,26 +484,31 @@ write.csv(umap_embeddings, file = paste0(output_dir, &quot;/raw_umap_embeddings.
 <h2>Extract and Save Normalized Counts</h2>
 <pre class="r"><code>cat(&quot;Saving normalized counts...\n&quot;)</code></pre>
 <pre><code>## Saving normalized counts...</code></pre>
-<pre class="r"><code>normalized_counts &lt;- seurat_obj[[&quot;RNA&quot;]]@layers[[&quot;data&quot;]] # Sparse matrix
+<pre class="r"><code>normalized_counts &lt;- seurat_obj@assays$RNA@data # Sparse matrix
 
-gene_names &lt;- dimnames(seurat_obj[[&quot;RNA&quot;]]@features)[[1]]
-cell_names &lt;- dimnames(seurat_obj[[&quot;RNA&quot;]]@cells)[[1]]
+# Convert sparse matrix to triplet format (long format)
+long_data &lt;- summary(normalized_counts)
 
-triplet &lt;- summary(normalized_counts)
-triplet$Gene &lt;- gene_names[triplet$i]
-triplet$Cell &lt;- cell_names[triplet$j]
+# Get row (gene) and column (cell) names
+long_data$Gene &lt;- rownames(normalized_counts)[long_data$i]
+long_data$Cell &lt;- colnames(normalized_counts)[long_data$j]
+long_data$Expression &lt;- long_data$x
 
-long_data &lt;- triplet %&gt;%
-  select(Cell, Gene, Expression = x)
+# Keep only necessary columns
+long_data &lt;- long_data[, c(&quot;Gene&quot;, &quot;Cell&quot;, &quot;Expression&quot;)]
 
+# Filter out zero values
 nonzero_data &lt;- long_data[long_data$Expression &gt; 0, ]
+
+# Convert to data.table for efficiency
 nonzero_data &lt;- as.data.table(nonzero_data)
+# Save to CSV with index as the first column in a fast way
 fwrite(nonzero_data, file = paste0(output_dir, &quot;/raw_normalized_counts.csv&quot;), row.names = FALSE)</code></pre>
 <hr />
 <pre class="r"><code>cat(&quot;Done! Data extraction is complete!
 You can find the output files in the directory:&quot;, output_dir, &quot;\n&quot;)</code></pre>
 <pre><code>## Done! Data extraction is complete!
-## You can find the output files in the directory: example_data/PMDBS_snRNAseq</code></pre>
+## You can find the output files in the directory: example_data/snRNA_MTG_10Samples</code></pre>
 </div>
 
 

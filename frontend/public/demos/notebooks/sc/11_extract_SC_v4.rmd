@@ -36,6 +36,7 @@ library(Matrix)
 library(data.table)
 library(Seurat)
 library(tidyverse)
+library(jsonlite)
 library(presto)
 ```
 
@@ -45,9 +46,9 @@ You can set these manually for interactive use:
 
 ```{r input-args}
 # Set these manually for notebook use
-seurat_obj_file <- "example_data/pmdbs_lee_obj_updated_SN.rds"  # Path to your Seurat object fil
-output_dir <- "example_data/PMDBS_snRNAseq"  # Directory to save output files, usually the dataset name
-cluster_col <- "cell_type"  # Column name in metadata for clustering information
+seurat_obj_file <- "example_data/snRNAseq_MTG_10samples.rds"  # Path to your Seurat object fil
+output_dir <- "example_data/snRNA_MTG_10Samples"  # Directory to save output files, usually the dataset name
+cluster_col <- "MajorCellTypes"  # Column name in metadata for clustering information
 ```
 
 ## Create Output Directory
@@ -75,7 +76,7 @@ v5 Seurat objects have a different structure compared to v4, so we need to ensur
 if (!"RNA" %in% names(seurat_obj@assays)) {
   stop("The Seurat object does not contain the 'RNA' assay.")
 }
-if (!"data" %in% names(seurat_obj@assays$RNA@layers)) {
+if (!"data" %in% slotNames(seurat_obj@assays$RNA)) {
   stop("The Seurat object does not contain the 'data' slot in the 'RNA' assay.")
 }
 if (!"meta.data" %in% slotNames(seurat_obj)) {
@@ -114,20 +115,25 @@ write.csv(umap_embeddings, file = paste0(output_dir, "/raw_umap_embeddings.csv")
 
 ```{r save-normalized-counts}
 cat("Saving normalized counts...\n")
-normalized_counts <- seurat_obj[["RNA"]]@layers[["data"]] # Sparse matrix
+normalized_counts <- seurat_obj@assays$RNA@data # Sparse matrix
 
-gene_names <- dimnames(seurat_obj[["RNA"]]@features)[[1]]
-cell_names <- dimnames(seurat_obj[["RNA"]]@cells)[[1]]
+# Convert sparse matrix to triplet format (long format)
+long_data <- summary(normalized_counts)
 
-triplet <- summary(normalized_counts)
-triplet$Gene <- gene_names[triplet$i]
-triplet$Cell <- cell_names[triplet$j]
+# Get row (gene) and column (cell) names
+long_data$Gene <- rownames(normalized_counts)[long_data$i]
+long_data$Cell <- colnames(normalized_counts)[long_data$j]
+long_data$Expression <- long_data$x
 
-long_data <- triplet %>%
-  select(Cell, Gene, Expression = x)
+# Keep only necessary columns
+long_data <- long_data[, c("Gene", "Cell", "Expression")]
 
+# Filter out zero values
 nonzero_data <- long_data[long_data$Expression > 0, ]
+
+# Convert to data.table for efficiency
 nonzero_data <- as.data.table(nonzero_data)
+# Save to CSV with index as the first column in a fast way
 fwrite(nonzero_data, file = paste0(output_dir, "/raw_normalized_counts.csv"), row.names = FALSE)
 ```
 
