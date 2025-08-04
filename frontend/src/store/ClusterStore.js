@@ -1,13 +1,13 @@
 import {create} from "zustand"
-import {getCellTypeList, getMarkerGenes, getCellCounts, getMainClusterInfo, getDEGsOfCluster,} from "../api/api.js";
+import {getClusterList, getMarkerGenes, getCellCounts, getMainClusterInfo, getDEGsOfCluster,} from "../api/api.js";
 import {toast} from "react-toastify";
 import {transformSplitFormatToArray} from "../utils/funcs.js";
 
 const useClusterStore = create((set, get) => ({
     // State
     mainCluster: "",
-    cellTypeList: [],
-    selectedCellTypes: [],
+    clusterList: [],
+    selectedClusters: [],
     cellCounts: null,
 
     markerGenes: null,
@@ -18,7 +18,7 @@ const useClusterStore = create((set, get) => ({
 
     // Actions
 
-    setSelectedCellTypes: (cellTypes) => set({selectedCellTypes: cellTypes}),
+    setSelectedClusters: (clusters) => set({selectedCluster: clusters}),
 
     setMainCluster: async (cluster) => await set({mainCluster: cluster}),
     getMainCluster: async () => await get().mainCluster,
@@ -47,22 +47,22 @@ const useClusterStore = create((set, get) => ({
         }
     },
 
-    fetchCellTypeList: async (dataset_id) => {
+    fetchClusterList: async (dataset_id) => {
         if (!dataset_id || dataset_id === "all") {
-            set({error: "fetchCellTypeList: No dataset selected"});
+            set({error: "fetchClusterList: No dataset selected"});
             return;
         }
         try {
             set({loading: true})
             // Mock API call - replace with actual API
-            const response = await getCellTypeList(dataset_id);
+            const response = await getClusterList(dataset_id);
             if (response.status === 200) {
                 const data = await response.data;
-                await set({cellTypeList: data, loading: false, error: null});
+                await set({clusterList: data, loading: false, error: null});
 
             } else {
-                const error_message = "Error fetching cell type list: " + response.message;
-                await set({cellTypeList: [], error: error_message, loading: false});
+                const error_message = "Error fetching cluster list: " + response.message;
+                await set({clusterList: [], error: error_message, loading: false});
                 toast.error(response.message);
             }
         } catch (error) {
@@ -126,23 +126,23 @@ const useClusterStore = create((set, get) => ({
         try {
             set({loading: true})
 
-            const selectedCellTypes = get().selectedCellTypes
+            const selectedCluster = get().selectedCluster
 
-            if (selectedCellTypes.length === 0) {
+            if (selectedCluster.length === 0) {
                 set({diffExpGenes: {}, loading: false});
                 return;
             }
 
-            for (var cellType of selectedCellTypes) {
-                if (!get().diffExpGenes[cellType]) {
-                    const response = await getDEGsOfCluster(dataset_id, cellType);
-                    set({diffExpGenes: {...get().diffExpGenes, [cellType]: response.data}});
+            for (var cluster of selectedCluster) {
+                if (!get().diffExpGenes[cluster]) {
+                    const response = await getDEGsOfCluster(dataset_id, cluster);
+                    set({diffExpGenes: {...get().diffExpGenes, [cluster]: response.data}});
                 }
             }
 
             // remove cell type item if it is not selected
             for (var key in get().diffExpGenes) {
-                if (!selectedCellTypes.includes(key)) {
+                if (!selectedCluster.includes(key)) {
                     delete get().diffExpGenes[key];
                 }
             }
@@ -172,8 +172,8 @@ const useClusterStore = create((set, get) => ({
             // const mockDiffExpGenes = {}
             //
             // // For each selected cell type
-            // selectedCellTypes.forEach((cellType) => {
-            //     mockDiffExpGenes[cellType] = {}
+            // selectedCluster.forEach((cluster) => {
+            //     mockDiffExpGenes[cluster] = {}
             //
             //     // For each comparison type
             //     comparisons.forEach((comparison) => {
@@ -252,7 +252,7 @@ const useClusterStore = create((set, get) => ({
             //         }
             //
             //         // Add the DEGs for this comparison to the cell type
-            //         mockDiffExpGenes[cellType][comparison] = degs
+            //         mockDiffExpGenes[cluster][comparison] = degs
             //     })
             // })
             //

@@ -5,7 +5,7 @@ import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 import {FormControl, InputLabel, Select, MenuItem} from "@mui/material"
 
-const BarPlot = ({cellCounts, selectedCellTypes}) => {
+const BarPlot = ({cellCounts, selectedClusters}) => {
     const plotRef = useRef(null)
     const [comparisonType, setComparisonType] = useState("conditions")
 
@@ -17,9 +17,9 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
 
     let ConditionSet = new Set()
     let SexSet = new Set()
-    for (const cellType in cellCounts) {
-        cellCounts[cellType].forEach((item) => ConditionSet.add(item.condition))
-        cellCounts[cellType].forEach((item) => SexSet.add(item.sex))
+    for (const cluster in cellCounts) {
+        cellCounts[cluster].forEach((item) => ConditionSet.add(item.condition))
+        cellCounts[cluster].forEach((item) => SexSet.add(item.sex))
     }
     ConditionSet = [...ConditionSet]
     SexSet = [...SexSet]
@@ -29,9 +29,9 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
 
         // Filter data based on selected cell types
         const filteredCounts = {}
-        selectedCellTypes.forEach((cellType) => {
-            if (cellCounts[cellType]) {
-                filteredCounts[cellType] = cellCounts[cellType]
+        selectedClusters.forEach((cluster) => {
+            if (cellCounts[cluster]) {
+                filteredCounts[cluster] = cellCounts[cluster]
             }
         })
 
@@ -45,11 +45,11 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     const y = []
 
                     // Collect data for all cell types for this condition
-                    Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                    Object.entries(filteredCounts).forEach(([cluster, data]) => {
                         const conditionData = data.filter((item) => item.condition === condition)
                         const count_sum = conditionData.reduce((sum, item) => sum + item.count, 0)
 
-                        x.push(cellType)
+                        x.push(cluster)
                         y.push(count_sum)
                     })
 
@@ -71,11 +71,11 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     const y = []
 
                     // Collect data for all cell types for this sex
-                    Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                    Object.entries(filteredCounts).forEach(([cluster, data]) => {
                         const sexData = data.filter((item) => item.sex === sex)
                         const count_sum = sexData.reduce((sum, item) => sum + item.count, 0)
 
-                        x.push(cellType)
+                        x.push(cluster)
                         y.push(count_sum)
                     })
 
@@ -99,11 +99,11 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                         const y = []
 
                         // Collect data for all cell types for this condition and sex
-                        Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                        Object.entries(filteredCounts).forEach(([cluster, data]) => {
                             const filteredData = data.filter((item) => item.condition === condition && item.sex === sex)
                             const count_sum = filteredData.reduce((sum, item) => sum + item.count, 0)
 
-                            x.push(cellType)
+                            x.push(cluster)
                             y.push(count_sum)
                         })
 
@@ -132,11 +132,11 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     const y = []
 
                     // Collect data for all cell types for this condition and first sex
-                    Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                    Object.entries(filteredCounts).forEach(([cluster, data]) => {
                         const filteredData = data.filter((item) => item.condition === condition && item.sex === SexSet[0])
                         const count_sum = filteredData.reduce((sum, item) => sum + item.count, 0)
 
-                        x.push(cellType)
+                        x.push(cluster)
                         y.push(count_sum)
                     })
 
@@ -157,11 +157,11 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
                     const y = []
 
                     // Collect data for all cell types for this condition and second sex
-                    Object.entries(filteredCounts).forEach(([cellType, data]) => {
+                    Object.entries(filteredCounts).forEach(([cluster, data]) => {
                         const filteredData = data.filter((item) => item.condition === condition && item.sex === SexSet[1])
                         const count_sum = filteredData.reduce((sum, item) => sum + item.count, 0)
 
-                        x.push(cellType)
+                        x.push(cluster)
                         y.push(count_sum)
                     })
 
@@ -241,7 +241,7 @@ const BarPlot = ({cellCounts, selectedCellTypes}) => {
 
 BarPlot.propTypes = {
     cellCounts: PropTypes.object.isRequired,
-    selectedCellTypes: PropTypes.array.isRequired,
+    selectedClusters: PropTypes.array.isRequired,
 }
 
 export default BarPlot

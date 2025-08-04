@@ -57,13 +57,13 @@ export const getMainClusterInfo = async (dataset) => {
     }
 }
 
-export const getCellTypeList = async (dataset) => {
+export const getClusterList = async (dataset) => {
     try {
-        const response = await axios.get(`${API_URL}/getcelltypelist`,
+        const response = await axios.get(`${API_URL}/getclusterlist`,
             {params: {dataset:dataset}});
         return response;
     } catch (error) {
-        console.error("Error getCellTypeList:", error);
+        console.error("Error getClusterList:", error);
         throw error;
     }
 }

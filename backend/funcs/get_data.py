@@ -434,7 +434,7 @@ def get_config_info(dataset):
         return "Error: Config info file not found"
 
 
-def get_celltype_list(dataset):
+def get_cluster_list(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:

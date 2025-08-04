@@ -4,8 +4,8 @@ import {useEffect, useRef} from "react"
 import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
-const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected, mainCluster}) => {
-    // console.log("UMAPPlot", umapData, metaData, selectedCellTypes, isAllCellTypesSelected, mainCluster)
+const UMAPPlot = ({umapData, metaData, selectedClusters, isAllClustersSelected, mainCluster}) => {
+    // console.log("UMAPPlot", umapData, metaData, selectedClusters, isAllClustersSelected, mainCluster)
     const plotRef = useRef(null)
 
     const {cell_metadata, cell_metadata_mapping} = metaData
@@ -32,13 +32,13 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
 
         // cell type colors
         const cellTypeColors = {}
-        selectedCellTypes.forEach((cellType) => {
-            cellTypeColors[cellType] = colorPalette[selectedCellTypes.indexOf(cellType) % colorPalette.length]
+        selectedClusters.forEach((cellType) => {
+            cellTypeColors[cellType] = colorPalette[selectedClusters.indexOf(cellType) % colorPalette.length]
         })
 
         const traces = []
 
-        if (isAllCellTypesSelected) {
+        if (isAllClustersSelected) {
             // Group by cell type for coloring
             const cellTypeGroups = {}
 
@@ -77,7 +77,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
 
             umapData.forEach((point) => {
                 const cellType = updatedCellMetaData?.[point[0]]?.[mainCluster] ?? "Other"
-                const isSelected = selectedCellTypes.includes(cellType)
+                const isSelected = selectedClusters.includes(cellType)
 
                 x.push(point[1])
                 y.push(point[2])
@@ -101,7 +101,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             xaxis: {title: "UMAP_1", zeroline: true, showgrid: false, visible: false},
             yaxis: {title: "UMAP_2", zeroline: true, showgrid: false, visible: false},
             hovermode: "closest",
-            showlegend: isAllCellTypesSelected,
+            showlegend: isAllClustersSelected,
             legend: {x: 1, y: 0.5,},
             margin: {l: 50, r: 50, b: 50, t: 50, pad: 4,},
             autosize: true,
@@ -121,7 +121,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
                 Plotly.purge(plotRef.current)
             }
         }
-    }, [umapData, metaData, selectedCellTypes, isAllCellTypesSelected])
+    }, [umapData, metaData, selectedClusters, isAllClustersSelected])
 
     return <div ref={plotRef} style={{width: "100%", height: "100%"}}/>
 }
@@ -129,8 +129,8 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
 UMAPPlot.propTypes = {
     umapData: PropTypes.array.isRequired,
     metaData: PropTypes.object.isRequired,
-    selectedCellTypes: PropTypes.array.isRequired,
-    isAllCellTypesSelected: PropTypes.bool.isRequired,
+    selectedClusters: PropTypes.array.isRequired,
+    isAllClustersSelected: PropTypes.bool.isRequired,
     mainCluster: PropTypes.string.isRequired
 }
 

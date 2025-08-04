@@ -79,15 +79,15 @@ async def getmainclusterinfo(request: Request):
     return main_cluster
 
 
-@router.get("/getcelltypelist")
-async def getcelltypelist(request: Request):
-    print("getcelltypelist() called================")
+@router.get("/getclusterlist")
+async def getclusterlist(request: Request):
+    print("getclusterlist() called================")
     dataset_id = request.query_params.get("dataset")
 
-    response = get_celltype_list(dataset_id)
+    response = get_cluster_list(dataset_id)
     # print (response)
     if "Error" in response:
-        raise HTTPException(status_code=404, detail="Error in getting celltype list.")
+        raise HTTPException(status_code=404, detail="Error in getting cluster list.")
     return response
 
 

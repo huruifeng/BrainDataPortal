@@ -4,33 +4,33 @@ import {useEffect, useRef} from "react"
 import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 
-const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainCluster}) => {
-    // console.log("DotPlot2", markerGenes, selectedCellTypes, isAllCellTypesSelected, mainCluster)
+const DotPlot2 = ({markerGenes, selectedClusters, isAllClustersSelected, mainCluster}) => {
+    // console.log("DotPlot2", markerGenes, selectedClusters, isAllClustersSelected, mainCluster)
 
     const plotRef = useRef(null)
 
     useEffect(() => {
-        if (!markerGenes || !plotRef.current || selectedCellTypes.length === 0) return
+        if (!markerGenes || !plotRef.current || selectedClusters.length === 0) return
 
         // Get all unique cell types from the data
-        const allCellTypes = Array.from(new Set(markerGenes.map((gene) => gene[mainCluster]))).filter(Boolean)
+        const allClusters = Array.from(new Set(markerGenes.map((gene) => gene[mainCluster]))).filter(Boolean)
 
         // Filter genes for selected cell types (limit to 10 per cell type)
         let pooledGenes = []
 
-        selectedCellTypes.forEach((cellType) => {
+        selectedClusters.forEach((cluster) => {
             // Filter genes that are markers for this cell type
-            const cellTypeMarkers = markerGenes.filter((gene) => gene[mainCluster] === cellType && gene.is_marker)
+            const clusterMarkers = markerGenes.filter((gene) => gene[mainCluster] === cluster && gene.is_marker)
 
             // Sort by score or another metric if available, then take top 10
-            const topMarkers = cellTypeMarkers.sort((a, b) => (a.score || a.avg_expr) - (b.score || b.avg_expr)).slice(0, 10)
+            const topMarkers = clusterMarkers.sort((a, b) => (a.score || a.avg_expr) - (b.score || b.avg_expr)).slice(0, 10)
 
             // Add to pooled genes with source cell type
             pooledGenes = [
                 ...pooledGenes,
                 ...topMarkers.map((gene) => ({
                     ...gene,
-                    sourceCellType: cellType, // Track which cell type this gene came from
+                    sourceCluster: cluster, // Track which cell type this gene came from
                 })),
             ]
         })
@@ -49,14 +49,14 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
         uniqueGeneNames.forEach((geneName) => {
             // Find the source cell type for this gene (which cell type it's a marker for)
             const sourceGene = pooledGenes.find((gene) => gene.gene === geneName)
-            const sourceType = sourceGene ? sourceGene.sourceCellType : "Unknown"
+            const sourceType = sourceGene ? sourceGene.sourceCluster : "Unknown"
 
-            allCellTypes.forEach((cellType) => {
+            allClusters.forEach((cluster) => {
                 // Find the gene data for this cell type
-                const geneData = markerGenes.find((gene) => gene.gene === geneName && gene[mainCluster] === cellType)
+                const geneData = markerGenes.find((gene) => gene.gene === geneName && gene[mainCluster] === cluster)
 
                 if (geneData) {
-                    xValues.push(cellType)
+                    xValues.push(cluster)
                     yValues.push(geneName)
 
                     // Calculate percentage of cells expressing the gene
@@ -69,20 +69,20 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
 
                     textValues.push(
                         `Gene: ${geneName}<br>` +
-                        `Cell Type: ${cellType}<br>` +
+                        `Cell Type: ${cluster}<br>` +
                         `Avg Expression: ${geneData.avg_expr.toFixed(2)}<br>` +
                         `% Cells: ${(percentage * 100).toFixed(1)}%<br>` +
                         `Marker for: ${sourceType}`,
                     )
                 } else {
                     // If no data for this gene in this cell type, add placeholder with zero values
-                    xValues.push(cellType)
+                    xValues.push(cluster)
                     yValues.push(geneName)
                     sizeValues.push(0)
                     colorValues.push(0)
                     textValues.push(
                         `Gene: ${geneName}<br>` +
-                        `Cell Type: ${cellType}<br>` +
+                        `Cell Type: ${cluster}<br>` +
                         `Avg Expression: 0<br>` +
                         `% Cells: 0%<br>` +
                         `Marker for: ${sourceType}`,
@@ -115,7 +115,7 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
                     ticktext: ["0", "2", "4", "6+"],
                     // Position the colorbar below the vertical center line
                     y: 0.85,
-                    len: 1 / (selectedCellTypes.length + 1),
+                    len: 1 / (selectedClusters.length + 1),
                     yanchor: "top",
                 },
                 opacity: 0.8,
@@ -130,9 +130,9 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
         const sizeLegendSizes = [20]
         const legendTraces = []
 
-        const bubbleSpacing = 0.12 / selectedCellTypes.length;
+        const bubbleSpacing = 0.12 / selectedClusters.length;
         const firstDotY = 0.7;
-        const titleOffset = 0.12 / selectedCellTypes.length; // fixed distance above first dot
+        const titleOffset = 0.12 / selectedClusters.length; // fixed distance above first dot
 
 
         // Create a separate trace for each legend dot
@@ -176,7 +176,7 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
         })
 
         const layout = {
-            title: {text: `Dot Plot (${uniqueGeneNames.length} genes across ${allCellTypes.length} clusters)`},
+            title: {text: `Dot Plot (${uniqueGeneNames.length} genes across ${allClusters.length} clusters)`},
             grid: {
                 rows: 1,
                 columns: 2,
@@ -243,15 +243,15 @@ const DotPlot2 = ({markerGenes, selectedCellTypes, isAllCellTypesSelected, mainC
                 Plotly.purge(plotRef.current)
             }
         }
-    }, [markerGenes, selectedCellTypes, isAllCellTypesSelected])
+    }, [markerGenes, selectedClusters, isAllClustersSelected])
 
     return <div ref={plotRef} style={{width: "100%", height: "100%", minHeight: "400px"}}/>
 }
 
 DotPlot2.propTypes = {
     markerGenes: PropTypes.array.isRequired,
-    selectedCellTypes: PropTypes.array.isRequired,
-    isAllCellTypesSelected: PropTypes.bool.isRequired,
+    selectedClusters: PropTypes.array.isRequired,
+    isAllClustersSelected: PropTypes.bool.isRequired,
     mainCluster: PropTypes.string.isRequired
 }
 

@@ -29,7 +29,7 @@ import "./ClustersView.css"
 function ClustersView() {
     // Get all the pre-selected values
     const [queryParams, setQueryParams] = useSearchParams()
-    const initialCellTypes = queryParams.getAll("celltype")
+    const initialClusters = queryParams.getAll("cluster") || []
     const initialDataset = queryParams.get("dataset") ?? ""
 
     const [selectedDataset, setSelectedDataset] = useState(initialDataset)
@@ -39,13 +39,13 @@ function ClustersView() {
     // Prepare all the data
     const {setDataset, umapData, fetchUMAPData, selectedMetaData, fetchSelectedMetaData} = useSampleGeneMetaStore()
 
-    const {selectedCellTypes, setSelectedCellTypes} = useClusterStore()
-    const {cellTypeList, fetchCellTypeList, markerGenes, fetchMarkerGenes} = useClusterStore()
+    const {selectedClusters, setSelectedClusters} = useClusterStore()
+    const {clusterList, fetchClusterList, markerGenes, fetchMarkerGenes} = useClusterStore()
     const {cellCounts, fetchCellCounts, diffExpGenes, fetchDiffExpGenes} = useClusterStore()
     const {fetchMainClusterInfo,mainCluster, getMainCluster } = useClusterStore()
     const {loading, error,metadataLoading } = useClusterStore()
 
-    const [cellTypeSearchText, setCellTypeSearchText] = useState("")
+    const [clusterSearchText, setClusterSearchText] = useState("")
     const [datasetSearchText, setDatasetSearchText] = useState("")
 
     useEffect(() => {
@@ -61,7 +61,7 @@ function ClustersView() {
             const mainCluster = await getMainCluster()
             await fetchUMAPData(selectedDataset)
             await fetchSelectedMetaData(selectedDataset, [mainCluster])
-            await fetchCellTypeList(selectedDataset)
+            await fetchClusterList(selectedDataset)
         }
 
         fetchPrimaryData()
@@ -73,12 +73,12 @@ function ClustersView() {
         .map((d) => d.dataset_id);
 
     useEffect(() => {
-        const initialSelectedCellTypes = initialCellTypes.length ? initialCellTypes : []
+        const initialSelectedClusters = initialClusters.length ? initialClusters : []
 
         setDataset(selectedDataset)
 
         useClusterStore.setState({
-            selectedCellTypes: initialSelectedCellTypes,
+            selectedClusters: initialSelectedClusters,
         })
 
         fetchMarkerGenes(selectedDataset) // Fetch marker genes for selected cell types
@@ -87,10 +87,10 @@ function ClustersView() {
     }, [selectedDataset])
 
     /** Updates the query parameters in the URL */
-    const updateQueryParams = (cellTypes, dataset) => {
+    const updateQueryParams = (clusters, dataset) => {
         const newParams = new URLSearchParams()
         dataset && newParams.set("dataset", dataset)
-        cellTypes.forEach((cellType) => newParams.append("celltype", cellType))
+        clusters.forEach((cluster) => newParams.append("cluster", cluster))
         setQueryParams(newParams)
     }
 
@@ -98,21 +98,21 @@ function ClustersView() {
     const handleDatasetChange = (event, newValue) => {
         setDataset(newValue)
         setSelectedDataset(newValue)
-        updateQueryParams(selectedCellTypes, newValue)
+        updateQueryParams(selectedClusters, newValue)
     }
 
     /** Handles cell type selection change */
-    const handleCellTypeChange = (event, newValue) => {
-        setSelectedCellTypes(newValue)
+    const handleClusterChange = (event, newValue) => {
+        setSelectedClusters(newValue)
         updateQueryParams(newValue, selectedDataset)
         fetchMarkerGenes(selectedDataset)
         fetchDiffExpGenes(selectedDataset)
     }
 
-    const handleCellTypeDelete = (delCellType) => {
-        const newCellTypes = selectedCellTypes.filter((ct) => ct !== delCellType)
-        setSelectedCellTypes(newCellTypes)
-        updateQueryParams(newCellTypes, selectedDataset)
+    const handleClusterDelete = (delCluster) => {
+        const newClusters = selectedClusters.filter((ct) => ct !== delCluster)
+        setSelectedClusters(newClusters)
+        updateQueryParams(newClusters, selectedDataset)
         fetchMarkerGenes(selectedDataset)
         fetchDiffExpGenes(selectedDataset)
     }
@@ -125,7 +125,7 @@ function ClustersView() {
         fetchDiffExpGenes(selectedDataset)
     }
 
-    const isAllCellTypesSelected = selectedCellTypes.includes("all")
+    const isAllClustersSelected = selectedClusters.includes("all")
 
     return (
         <div className="plot-page-container">
@@ -148,8 +148,7 @@ function ClustersView() {
                         inputValue={datasetSearchText}
                         onInputChange={(event, newInputValue) => setDatasetSearchText(newInputValue)}
                         renderInput={(params) => (
-                            <TextField {...params} label="Select Dataset" variant="standard"
-                                       style={{margin: "10px 0px"}}/>
+                            <TextField {...params} label="Select Dataset" variant="standard" style={{margin: "10px 0px"}}/>
                         )}
                     />
 
@@ -157,12 +156,12 @@ function ClustersView() {
                     <Autocomplete
                         multiple
                         size="small"
-                        options={cellTypeList}
-                        value={selectedCellTypes}
-                        onChange={handleCellTypeChange}
-                        inputValue={cellTypeSearchText}
+                        options={clusterList}
+                        value={selectedClusters}
+                        onChange={handleClusterChange}
+                        inputValue={clusterSearchText}
                         onInputChange={(event, newInputValue) => {
-                            setCellTypeSearchText(newInputValue)
+                            setClusterSearchText(newInputValue)
                         }}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => {
@@ -173,7 +172,7 @@ function ClustersView() {
                                         label={option}
                                         {...tagProps}
                                         color="primary"
-                                        onDelete={() => handleCellTypeDelete(option)}
+                                        onDelete={() => handleClusterDelete(option)}
                                     />
                                 )
                             })
@@ -222,8 +221,8 @@ function ClustersView() {
                                                 <UMAPPlot
                                                     umapData={umapData}
                                                     metaData={selectedMetaData}
-                                                    selectedCellTypes={selectedCellTypes}
-                                                    isAllCellTypesSelected={isAllCellTypesSelected}
+                                                    selectedClusters={selectedClusters}
+                                                    isAllClustersSelected={isAllClustersSelected}
                                                     mainCluster={mainCluster}
                                                 />
                                             )}
@@ -238,8 +237,8 @@ function ClustersView() {
                                     {markerGenes && (
                                         <DotPlot2
                                             markerGenes={markerGenes}
-                                            selectedCellTypes={selectedCellTypes}
-                                            isAllCellTypesSelected={isAllCellTypesSelected}
+                                            selectedClusters={selectedClusters}
+                                            isAllClustersSelected={isAllClustersSelected}
                                             mainCluster={mainCluster}
                                         />
                                     )}
@@ -250,13 +249,13 @@ function ClustersView() {
                                 <Divider sx={{marginTop: "10px"}} flexItem>Cell Counts & Differential Expression</Divider>
                                 <Grid container spacing={2} className="bottom-plots-container">
                                     <Grid item xs={12} md={6}>
-                                        {cellCounts && selectedCellTypes.length > 0 && (
-                                            <BarPlot cellCounts={cellCounts} selectedCellTypes={selectedCellTypes}/>)
+                                        {cellCounts && selectedClusters.length > 0 && (
+                                            <BarPlot cellCounts={cellCounts} selectedClusters={selectedClusters}/>)
                                         }
                                     </Grid>
                                     <Grid item xs={12} md={6}>
-                                        {diffExpGenes && selectedCellTypes.length > 0 && (
-                                            <HeatmapPlot2 diffExpGenes={diffExpGenes} selectedCellTypes={selectedCellTypes}/>
+                                        {diffExpGenes && selectedClusters.length > 0 && (
+                                            <HeatmapPlot2 diffExpGenes={diffExpGenes} selectedClusters={selectedClusters}/>
                                         )}
                                     </Grid>
                                 </Grid>

@@ -5,25 +5,25 @@ import PropTypes from "prop-types"
 import Plotly from "plotly.js-dist-min"
 import {FormControl, InputLabel, Select, MenuItem} from "@mui/material"
 
-const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
-    console.log("diffExpGenes: ", diffExpGenes, selectedCellTypes)
+const HeatmapPlot2 = ({diffExpGenes, selectedClusters}) => {
+    console.log("diffExpGenes: ", diffExpGenes, selectedClusters)
 
     const plotRef = useRef(null)
-    const [selectedCellType, setSelectedCellType] = useState("")
+    const [selectedCluster, setSelectedCluster] = useState("")
     const [compareList, setCompareList] = useState([]) // List of available comparisons
     const [selectedCompare, setSelectedCompare] = useState("") // Selected comparison
 
-    // Update cell type when selectedCellTypes changes
+    // Update cell type when selectedClusters changes
     useEffect(() => {
-        if (selectedCellTypes.length > 0 && !selectedCellType) {
-            setSelectedCellType(selectedCellTypes[0])
+        if (selectedClusters.length > 0 && !selectedCluster) {
+            setSelectedCluster(selectedClusters[0])
         }
-    }, [selectedCellTypes, selectedCellType])
+    }, [selectedClusters, selectedCluster])
 
-    // Update compare list when selectedCellType changes
+    // Update compare list when selectedCluster changes
     useEffect(() => {
-        if (selectedCellType && diffExpGenes && diffExpGenes[selectedCellType]) {
-            const availableCompares = Object.keys(diffExpGenes[selectedCellType])
+        if (selectedCluster && diffExpGenes && diffExpGenes[selectedCluster]) {
+            const availableCompares = Object.keys(diffExpGenes[selectedCluster])
             setCompareList(availableCompares)
 
             // Set the first comparison as default if none is selected
@@ -31,14 +31,14 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
                 setSelectedCompare(availableCompares[0])
             }
         }
-    }, [selectedCellType, diffExpGenes, selectedCompare])
+    }, [selectedCluster, diffExpGenes, selectedCompare])
 
-    // Update the plot when selectedCellType or selectedCompare changes
+    // Update the plot when selectedCluster or selectedCompare changes
     useEffect(() => {
-        if (!diffExpGenes || !plotRef.current || !selectedCellType || !selectedCompare) return
-        if (!diffExpGenes[selectedCellType] || !diffExpGenes[selectedCellType][selectedCompare]) return
+        if (!diffExpGenes || !plotRef.current || !selectedCluster || !selectedCompare) return
+        if (!diffExpGenes[selectedCluster] || !diffExpGenes[selectedCluster][selectedCompare]) return
 
-        const cellTypeData = diffExpGenes[selectedCellType][selectedCompare]
+        const clusterData = diffExpGenes[selectedCluster][selectedCompare]
 
         // Extract conditions from the comparison string (format: "Cond1vsCond2")
         const compareMatch = selectedCompare.match(/(.+)vs(.+)/)
@@ -46,12 +46,12 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
         const condition2 = compareMatch ? compareMatch[2] : "Condition2"
 
         // Get top 10 up and top 10 down genes
-        const upGenes = cellTypeData
+        const upGenes = clusterData
         .filter((gene) => gene.avg_log2FC > 0)
         .sort((a, b) => b.avg_log2FC - a.avg_log2FC)
         .slice(0, 10)
 
-        const downGenes = cellTypeData
+        const downGenes = clusterData
         .filter((gene) => gene.avg_log2FC < 0)
         .sort((a, b) => a.avg_log2FC - b.avg_log2FC)
         .slice(0, 10)
@@ -65,7 +65,7 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
                 plotRef.current,
                 [],
                 {
-                    title: `No differentially expressed genes found for ${selectedCellType} (${selectedCompare})`,
+                    title: `No differentially expressed genes found for ${selectedCluster} (${selectedCompare})`,
                 },
                 {
                     responsive: true,
@@ -235,7 +235,7 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
         })
 
         const layout = {
-            // title: {text: `Differentially Expressed Genes: ${selectedCellType} (${selectedCompare})`},
+            // title: {text: `Differentially Expressed Genes: ${selectedCluster} (${selectedCompare})`},
             grid: {
                 rows: 1,
                 columns: 2,
@@ -285,10 +285,10 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
                 Plotly.purge(plotRef.current)
             }
         }
-    }, [diffExpGenes, selectedCellType, selectedCompare])
+    }, [diffExpGenes, selectedCluster, selectedCompare])
 
-    const handleCellTypeChange = (event) => {
-        setSelectedCellType(event.target.value)
+    const handleClusterChange = (event) => {
+        setSelectedCluster(event.target.value)
         // Reset the selected comparison when cell type changes
         setSelectedCompare("")
     }
@@ -305,13 +305,13 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
                     <Select
                         labelId="cell-type-label"
                         id="cell-type-select"
-                        value={selectedCellType}
-                        onChange={handleCellTypeChange}
+                        value={selectedCluster}
+                        onChange={handleClusterChange}
                         size="small"
                     >
-                        {selectedCellTypes.map((cellType) => (
-                            <MenuItem key={cellType} value={cellType}>
-                                {cellType}
+                        {selectedClusters.map((cluster) => (
+                            <MenuItem key={cluster} value={cluster}>
+                                {cluster}
                             </MenuItem>
                         ))}
                     </Select>
@@ -366,7 +366,7 @@ const HeatmapPlot2 = ({diffExpGenes, selectedCellTypes}) => {
 
 HeatmapPlot2.propTypes = {
     diffExpGenes: PropTypes.object.isRequired,
-    selectedCellTypes: PropTypes.array.isRequired,
+    selectedClusters: PropTypes.array.isRequired,
 }
 
 export default HeatmapPlot2
