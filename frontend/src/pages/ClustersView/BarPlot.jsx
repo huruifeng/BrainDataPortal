@@ -214,7 +214,7 @@ const BarPlot = ({cellCounts, selectedClusters}) => {
                 Plotly.purge(plotRef.current)
             }
         }
-    }, [cellCounts, selectedCellTypes, comparisonType])
+    }, [cellCounts, selectedClusters, comparisonType])
 
     return (
         <div style={{minHeight: "450px"}}>

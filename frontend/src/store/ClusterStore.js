@@ -18,7 +18,7 @@ const useClusterStore = create((set, get) => ({
 
     // Actions
 
-    setSelectedClusters: (clusters) => set({selectedCluster: clusters}),
+    setSelectedClusters: (clusters) => set({selectedClusters: clusters}),
 
     setMainCluster: async (cluster) => await set({mainCluster: cluster}),
     getMainCluster: async () => await get().mainCluster,
