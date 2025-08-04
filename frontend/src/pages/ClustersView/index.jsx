@@ -67,7 +67,10 @@ function ClustersView() {
         fetchPrimaryData()
     }, [selectedDataset])
 
-    const datasetOptions = datasetRecords.map((d) => d.dataset_id)
+    // Filter qtl datasets
+    const datasetOptions = datasetRecords
+        .filter((d) => !d.assay.toLowerCase().endsWith("qtl"))
+        .map((d) => d.dataset_id);
 
     useEffect(() => {
         const initialSelectedCellTypes = initialCellTypes.length ? initialCellTypes : []
@@ -128,13 +131,13 @@ function ClustersView() {
         <div className="plot-page-container">
             {/* Title Row */}
             <Box className="title-row">
-                <Typography variant="h6">Cell Type Analysis</Typography>
+                <Typography variant="h6">Cluster Analysis</Typography>
             </Box>
             <Divider/>
             <div className="plot-content">
                 {/* Left Panel for Dataset & Cell Type Selection (25%) */}
                 <div className="plot-panel">
-                    <Typography variant="subtitle1">Select Datasets & Cell Types</Typography>
+                    <Typography variant="subtitle1">Select Datasets & Clusters</Typography>
 
                     {/* Dataset Selection */}
                     <Autocomplete

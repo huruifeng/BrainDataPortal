@@ -30,7 +30,7 @@ export default function HomePage() {
             title: "Cluster View",
             description: "Visualize and compare different clusters (cell types, layers, etc.), their markers, and distribution across samples.",
             icon: <FontAwesomeIcon icon={faHexagonNodes} style={{color: "#3b82f6"}} size={"3x"} />,
-            href: "clusterview",
+            href: "clusters",
         },
         // {
         //     title: "Layer View",
