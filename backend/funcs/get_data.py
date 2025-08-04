@@ -553,7 +553,7 @@ def get_degs_celllevel(dataset, celltype):
         return "Error: DEGs file not found"
 
 
-def get_degs_pseudobulk(dataset, celltype):
+def get_degs_pseudobulk(dataset, cluster):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
@@ -562,14 +562,14 @@ def get_degs_pseudobulk(dataset, celltype):
             "datasets",
             dataset,
             "clustermarkers",
-            "cluster_pseudobulk_DEGs_topN.csv",
+            "cluster_pb_DEGs_topN.csv",
         )
 
     data = {}
     if os.path.exists(degs_file):
         degs_df = pd.read_csv(degs_file, index_col=None, header=0)
         degs_df = degs_df.loc[
-            degs_df["cluster_DE"].str.startswith(celltype),
+            degs_df["cluster_DE"].str.startswith(cluster),
             ["cluster_DE", "gene", "avg_log2FC", "p_val_adj"],
         ]
 
@@ -577,7 +577,7 @@ def get_degs_pseudobulk(dataset, celltype):
         degs_df["avg_log2FC"] = degs_df["avg_log2FC"].round(4)
         degs_df["p_val_adj"] = degs_df["p_val_adj"].round(4)
 
-        ## split cluster_DE into CellType and DE
+        ## split cluster_DE into cluster and DE
         # degs_df["cluster_DE"] = degs_df["cluster_DE"].astype(str)
         # degs_df["cluster"] = [i.split(".")[0] for i in degs_df["cluster_DE"].tolist()]
         degs_df["DE"] = [i.split(".")[1] for i in degs_df["cluster_DE"].tolist()]
@@ -608,13 +608,13 @@ def get_degs_pseudobulk(dataset, celltype):
                 "datasets",
                 dataset,
                 "clustermarkers",
-                "pb_expr_matrix_topN_DEGs.csv",
+                "pb_expr_matrix_DEGs_topN.csv",
             ),
             index_col=0,
             header=0,
         )
-        escaped_celltype = re.escape(celltype)
-        pattern = rf"{escaped_celltype}"
+        escaped_cluster = re.escape(cluster)
+        pattern = rf"{escaped_cluster}"
 
         for DE, degs in degs_groups.items():
             for deg in degs:

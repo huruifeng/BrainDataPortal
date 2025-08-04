@@ -1,9 +1,9 @@
 import {create} from "zustand"
-import {getCellTypeList, getMarkerGenes, getCellCounts, getMainClusterInfo, getDEGsOfCellType,} from "../api/api.js";
+import {getCellTypeList, getMarkerGenes, getCellCounts, getMainClusterInfo, getDEGsOfCluster,} from "../api/api.js";
 import {toast} from "react-toastify";
 import {transformSplitFormatToArray} from "../utils/funcs.js";
 
-const useCellTypeStore = create((set, get) => ({
+const useClusterStore = create((set, get) => ({
     // State
     mainCluster: "",
     cellTypeList: [],
@@ -135,7 +135,7 @@ const useCellTypeStore = create((set, get) => ({
 
             for (var cellType of selectedCellTypes) {
                 if (!get().diffExpGenes[cellType]) {
-                    const response = await getDEGsOfCellType(dataset_id, cellType);
+                    const response = await getDEGsOfCluster(dataset_id, cellType);
                     set({diffExpGenes: {...get().diffExpGenes, [cellType]: response.data}});
                 }
             }
@@ -264,5 +264,5 @@ const useCellTypeStore = create((set, get) => ({
     },
 }))
 
-export default useCellTypeStore
+export default useClusterStore
 

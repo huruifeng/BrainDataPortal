@@ -8,7 +8,7 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
     // console.log("UMAPPlot", umapData, metaData, selectedCellTypes, isAllCellTypesSelected, mainCluster)
     const plotRef = useRef(null)
 
-    const {cell_metadata, sample_metadata, cell_metadata_mapping} = metaData
+    const {cell_metadata, cell_metadata_mapping} = metaData
     const updatedCellMetaData = Object.fromEntries(
         Object.entries(cell_metadata??{}).map(([cs_id, csObj]) => {
             const newSubObj = {...csObj};  // shallow copy of inner object
@@ -105,8 +105,8 @@ const UMAPPlot = ({umapData, metaData, selectedCellTypes, isAllCellTypesSelected
             legend: {x: 1, y: 0.5,},
             margin: {l: 50, r: 50, b: 50, t: 50, pad: 4,},
             autosize: true,
-            plot_bgcolor: "rgba(0,0,0,0)",
-            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgb(245,245,245)",
+            paper_bgcolor: "rgb(245,245,245)",
         }
 
         Plotly.newPlot(plotRef.current, traces, layout, {

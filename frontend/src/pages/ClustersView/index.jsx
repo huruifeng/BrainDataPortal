@@ -15,7 +15,7 @@ import {
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
 import {useSearchParams} from "react-router-dom"
 
-import useCellTypeStore from "../../store/CellTypeStore.js"
+import useClusterStore from "../../store/ClusterStore.js"
 import useSampleGeneMetaStore from "../../store/SampleGeneMetaStore.js"
 import useDataStore from "../../store/DatatableStore.js"
 
@@ -39,11 +39,11 @@ function ClustersView() {
     // Prepare all the data
     const {setDataset, umapData, fetchUMAPData, selectedMetaData, fetchSelectedMetaData} = useSampleGeneMetaStore()
 
-    const {selectedCellTypes, setSelectedCellTypes} = useCellTypeStore()
-    const {cellTypeList, fetchCellTypeList, markerGenes, fetchMarkerGenes} = useCellTypeStore()
-    const {cellCounts, fetchCellCounts, diffExpGenes, fetchDiffExpGenes} = useCellTypeStore()
-    const {fetchMainClusterInfo,mainCluster, getMainCluster } = useCellTypeStore()
-    const {loading, error,metadataLoading } = useCellTypeStore()
+    const {selectedCellTypes, setSelectedCellTypes} = useClusterStore()
+    const {cellTypeList, fetchCellTypeList, markerGenes, fetchMarkerGenes} = useClusterStore()
+    const {cellCounts, fetchCellCounts, diffExpGenes, fetchDiffExpGenes} = useClusterStore()
+    const {fetchMainClusterInfo,mainCluster, getMainCluster } = useClusterStore()
+    const {loading, error,metadataLoading } = useClusterStore()
 
     const [cellTypeSearchText, setCellTypeSearchText] = useState("")
     const [datasetSearchText, setDatasetSearchText] = useState("")
@@ -77,7 +77,7 @@ function ClustersView() {
 
         setDataset(selectedDataset)
 
-        useCellTypeStore.setState({
+        useClusterStore.setState({
             selectedCellTypes: initialSelectedCellTypes,
         })
 
