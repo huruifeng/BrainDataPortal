@@ -14,7 +14,7 @@ const StatBar = ({disease, homeData}) => {
         {icon: <Description/>, value: homeData?.[disease]["n_samples"], label: "Samples", link: "/samples/all"},
         {icon: <Images/>, value: homeData?.[disease]["n_visiumst"], label: "Slices", link: "/views/visiumview"},
         {icon: <Dna/>, value: "> 30,000", label: "Genes", link: "/views/geneview"},
-        {icon: <DnaOff/>, value: "> 400,000", label: "Mutations", link: "/views/regionsview"},
+        {icon: <DnaOff/>, value: "> 400,000", label: "Mutations", link: "/views/xqtlview"},
     ];
 
     return (
