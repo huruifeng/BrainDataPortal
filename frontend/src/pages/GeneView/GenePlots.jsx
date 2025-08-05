@@ -168,13 +168,13 @@ const GeneMetaPlots = ({
                         onChange={() => setIncludeZeros(prev => !prev)}
                         color="primary"
                     />
-                    <Typography>Include Zeros</Typography>
+                    <Typography>With Zeros</Typography>
                     <div>&nbsp;&nbsp;</div>
                     <button onClick={handleDownload} className="download-button">
                         Download CSV
                     </button>
                     <div>&nbsp;&nbsp;</div>
-                    { isCat && (<button onClick={() => handleDownloadPDF(isCat)} className="download-button">Export image</button>)}
+                    { isCat && (<button onClick={() => handleDownloadPDF(isCat)} className="download-button">Export SVG</button>)}
 
                 </Stack>
             </div>

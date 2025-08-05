@@ -21,6 +21,7 @@ import {useSearchParams} from "react-router-dom"
 import useSampleGeneMetaStore from "../../store/SampleGeneMetaStore.js"
 
 import EChartScatterPlot from "./EChartScatter.jsx"
+import PlotlyScatterPlot from "./PlotlyScatter.jsx";
 import GeneMetaPlots from "./GenePlots.jsx"
 
 import "./GeneView.css"
@@ -385,8 +386,21 @@ function GeneView() {
                                 {Object.entries(exprDataDict).map(([gene, expr_data]) => (
                                     <div key={gene} className="umap-item">
                                         <div className="umap-wrapper">
-                                            {(umapData && allCellMetaData) && (
-                                                <EChartScatterPlot
+                                            {/*{(umapData && allCellMetaData) && (*/}
+                                            {/*    <EChartScatterPlot*/}
+                                            {/*        gene={gene}*/}
+                                            {/*        sampleList={selectedSamples}*/}
+                                            {/*        umapData={umapData}*/}
+                                            {/*        exprData={expr_data}*/}
+                                            {/*        cellMetaData={allCellMetaData ?? {}}*/}
+                                            {/*        CellMetaMap={CellMetaMap ?? {}}*/}
+                                            {/*        sampleMetaData={allSampleMetaData ?? {}}*/}
+                                            {/*        group={coloring}*/}
+                                            {/*        isMetaDataLoading={metadataLoading}*/}
+                                            {/*    />*/}
+                                            {/*)}*/}
+                                            {umapData &&
+                                                <PlotlyScatterPlot
                                                     gene={gene}
                                                     sampleList={selectedSamples}
                                                     umapData={umapData}
@@ -396,9 +410,7 @@ function GeneView() {
                                                     sampleMetaData={allSampleMetaData ?? {}}
                                                     group={coloring}
                                                     isMetaDataLoading={metadataLoading}
-                                                />
-                                            )}
-                                            {/*{umapData && <PlotlyScatterPlot gene={gene} sampleList={selectedSamples} umapData={umapData} exprData={expr_data} cellMetaData={allCellMetaData} group={coloring}/>}*/}
+                                                />}
                                         </div>
                                     </div>
                                 ))}
@@ -426,25 +438,30 @@ function GeneView() {
                         <div className={`umap-container single-plot`}>
                             <div key={"all_gene"} className="umap-item">
                                 <div className="umap-wrapper">
-                                    {umapData && (
-                                        <EChartScatterPlot
-                                            gene={"all"}
-                                            sampleList={selectedSamples}
-                                            umapData={umapData}
-                                            exprData={{all: "all"}}
-                                            cellMetaData={allCellMetaData ?? {}}
-                                            CellMetaMap={CellMetaMap ?? {}}
-                                            sampleMetaData={allSampleMetaData ?? {}}
-                                            group={coloring}
-                                            isMetaDataLoading={metadataLoading}
-                                        />
-                                    )}
+                                    {/*{umapData && (*/}
+                                    {/*    <EChartScatterPlot*/}
+                                    {/*        gene={"all"}*/}
+                                    {/*        sampleList={selectedSamples}*/}
+                                    {/*        umapData={umapData}*/}
+                                    {/*        exprData={{all: "all"}}*/}
+                                    {/*        cellMetaData={allCellMetaData ?? {}}*/}
+                                    {/*        CellMetaMap={CellMetaMap ?? {}}*/}
+                                    {/*        sampleMetaData={allSampleMetaData ?? {}}*/}
+                                    {/*        group={coloring}*/}
+                                    {/*        isMetaDataLoading={metadataLoading}*/}
+                                    {/*    />*/}
+                                    {/*)}*/}
 
-                                    {/*{umapData && <PlotlyScatterPlot gene={"all"}*/}
-                                    {/*                                sampleList={selectedSamples}*/}
-                                    {/*                                umapData={umapData} exprData={{"all": "all"}}*/}
-                                    {/*                                cellMetaData={allCellMetaData ?? {}}*/}
-                                    {/*                                group={coloring}/>}*/}
+                                    {umapData && <PlotlyScatterPlot gene={"all"}
+                                                                    sampleList={selectedSamples}
+                                                                    umapData={umapData}
+                                                                    exprData={{"all": "all"}}
+                                                                    cellMetaData={allCellMetaData ?? {}}
+                                                                    CellMetaMap={CellMetaMap ?? {}}
+                                                                    sampleMetaData={allSampleMetaData ?? {}}
+                                                                    group={coloring}
+                                                                    isMetaDataLoading={metadataLoading}
+                                    />}
                                 </div>
                             </div>
                         </div>
