@@ -84,8 +84,8 @@ const PlotlyScatterPlot = ({
                 opacity: 0.8,
             },
             hoverinfo: 'text',
-            hovertext: plotData?.map((item, index) =>
-                `Sample: ${item.cs_id} - ${group_i ? `${group_i}` : ''}`
+            hovertext: plotData?.map((item) =>
+                `Sample: ${item.cs_id}${group_i ? ` - ${group_i}` : ''}`
             )
         }));
         return traces;
@@ -103,16 +103,15 @@ const PlotlyScatterPlot = ({
                 colorbar: {
                     // title: gene ? `${gene} Expression` : group,
                     titleside: 'right',
-                    len: 0.3
+                    len: 0.5,
+                    thickness: 10
                 },
                 size: 3,
                 opacity: 0.8
             },
             hoverinfo: 'text',
-            hovertext: plotData?.map((item, index) =>
-                `Sample: ${item.cs_id}<br>
-                ${gene !== "all" ? `${gene} Expr: ${colorValues[index].toFixed(2)}` : ''}
-                ${group ? `${group}: ${item[group]}` : ''}`
+            hovertext: plotData?.map((p, index) =>
+                `Sample: ${p.cs_id}<br>${gene !== "all" ? `${gene} Expr: ${colorValues[index].toFixed(2)}` : ''}<br>${group ? `${group}: ${p[group]}` : ''}`
             )
         }];
         return traces
@@ -121,32 +120,31 @@ const PlotlyScatterPlot = ({
     let traces = [];
     let isCategoricalGroup = false;
     const cell_level_meta = Object.keys(CellMetaMap ?? {});
+    let updatedCellMetaData = {};
+    if (cell_level_meta.includes(group)) {
+        // Create a **new object** with changes
+        updatedCellMetaData = Object.fromEntries(
+            Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                const newSubObj = {...csObj};  // shallow copy of inner object
+                const targetValue = csObj[group];
+                newSubObj[group] = CellMetaMap[group][targetValue][0];
+                return [cs_id, newSubObj];
+            })
+        );
+    } else {
+        updatedCellMetaData = Object.fromEntries(
+            Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                const sample_id = cs_id.split(/_[cs]\d+$/)[0];
+                const newSubObj = {...csObj};  // shallow copy of inner object
+                newSubObj[group] = sampleMetaData[sample_id][group];
+                return [cs_id, newSubObj];
+            })
+        );
+    }
     if (gene === "all") {
         //===============================
         // In this case the expression data is not needed, just use the metaData
         //===============================
-
-        let updatedCellMetaData = {};
-        if (cell_level_meta.includes(group)) {
-            // Create a **new object** with changes
-            updatedCellMetaData = Object.fromEntries(
-                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                    const newSubObj = {...csObj};  // shallow copy of inner object
-                    const targetValue = csObj[group];
-                    newSubObj[group] = CellMetaMap[group][targetValue][0];
-                    return [cs_id, newSubObj];
-                })
-            );
-        } else {
-            updatedCellMetaData = Object.fromEntries(
-                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                    const sample_id = cs_id.split(/_[cs]\d+$/)[0];
-                    const newSubObj = {...csObj};  // shallow copy of inner object
-                    newSubObj[group] = sampleMetaData[sample_id][group];
-                    return [cs_id, newSubObj];
-                })
-            );
-        }
         const plotData = umapData.map(item => ({
             "x": item[1],
             "y": item[2],
@@ -169,6 +167,8 @@ const PlotlyScatterPlot = ({
             "x": item[1],
             "y": item[2],
             [gene]: exprData?.[item[0]] ?? 0, // Works for both objects and arrays, returns 0 for undefined/null values
+            [group]: updatedCellMetaData?.[item[0]]?.[group] ?? "Cell/Spot", // Works for both objects and arrays, returns 0 for undefined/null values
+            cs_id: item[0],
         })) || [];
         traces = createContinuousTraces(plotData, gene);
     }
