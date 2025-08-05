@@ -1,4 +1,5 @@
 import Plot from "react-plotly.js";
+import Plotly from "plotly.js-dist";
 import {isCategorical} from "../../utils/funcs.js";
 import PropTypes from "prop-types";
 import {groupBy} from "lodash";
@@ -33,7 +34,7 @@ const PlotlyScatterPlot = ({
                         opacity: 0.8,
                     },
                     hoverinfo: 'text',
-                    hovertext: plotData?.map((item, index) =>
+                    hovertext: plotData?.map((item) =>
                         `Sample: ${item.cs_id}`
                     )
                 }
@@ -152,7 +153,11 @@ const PlotlyScatterPlot = ({
             cs_id: item[0],
         })) || [];
         // console.log("plotData: ", plotData);
-        isCategoricalGroup = isCategorical(Object.values(updatedCellMetaData).map((p) => p[group]))
+        if (/(mmse|updrs)/i.test(group)) {
+            isCategoricalGroup = false
+        }else{
+            isCategoricalGroup = isCategorical(Object.values(updatedCellMetaData).map((p) => p[group]))
+        }
 
         if (isCategoricalGroup) {
             traces = createCategoryTraces(plotData, group);
@@ -217,6 +222,28 @@ const PlotlyScatterPlot = ({
             data={traces}
             layout={layout}
             style={{width: '100%', height: '100%'}}
+            config={{
+                displaylogo: false,
+                responsive: true,
+                doubleClick: false,
+                toImageButtonOptions: {
+                    name: "Save as SVG",
+                    format: 'svg', // one of png, svg, jpeg, webp
+                    filename: `UMAP.${gene}.${group}.${sampleList.join('_')}`,
+                    scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+                },
+                modeBarButtonsToAdd: [
+                    [
+                        {
+                            name: "Save as SVG",
+                            icon: Plotly.Icons.disk,
+                            click: function (gd) {
+                                Plotly.downloadImage(gd, {format: "svg", filename: `UMAP.${gene}.${group}.${sampleList.join('_')}`});
+                            },
+                        },
+                    ],
+                ],
+            }}
         />
     );
 };

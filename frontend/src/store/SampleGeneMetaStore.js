@@ -65,6 +65,12 @@ const useSampleGeneMetaStore = create((set, get) => ({
     },
 
     setSelectedSamples: async (samples) => {
+        if (samples.length > 1 && samples.includes("all")) {
+            samples = samples.filter(item => item !== "all");
+        }
+        if (samples.length === 0) {
+            samples = ["all"]
+        }
         set({selectedSamples: samples})
     },
 
@@ -185,9 +191,9 @@ const useSampleGeneMetaStore = create((set, get) => ({
                             {
                                 ...get().sampleMetaDict,
                                 [sample]: {
-                                    "cell_metadata":transformSplitFormat(response.data.cell_metadata),
-                                    "sample_metadata":response.data.sample_metadata,
-                                    "cell_metadata_mapping":response.data.cell_metadata_mapping
+                                    "cell_metadata": transformSplitFormat(response.data.cell_metadata),
+                                    "sample_metadata": response.data.sample_metadata,
+                                    "cell_metadata_mapping": response.data.cell_metadata_mapping
                                 }
                             }
                     })

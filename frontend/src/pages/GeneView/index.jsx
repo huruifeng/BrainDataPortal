@@ -82,7 +82,7 @@ function GeneView() {
             await fetchSampleList(datasetId)
             await fetchMetaList(datasetId)
             // 清空旧数据，并重新获取 exprData
-            useSampleGeneMetaStore.setState({ exprDataDict: {} }); // 先清空
+            useSampleGeneMetaStore.setState({exprDataDict: {}}); // 先清空
             await fetchExprData(datasetId);
             await fetchAllMetaData(datasetId);
             await fetchMainClusterInfo(datasetId);
@@ -105,13 +105,15 @@ function GeneView() {
     const [sampleSearchText, setSampleSearchText] = useState("")
 
     useEffect(() => {
-        const initialSelectedSamples = initialSamples.length ? initialSamples : []
+        const initialSelectedSamples = initialSamples.length ? initialSamples : ["all"]
         const initialSelectedGenes = initialGenes.length ? initialGenes : []
 
         setDataset(datasetId)
 
         useSampleGeneMetaStore.setState({
-            selectedSamples: initialSelectedSamples,
+            selectedSamples: initialSelectedSamples.length > 1 && initialSelectedSamples.includes("all")
+                ? initialSelectedSamples.filter(item => item !== "all")
+                : initialSelectedSamples,
             selectedGenes: initialSelectedGenes,
         })
     }, [])
@@ -150,6 +152,12 @@ function GeneView() {
 
     /** Handles sample selection change */
     const handleSampleChange = (event, newValue) => {
+        if (newValue.length > 1 && newValue.includes("all")) {
+            newValue = newValue.filter(item => item !== "all");
+        }
+        if (newValue.length === 0) {
+            newValue = ["all"]
+        }
         setSelectedSamples(newValue)
         updateQueryParams(datasetId, selectedGenes, newValue) // Pass the new value instead of old state
     }
