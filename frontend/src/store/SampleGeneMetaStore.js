@@ -68,9 +68,6 @@ const useSampleGeneMetaStore = create((set, get) => ({
         if (samples.length > 1 && samples.includes("all")) {
             samples = samples.filter(item => item !== "all");
         }
-        if (samples.length === 0) {
-            samples = ["all"]
-        }
         set({selectedSamples: samples})
     },
 
@@ -121,14 +118,14 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
 
         try {
-            const response = await getSampleList(dataset_id, query_str)
-            if (response.status === 200) {
-                const data = await response.data
-                await set({sampleList: data})
+            const {data} = await getSampleList(dataset_id, query_str)
+            if (data.success) {
+                const samples = await data.data
+                await set({sampleList: samples})
             } else {
-                console.error("Error fetching sample list:", response.message)
+                console.error("Error fetching sample list:", data.message)
                 await set({sampleList: []})
-                toast.error(response.message)
+                toast.error(data.message)
             }
         } catch (error) {
             console.error("Error fetching gene list:", error)

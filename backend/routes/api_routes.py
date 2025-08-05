@@ -45,8 +45,8 @@ async def getsamplelist(request: Request):
     response = get_sample_list(dataset_id, query_str)
     # print (response)
     if "Error" in response:
-        raise HTTPException(status_code=404, detail="Error in getting sample list.")
-    return response
+        return {"success": False, "message": "Error in getting sample list."}
+    return {"success": True, "data": response}
 
 
 @router.get("/getmetalist")

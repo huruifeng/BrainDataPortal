@@ -398,12 +398,12 @@ def get_sample_list(dataset, query_str="all"):
             ]
     else:
         print(sample_file + " not found")
-        return "Error: Gene list file not found"
+        return "Error: Sample list file not found"
 
 
 def get_meta_list(dataset, query_str="all"):
     if dataset == "all":
-        return "Error: Sample dataset not specified."
+        return "Error: Dataset not specified."
     else:
         meta_file = os.path.join("backend", "datasets", dataset, "meta_list.json")
 
@@ -416,7 +416,7 @@ def get_meta_list(dataset, query_str="all"):
             return [meta for meta in data if meta.lower().startswith(query_str.lower())]
     else:
         print(meta_file + " not found")
-        return "Error: Gene list file not found"
+        return "Error: Meta list file not found"
 
 
 def get_config_info(dataset):

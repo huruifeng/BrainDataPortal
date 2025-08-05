@@ -80,9 +80,13 @@ function GeneView() {
         await fetchGeneList(datasetId)
         await fetchSampleList(datasetId)
         await fetchMetaList(datasetId)
+
         // 清空旧数据，并重新获取 exprData
         useSampleGeneMetaStore.setState({exprDataDict: {}}); // 先清空
         await fetchExprData(datasetId);
+
+        // 清空旧数据，并重新获取 metaData
+        useSampleGeneMetaStore.setState({allCellMetaData: {}, allSampleMetaData: {}, CellMetaMap: {}});
         await fetchAllMetaData(datasetId);
         await fetchMainClusterInfo(datasetId);
     }
