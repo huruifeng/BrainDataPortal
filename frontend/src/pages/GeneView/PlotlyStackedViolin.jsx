@@ -175,6 +175,13 @@ const PlotlyStackedViolin = React.memo(function PlotlyStackedViolin({gene, exprD
                 displaylogo: false,
                 responsive: true,
                 doubleClick: false,
+                scrollZoom: false,
+                zoom2d: false,
+                pan2d: false,
+                select2d: false,
+                lasso2d: false,
+                staticPlot: true,
+                modeBarButtonsToRemove: ["zoom2d", "pan2d", "select2d","lasso2d","pan2d"],
                 toImageButtonOptions: {
                     name: "Save as SVG",
                     format: 'svg', // one of png, svg, jpeg, webp

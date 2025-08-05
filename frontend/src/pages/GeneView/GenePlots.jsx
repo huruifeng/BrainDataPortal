@@ -139,7 +139,7 @@ const GeneMetaPlots = ({
         saveAs(blob, "gene_meta_export.csv");
     };
 
-    const handleDownloadPDF = (isViolins) => {
+    const handleDownloadPDF = (isViolins, format) => {
         if (isViolins) {
             const plotId = 'geneview-gene-plot'; // this should match the id of your plot container
             const plotElement = document.getElementById(plotId);
@@ -150,7 +150,7 @@ const GeneMetaPlots = ({
             }
 
             Plotly.downloadImage(plotElement, {
-                format: 'svg',
+                format: format,
                 filename: `StackedViolin.${group}.Zeros_${includeZeros}`,
             });
         }else {
@@ -174,7 +174,9 @@ const GeneMetaPlots = ({
                         Download CSV
                     </button>
                     <div>&nbsp;&nbsp;</div>
-                    { isCat && (<button onClick={() => handleDownloadPDF(isCat)} className="download-button">Export SVG</button>)}
+                    { isCat && (<button onClick={() => handleDownloadPDF(isCat,"svg")} className="download-button">Export SVG</button>)}
+                    <div>&nbsp;&nbsp;</div>
+                    { isCat && (<button onClick={() => handleDownloadPDF(isCat,"png")} className="download-button">Export PNG</button>)}
 
                 </Stack>
             </div>
