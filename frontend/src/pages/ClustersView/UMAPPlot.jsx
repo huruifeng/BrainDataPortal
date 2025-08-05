@@ -40,22 +40,22 @@ const UMAPPlot = ({umapData, metaData, selectedClusters, isAllClustersSelected, 
 
         if (isAllClustersSelected) {
             // Group by cell type for coloring
-            const cellTypeGroups = {}
+            const plorData = {}
 
             umapData.forEach((point) => {
                 const cellType = updatedCellMetaData[point[0]]?.[mainCluster] || "Other"
-                if (!cellTypeGroups[cellType]) {
-                    cellTypeGroups[cellType] = {x: [], y: [], text: [], ids: []}
+                if (!plorData[cellType]) {
+                    plorData[cellType] = {x: [], y: [], text: [], ids: []}
                 }
 
-                cellTypeGroups[cellType].x.push(point[1])
-                cellTypeGroups[cellType].y.push(point[2])
-                cellTypeGroups[cellType].text.push(cellType)
-                cellTypeGroups[cellType].ids.push(point[0])
+                plorData[cellType].x.push(point[1])
+                plorData[cellType].y.push(point[2])
+                plorData[cellType].text.push(cellType)
+                plorData[cellType].ids.push(point[0])
             })
 
             // Create a trace for each cell type
-            Object.entries(cellTypeGroups).forEach(([cellType, points]) => {
+            Object.entries(plorData).forEach(([cellType, points]) => {
                 traces.push({
                     x: points.x,
                     y: points.y,
@@ -69,30 +69,40 @@ const UMAPPlot = ({umapData, metaData, selectedClusters, isAllClustersSelected, 
                 })
             })
         } else {
-            // Single trace with highlighted cell types
-            const x = []
-            const y = []
-            const text = []
-            const colors = []
+            // Group by cell type for coloring/traces
+            const plorData = {}
 
             umapData.forEach((point) => {
-                const cellType = updatedCellMetaData?.[point[0]]?.[mainCluster] ?? "Other"
-                const isSelected = selectedClusters.includes(cellType)
+                let cellType = updatedCellMetaData[point[0]]?.[mainCluster] || "Other"
+                if (selectedClusters.includes(cellType)) {
+                    cellTypeColors[cellType] = colorPalette[selectedClusters.indexOf(cellType) % colorPalette.length]
+                }else {
+                    cellType="Other"
+                    cellTypeColors[cellType] = "rgba(200, 200, 200, 0.3)"
+                }
+                if (!plorData[cellType]) {
+                    plorData[cellType] = {x: [], y: [], text: [], ids: []}
+                }
 
-                x.push(point[1])
-                y.push(point[2])
-                text.push(cellType)
-
-                // Highlight selected cell types
-                colors.push(isSelected ? cellTypeColors[cellType] : "rgba(200, 200, 200, 0.3)")
+                plorData[cellType].x.push(point[1])
+                plorData[cellType].y.push(point[2])
+                plorData[cellType].text.push(cellType)
+                plorData[cellType].ids.push(point[0])
             })
 
-            traces.push({
-                x, y, text,
-                mode: "markers",
-                type: "scattergl",
-                marker: {size: 4, color: colors,},
-                hoverinfo: "text",
+            // Create a trace for each cell type
+            Object.entries(plorData).forEach(([cellType, points]) => {
+                traces.push({
+                    x: points.x,
+                    y: points.y,
+                    text: points.text,
+                    ids: points.ids,
+                    mode: "markers",
+                    type: "scattergl",
+                    name: cellType,
+                    marker: {size: 4, opacity: 0.8, color: cellTypeColors[cellType]},
+                    hoverinfo: "text",
+                })
             })
         }
 
@@ -101,7 +111,7 @@ const UMAPPlot = ({umapData, metaData, selectedClusters, isAllClustersSelected, 
             xaxis: {title: "UMAP_1", zeroline: true, showgrid: false, visible: false},
             yaxis: {title: "UMAP_2", zeroline: true, showgrid: false, visible: false},
             hovermode: "closest",
-            showlegend: isAllClustersSelected,
+            showlegend: true,
             legend: {x: 1, y: 0.5,},
             margin: {l: 50, r: 50, b: 50, t: 50, pad: 4,},
             autosize: true,

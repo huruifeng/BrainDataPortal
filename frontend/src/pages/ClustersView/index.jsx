@@ -53,17 +53,19 @@ function ClustersView() {
         fetchMainClusterInfo(selectedDataset);
     }, [])
 
-    useEffect(() => {
-        // Main data fetches (control loading state)
-        const fetchPrimaryData = async () => {
-            await fetchMainClusterInfo(selectedDataset)
-            // update the mainCluster
-            const mainCluster = await getMainCluster()
-            await fetchUMAPData(selectedDataset)
-            await fetchSelectedMetaData(selectedDataset, [mainCluster])
-            await fetchClusterList(selectedDataset)
-        }
+     // Main data fetches (control loading state)
+    const fetchPrimaryData = async () => {
+        await fetchMainClusterInfo(selectedDataset)
+        const mainCluster = await getMainCluster() // update the mainCluster
 
+        setSelectedClusters([]) // clear the selectedClusters
+        useClusterStore.setState({clusterList: []}) // clear the clusterList
+
+        await fetchUMAPData(selectedDataset)
+        await fetchSelectedMetaData(selectedDataset, [mainCluster])
+        await fetchClusterList(selectedDataset)
+    }
+    useEffect(() => {
         fetchPrimaryData()
     }, [selectedDataset])
 
@@ -96,6 +98,8 @@ function ClustersView() {
 
     /** Handles dataset selection change */
     const handleDatasetChange = (event, newValue) => {
+        // Clear selected cell types
+        setSelectedClusters([])
         setDataset(newValue)
         setSelectedDataset(newValue)
         updateQueryParams(selectedClusters, newValue)
@@ -204,7 +208,7 @@ function ClustersView() {
                         </>
                     ) }
 
-                    {selectedDataset === "" ? (
+                    {selectedDataset === "" || selectedDataset === null ? (
                         <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">
                             No dataset selected for exploration
                         </Typography>
@@ -231,7 +235,7 @@ function ClustersView() {
                                 </div>
                             </div>
 
-                            <div className="plot-section" id="marker-genes-section">
+                            {selectedClusters.length > 0 && <div className="plot-section" id="marker-genes-section">
                                 <Divider sx={{marginTop: "10px"}} flexItem>Marker Genes</Divider>
                                 <div className="dot-container">
                                     {markerGenes && (
@@ -243,9 +247,9 @@ function ClustersView() {
                                         />
                                     )}
                                 </div>
-                            </div>
+                            </div>}
 
-                            <div className="plot-section" id="cell-counts-deg-section">
+                            {selectedClusters.length > 0 && <div className="plot-section" id="cell-counts-deg-section">
                                 <Divider sx={{marginTop: "10px"}} flexItem>Cell Counts & Differential Expression</Divider>
                                 <Grid container spacing={2} className="bottom-plots-container">
                                     <Grid item xs={12} md={6}>
@@ -259,7 +263,7 @@ function ClustersView() {
                                         )}
                                     </Grid>
                                 </Grid>
-                            </div>
+                            </div>}
                         </>
                     )}
                 </div>

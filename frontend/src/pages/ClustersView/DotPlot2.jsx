@@ -55,6 +55,7 @@ const DotPlot2 = ({markerGenes, selectedClusters, isAllClustersSelected, mainClu
                 // Find the gene data for this cell type
                 const geneData = markerGenes.find((gene) => gene.gene === geneName && gene[mainCluster] === cluster)
 
+                if(selectedClusters.includes(cluster)) cluster = `<b>${cluster}</b>`
                 if (geneData) {
                     xValues.push(cluster)
                     yValues.push(geneName)
@@ -127,7 +128,7 @@ const DotPlot2 = ({markerGenes, selectedClusters, isAllClustersSelected, mainClu
         }
 
         // Create legend traces with actual circles
-        const sizeLegendSizes = [20]
+        const sizeLegendSizes = [10,20]
         const legendTraces = []
 
         const bubbleSpacing = 0.12 / selectedClusters.length;
@@ -222,9 +223,8 @@ const DotPlot2 = ({markerGenes, selectedClusters, isAllClustersSelected, mainClu
             height: Math.max(400, uniqueGeneNames.length * 30 + 120), // Dynamic height based on number of genes
             autosize: true,
             hovermode: "closest",
-            // Adjust the plot padding
-            // plot_bgcolor: "rgba(255,0,0,0)",
-            // paper_bgcolor: "rgba(0,255,0,0)",
+            plot_bgcolor: "rgba(255,0,0,0)",
+            paper_bgcolor: "rgb(245,245,245,1)",
             bargap: 0,
             bargroupgap: 0,
         }

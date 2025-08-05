@@ -6,7 +6,7 @@ import Plotly from "plotly.js-dist-min"
 import {FormControl, InputLabel, Select, MenuItem} from "@mui/material"
 
 const HeatmapPlot2 = ({diffExpGenes, selectedClusters}) => {
-    console.log("diffExpGenes: ", diffExpGenes, selectedClusters)
+    // console.log("diffExpGenes: ", diffExpGenes, selectedClusters)
 
     const plotRef = useRef(null)
     const [selectedCluster, setSelectedCluster] = useState("")

@@ -180,9 +180,9 @@ const BarPlot = ({cellCounts, selectedClusters}) => {
         }
 
         const layout = {
-            title: "Cell Counts",
+            title: {text: "Cell Counts"},
             yaxis: {
-                title: "Total Cell Count",
+                title: {text: "Total Cell Count"},
                 zeroline: true,
             },
             xaxis: {
