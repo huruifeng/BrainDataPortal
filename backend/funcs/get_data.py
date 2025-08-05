@@ -412,6 +412,15 @@ def get_meta_list(dataset, query_str="all"):
             data = json.load(f)
         if query_str == "all" or query_str == "":
             return data
+        elif query_str == "cell_level":
+            cellspot_meta_file = os.path.join("backend", "datasets", dataset, "cellspot_meta_mapping.json")
+            if os.path.exists(cellspot_meta_file):
+                with open(cellspot_meta_file, "r") as f:
+                    cellspot_meta = json.load(f)
+                return list(cellspot_meta.keys())
+            else:
+                print(cellspot_meta_file + " not found")
+                return "Error: cellspot_meta_mapping file not found"
         else:
             return [meta for meta in data if meta.lower().startswith(query_str.lower())]
     else:
@@ -696,7 +705,7 @@ def get_metadata_of_sample(dataset, sample="all", features="all"):
         cell_metadata = data_df.to_dict(orient="split")
 
         # get sample metadata
-        sample_metadata = get_sample_metadata(dataset)
+        sample_metadata = get_sample_metadata(dataset, samples=[sample])
 
         ## get cell_metadata_mapping
         cell_metadata_mapping = get_metadata_mapping(dataset)

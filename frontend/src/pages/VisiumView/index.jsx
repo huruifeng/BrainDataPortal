@@ -71,7 +71,7 @@ function VisiumView() {
         setDataset(datasetId);
         await fetchSampleList(datasetId);
         await fetchGeneList(datasetId);
-        await fetchMetaList(datasetId);
+        await fetchMetaList(datasetId, "cell_level");
         await fetchVisiumDefaults(datasetId);
 
         // Get the current state after fetching defaults
@@ -173,7 +173,7 @@ function VisiumView() {
             ? "two-plots" : Object.keys(selectedFeatures).length === 3
                 ? "three-plots" : "four-plots";
 
-
+    // console.log("sampleMetaDict:", sampleMetaDict);
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
