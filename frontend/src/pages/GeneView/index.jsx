@@ -452,16 +452,19 @@ function GeneView() {
                                     {/*    />*/}
                                     {/*)}*/}
 
-                                    {umapData && <PlotlyScatterPlot gene={"all"}
-                                                                    sampleList={selectedSamples}
-                                                                    umapData={umapData}
-                                                                    exprData={{"all": "all"}}
-                                                                    cellMetaData={allCellMetaData ?? {}}
-                                                                    CellMetaMap={CellMetaMap ?? {}}
-                                                                    sampleMetaData={allSampleMetaData ?? {}}
-                                                                    group={coloring}
-                                                                    isMetaDataLoading={metadataLoading}
-                                    />}
+                                    {umapData &&
+                                        <PlotlyScatterPlot
+                                            gene={"all"}
+                                            sampleList={selectedSamples}
+                                            umapData={umapData}
+                                            exprData={{"all": "all"}}
+                                            cellMetaData={allCellMetaData ?? {}}
+                                            CellMetaMap={CellMetaMap ?? {}}
+                                            sampleMetaData={allSampleMetaData ?? {}}
+                                            group={coloring}
+                                            isMetaDataLoading={metadataLoading}
+                                        />
+                                    }
                                 </div>
                             </div>
                         </div>
