@@ -25,6 +25,7 @@ import GeneMetaPlots from "./GenePlots.jsx"
 
 import "./GeneView.css"
 import useDataStore from "../../store/DatatableStore.js"
+import useClusterStore from "../../store/ClusterStore.js";
 
 function GeneView() {
     // Get all the pre-selected values
@@ -35,12 +36,16 @@ function GeneView() {
     const initialGrouping = queryParams.get("group") ?? ""
     const initialDataset = queryParams.get("dataset") ?? ""
 
+    const {mainCluster, fetchMainClusterInfo} = useClusterStore()
+
     const {datasetRecords, fetchDatasetList} = useDataStore()
     useEffect(() => {
         fetchDatasetList()
     }, [])
 
-    const datasetOptions = datasetRecords.map((d) => d.dataset_id)
+    const datasetOptions = datasetRecords
+    .filter((d) => !d.assay.toLowerCase().endsWith("qtl"))
+    .map((d) => d.dataset_id)
 
     const [datasetId, setDatasetId] = useState(initialDataset)
     const [datasetSearchText, setDatasetSearchText] = useState("")
@@ -62,23 +67,35 @@ function GeneView() {
     const {allCellMetaData, fetchAllMetaData, exprDataDict, fetchExprData} = useSampleGeneMetaStore()
     const {allSampleMetaData, CellMetaMap} = useSampleGeneMetaStore()
     const {metadataLoading, loading, error} = useSampleGeneMetaStore()
-    const [coloring, setColoring] = useState(initialColoring)
-    const [grouping, setGrouping] = useState(initialGrouping)
+    const [coloring, setColoring] = useState(initialColoring || mainCluster)
+    const [grouping, setGrouping] = useState(initialGrouping || mainCluster)
 
     const [exprValueType, setExprValueType] = useState("celllevel")
 
     useEffect(() => {
         // Load these in parallel immediately
         const fetchPrimaryData = async () => {
+            setDataset(datasetId);
             await fetchUMAPData(datasetId);
             await fetchGeneList(datasetId)
             await fetchSampleList(datasetId)
             await fetchMetaList(datasetId)
+            // 清空旧数据，并重新获取 exprData
+            useSampleGeneMetaStore.setState({ exprDataDict: {} }); // 先清空
             await fetchExprData(datasetId);
             await fetchAllMetaData(datasetId);
+            await fetchMainClusterInfo(datasetId);
         }
         fetchPrimaryData()
     }, [datasetId])
+
+    useEffect(() => {
+        if (datasetId && mainCluster) {
+            setColoring(mainCluster); // 强制更新 coloring
+            setGrouping(mainCluster);
+            updateQueryParams(datasetId, selectedGenes, selectedSamples, mainCluster, mainCluster);
+        }
+    }, [datasetId, mainCluster]);
 
     const sampleOptions = sampleList.map((sample) => sample)
     sampleOptions.unshift("all")
