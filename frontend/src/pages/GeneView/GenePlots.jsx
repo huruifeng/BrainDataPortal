@@ -151,7 +151,7 @@ const GeneMetaPlots = ({
 
             Plotly.downloadImage(plotElement, {
                 format: 'svg',
-                filename: 'geneview_plot',
+                filename: `StackedViolin.${group}.Zeros_${includeZeros}`,
             });
         }else {
             const plotId = 'stacked_violin_div'; // this should match the id of your plot container

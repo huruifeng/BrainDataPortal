@@ -1,9 +1,10 @@
 import Plot from 'react-plotly.js';
 import Plotly from "plotly.js-dist";
 import PropTypes from "prop-types";
+import React from "react";
 
 
-const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, type = "violin"}) => {
+const PlotlyStackedViolin = React.memo(function PlotlyStackedViolin({gene, exprData, metaData, group, includeZeros, type = "violin"}) {
     if (metaData.length === 0) return "Sample not found in the MetaData";
     if (gene !== "stackedviolin") return null;
 
@@ -186,7 +187,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, typ
                             name: "Save as SVG",
                             icon: Plotly.Icons.disk,
                             click: function (gd) {
-                                Plotly.downloadImage(gd, {format: "svg", filename: `StackedViolin.${group}.${genes.join('_')}`});
+                                Plotly.downloadImage(gd, {format: "svg", filename: `StackedViolin.${group}.${genes.join('_')}.Zeros_${includeZeros}`});
                             },
                         },
                     ],
@@ -194,7 +195,7 @@ const PlotlyStackedViolin = ({gene, exprData, metaData, group, includeZeros, typ
             }}
         />
     );
-};
+});
 PlotlyStackedViolin.propTypes = {
     gene: PropTypes.string.isRequired,
     exprData: PropTypes.object.isRequired,

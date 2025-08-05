@@ -73,20 +73,20 @@ function GeneView() {
 
     const [exprValueType, setExprValueType] = useState("celllevel")
 
+    // Load these in parallel immediately
+    const fetchPrimaryData = async () => {
+        setDataset(datasetId);
+        await fetchUMAPData(datasetId);
+        await fetchGeneList(datasetId)
+        await fetchSampleList(datasetId)
+        await fetchMetaList(datasetId)
+        // 清空旧数据，并重新获取 exprData
+        useSampleGeneMetaStore.setState({exprDataDict: {}}); // 先清空
+        await fetchExprData(datasetId);
+        await fetchAllMetaData(datasetId);
+        await fetchMainClusterInfo(datasetId);
+    }
     useEffect(() => {
-        // Load these in parallel immediately
-        const fetchPrimaryData = async () => {
-            setDataset(datasetId);
-            await fetchUMAPData(datasetId);
-            await fetchGeneList(datasetId)
-            await fetchSampleList(datasetId)
-            await fetchMetaList(datasetId)
-            // 清空旧数据，并重新获取 exprData
-            useSampleGeneMetaStore.setState({exprDataDict: {}}); // 先清空
-            await fetchExprData(datasetId);
-            await fetchAllMetaData(datasetId);
-            await fetchMainClusterInfo(datasetId);
-        }
         fetchPrimaryData()
     }, [datasetId])
 
@@ -178,9 +178,7 @@ function GeneView() {
 
     // click the button to fetch umap data
     const handleLoadPlot = () => {
-        setDataset(datasetId)
-        fetchAllMetaData(datasetId)
-        fetchExprData(datasetId)
+        fetchPrimaryData()
     }
 
     const handleGroupingChange = (event) => {

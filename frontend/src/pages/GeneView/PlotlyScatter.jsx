@@ -3,13 +3,13 @@ import Plotly from "plotly.js-dist";
 import {isCategorical} from "../../utils/funcs.js";
 import PropTypes from "prop-types";
 import {groupBy} from "lodash";
+import React from "react";
 
-
-const PlotlyScatterPlot = ({
+const PlotlyScatterPlot = React.memo(function PlotlyScatterPlot({
                                gene, sampleList, umapData, exprData,
                                cellMetaData, CellMetaMap, sampleMetaData,
                                group, isMetaDataLoading
-                           }) => {
+                           }){
     // console.log("PlotlyScatterPlot: ", gene, metaData, group);
     if (umapData.length === 0) return "UMAP data is loading...";
 
@@ -246,7 +246,7 @@ const PlotlyScatterPlot = ({
             }}
         />
     );
-};
+});
 
 PlotlyScatterPlot.propTypes = {
     gene: PropTypes.string.isRequired,
