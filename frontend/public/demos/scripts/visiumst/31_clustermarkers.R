@@ -22,7 +22,7 @@ cat("===================================================\n")
 # seurat_type <- args[6]
 
 
-seurat_obj_file <- "Visium_MTG_10samples"
+seurat_obj_file <- "Visium_MTG_10samples.rds"
 output_dir <- "datasets/Visium_MTG_10samples"
 cluster_col <- "smoothed_label_s5"
 condition_col <- "diagnosis"

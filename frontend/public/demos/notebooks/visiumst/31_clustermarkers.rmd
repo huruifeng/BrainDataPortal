@@ -33,12 +33,13 @@ library(tidyverse)
 ## Set Parameters
 
 ```{r parameters}
-seurat_obj_file <- "example_data/PD5D_MTG_10samples.rds" # Path to your Seurat object file
-output_dir <- "example_data/PMDBS_snRNAseq" # Directory to save output files, usually the dataset name
-cluster_col <- "cell_type" # Column name in metadata for clustering information
-condition_col <- "case" # Column name in metadata for condition information
-sample_col <- "sample_id" # Column name in metadata for sample information
-seurat_type <- "snrnaseq" # Type of Seurat object: scrnaseq, snrnaseq, snatacseq, scatacseq, visiumst
+seurat_obj_file <- "example_data/Visium_MTG_10samples.rds"
+output_dir <- "example_data/Visium_MTG_10samples"
+cluster_col <- "smoothed_label_s5"
+condition_col <- "diagnosis"
+sample_col <- "sample_name"
+seurat_type <- "visiumst" # options: "scrnaseq", "snrnaseq", "snatacseq", "scatacseq", "visiumst"
+
 
 # Create output directory
 clustermarkers_folder = paste0(output_dir, "/clustermarkers")
@@ -230,7 +231,11 @@ for (cluster in clusters) {
 		for (i in 1:ncol(combinations)) {
 			c1 <- combinations[1, i]
 			c2 <- combinations[2, i]
-			de_results <- FindMarkers(subset_obj, ident.1 = c1, ident.2 = c2, group.by = condition_col, test.use = "wilcox")
+			
+			if (sum(Idents(seurat_obj) == c1) >= 3 & sum(Idents(seurat_obj) == c2) >= 3) {
+				de_results <- FindMarkers(subset_obj, ident.1 = c1, ident.2 = c2, group.by = condition_col, test.use = "wilcox")
+			}
+			
 			## add a column for the gene names
 			de_results$gene <- rownames(de_results)
 			

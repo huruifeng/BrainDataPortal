@@ -46,9 +46,9 @@ You can set these manually for interactive use:
 
 ```{r input-args}
 # Set these manually for notebook use
-seurat_obj_file <- "example_data/pmdbs_lee_obj_updated_SN.rds"  # Path to your Seurat object fil
-output_dir <- "example_data/PMDBS_snRNAseq"  # Directory to save output files, usually the dataset name
-cluster_col <- "cell_type"  # Column name in metadata for clustering information
+seurat_obj_file <- "example_data/Visium_MTG_10samples.rds"  # Path to your Seurat object fil
+output_dir <- "example_data/Visium_MTG_10samples"  # Directory to save output files, usually the dataset name
+cluster_col <- "smoothed_label_s5"  # Column name in metadata for clustering information
 ```
 
 ## Create Output Directory
@@ -123,17 +123,19 @@ write.csv(umap_embeddings, file = paste0(output_dir, "/raw_umap_embeddings.csv")
 
 ```{r save-normalized-counts}
 cat("Saving normalized counts...\n")
-normalized_counts <- seurat_obj[["RNA"]]@layers[["data"]] # Sparse matrix
+normalized_counts <- seurat_obj@assays$Spatial@data  # This is a sparse matrix
 
-gene_names <- dimnames(seurat_obj[["RNA"]]@features)[[1]]
-cell_names <- dimnames(seurat_obj[["RNA"]]@cells)[[1]]
-
+# Convert sparse matrix to triplet format (long format)
 triplet <- summary(normalized_counts)
-triplet$Gene <- gene_names[triplet$i]
-triplet$Cell <- cell_names[triplet$j]
+# Get row (gene) and column (spot) names
+triplet$Gene <- rownames(normalized_counts)[triplet$i]
+triplet$Spot <- colnames(normalized_counts)[triplet$j]
+triplet$Expression <- triplet$x
+# Keep only necessary columns
+triplet <- triplet[, c("Gene", "Spot", "Expression")]
 
 long_data <- triplet %>%
-  select(Cell, Gene, Expression = x)
+  select(Spot, Gene, Expression)
 
 nonzero_data <- long_data[long_data$Expression > 0, ]
 nonzero_data <- as.data.table(nonzero_data)
