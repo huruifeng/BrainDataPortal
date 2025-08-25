@@ -13,13 +13,11 @@ import numpy as np
 # cluster_col = sys.argv[2]  # e.g. "SubCellTypes"
 # sex_col = sys.argv[3]  # e.g. "sex"
 
-dataset_folder = "datasets/PMDBS_SN_snRNAseq"
-cluster_col = "cell_type"
+
+dataset_folder = "datasets/PD5D_MTG_VisiumST"
+cluster_col = "smoothed_label_s5"
 sex_col = "sex"
 
-# dataset_folder = "datasets/PD5D_MTG_VisiumST"
-# cluster_col = "smoothed_label_s5"
-# sex_col = "sex"
 
 
 condition_col = "Condition"

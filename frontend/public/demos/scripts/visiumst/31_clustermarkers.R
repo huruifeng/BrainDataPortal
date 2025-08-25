@@ -1,9 +1,3 @@
-## This script is used to extract the data from the Seurat object.
-## it will extract the data from the Seurat object and save it in a format that can be used for downstream analysis.
-
-## Run R script as follows:
-## Rscript extract_data_SC.R seurat_obj.rds output_directory
-
 library(jsonlite)
 library(Matrix)
 library(data.table)
@@ -28,12 +22,12 @@ cat("===================================================\n")
 # seurat_type <- args[6]
 
 
-seurat_obj_file <- "Seurats/pmdbs/pmdbs_lee_obj_updated_SN.rds"
-output_dir <- "datasets/PMDBS_SN_snRNAseq"
-cluster_col <- "cell_type"
-condition_col <- "case"
-sample_col <- "sample_id"
-seurat_type <- "snrnaseq"
+seurat_obj_file <- "Visium_MTG_10samples"
+output_dir <- "datasets/Visium_MTG_10samples"
+cluster_col <- "smoothed_label_s5"
+condition_col <- "diagnosis"
+sample_col <- "sample_name"
+seurat_type <- "visiumst" # options: "scrnaseq", "snrnaseq", "snatacseq", "scatacseq", "visiumst"
 
 
 clustermarkers_folder = paste0(output_dir, "/clustermarkers")
@@ -56,7 +50,7 @@ if(seurat_type == "scrnaseq" | seurat_type == "snrnaseq"){
 		stop("The Seurat object does not contain the 'RNA' assay.")
 	}
 	# Check if the Seurat object has the necessary assay data
-	if (!"data" %in% names(seurat_obj@assays$RNA@layers)) {
+	if (!"data" %in% slotNames(seurat_obj@assays$RNA)) {
 		stop("The Seurat object does not contain the 'data' slot in the 'RNA' assay.")
 	}
 } else if (seurat_type == "snatacseq" | seurat_type == "scatacseq") {
@@ -106,7 +100,7 @@ fwrite(cell_type_markers_dt, paste0(clustermarkers_folder,"/cluster_FindAllMarke
 ## ============================================================
 # Ecalcaulate differential expression within each cell type between the conditions # nolint
 print("=====================================================")
-print("Calculating differential expression within each cell type...")
+print("Calculating differential expression within each cluster...")
 
 # Define the cell types
 cell_types <- unique(seurat_obj@meta.data[[cluster_col]])
@@ -169,7 +163,7 @@ fwrite(de_results_topN_dt, paste0(clustermarkers_folder, "/cluster_DEGs_topN.csv
 ## ============================================================
 print("=====================================================")
 # pseudo-bulk DE analysis in each cell type
-print("Calculating pseudo-bulk differential expression within each cell type...")
+print("Calculating pseudo-bulk differential expression within each cluster...")
 # Create a new Seurat object for pseudo-bulk analysis
 # pb_obj <- AggregateExpression(seurat_obj, assays = "RNA", slot = "counts", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
 if(seurat_type == "scrnaseq" | seurat_type == "snrnaseq"){
@@ -191,7 +185,7 @@ pb_obj@meta.data[[cluster_col]] <- gsub("-", "_", pb_obj@meta.data[[cluster_col]
 pb_obj@meta.data[["orig.ident"]] <- gsub("-", "_", pb_obj@meta.data[["orig.ident"]])
 
 metadata = pb_obj@meta.data
-## rename sample_id to sampleId
+## rename, this is needed for the visualization in the data portal
 colnames(metadata)[colnames(metadata) == sample_col] <- "sampleId"
 colnames(metadata)[colnames(metadata) == condition_col] <- "condition"
 

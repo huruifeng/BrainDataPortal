@@ -12,11 +12,18 @@ print = functools.partial(print, flush=True)
 print("============================================")
 # %% ==============================
 # Get the arguments
-dataset_path = sys.argv[1]
-kept_features = sys.argv[2].split(",")
-sample_col = sys.argv[3]
-cluster_col = sys.argv[4]
-condition_col = sys.argv[5]
+# dataset_path = sys.argv[1]
+# kept_features = sys.argv[2].split(",")
+# sample_col = sys.argv[3]
+# cluster_col = sys.argv[4]
+# condition_col = sys.argv[5]
+
+dataset_path = "Visium_MTG_10samples"
+kept_features =["nCount_Spatial","nFeature_Spatial","sample_name","sex","diagnosis","last_mmse_test_score","motor_updrs_score","smoothed_label_s5"]
+sample_col = "sample_name"
+cluster_col = "smoothed_label_s5"
+condition_col = "diagnosis"
+
 print("============================================")
 print("Dataset path: ", dataset_path)
 print("Kept features: ", kept_features)

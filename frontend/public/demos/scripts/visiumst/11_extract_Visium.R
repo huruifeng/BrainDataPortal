@@ -13,16 +13,12 @@ library(jsonlite)
 library(png)
 
 cat("===================================================\n")
-# Check if the script is run with the correct number of arguments
-args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 3) {
-  stop("Please provide the Seurat object file and output directory as arguments.")
-}
+
 
 # Get the arguments
-seurat_obj_file <- args[1]
-output_dir <- args[2]
-cluster_col <- args[3]
+seurat_obj_file <- "Seurats/Visium_MTG_10samples.rds"
+output_dir <- "Visium_MTG_10samples"
+cluster_col <- "smoothed_label_s5"
 
 
 # Check if the output directory exists, if not create it
@@ -68,6 +64,8 @@ if (!cluster_col %in% colnames(seurat_obj@meta.data)) {
 ## ===================================================
 # Extract the data
 cat("Extract data...\n")
+
+cat("Save metadata...\n")
 # Save to CSV with index as the first column
 metadata <- seurat_obj@meta.data
 write.csv(metadata, file = paste0(output_dir, "/raw_metadata.csv"), row.names = TRUE)
