@@ -383,9 +383,9 @@ genes = [ "SNCA",...]                    ## List of default gene names
                                 After running the pipeline, there will be a dataset folder that contains the all necessary files:
                                 <ul>
                                     <li>1. the files with names starting with <code>raw_</code> are not necessary for upload.</li>
-                                    <li>2. the file named &apos;pb_expr_matrix.csv&apos; in the folder &apos;&lt;data_name&gt;/clustermarkers&apos; is necessary for upload.</li>
-                                    <li>3. Upload the dataset folder named <b>&apos;&lt;data_name&gt;&apos;</b> to the server at <b>&apos;backend/datasets&apos;</b>.</li>
-                                    <li>4. Put the dataset configuration file named <b>&apos;dataset_info.toml&apos;</b> to your dataset folder at <b>&apos;backend/datasets/&lt;data_name&gt;&apos;</b>.</li>
+                                    <li>2. the file named &apos;pb_expr_matrix.csv&apos; in the folder &apos;&lt;dataset_name&gt;/clustermarkers&apos; is not necessary for upload.</li>
+                                    <li>3. Upload the dataset folder named <b>&apos;&lt;dataset_name&gt;&apos;</b> to the server at <b>&apos;backend/datasets&apos;</b>.</li>
+                                    <li>4. Put the dataset configuration file named <b>&apos;dataset_info.toml&apos;</b> to your dataset folder at <b>&apos;backend/datasets/&lt;dataset_name&gt;&apos;</b>.</li>
                                     <li>5. Upload <b>samplesheet file</b> to the server at <b>&apos;backend/SampleSheet&apos;</b>.</li>
                                     <li>6. Refresh the database: Go to <b>&apos;<a href="/datasetmanager?dataset=&stepidx=0">Datasets Management Page</a> &apos;</b>(DATASETS -&gt; +ADD DATASET) and click <b>&apos;REFRESH DB&apos;</b>.</li>
                                 </ul>
@@ -394,72 +394,72 @@ genes = [ "SNCA",...]                    ## List of default gene names
 
                     </section>
 
-                    <section id="troubleshooting" className="tutorial-section">
-                        <h2>Troubleshooting</h2>
+{/*                    <section id="troubleshooting" className="tutorial-section">*/}
+{/*                        <h2>Troubleshooting</h2>*/}
 
-                        <div className="troubleshooting-item">
-                            <h4>Issue: Memory errors during processing</h4>
-                            <p>
-                                <strong>Solution:</strong> Process data in chunks or use a machine with more RAM.
-                                Consider using sparse
-                                matrices and avoiding dense operations.
-                            </p>
-                            <div className="code-block">
-                <pre>
-                  <code>{`# Use sparse matrices
-import scipy.sparse as sp
-if not sp.issparse(adata.X):
-    adata.X = sp.csr_matrix(adata.X)`}</code>
-                </pre>
-                            </div>
-                        </div>
+{/*                        <div className="troubleshooting-item">*/}
+{/*                            <h4>Issue: Memory errors during processing</h4>*/}
+{/*                            <p>*/}
+{/*                                <strong>Solution:</strong> Process data in chunks or use a machine with more RAM.*/}
+{/*                                Consider using sparse*/}
+{/*                                matrices and avoiding dense operations.*/}
+{/*                            </p>*/}
+{/*                            <div className="code-block">*/}
+{/*                <pre>*/}
+{/*                  <code>{`# Use sparse matrices*/}
+{/*import scipy.sparse as sp*/}
+{/*if not sp.issparse(adata.X):*/}
+{/*    adata.X = sp.csr_matrix(adata.X)`}</code>*/}
+{/*                </pre>*/}
+{/*                            </div>*/}
+{/*                        </div>*/}
 
-                        <div className="troubleshooting-item">
-                            <h4>Issue: Too many cells filtered out</h4>
-                            <p>
-                                <strong>Solution:</strong> Adjust filtering thresholds based on your specific dataset
-                                characteristics.
-                            </p>
-                            <div className="code-block">
-                <pre>
-                  <code>{`# Check your data distribution first
-print(adata.obs[['total_counts', 'n_genes_by_counts', 'pct_counts_mt']].describe())
-# Adjust thresholds accordingly`}</code>
-                </pre>
-                            </div>
-                        </div>
+{/*                        <div className="troubleshooting-item">*/}
+{/*                            <h4>Issue: Too many cells filtered out</h4>*/}
+{/*                            <p>*/}
+{/*                                <strong>Solution:</strong> Adjust filtering thresholds based on your specific dataset*/}
+{/*                                characteristics.*/}
+{/*                            </p>*/}
+{/*                            <div className="code-block">*/}
+{/*                <pre>*/}
+{/*                  <code>{`# Check your data distribution first*/}
+{/*print(adata.obs[['total_counts', 'n_genes_by_counts', 'pct_counts_mt']].describe())*/}
+{/*# Adjust thresholds accordingly`}</code>*/}
+{/*                </pre>*/}
+{/*                            </div>*/}
+{/*                        </div>*/}
 
-                        <div className="troubleshooting-item">
-                            <h4>Issue: Gene names not recognized</h4>
-                            <p>
-                                <strong>Solution:</strong> Ensure gene symbols are in the correct format (human: HGNC
-                                symbols, mouse:
-                                MGI symbols).
-                            </p>
-                            <div className="code-block">
-                <pre>
-                  <code>{`# Convert gene IDs if needed
-# For Ensembl to gene symbol conversion
-import mygene
-mg = mygene.MyGeneInfo()
-gene_info = mg.querymany(adata.var_names.tolist(), scopes='ensembl.gene', fields='symbol', species='human')
-# Update gene names based on results`}</code>
-                </pre>
-                            </div>
-                        </div>
-                    </section>
+{/*                        <div className="troubleshooting-item">*/}
+{/*                            <h4>Issue: Gene names not recognized</h4>*/}
+{/*                            <p>*/}
+{/*                                <strong>Solution:</strong> Ensure gene symbols are in the correct format (human: HGNC*/}
+{/*                                symbols, mouse:*/}
+{/*                                MGI symbols).*/}
+{/*                            </p>*/}
+{/*                            <div className="code-block">*/}
+{/*                <pre>*/}
+{/*                  <code>{`# Convert gene IDs if needed*/}
+{/*# For Ensembl to gene symbol conversion*/}
+{/*import mygene*/}
+{/*mg = mygene.MyGeneInfo()*/}
+{/*gene_info = mg.querymany(adata.var_names.tolist(), scopes='ensembl.gene', fields='symbol', species='human')*/}
+{/*# Update gene names based on results`}</code>*/}
+{/*                </pre>*/}
+{/*                            </div>*/}
+{/*                        </div>*/}
+{/*                    </section>*/}
 
-                    <div className="next-steps">
-                        <h3>Next Steps</h3>
-                        <p>After completing this tutorial, you can:</p>
-                        <ul>
-                            <li>Upload your processed data to BrainDataPortal</li>
-                            <li>Perform dimensionality reduction and clustering</li>
-                            <li>Identify cell types and marker genes</li>
-                            <li>Conduct differential expression analysis</li>
-                            <li>Integrate with other omics data types</li>
-                        </ul>
-                    </div>
+                    {/*<div className="next-steps">*/}
+                    {/*    <h3>Next Steps</h3>*/}
+                    {/*    <p>After completing this tutorial, you can:</p>*/}
+                    {/*    <ul>*/}
+                    {/*        <li>Upload your processed data to BrainDataPortal</li>*/}
+                    {/*        <li>Perform dimensionality reduction and clustering</li>*/}
+                    {/*        <li>Identify cell types and marker genes</li>*/}
+                    {/*        <li>Conduct differential expression analysis</li>*/}
+                    {/*        <li>Integrate with other omics data types</li>*/}
+                    {/*    </ul>*/}
+                    {/*</div>*/}
                 </div>
             </main>
         </div>
