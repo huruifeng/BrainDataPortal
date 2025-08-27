@@ -67,6 +67,7 @@ function GeneView() {
     const {selectedSamples, setSelectedSamples, selectedGenes, setSelectedGenes} = useSampleGeneMetaStore()
     const {allCellMetaData, fetchAllMetaData, exprDataDict, fetchExprData} = useSampleGeneMetaStore()
     const {allSampleMetaData, CellMetaMap} = useSampleGeneMetaStore()
+
     const {metadataLoading, loading, error} = useSampleGeneMetaStore()
     const [coloring, setColoring] = useState(initialColoring || mainCluster)
     const [grouping, setGrouping] = useState(initialGrouping || mainCluster)
@@ -87,7 +88,7 @@ function GeneView() {
 
         // 清空旧数据，并重新获取 metaData
         useSampleGeneMetaStore.setState({allCellMetaData: {}, allSampleMetaData: {}, CellMetaMap: {}});
-        await fetchAllMetaData(datasetId);
+        await fetchAllMetaData(datasetId,[coloring]);
         await fetchMainClusterInfo(datasetId);
     }
     useEffect(() => {
@@ -192,6 +193,7 @@ function GeneView() {
 
     const handleColoringChange = (event) => {
         setColoring(event.target.value)
+        fetchAllMetaData(datasetId,[event.target.value]);
         updateQueryParams(datasetId, selectedGenes, selectedSamples, event.target.value, grouping)
     }
 

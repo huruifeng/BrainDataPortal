@@ -767,6 +767,7 @@ def get_all_metadata(dataset, cols=["all"], rows=["all"]):
             data_df = pd.read_csv(meta_file, index_col=0, header=0)
 
             if cols and cols[0] != "all" and cols[0] != "":
+                cols = [i for i in cols if i in data_df.columns]
                 data_df = data_df.loc[:, cols]
 
             if rows and rows[0] == "umap":
