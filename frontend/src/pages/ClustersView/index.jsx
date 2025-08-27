@@ -10,7 +10,7 @@ import {
     TextField,
     Button,
     LinearProgress,
-    Grid,
+    Grid, CircularProgress,
 } from "@mui/material"
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot"
 import {useSearchParams} from "react-router-dom"
@@ -60,6 +60,7 @@ function ClustersView() {
 
     // Main data fetches (control loading state)
     const fetchPrimaryData = async () => {
+        useClusterStore.setState({metadataLoading: true})
         await fetchMainClusterInfo(selectedDataset)
         const mainCluster = await getMainCluster() // update the mainCluster
 
@@ -68,6 +69,7 @@ function ClustersView() {
         await fetchUMAPData(selectedDataset)
         await fetchSelectedMetaData(selectedDataset, [mainCluster])
         await fetchClusterList(selectedDataset)
+        useClusterStore.setState({metadataLoading: false})
     }
     useEffect(() => {
         fetchPrimaryData(initialClusters)
@@ -196,14 +198,6 @@ function ClustersView() {
                     {(loading || metadataLoading) && (
                         <>
                             <Box sx={{width: "100%"}}><LinearProgress/></Box>
-                            {/*<Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}>*/}
-                            {/*    <CircularProgress/>*/}
-                            {/*</Box>*/}
-                            {/*<Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>*/}
-                            {/*    <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">*/}
-                            {/*        Loading data...*/}
-                            {/*    </Typography>*/}
-                            {/*</Box>*/}
                         </>
                     )}
 
