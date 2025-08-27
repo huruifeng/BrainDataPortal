@@ -223,7 +223,7 @@ function GeneView() {
             <Divider/>
             <div className="plot-content">
                 {/* Right Panel for Sample & Gene Selection (20%) */}
-                <div className="plot-panel">
+                <div className="plot-control-panel">
                     <Typography variant="subtitle1">Select a Dataset </Typography>
                     {/* Dataset Selection */}
                     <Autocomplete
@@ -383,7 +383,9 @@ function GeneView() {
 
                 {/* Left UMAP Plot Area (80%) */}
                 <div className="plot-main">
+                    <div style={{width: "100%", height:"6px"}}>
                     {(metadataLoading || loading) && (<Box sx={{width: "100%"}}><LinearProgress/></Box>)}
+                    </div>
 
                     {datasetId === "" || datasetId === null || datasetId === undefined ? (
                         <Typography sx={{color: "text.secondary", paddingTop: "100px"}} variant="h5">

@@ -27,7 +27,7 @@
 /*    justify-content: center;*/
 /*}*/
 
-/*.plot-panel {*/
+/*.plot-control-panel {*/
 /*    flex: 1;*/
 /*    background-color: #ffffff;*/
 /*    border-left: 1px solid #ddd;*/
@@ -46,7 +46,7 @@
 }
 
 /* Left Panel (Fixed Width) */
-.plot-panel {
+.plot-control-panel {
     width: 25%;
     /*min-width: 250px;*/
     padding: 10px;
