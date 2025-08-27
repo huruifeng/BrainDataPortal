@@ -138,7 +138,7 @@ const PlotlyScatterPlot = React.memo(function PlotlyScatterPlot({
     // Layout configuration
     const layout = {
         title: {
-            text: gene === "all" ? `UMAP Plot for ${group}` : `${gene}`,
+            text: gene === "all" ? (isMetaDataLoading ? "UMAP Plot (Color loading...)" : `UMAP Plot for ${group}`) : `${gene}`,
             font: {size: 18, weight: 'regular'},
             pad: {t: 10, b: 10},
             automargin: true
