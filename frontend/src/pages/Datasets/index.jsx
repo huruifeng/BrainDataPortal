@@ -5,10 +5,13 @@ import FilterPanel from "./FilterPanel";
 import DatasetDisplay from "./DatasetDisplay.jsx";
 import "./DatasetPage.css";
 import useDatatableStore from "../../store/DatatableStore.js";
+
 import {useSearchParams} from "react-router-dom";
+import useSignalStore from "../../store/GenomicRegionStore.js";
 
 const DatasetsPage = () => {
-    const {datasetRecords, fetchDatasetList} = useDatatableStore();
+    const {datasetRecords, fetchDatasetList, setDatasetRecords} = useDatatableStore();
+    const {checkBWDataExists} = useSignalStore()
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Initialize filters from URL params
@@ -24,6 +27,29 @@ const DatasetsPage = () => {
     useEffect(() => {
         fetchDatasetList()
     }, [fetchDatasetList]);
+
+    useEffect(() => {
+        // Add has_bw property to all dataset records at once
+        const updateAllRecordsWithBWInfo = async () => {
+            const updatedRecords = await Promise.all(
+                datasetRecords.map(async (record) => {
+                    const hasBW = await checkBWDataExists(record.dataset_id);
+                    return {...record, has_bw: hasBW};
+
+                })
+            );
+
+            // Update the store with all records at once
+            setDatasetRecords(updatedRecords);
+        };
+
+        if (datasetRecords.length > 0) {
+            updateAllRecordsWithBWInfo();
+        }
+    }, [datasetRecords, checkBWDataExists, setDatasetRecords]);
+
+
+    console.log(datasetRecords)
 
     // Update URL when filters change
     useEffect(() => {

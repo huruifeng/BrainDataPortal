@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import {
+    getBWDataExists,
     getRegionSignalData,
     getCellTypeList,
     getGeneLocationsInChromosome,
@@ -42,6 +43,22 @@ const useSignalStore = create((set, get) => ({
 
     setSelectedRange: (start, end) => {
         set({ selectedRange: { start: start, end: end } });
+    },
+
+    setHasBWData: (hasBWData) => {
+        set({ hasBWData: hasBWData });
+    },
+
+    checkBWDataExists: async (dataset) => {
+        dataset = dataset ?? get().dataset;
+        try {
+            const response = await getBWDataExists(dataset);
+            const hasBWData = response.data.hasBWData;
+            set({ hasBWData: hasBWData });
+            return hasBWData;
+        } catch (error) {
+            console.error("Error checking BW data exists:", error);
+        }
     },
 
     fetchCellTypes: async (dataset) => {
@@ -109,7 +126,12 @@ const useSignalStore = create((set, get) => ({
                 c,
                 binSize,
             );
-            const signalData = response.data;
+            const hasBWData = response.data.hasBWData;
+            set({ hasBWData: hasBWData });
+            if (!hasBWData) {
+                return [c, []];
+            }
+            const signalData = response.data.data;
             const signalDataRows = columnToRow(signalData);
             return [c, signalDataRows];
         });
