@@ -80,7 +80,7 @@ function GenomicRegionView() {
   }, []);
 
   const datasetOptions = datasetRecords
-    .filter((d) => d.assay.toLowerCase().endsWith("signal"))
+    .filter((d) => d.assay.toLowerCase().endsWith("qtl"))
     .map((d) => d.dataset_id);
 
   const [datasetId, setDatasetId] = useState(urlDataset);

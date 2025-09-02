@@ -95,9 +95,9 @@ const useSignalStore = create((set, get) => ({
         set({ loading: true, snpData: {} });
 
         const promises = get().availableCellTypes.map(async (c) => {
-            console.log(
-                `Fetching signal data for ${dataset}, chromosome ${chromosome}, range ${start}-${end}, cell type ${c}, bin size ${binSize}`,
-            );
+            // console.log(
+            //     `Fetching signal data for ${dataset}, chromosome ${chromosome}, range ${start}-${end}, cell type ${c}, bin size ${binSize}`,
+            // );
 
             const response = await getRegionSignalData(
                 dataset,
