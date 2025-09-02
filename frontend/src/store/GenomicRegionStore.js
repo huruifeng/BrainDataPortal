@@ -23,6 +23,16 @@ function columnToRow(data) {
     return rows;
 }
 
+export const checkBWDataExists = async (dataset) => {
+    try {
+        const response = await getBWDataExists(dataset);
+        const hasBWData = response.data.hasBWData;
+        return hasBWData;
+    } catch (error) {
+        console.error("Error checking BW data exists:", error);
+    }
+}
+
 const useSignalStore = create((set, get) => ({
     dataset: null,
     hasBWData: false,
@@ -49,15 +59,24 @@ const useSignalStore = create((set, get) => ({
         set({ hasBWData: hasBWData });
     },
 
-    checkBWDataExists: async (dataset) => {
+    fetchBWDataExists: async (dataset) => {
         dataset = dataset ?? get().dataset;
+        if (!dataset || dataset === "all") {
+            set({
+                error: "fetchBWDataExists: No dataset selected",
+                loading: false,
+            });
+            return;
+        }
+        set({ loading: true });
+
         try {
             const response = await getBWDataExists(dataset);
             const hasBWData = response.data.hasBWData;
-            set({ hasBWData: hasBWData });
-            return hasBWData;
+            set({ hasBWData: hasBWData, loading: false });
         } catch (error) {
-            console.error("Error checking BW data exists:", error);
+            console.error("Error fetching BW data exists:", error);
+            throw error;
         }
     },
 
