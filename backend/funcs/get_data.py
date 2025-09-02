@@ -883,8 +883,6 @@ def get_cached_bigwig_handle(dataset, celltype):
     if not os.path.exists(celltype_mapping_file):
         print(celltype_mapping_file + " not found")
         return None
-    else:
-        print(celltype_mapping_file + " found")
 
     with open(celltype_mapping_file, "r") as f:
         celltype_mapping = json.load(f)

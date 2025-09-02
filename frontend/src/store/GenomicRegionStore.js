@@ -24,6 +24,7 @@ function columnToRow(data) {
 
 const useSignalStore = create((set, get) => ({
     dataset: null,
+    hasBWData: false,
     selectedChromosome: null,
     selectedRange: null,
     availableCellTypes: [],
@@ -88,6 +89,7 @@ const useSignalStore = create((set, get) => ({
         ) {
             set({
                 error: "fetchSignalData: No chromosome or range selected",
+                hasBWData: false,
                 loading: false,
             });
             return;
