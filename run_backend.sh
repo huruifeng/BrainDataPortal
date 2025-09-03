@@ -1,6 +1,7 @@
 conda activate FastAPI
 cd backend/
 pip3 install -r requirements.txt
+cd ../
 nohup python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers >> backend.log 2>&1 &
 # nohup python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 --proxy-headers >> backend.log 2>&1 &
 
