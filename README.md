@@ -13,8 +13,63 @@
 - The data is stored in [SQLite3](https://www.sqlite.org/) and JSON files.
 - Use zustand for state management, and Material UI for web page layout design
 
-## How to use
+## Directory structure:
 
+    BrainDataPortal/
+    |-- Backend/
+    |   |-- main.py                         ## The main entry of the backend
+    |   |-- db.py                           ## The database connection and management
+    |   |-- settings.py                     ## The configuration of the backend
+    |   |-- requirements.txt                ## The required libraries of the backend
+    |   |-- funcs/                          ## This folder contains request handler functions of the backend
+    |   |   |-- get_data.py                 ## The request handler functions for data
+    |   |   |-- utils.py                    ## The utils functions
+    |   |   `-- ...
+    |   |-- models/                         ## This folder contains database models of the backend
+    |   |   |-- dataset.py                  ## The dataset model/table
+    |   |   `-- ...
+    |   |-- routes/                         ## This folder contains routes endpoints of requests
+    |   |   |-- api_routes.py                
+    |   |   |-- qtl_routes.py
+    |   |   |-- visium_routes.py
+    |   |   `-- ...
+    |   |-- SampleSheets/                   ## Upload sample sheets here when adding new datasets
+    |   |   |-- Sample_snRNAseq.csv
+    |   |   `-- ...
+    |   |-- datasets/                       ## The datasets are stored here
+    |   |   |-- dataset_1/
+    |   |   |   |-- meta_cell.json
+    |   |   |   |-- meta_sample.json
+    |   |   |   |-- ...
+    |   |   `-- ...
+    |   |-- bdp_db.db                        ## The database file
+    |   `-- ...
+    |-- Frontend
+    |   |-- index.html                      ## The entry page of the frontend
+    |   |-- vite.config.js                  ## The vite configuration file
+    |   |-- package.json                    ## The dependencies and dev/build settings of the frontend
+    |   |-- env/                            ## The environment variables
+    |   |   |-- .env                        ## The global environment variables
+    |   |   |-- .env.development            ## The development environment variables
+    |   |   `-- .env.production             ## The production environment variables
+    |   `-- src/                            ## The source code of the frontend
+    |   |   |-- App.jsx                     ## Define the routes of the frontend
+    |   |   |-- index.css                   ## The global styles of the frontend
+    |   |   |-- main.jsx                   ## The entry file of the frontend
+    |   |   |-- components/                 ## The components of the frontend
+    |   |   |   |-- ...
+    |   |   |-- pages/                      ## The pages of the frontend
+    |   |   |   |-- ...
+    |   |   |-- utils/                      ## The fucntional utils
+    |   |   |   |-- ...
+    |   |   |-- store/                      ## The stores for state management
+    |   |   |-- api/                        ## The api for data fetching
+    |   |   `-- ...
+    |   `-- ...
+    `-- README.md
+
+
+## How to use
 ### 1. Prerequisites
 Before you begin, ensure you have the following installed on your system:
 - Python 3.10 or higher: Required to run the backend
@@ -167,15 +222,15 @@ Before you begin, ensure you have the following installed on your system:
        ```
      - Setup the proxy service (Nginx server) (Example configuration file [bdpvite_nginx](bdpvite_nginx)):
        ```bash
-       # if you are using the Ubuntu/Debian system
+       # if you have "/etc/nginx/sites-available" folder in the system (e.g., Ubuntu/Debian system)
        # Create and edit /etc/nginx/sites-available/BrainDataPortal
        
-       # if you are using the RHEL/CentOS system
+       # if you have "/etc/nginx/conf.d/" folder in the system(e.g., RHEL/CentOS system)
        # Create and edit /etc/nginx/conf.d/BrainDataPortal.conf
        
        server {
 
-           # Make sure THE PORT IS NOT USED!
+           #You can user another port, Make sure THE PORT IS NOT USED by other conf file!
            listen 80;
            server_name localhost;
 
@@ -206,6 +261,14 @@ Before you begin, ensure you have the following installed on your system:
            }
 
            location /visium/ {
+               proxy_pass http://localhost:8000;
+               proxy_http_version 1.1;
+               proxy_set_header Host $host;
+               proxy_set_header X-Real-IP $remote_addr;
+               proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           }
+       
+           location /signal/ {
                proxy_pass http://localhost:8000;
                proxy_http_version 1.1;
                proxy_set_header Host $host;
