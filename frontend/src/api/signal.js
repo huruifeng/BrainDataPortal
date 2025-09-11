@@ -37,7 +37,7 @@ export const getRegionSignalData = async (
         return response;
     } catch (error) {
         console.error("Error getRegionSignalData:", error);
-        throw error;
+        // throw error;
     }
 };
 
