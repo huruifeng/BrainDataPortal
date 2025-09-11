@@ -1,46 +1,63 @@
-import pandas as pd
+import polars as pl
 from pathlib import Path
 from glob import glob
 import os
 from tqdm import tqdm
+from multiprocessing import Pool, cpu_count
+import time
 
 print("Collecting significant pairs...")
-sig_pairs = []
+sig_dfs = []
+for filepath in tqdm(sorted(glob("filtered_celltypes/*.tsv")), desc="Reading filtered files"):
+    df = pl.read_csv(filepath, separator="\t", columns=["snp_id", "gene_id"])
+    sig_dfs.append(df)
 
-for filepath in sorted(glob("filtered_celltypes/*.tsv")):
-    df = pd.read_csv(filepath, sep="\t", usecols=["snp_id", "gene_id"])
-    sig_pairs.append(df)
-
-significant_df = pd.concat(sig_pairs).drop_duplicates()
-print(f"  > Collected {len(significant_df)} unique significant SNP–gene pairs")
+significant_df = pl.concat(sig_dfs).unique()
+print(f"  > Collected {significant_df.height} unique significant SNP–gene pairs")
 
 os.makedirs("celltypes", exist_ok=True)
+unfiltered_files = sorted(glob("unfiltered_celltypes/*.tsv"))
 
 print("Filtering celltypes to match significant pairs...")
 
-for filepath in sorted(glob("unfiltered_celltypes/*.tsv")):
-    print(f"  * Processing {filepath}...")
+def process_file(filepath):
     region = Path(filepath).stem
-    output_path = Path("celltypes") / f"{region}.tsv"
+    output_path = f"celltypes/{region}.tsv"
+    print(f"  > Starting {region}.tsv...")
 
-    filtered_chunks = []
+    start_time = time.time()
+    chunk_size = 1_000_000
+    header = pl.read_csv(filepath, separator="\t", n_rows=0)
+    total_rows = sum(1 for _ in open(filepath)) - 1  # -1 for header
 
-    with open(filepath) as f:
-        total_lines = sum(1 for _ in f) - 1
+    chunks = []
+    for offset in tqdm(range(1, total_rows + 1, chunk_size), desc=f"  Processing {region}", unit="row"):
+        df_chunk = pl.read_csv(
+            filepath,
+            separator="\t",
+            skip_rows=offset,
+            n_rows=chunk_size,
+            has_header=False,
+            new_columns=header.columns
+        )
+        df_filtered = df_chunk.join(significant_df, on=["snp_id", "gene_id"], how="semi")
+        chunks.append(df_filtered)
 
-    chunk_reader = pd.read_csv(filepath, sep="\t", chunksize=500_000)
+    df = pl.concat(chunks) if chunks else pl.DataFrame(schema=header.schema)
+    df.write_csv(output_path, separator="\t", float_precision=6)
 
-    for chunk in tqdm(
-        chunk_reader,
-        total=(total_lines // 500_000) + 1,
-        desc=f"  > Filtering {region}",
-        unit="chunk",
-    ):
-        filtered = chunk.merge(significant_df, on=["snp_id", "gene_id"], how="inner")
-        filtered_chunks.append(filtered)
+    elapsed = time.time() - start_time
+    return (region, df.height, elapsed)
 
-    final_df = pd.concat(filtered_chunks, ignore_index=True)
-    final_df.to_csv(output_path, sep="\t", index=False, float_format="%.6g")
-    print(f"  - {region}.tsv created with {len(final_df)} entries")
+results = []
+for filepath in tqdm(unfiltered_files, desc="Processing files", unit="file"):
+    results.append(process_file(filepath))
+
+for region, count, elapsed in results:
+    print(f"  - {region}.tsv: {count} entries ({elapsed:.1f}s)")
+
+## move the celltype_parquet.json to celltypes
+os.rename("celltype_parquet.json", "celltypes/celltype_parquet.json")
+
 
 print("All done. Filtered files are in 'celltypes/'.")
