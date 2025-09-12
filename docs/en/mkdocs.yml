@@ -1,18 +1,18 @@
-site_name: BrainDataPortal Docs
-site_url: https://huruifeng.github.io/BrainDataPortal/
+site_name: Ruifeng's Notes - Machine Learning
+site_url: https://huruifeng.github.io/ml_notes
 site_author: Ruifeng Hu
 site_description: >-
-  BrainDataPortal is a platform for brian multi-modal data exploration and visualization.
+  Learn about Machine Learning.
 
-repo_name: huruifeng/BrainDataPortal
-repo_url: https://github.com/huruifeng/BrainDataPortal
+repo_name: huruifeng/ml_notes
+repo_url: https://github.com/huruifeng/ml_notes
 
 copyright: Copyright &copy; 2024 Ruifeng Hu
 
 theme:
   name: material
   custom_dir: docs/overrides
-
+    
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
@@ -22,7 +22,7 @@ theme:
 
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
-      scheme: default
+      scheme: default 
       toggle:
         icon: material/weather-sunny
         name: Switch to dark mode
@@ -60,48 +60,40 @@ extra_css:
 extra_javascript:
   - assets/js/myscript.js
 
-markdown_extensions:
-
-  # Python Markdown
-  - abbr
-  - admonition
-  - attr_list
-  - def_list
-  - footnotes
-  - md_in_html
-  - toc:
-      permalink: true
-
-    # Python Markdown Extensions
-  - pymdownx.arithmatex:
-      generic: true
-  - pymdownx.betterem:
-      smart_enable: all
-  - pymdownx.caret
-  - pymdownx.details
-  - pymdownx.highlight
-  - pymdownx.inlinehilite
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.tilde
-  - pymdownx.snippets
-
 
 plugins:
   - search
+  - i18n:
+      docs_structure: folder
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          name: English
+          build: true
+          default: true  # Set English as the default language
+          site_name: "Machine Learning Notes"
+        - locale: zh
+          name: 中文
+          build: true  # Ensure this language is built properly
+          site_name: "机器学习笔记"
+          theme:
+            palette:
+              primary: red
+          nav_translations:
+            Home: 首页
+            Python basics: Python 基础
+            Python advanced: Python 进阶
+            Machine learning: 机器学习
+            Machine learning basics: 机器学习基础
+            Machine learning advanced: 机器学习进阶
 
 
 nav:
   - Home: index.md
   - Python:
     - python/index.md
-    - Python install: python/python_install.md
     - Python basics: python/python_basics.md
     - Python advanced: python/python_advanced.md
   - Machine learning:
