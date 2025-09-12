@@ -1,0 +1,47 @@
+{% extends "main.html" %}
+{% block tabs %}
+{{ super() }}
+<style>
+    .md-header{position:initial}
+    .md-main__inner{margin:0}
+    .md-content{display:none}
+    .mdx-hero{
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+    @media screen and (min-width: 60em) {
+        .md-sidebar--primary{display:none}
+        .md-sidebar--secondary{display:none}
+        .md-sidebar--secondary:not([hidden]){display:none}
+    }
+    @media screen and (min-width:76.25em){
+        .md-sidebar--primary{display:none}
+        .md-sidebar--secondary{display:none}
+        .md-sidebar--secondary:not([hidden]){display:none}
+    }
+</style>
+<section class="mdx-container">
+    <div class="md-grid md-typeset">
+    <div class="mdx-hero">
+        <div class="mdx-hero__image">
+        <img src="assets/logo_by_maxicons.png" alt="" draggable="false">
+        </div>
+        <div class="mdx-hero__content">
+        <h1>一步一步学习机器学习和深度学习</h1>
+        <p>这里分享机器学习知识,一步一步从最简单的开始，从基础到应用。</p>
+        <p>机器学习和深度学习主要的编程语言是Python， 学习机器学习必将从Python开始，逐步学习机器学习和深度学习的知识</p>
+        <p>这里是我的个人学习经验，希望能帮助你学习机器学习和深度学习</p>
+        <p style="margin: 0 0 2.25em">学习笔记将集中在这里，<b>并持续更新......</b></p>
+        <a href="{{ 'zh/python' | url }}" title="开始学习" class="md-button md-button--primary">
+            开始
+        </a>
+        <!-- <a href="{{ 'setup/' | url }}" title="" class="md-button">
+            参数配置
+        </a> -->
+        </div>
+    </div>
+    </div>
+</section>
+{% endblock %}
+{% block content %}{% endblock %}
+{% block footer %}{% endblock %}
