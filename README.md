@@ -1,7 +1,7 @@
 # BrainDataPortal
 
 ## Installation and running
-The Documentation for installation and running the app is available at [BrainDataPortal Docs](https://huruifeng.github.io/BrainDataPortal/)
+The Documentation for installation and running the app is available at [BrainDataPortal Docs](https://huruifeng.github.io/BrainDataPortal/){:target="_blank"}
 
 ### NOTES:
 - 1. Load all the meta data when first load the page, separate the meta data into cell level and sample level
