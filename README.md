@@ -1,5 +1,8 @@
 # BrainDataPortal
 
+## Installation and running
+The Documentation for installation and running the app is available at <a href="https://huruifeng.github.io/BrainDataPortal/" target="_blank">BrainDataPortal Docs</a>.
+
 ### NOTES:
 - 1. Load all the meta data when first load the page, separate the meta data into cell level and sample level
 - 2. To reduce the size of the meta data file, meta file only save an index/key of the meta string. And the actual meta data is stored in a JSON file (Dict).
@@ -68,6 +71,12 @@
     |   `-- ...
     `-- README.md
 
+## Example pages
+#### Home Page
+![Home Page](docs/screenshots/home.png)
 
-## How to use
-The Documentation for installation and running the app is available at [BrainDataPortal Docs](huruifeng.github.io/BrainDataPortal/).
+#### Single Cell UMAP clustering
+![UMAP Page](docs/screenshots/sc_page.png)
+
+#### Spatial Transcriptomics
+![VisiumST Page](docs/screenshots/Visium_page.png)
