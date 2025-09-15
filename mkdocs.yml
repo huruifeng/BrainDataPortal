@@ -38,7 +38,7 @@ theme:
     - navigation.indexes
     - navigation.instant.progress
     - navigation.tracking
-    - navigation.tabs
+    # - navigation.tabs
     - navigation.sections
     # - navigation.sections  # expand all sections
     # - navigation.path
@@ -61,7 +61,6 @@ extra_javascript:
   - assets/js/myscript.js
 
 markdown_extensions:
-
   # Python Markdown
   - abbr
   - admonition
@@ -99,12 +98,10 @@ plugins:
 
 nav:
   - Home: index.md
-  - Python:
-    - python/index.md
-    - Python install: python/python_install.md
-    - Python basics: python/python_basics.md
-    - Python advanced: python/python_advanced.md
-  - Machine learning:
-    - machine_learning/index.md
-    - Machine learning basics: machine_learning/machine_learning_basics.md
-    - Machine learning advanced: machine_learning/machine_learning_advanced.md
+  - Install:
+    - install/index.md
+  - Prepare dataset:
+    - prepare_dataset/index.md
+    - scRNAseq dataset: prepare_dataset/scrnaseq.md
+    - VisiumST dataset: prepare_dataset/visiumst.md
+    - scATACseq dataset: prepare_dataset/scatacseq.md

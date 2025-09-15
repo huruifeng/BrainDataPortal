@@ -93,7 +93,7 @@ Before you begin, ensure you have the following installed on your system:
    
        ```pip install -r requirements.txt```
 3. Run the backend.
-   - Make sure you are in the ROOT (e.g., BrainDataPortal) directory, NOT the backend folder
+   - Make sure you are in the ROOT directory of the project (e.g., BrainDataPortal) directory, NOT the backend folder
    - __Option 1__: Run the backend server in the terminal.
       ```bash
       uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers
