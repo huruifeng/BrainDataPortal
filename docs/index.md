@@ -64,4 +64,4 @@ This documentation will guide you through the installation and data preparation 
     |   `-- ...
     `-- README.md
 
- <a href="{{ 'python' | url }}" title="Start to learn" class="md-button md-button--primary">Get Started</a>
+ <a href="install/" title="Start to learn" class="md-button md-button--primary">Get Started</a>

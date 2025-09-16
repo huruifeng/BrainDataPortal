@@ -41,7 +41,7 @@ theme:
     # - navigation.tabs
     - navigation.sections
     # - navigation.sections  # expand all sections
-    # - navigation.path
+    - navigation.path
     # - navigation.prune
     - navigation.top
 
