@@ -104,4 +104,4 @@ nav:
     - prepare_dataset/index.md
     - scRNAseq dataset: prepare_dataset/scrnaseq.md
     - VisiumST dataset: prepare_dataset/visiumst.md
-    - scATACseq dataset: prepare_dataset/scatacseq.md
+    - xQTL dataset: prepare_dataset/xqtl.md
