@@ -18,13 +18,13 @@ This dataset contains 10 subjects, approximately 50,000 cells from brain middle 
 * Demo dataset and scripts:
 > 1. Seurat object: [snRNAseq_MTG_10samples.rds](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/seurat_object.rds)
 > 2. Sample metadata sheet: [Sample_snRNAseq_MTG_10samples.csv](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/Sample_snRNAseq.csv)
-> 3. Dataset configuration file: [dataset_info.toml](../assets/notebooks/sc/dataset_info.toml)
-> 4. Processing script: [sc_script.zip](../assets/scripts/sc.zip)
+> 3. Dataset configuration file: [dataset_info.toml](../demos/notebooks/sc/dataset_info.toml)
+> 4. Processing script: [sc_script.zip](../demos/scripts/sc.zip)
 
 ## 3. Data loading and checking
 Once you have the data, Load it and perform initial inspection to understand the dataset structure.
 
-Full code in Notebook: [11.extract_SC_v4.R](../assets/notebooks/sc/11_extract_SC_v4.html).
+Full code in Notebook: [11.extract_SC_v4.R](../demos/notebooks/sc/11_extract_SC_v4.html).
 
 You need to pay attention to the input arguments: __seurat_obj_file__, __output_dir__, __cluster_col__
 
@@ -72,7 +72,7 @@ capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure
 ## 4. Data extraction
 After check the structure of the Seurat object, we can extract the data and metadata from the object.
 
-Full code in Notebook: [11.extract_SC_v4.R](../assets/notebooks/sc/11_extract_SC_v4.html).
+Full code in Notebook: [11.extract_SC_v4.R](../demos/notebooks/sc/11_extract_SC_v4.html).
 !!! warning "Important Note"
     Seurat v5 has a different structure compared to v4, you may need to adjust the following codes accordingly.
 
@@ -121,7 +121,7 @@ This step processes single cell metadata for visualization, including:
 - Expression data splitting and saving (Save gene expression data in json files)
 - Pseudo-bulk level expression calculation
 
-Full code in Notebook: [21.rename_meta.py](../assets/notebooks/sc/21_rename_meta.html).
+Full code in Notebook: [21.rename_meta.py](../demos/notebooks/sc/21_rename_meta.html).
 
 Set the following parameters according to your dataset:
 ```python
@@ -143,7 +143,7 @@ This step computes cluster markers for each cluster, including:
 - Calculating differential expression between conditions within each cell cluster
 - Performing pseudo-bulk analysis
 
-Full code in Notebook: [31.clustermarkers.R](../assets/notebooks/sc/31_clustermarkers.html).
+Full code in Notebook: [31.clustermarkers.R](../demos/notebooks/sc/31_clustermarkers.html).
 
 Set the following parameters according to your dataset:
 ```R
@@ -184,7 +184,7 @@ seurat_type <- "snrnaseq"
 This step identifies and analyzes top marker genes for each cell type (or cluster) from single-cell data.
 It also calculates detection frequency and average expression for selected marker genes across conditions and sexes.
 
-Full code in Notebook: [41_clustermarkers_postprocess.py](../assets/notebooks/sc/41_clustermarkers_postprocess.html).
+Full code in Notebook: [41_clustermarkers_postprocess.py](../demos/notebooks/sc/41_clustermarkers_postprocess.html).
 
 Modify the following codes for your specific dataset.
 ```python
@@ -214,7 +214,7 @@ top_genes = (
 This step generates a sample sheet file for the dataset.
 It includes information about the samples, such as condition, sex, and other relevant metadata.
 
-Download the demo sample sheet file: [Sample_snRNAseq_MTG_10samples.csv](../assets/notebooks/sc/Sample_snRNAseq_MTG_10samples.csv)
+Download the demo sample sheet file: [Sample_snRNAseq_MTG_10samples.csv](../demos/notebooks/sc/Sample_snRNAseq_MTG_10samples.csv)
 !!! danger "Important Note"
     PLEASE KEEP ALL THE COLUMN NAMES AND ORDER AS IS, JUST FILL IN YOUR DATA.
 
@@ -224,7 +224,7 @@ This step prepares the dataset information.
 - The dataset information file is a toml file.
 - It is an essential file for the dataset.
 
-Download the demo dataset information file: [dataset_info.toml](../assets/notebooks/sc/dataset_info.toml)
+Download the demo dataset information file: [dataset_info.toml](../demos/notebooks/sc/dataset_info.toml)
 !!! danger "Important Note"
     Dataset configuration file name must be __dataset_info.toml__.
 Here is an example of the dataset configuration file content:

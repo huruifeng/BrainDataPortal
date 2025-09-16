@@ -4,7 +4,7 @@ import sys
 
 
 directory = Path("filtered_celltypes").resolve()
-output_file = Path("celltype_mapping.json").resolve()
+output_file = Path("celltype_parquet.json").resolve()
 mapping = {}
 
 if not directory.is_dir():

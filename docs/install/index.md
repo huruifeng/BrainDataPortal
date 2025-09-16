@@ -13,7 +13,7 @@ Before you begin, ensure you have the following installed on your system:
 ## 2. Get codes
 1. Clone the repository. 
    ```bash
-   git clone https://github.com/BrainDataPortal/BrainDataPortal.git
+   git clone https://github.com/huruifeng/BrainDataPortal.git
    ```
    Or, download the zipped repository from [https://github.com/huruifeng/BrainDataPortal](https://github.com/huruifeng/BrainDataPortal)
 2. Setup backend environment.
@@ -161,7 +161,7 @@ Before you begin, ensure you have the following installed on your system:
       npm run build:nginx
       # This command will build the frontend pages in the frontend/dist folder
       ```
-    - Setup the proxy service (Nginx server) (Example configuration file [bdpvite_nginx](../assets/bdpvite)):
+    - Setup the proxy service (Nginx server) (Example configuration file [bdpvite_nginx](../demos/bdpvite)):
       ```bash
       # Create and edit /etc/nginx/conf.d/BrainDataPortal.conf
        

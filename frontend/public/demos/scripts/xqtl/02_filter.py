@@ -4,10 +4,11 @@ from glob import glob
 import os
 from tqdm import tqdm
 
-os.makedirs("filtered_celltypes", exist_ok=True)
 
+############################
 files = sorted(glob("unfiltered_celltypes/*.tsv"))
 
+os.makedirs("filtered_celltypes", exist_ok=True)
 print("Filtering for significant QTLs in each celltype...")
 
 for filepath in tqdm(files, desc="Processing files", unit="file"):

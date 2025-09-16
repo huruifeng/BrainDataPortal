@@ -1,7 +1,7 @@
 # xQTL Dataset Preparation
-Step-by-step guide for preparing single-cell ATAC-seq/xQTL data for visualization in BrainDataPortal.
+Step-by-step guide for preparing single-cell ATAC-seq/xQTL/GWAS data for visualization in BrainDataPortal.
 
-Learn how to prepare and process single-cell/nuclei ATAC-seq/xQTL data for visualization in BrainDataPortal. 
+Learn how to prepare and process single-cell/nuclei ATAC-seq/xQTL/GWAS data for visualization in BrainDataPortal. 
 This section covers seurat object processing, gene expression data splitting, metadata table preparation and data formatting.
 
 We will use a brain dataset as an example and cover all essential preprocessing steps.
@@ -12,13 +12,12 @@ We will use a brain dataset as an example and cover all essential preprocessing 
 
 ## 2. Download demo data
 We will use a single-cell dataset from human brain. 
-This dataset contains 10 subjects, approximately 50,000 cells from brain middle temporal gyrus region.
+This demo dataset contains several cell types from human brain middle temporal gyrus region.
 
 * Demo dataset and scripts:
-> 1. Seurat object: [snRNAseq_MTG_10samples.rds](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/seurat_object.rds)
-> 2. Sample metadata sheet: [Sample_snRNAseq_MTG_10samples.csv](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/Sample_snRNAseq.csv)
+> 1. Seurat object: [xQTL_Demo.zip](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/seurat_object.rds)
 > 3. Dataset configuration file: [dataset_info.toml](../assets/notebooks/sc/dataset_info.toml)
-> 4. Processing script: [sc_script.zip](../assets/scripts/sc.zip)
+> 4. Processing script: [xqtl_script.zip](../assets/scripts/xqtl.zip)
 
 ## 3. Data loading and checking
 Once you have the data, Load it and perform initial inspection to understand the dataset structure.
