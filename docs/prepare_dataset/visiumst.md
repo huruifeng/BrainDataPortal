@@ -1,7 +1,7 @@
-# Single-Cell Dataset Preparation
-Step-by-step guide for preparing single-cell RNA-seq data for visualization in BrainDataPortal.
+# Visium ST Dataset Preparation
+Step-by-step guide for preparing Visium ST RNA-seq data for visualization in BrainDataPortal.
 
-Learn how to prepare and process single-cell/nuclei RNA sequencing data for visualization in BrainDataPortal. 
+Learn how to prepare and process Visium ST data for visualization in BrainDataPortal. 
 This section covers seurat object processing, gene expression data splitting, metadata table preparation and data formatting.
 
 We will use a brain dataset as an example and cover all essential preprocessing steps.
@@ -9,22 +9,22 @@ We will use a brain dataset as an example and cover all essential preprocessing 
 ## 1. Prerequisites
 * Python 3.8+ with pandas, numpy, json libraries installed.
 * R 4.0+ with Seurat, tidyverse, presto packages installed.
-* Basic understanding of single-cell RNA-seq concepts.
+* Basic understanding of Visium ST concepts.
 
 ## 2. Download demo data
-We will use a single-cell dataset from human brain. 
-This dataset contains 10 subjects, approximately 50,000 cells from brain middle temporal gyrus region.
+We will use a Visium ST dataset from human brain. 
+This dataset contains 10 subjects, approximately 40,000 spots from brain middle temporal gyrus region.
 
 * Demo dataset and scripts:
-> 1. Seurat object: [snRNAseq_MTG_10samples.rds](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/seurat_object.rds)
-> 2. Sample metadata sheet: [Sample_snRNAseq_MTG_10samples.csv](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/Sample_snRNAseq.csv)
-> 3. Dataset configuration file: [dataset_info.toml](../assets/notebooks/sc/dataset_info.toml)
-> 4. Processing script: [sc_script.zip](../assets/scripts/sc.zip)
+> 1. Seurat object: [VisiumST_MTG_10samples.rds](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/seurat_object.rds)
+> 2. Sample metadata sheet: [Sample_VisiumST_MTG_10samples.csv](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/Sample_snRNAseq.csv)
+> 3. Dataset configuration file: [dataset_info.toml](../assets/notebooks/visiumst/dataset_info.toml)
+> 4. Processing script: [visiumst_script.zip](../assets/scripts/visiumst.zip)
 
 ## 3. Data loading and checking
 Once you have the data, Load it and perform initial inspection to understand the dataset structure.
 
-Full code in Notebook: [11.extract_SC_v4.R](../assets/notebooks/sc/11_extract_SC_v4.html).
+Full code in Notebook: [11.extract_VisiumST.R](../assets/notebooks/visiumst/11_extract_VisiumST.html).
 
 You need to pay attention to the input arguments: __seurat_obj_file__, __output_dir__, __cluster_col__
 
@@ -32,9 +32,9 @@ You need to pay attention to the input arguments: __seurat_obj_file__, __output_
 ## Rscript 11.extract_SC_v4.R
 ... ...
 # Get the arguments
-seurat_obj_file <- "snRNAseq_MTG_10samples.rds"
-output_dir <- "snRNAseq_MTG_10samples"
-cluster_col <- "MajorCellTypes"
+seurat_obj_file <- "Visium_MTG_10samples.rds"
+output_dir <- "Visium_MTG_10samples"
+cluster_col <- "smoothed_label_s5"
 
 # Load the Seurat object
 seurat_obj <- readRDS(seurat_obj_file)
@@ -49,7 +49,7 @@ capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure
 
         sc RNAseq Seurat RDS/
         |-- @assays                     ## List of assays
-        |   |-- RNA                     ## RNA data
+        |   |-- Spatial                 ## RNA data
         |   |   |-- @counts             ## Raw counts
         |   |   |-- @data               ## Normalized data
         |   |   |-- @features           ## Feature/Gene names, v5 format
@@ -67,12 +67,20 @@ capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure
         |   |   |-- @cell.embeddings    ## UMAP coordinates for each cell
         |   |   `-- ...
         |   `-- ...
+        |-- @images                     ## Spatial image data
+        |   |-- Sample1                 ## Image name
+        |   |   |-- @image              ## Image data
+        |   |   |-- @coordinates        ## Image coordinates
+        |   |   `-- @scale.factors      ## Image scale
+        |   |-- Sample2                 ## Image name
+        |   |   |-- ...
+        |   `-- ...
         `-- ...
 
 ## 4. Data extraction
 After check the structure of the Seurat object, we can extract the data and metadata from the object.
 
-Full code in Notebook: [11.extract_SC_v4.R](../assets/notebooks/sc/11_extract_SC_v4.html).
+Full code in Notebook: [11.extract_VisiumST.R](../assets/notebooks/visiumst/11_extract_VisiumST.html).
 !!! warning "Important Note"
     Seurat v5 has a different structure compared to v4, you may need to adjust the following codes accordingly.
 
@@ -121,39 +129,39 @@ This step processes single cell metadata for visualization, including:
 - Expression data splitting and saving (Save gene expression data in json files)
 - Pseudo-bulk level expression calculation
 
-Full code in Notebook: [21.rename_meta.py](../assets/notebooks/sc/21_rename_meta.html).
+Full code in Notebook: [21.rename_meta.py](../assets/notebooks/visiumst/21_rename_meta.html).
 
 Set the following parameters according to your dataset:
 ```python
 ## This is the output directory from the previous step 
-dataset_path = "snRNAseq_MTG_10samples"  
+dataset_path = "Visium_MTG_10samples" 
 
 ## a list of metadata columns to keep, pick features that you want to visualize
-kept_features =[ "nCount_RNA", "nFeature_RNA", "sex", "MajorCellTypes", 
-                "updrs", "Complex_Assignment", "mmse", "sample_id", "case",]
-sample_col = "sample_id"
-cluster_col = "MajorCellTypes"
-condition_col = "case"
+kept_features =["nCount_Spatial","nFeature_Spatial","sample_name","sex","diagnosis",
+                "last_mmse_test_score","motor_updrs_score","smoothed_label_s5"]
+sample_col = "sample_name"
+cluster_col = "smoothed_label_s5"
+condition_col = "diagnosis"
 ```
 
 ## 6. Computing cluster markers
 This step computes cluster markers for each cluster, including:
 
-- Finding cell cluster specific markers
-- Calculating differential expression between conditions within each cell cluster
+- Finding cluster specific markers
+- Calculating differential expression between conditions within each cluster
 - Performing pseudo-bulk analysis
 
-Full code in Notebook: [31.clustermarkers.R](../assets/notebooks/sc/31_clustermarkers.html).
+Full code in Notebook: [31.clustermarkers.R](../assets/notebooks/visiumst/31_clustermarkers.html).
 
 Set the following parameters according to your dataset:
 ```R
 ## Dataset specific parameters
-seurat_obj_file <- "snRNAseq_MTG_10samples.rds"
-output_dir <- "snRNAseq_MTG_10samples"
-cluster_col <- "MajorCellTypes"
-condition_col <- "case"
-sample_col <- "sample_id"
-seurat_type <- "snrnaseq"
+seurat_obj_file <- "Visium_MTG_10samples"
+output_dir <- "datasets/Visium_MTG_10samples"
+cluster_col <- "smoothed_label_s5"
+condition_col <- "diagnosis"
+sample_col <- "sample_name"
+seurat_type <- "visiumst" # options: "scrnaseq", "snrnaseq", "snatacseq", "scatacseq", "visiumst"
 ```
 !!! warning "Important Note"
     You may need to adjust the following codes for your specific dataset.
@@ -181,10 +189,10 @@ seurat_type <- "snrnaseq"
     }
     ```
 ## 7. Post-marker processing
-This step identifies and analyzes top marker genes for each cell type (or cluster) from single-cell data.
+This step identifies and analyzes top marker genes for each cell type (or cluster) from Visium ST data.
 It also calculates detection frequency and average expression for selected marker genes across conditions and sexes.
 
-Full code in Notebook: [41_clustermarkers_postprocess.py](../assets/notebooks/sc/41_clustermarkers_postprocess.html).
+Full code in Notebook: [41_clustermarkers_postprocess.py](../assets/notebooks/visiumst/41_clustermarkers_postprocess.html).
 
 Modify the following codes for your specific dataset.
 ```python
@@ -214,7 +222,7 @@ top_genes = (
 This step generates a sample sheet file for the dataset.
 It includes information about the samples, such as condition, sex, and other relevant metadata.
 
-Download the demo sample sheet file: [Sample_snRNAseq_MTG_10samples.csv](../assets/notebooks/sc/Sample_snRNAseq_MTG_10samples.csv)
+Download the demo sample sheet file: [Sample_VisiumST_MTG_10samples.csv](../assets/notebooks/visiumst/Sample_snRNAseq_MTG_10samples.csv)
 !!! danger "Important Note"
     PLEASE KEEP ALL THE COLUMN NAMES AND ORDER AS IS, JUST FILL IN YOUR DATA.
 
