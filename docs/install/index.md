@@ -28,7 +28,7 @@ Before you begin, ensure you have the following installed on your system:
      pip install -r requirements.txt
     ```
 ## 3. Run the backend.
-!!! warning
+!!! warning "Important Note"
     Make sure you are in the ROOT directory of the project (e.g., BrainDataPortal) directory, NOT the backend folder
 - ### __Option 1__: Run in the terminal.
     ```bash
