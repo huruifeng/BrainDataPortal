@@ -12,15 +12,15 @@ We will use a brain dataset as an example and cover all essential preprocessing 
 
 ## 2. Download demo data
 We will use a single-cell dataset from human brain. 
-This demo dataset contains several cell types from human brain middle temporal gyrus region.
+This demo dataset contains several cell types from human brain middle brain region.
 
 * Demo dataset and scripts:
 > 1. Seurat object: [xQTL_Demo.zip](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/seurat_object.rds)
 > 3. Dataset configuration file: [dataset_info.toml](../assets/notebooks/sc/dataset_info.toml)
 > 4. Processing script: [xqtl_script.zip](../assets/scripts/xqtl.zip)
 
-## 3. Data loading and checking
-Once you have the data, Load it and perform initial inspection to understand the dataset structure.
+## 3. Preprocessing
+Once you have the data, you can process it using our provided scripts.
 
 Full code in Notebook: [11.extract_SC_v4.R](../assets/notebooks/sc/11_extract_SC_v4.html).
 

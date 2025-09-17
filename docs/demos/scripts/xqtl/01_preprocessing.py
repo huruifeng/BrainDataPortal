@@ -35,7 +35,7 @@ def delete_old_data():
 
 ############################
 ## define parameters, modify as needed
-qtl_data_files = sorted(glob("caQTL_unfiltered/*_combined_nominals.txt"))
+qtl_data_files = sorted(glob("eQTL_unfiltered/*_combined_nominals.txt"))
 geneid_col = "gene_id",
 snpid_col = "variant_id",
 pvalue_col = "pval_nominal"
