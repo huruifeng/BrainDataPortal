@@ -209,7 +209,7 @@ async def getprocessingstatus(dataset: str =  Query(...), task: str = Query(...)
         status = "failed"
         processingStatus = {
             "status": status,
-            "log": "Error: cannot read log file["+task+"]" ,
+            "log": "Error: cannot read log file" ,
         }
         return processingStatus
 

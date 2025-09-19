@@ -10,8 +10,8 @@ This app supports the visualization of the following data assays:
 * <b>Single-cell ATAC-seq</b>: sc-eQTL, sc-eQTL, peak signals, GWAS
 * <b>Visium Spatial Transcriptomics</b>: UMAP plots, gene feature plot, spot cluster markers, DEGs in each cluster
 
-<a href="scrnaseq" title="Prepare scRNAseq dataset" class="md-button md-button--primary">scRNAseq dataset</a>
-<a href="scatacseq" title="Prepare scATACseq dataset" class="md-button md-button--primary">scATACseq dataset</a>
-<a href="visiumst" title="Prepare VisiumST dataset" class="md-button md-button--primary">VisiumST dataset</a>
+<a href="scrnaseq" title="Prepare scRNAseq dataset" class="md-button">scRNAseq dataset</a>
+<a href="scatacseq" title="Prepare scATACseq dataset" class="md-button">scATACseq dataset</a>
+<a href="visiumst" title="Prepare VisiumST dataset" class="md-button">VisiumST dataset</a>
 
 
