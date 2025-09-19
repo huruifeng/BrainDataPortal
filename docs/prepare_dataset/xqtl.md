@@ -16,213 +16,150 @@ This demo dataset contains several cell types from human brain middle brain regi
 
 * Demo dataset and scripts:
 > 1. Seurat object: [xQTL_Demo.zip](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/seurat_object.rds)
-> 3. Dataset configuration file: [dataset_info.toml](../assets/notebooks/sc/dataset_info.toml)
-> 4. Processing script: [xqtl_script.zip](../assets/scripts/xqtl.zip)
+> 2. Gene location file: [gene_annotations.tsv](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/gene_annotation.zip)
+> 3. SNP location file: [snp_annotations.tsv](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/snp_location.zip)
+> 4. GWAS summary file: [PD_GWAS.tab](https://github.com/huruifeng/BrainDataPortal/blob/main/demo_data/GWAS_summary.zip)
+> 5. Dataset configuration file: [dataset_info.toml](../demos/notebooks/xqtl/dataset_info.toml)
+> 6. Processing script: [xqtl_script.zip](../demos/scripts/xqtl_script.zip)
 
 ## 3. Preprocessing
-Once you have the data, you can process it using our provided scripts.
 
-Full code in Notebook: [11.extract_SC_v4.R](../assets/notebooks/sc/11_extract_SC_v4.html).
+In this step, we will read the raw xQTL summary files and extract the necessary columns and filter the data based on the p-values.
 
-You need to pay attention to the input arguments: __seurat_obj_file__, __output_dir__, __cluster_col__
+- This script should vary depending on the input data.
+- Renames QTL data columns to `gene_id, snp_id, p_value, beta_value'.
+- Splits QTL data by celltype into `unfiltered_celltypes/`.
+- Renames gene and SNP annotation columns to `gene_id`,`position_start`, `position_end`, `strand` and `snp_id`, `position`.
+- Filters each celltype in `unfiltered_celltypes/` for entries with p > 0.01 and outputs filtered TSVs into `filtered_celltypes/`.
 
-```R
-## Rscript 11.extract_SC_v4.R
+Full code in Python: [01_preprocessing.py](../demos/scripts/xqtl/01_preprocessing.py).
+
+Modify the following parameters according to your dataset and run the script:
+```python
 ... ...
-# Get the arguments
-seurat_obj_file <- "snRNAseq_MTG_10samples.rds"
-output_dir <- "snRNAseq_MTG_10samples"
-cluster_col <- "MajorCellTypes"
-
-# Load the Seurat object
-seurat_obj <- readRDS(seurat_obj_file)
-capture.output(str(seurat_obj), file = paste0(output_dir, "/seurat_obj_structure.txt"))
+############################
+## define parameters, modify as needed
+dataset_name = "eQTLsummary_demo"
+qtl_data_files = sorted(glob("eQTLsummary_sampled/*_sampled.tsv"))
+geneid_col = "gene_id"
+snpid_col = "variant_id"
+pvalue_col = "pval_nominal"
+beta_col = "slope"
 ... ...
 ```
 !!! warning "Important Note"
-    The above code will generate a file named __seurat_obj_structure.txt__ in the output directory. 
-    Check this file to see the structure of the Seurat object, Make sure the necessary data is present.
+    The QTL summary files should be in the TSV format with the following columns:
     
-    <h4> Required data in Seurat object</h4>
+    <h4> Example xQTL file format (For each cell type,e.g. Astrocytes_eQTL.tsv):</h4>
 
-        sc RNAseq Seurat RDS/
-        |-- @assays                     ## List of assays
-        |   |-- RNA                     ## RNA data
-        |   |   |-- @counts             ## Raw counts
-        |   |   |-- @data               ## Normalized data
-        |   |   |-- @features           ## Feature/Gene names, v5 format
-        |   |   `-- @cells              ## Cell names/ID, v5 format, 
-        |   `-- ...
-        |-- @meta.data                  ## Cell level Metadata table
-        |   |-- cell_id                 ## Cell ID
-        |   |-- cell_type               ## Cell type annotation
-        |   |-- sample_id               ## Sample ID
-        |   |-- nCount_RNA              ## Number of UMI counts in the cell
-        |   |-- nFeature_RNA            ## Number of genes detected in the cell
-        |   `-- ...
-        |-- @reductions                 ## Dimensionality reduction results
-        |   |--umap                
-        |   |   |-- @cell.embeddings    ## UMAP coordinates for each cell
-        |   |   `-- ...
-        |   `-- ...
-        `-- ...
+        Gene,SNP,p-value,beta
+        A1BG,rs1234567,0.02,0.213
+        A1BG,rs1234568,0.03,0.314
+        A1BG,rs1234569,0.01,0.615
 
-## 4. Data extraction
-After check the structure of the Seurat object, we can extract the data and metadata from the object.
 
-Full code in Notebook: [11.extract_SC_v4.R](../assets/notebooks/sc/11_extract_SC_v4.html).
+## 4. Mapping cell type names to files
+In this step, we will map the cell type names to the files. 
+It prompts user for display names that correspond to filenames in`celltypes/`. 
+Otherwise the __file names__ will be used.
+
+The python script is: [02_celltype_mapping.py](../demos/scripts/xqtl/02_celltype_mapping.py).
 !!! warning "Important Note"
-    Seurat v5 has a different structure compared to v4, you may need to adjust the following codes accordingly.
+    Change the __dataset_name = "your_dataset_name"__ to your dataset name. 
 
-<h3> v4 Seurat Object</h3>
-```R
-## 1. Extract the normalized counts
-normalized_counts <- seurat_obj@assays$RNA@data  # This is a sparse matrix
+## 5.Global significance filtering
+This step identifies gene-SNP pairs significant in at least one celltype using `filtered_celltypes/`.
+Filters `unfiltered_celltypes/` accordingly, and outputs filtered TSVs into `celltypes/`.
 
-## 2. Convert sparse matrix to triplet format (long format)
-long_data <- summary(normalized_counts)
+Full code in Python: [03_significant.py](../demos/scripts/xqtl/03_significant.py).
 
-## 3. Get row (gene) and column (cell) names
-long_data$Gene <- rownames(normalized_counts)[long_data$i]
-long_data$Cell <- colnames(normalized_counts)[long_data$j]
-long_data$Expression <- long_data$x
+## 6. Generate annotation JSONs
+This step generates annotation JSONs for genes and SNPs.
+The script reads the `gene_annotations.tsv` and `snp_annotations.tsv` files and splits gene and SNP annotation files by chromosome into `gene_locations/` and `snp_locations/`
 
-## 4. Keep only necessary columns
-long_data <- long_data[, c("Gene", "Cell", "Expression")]
-```
-
-<h3>v5 Seurat Object</h3>
-```R
-## 1. Extract normalized data
-norm_data <- seurat_obj[["RNA"]]@layers[["data"]]   # This is a sparse matrix
-
-## 2. Get gene and cell names from LogMaps
-gene_names <- dimnames(seurat_obj[["RNA"]]@features)[[1]]
-cell_names <- dimnames(seurat_obj[["RNA"]]@cells)[[1]]
-
-## 3. Convert to triplet format (sparse matrix summary)
-triplet <- summary(norm_data)
-
-## 4. Map i and j indices to gene and cell names
-triplet$Gene <- gene_names[triplet$i]
-triplet$Cell <- cell_names[triplet$j]
-
-## 5. Reorder and rename
-long_data <- triplet %>% select(Cell, Gene, Expression = x)
-```
-
-## 5. Metadata processing
-This step processes single cell metadata for visualization, including:
-
-- Metadata filtering and renaming
-- UMAP embedding sampling (Subset UMAP points for faster loading)
-- Expression data splitting and saving (Save gene expression data in json files)
-- Pseudo-bulk level expression calculation
-
-Full code in Notebook: [21.rename_meta.py](../assets/notebooks/sc/21_rename_meta.html).
+Full code in Python: [04_annotate.py](../demos/scripts/xqtl/04_annotate.py).
 
 Set the following parameters according to your dataset:
 ```python
-## This is the output directory from the previous step 
-dataset_path = "snRNAseq_MTG_10samples"  
-
-## a list of metadata columns to keep, pick features that you want to visualize
-kept_features =[ "nCount_RNA", "nFeature_RNA", "sex", "MajorCellTypes", 
-                "updrs", "Complex_Assignment", "mmse", "sample_id", "case",]
-sample_col = "sample_id"
-cluster_col = "MajorCellTypes"
-condition_col = "case"
-```
-
-## 6. Computing cluster markers
-This step computes cluster markers for each cluster, including:
-
-- Finding cell cluster specific markers
-- Calculating differential expression between conditions within each cell cluster
-- Performing pseudo-bulk analysis
-
-Full code in Notebook: [31.clustermarkers.R](../assets/notebooks/sc/31_clustermarkers.html).
-
-Set the following parameters according to your dataset:
-```R
 ## Dataset specific parameters
-seurat_obj_file <- "snRNAseq_MTG_10samples.rds"
-output_dir <- "snRNAseq_MTG_10samples"
-cluster_col <- "MajorCellTypes"
-condition_col <- "case"
-sample_col <- "sample_id"
-seurat_type <- "snrnaseq"
+## define parameters, modify as needed
+dataset_name = "eQTLsummary_demo"
+gene_annotation_file = "data/gene_annotations.tsv"
+geneid_col = "gene_id"
+gene_start_col = "position_start"
+gene_end_col = "position_end"
+gene_chrom_col = "chromosome" 
+gene_strand_col = "strand"  
+
+snp_annotation_file = "data/snp_annotations.tsv"
+snpid_col = "snp_id"
+snp_chrom_col = "chr"
+snp_pos_col = "position"
 ```
 !!! warning "Important Note"
-    You may need to adjust the following codes for your specific dataset.
-    ```R
-    if (!"data" %in% slotNames(seurat_obj@assays$RNA)) {
-        stop("The Seurat object does not contain the 'data' slot in the 'RNA' assay.")
-    }
-    ... ...
-    # Check if the Seurat object has the necessary assay
-    if (!"ATAC" %in% names(seurat_obj@assays)) {
-        stop("The Seurat object does not contain the 'ATAC' assay.")
-    }
-    # Check if the Seurat object has the necessary assay data
-    if (!"counts" %in% slotNames(seurat_obj@assays$ATAC)) {
-        stop("The Seurat object does not contain the 'counts' slot in the 'ATAC' assay.")
-    }
-    ... ...
-    # Check if the Seurat object has the necessary assay
-    if (!"Spatial" %in% names(seurat_obj@assays)) {
-        stop("The Seurat object does not contain the 'Spatial' assay.")
-    }
-    # Check if the Seurat object has the necessary assay data
-    if (!"data" %in% slotNames(seurat_obj@assays$Spatial)) {
-        stop("The Seurat object does not contain the 'data' slot in the 'Spatial' assay.")
-    }
-    ```
-## 7. Post-marker processing
-This step identifies and analyzes top marker genes for each cell type (or cluster) from single-cell data.
-It also calculates detection frequency and average expression for selected marker genes across conditions and sexes.
+    You can use the demo annotation files provided in the demo data. Or you can prepare your own annotation files. 
+    The annotation files should be in the TSV format with the following columns:
+    
+    <h4> Gene annotation file format (TSV)</h4>
 
-Full code in Notebook: [41_clustermarkers_postprocess.py](../assets/notebooks/sc/41_clustermarkers_postprocess.html).
+        gene    chromosome  start   end strand
+        A1BG    1   1234567 1234568 -
+        A1BG    1   1234568 1234569 -
+        A1BG    1   1234569 1234570 -
+
+    <h4> SNP annotation file format (TSV)</h4>
+
+        SNP chromosome  position
+        rs1234567   1   1234567
+        rs1234568   1   1234568
+        rs1234569   1   1234569
+
+
+## 7. Convert to Parquet
+This step converts all necessary TSV files to Parquet format for final use.
+
+Full code: [05_parquet.py](../demos/scripts/xqtl/05_parquet.py).
 
 Modify the following codes for your specific dataset.
 ```python
-# Define dataset and metadata column names
-dataset_folder = "example_data/snRNA_MTG_10Samples"
-cluster_col = "MajorCellTypes"
-sex_col = "sex"
-output_folder = dataset_folder + "/clustermarkers"
-... ...
-
-# Filter for significant genes
-filtered_df = marker_genes[marker_genes['p_val_adj'] < 0.05]
-
-# Rank by absolute log2FC and select top 10 per cluster
-top_genes = (
-    filtered_df
-    .assign(abs_log2FC = filtered_df['avg_log2FC'])  ## chenge to abs(filtered_df['avg_log2FC']) will include negative log2FC genes
-    .sort_values(['cluster', 'abs_log2FC'], ascending=[True, False])
-    .groupby('cluster')
-    .head(10)
-    .drop(columns='abs_log2FC')  # Optional: remove helper column
-)
+# Define dataset name
+dataset_name = "eQTLsummary_demo"
 ... ...
 ```
 
-## 8. Prepare sample sheet
-This step generates a sample sheet file for the dataset.
-It includes information about the samples, such as condition, sex, and other relevant metadata.
+## 8. Clean up unnecessary files
+This step cleans up unnecessary files. It removes the `unfiltered_celltypes/` directory and the `filtered_celltypes/` directory.
 
-Download the demo sample sheet file: [Sample_snRNAseq_MTG_10samples.csv](../assets/notebooks/sc/Sample_snRNAseq_MTG_10samples.csv)
-!!! danger "Important Note"
-    PLEASE KEEP ALL THE COLUMN NAMES AND ORDER AS IS, JUST FILL IN YOUR DATA.
+Full code: [06_filter_clean.py](../demos/scripts/xqtl/06_filter_clean.py).
 
-## 9. Dataset configuration file
-This step prepares the dataset information.
+Modify the following codes for your specific dataset.
+```python
+# Define dataset name
+dataset_name = "eQTLsummary_demo"
+... ...
+```
 
-- The dataset information file is a toml file.
-- It is an essential file for the dataset.
+## 9. Prepare GWAS data for visualization
+BrainDataPortal can visualize GWAS summary data in the form of a scatter plot.
+We provided a script to split the GWAS summary data to required TSV format files.
 
-Download the demo dataset information file: [dataset_info.toml](../assets/notebooks/sc/dataset_info.toml)
+Full code: [07_gwas.py](../demos/scripts/xqtl/07_gwas.py).
+
+Modify the following codes for your specific dataset.
+```python
+## Dataset specific parameters
+dataset_name = "eQTLsummary_demo"
+input_file = "PD_GWAS_with_rsIDs_hg38.tab"
+gwas_chrom_col = "#chrom"
+gwas_pos_col = "chromEnd"
+gwas_snp_col = "rsID"
+gwas_beta_col = "b"
+gwas_pval_col = "p"
+... ...
+```
+
+## 10. Prepare dataset information file
+Download and modify the demo dataset information file: [dataset_info.toml](../demos/notebooks/xqtl/dataset_info.toml)
 !!! danger "Important Note"
     Dataset configuration file name must be __dataset_info.toml__.
 Here is an example of the dataset configuration file content:
@@ -284,16 +221,14 @@ features = [ "smoothed_label_s5",...]    ## List of default feature names
 genes = [ "SNCA",...]                    ## List of default gene names
 ```
 
-## 10. Upload dataset
+## 11. Upload dataset
 Upload the dataset to server folder.
 
 After running the pipeline, there will be a dataset folder that contains all necessary files:
 
-* The files with names starting with __raw___ are __NOT__ necessary for upload.
-* The file named __'pb_expr_matrix.csv'__ in the folder '&lt;dataset_name&gt;/clustermarkers' is __NOT__ necessary for upload.
+* The files and folders within the `your_dataset_name` folder are necessary for upload.
 * Upload the dataset folder named '&lt;dataset_name&gt;' to the server at __'backend/datasets'__.
 * Put the dataset configuration file named __'dataset_info.toml'__ to your dataset folder at __'backend/datasets/&lt;dataset_name&gt;'__.
-* Upload __samplesheet file__ to the server at __'backend/SampleSheet'__.
 * Refresh the database: Go to __'Datasets Management Page '(DATASETS -> +ADD DATASET)__ and click __'REFRESH DB'__.
 
 

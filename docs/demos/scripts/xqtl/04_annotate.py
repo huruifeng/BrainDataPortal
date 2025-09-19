@@ -5,19 +5,124 @@ import json
 from glob import glob
 import re
 import time
+from collections import defaultdict
 
+############################################
+## define parameters, modify as needed
+dataset_name = "eQTLsummary_demo"
+gene_annotation_file = "data/gene_annotations.tsv"
+geneid_col = "gene_id"
+gene_start_col = "position_start"
+gene_end_col = "position_end"
+gene_chrom_col = "chromosome" 
+gene_strand_col = "strand"  
 
+snp_annotation_file = "data/snp_annotations.tsv"
+snpid_col = "snp_id"
+snp_chrom_col = "chr"
+snp_pos_col = "position"
+
+#############################################
 def safe_filename(name):
     return re.sub(r"[^a-zA-Z0-9_\-]", "_", name)
 
 
+# Process gene locations
+print("Processing gene locations...")
+start_time = time.time()
+output_dir = Path(dataset_name + "/gene_locations")
+output_dir.mkdir(exist_ok=True)
+
+chrom_data = {}
+
+file_start = time.time()
+
+chunks = []
+df = pd.read_csv( gene_annotation_file,
+    sep="\t",
+    usecols=[geneid_col, gene_chrom_col, gene_start_col, gene_end_col, gene_strand_col],
+    dtype={
+        geneid_col: str,
+        gene_chrom_col: str,
+        gene_start_col: int,
+        gene_end_col: int,
+        gene_strand_col: str,
+    },
+)
+df = df.rename(
+    columns={
+        geneid_col: "gene_id",
+        gene_chrom_col: "chromosome",
+        gene_start_col: "position_start",
+        gene_end_col: "position_end",
+        gene_strand_col: "strand",
+    }
+)
+
+# Group by chromosome
+for chrom, group in df.groupby("chromosome"):
+    if chrom not in chrom_data:
+        chrom_data[chrom] = []
+    chrom_data[chrom].append(group)
+
+print(f"  - Processed in {time.time()-file_start:.2f} seconds")
+
+# Write chromosome files with deduplication
+print("\nWriting gene location files...")
+for chrom, groups in chrom_data.items():
+    df = pd.concat(groups)
+    df.drop_duplicates(
+        subset=["gene_id", "position_start", "position_end", "strand"], inplace=True
+    )
+    df = df.drop(columns=["chromosome"])
+    df.to_csv(output_dir / f"{chrom}.tsv", sep="\t", index=False)
+    print(f"  - Chromosome {chrom}: {len(df):,} genes")
+
+print(f"Processed gene locations in {time.time()-start_time:.2f} seconds\n")
+
+
+
+#############################################
+# Process SNP locations with vectorized operations and chunking
+print("Processing SNP locations...")
+start_time = time.time()
+output_dir = Path(dataset_name + "/snp_locations")
+output_dir.mkdir(exist_ok=True)
+
+file_start = time.time()
+file_snp_count = 0
+
+seen_per_chromosome = defaultdict(set)
+
+df = pd.read_csv(snp_annotation_file, sep="\t", usecols=[snpid_col, snp_chrom_col, snp_pos_col])
+df.rename(columns={snpid_col: "snp_id", snp_chrom_col: "chr", snp_pos_col: "position"}, inplace=True)
+ 
+for chrom, group in df.groupby("chr"):
+    chrom_file = output_dir / f"{chrom}.tsv"
+    group = group[["snp_id", "position"]]
+    group = group[~group["snp_id"].isin(seen_per_chromosome[chrom])]
+    seen_per_chromosome[chrom].update(group["snp_id"])
+    if not group.empty:
+        if chrom_file.exists():
+            group.to_csv(chrom_file, sep="\t", index=False, mode="a", header=False)
+        else:
+            group.to_csv(chrom_file, sep="\t", index=False)
+        file_snp_count += len(group)
+
+print(f"  - Wrote {file_snp_count:,} SNPs in {time.time()-file_start:.2f} seconds")
+
+print(f"Processed all SNP locations in {time.time()-start_time:.2f} seconds")
+
+
+######################################### 
+# Annotate genes and SNPs with celltype information
 
 # Load celltype mapping
-celltype_mapping_file = Path("celltypes/celltype_parquet.json")
+celltype_mapping_file = Path(dataset_name + "/celltypes/celltype_parquet.json")
 
 celltype_mapping = json.loads(celltype_mapping_file.read_text())
 filename_to_pretty = {v: k for k, v in celltype_mapping.items()}
-files = sorted(glob("celltypes/*.tsv"))
+celltype_files = sorted(glob(dataset_name + "/celltypes/*.tsv"))
 
 # Step 1: Collect unique genes and SNPs from celltype files
 print("Collecting unique genes and SNPs from celltype files...")
@@ -25,7 +130,7 @@ unique_genes = set()
 unique_snps = set()
 
 start_time = time.time()
-for filepath in files:
+for filepath in celltype_files:
     # Process in chunks to reduce memory usage
     for chunk in pd.read_csv(
         filepath, sep="\t", usecols=["snp_id", "gene_id"], chunksize=500000
@@ -46,7 +151,7 @@ chrom_to_genes = {}
 chrom_to_snps = {}
 
 # Process gene locations
-for filepath in glob("gene_locations/*.tsv"):
+for filepath in glob(dataset_name + "/gene_locations/*.tsv"):
     chrom = Path(filepath).stem
     # Only read gene_id column to save memory
     df = pd.read_csv(filepath, sep="\t", usecols=["gene_id"])
@@ -55,7 +160,7 @@ for filepath in glob("gene_locations/*.tsv"):
     chrom_to_genes[chrom] = chrom_genes
 
 # Process SNP locations
-for filepath in glob("snp_locations/*.tsv"):
+for filepath in glob(dataset_name + "/snp_locations/*.tsv"):
     chrom = Path(filepath).stem
     # Only read snp_id column to save memory
     df = pd.read_csv(filepath, sep="\t", usecols=["snp_id"])
@@ -80,7 +185,7 @@ for chrom, genes in chrom_to_genes.items():
     if not genes:
         continue
 
-    filepath = f"gene_locations/{chrom}.tsv"
+    filepath = f"{dataset_name}/gene_locations/{chrom}.tsv"
     df = pd.read_csv(
         filepath,
         sep="\t",
@@ -114,7 +219,7 @@ for chrom, snps in chrom_to_snps.items():
     if not snps:
         continue
 
-    filepath = f"snp_locations/{chrom}.tsv"
+    filepath = f"{dataset_name}/snp_locations/{chrom}.tsv"
     df = pd.read_csv(filepath, sep="\t", usecols=["snp_id", "position"])
     df = df[df["snp_id"].isin(snps)]
 
@@ -143,7 +248,7 @@ start_time = time.time()
 gene_to_regions = {}
 snp_to_regions = {}
 
-for filepath in files:
+for filepath in celltype_files:
     path = Path(filepath)
     region_filename = path.stem + ".tsv"
     region_pretty = filename_to_pretty.get(region_filename, region_filename)
@@ -173,8 +278,8 @@ print(f"Processed celltype files in {time.time()-start_time:.2f} seconds")
 
 # Step 5: Write output files with progress tracking
 print("Writing JSON files...")
-os.makedirs("gene_jsons", exist_ok=True)
-os.makedirs("snp_jsons", exist_ok=True)
+os.makedirs(f"{dataset_name}/gene_jsons", exist_ok=True)
+os.makedirs(f"{dataset_name}/snp_jsons", exist_ok=True)
 
 # Per-gene JSONs with progress
 gene_ids = list(gene_to_regions.keys())
@@ -183,7 +288,7 @@ start_time = time.time()
 print(f"Writing {total_genes:,} gene JSON files...")
 
 for i, (gene, data) in enumerate(gene_to_regions.items(), 1):
-    gene_path = Path("gene_jsons") / f"{safe_filename(gene)}.json"
+    gene_path = Path(f"{dataset_name}/gene_jsons") / f"{safe_filename(gene)}.json"
     with gene_path.open("w") as f:
         json.dump(
             {
@@ -215,7 +320,7 @@ start_time = time.time()
 print(f"\nWriting {total_snps:,} SNP JSON files...")
 
 for i, (snp, data) in enumerate(snp_to_regions.items(), 1):
-    snp_path = Path("snp_jsons") / f"{safe_filename(snp)}.json"
+    snp_path = Path(f"{dataset_name}/snp_jsons") / f"{safe_filename(snp)}.json"
     with snp_path.open("w") as f:
         json.dump(
             {
@@ -239,7 +344,7 @@ for i, (snp, data) in enumerate(snp_to_regions.items(), 1):
         )
 
 # Write lists
-Path("gene_list.json").write_text(json.dumps(gene_ids, separators=(",", ":")))
-Path("snp_list.json").write_text(json.dumps(snp_ids, separators=(",", ":")))
+Path(f"{dataset_name}/gene_list.json").write_text(json.dumps(gene_ids, separators=(",", ":")))
+Path(f"{dataset_name}/snp_list.json").write_text(json.dumps(snp_ids, separators=(",", ":")))
 
 print("\nDone. Output files created.")
