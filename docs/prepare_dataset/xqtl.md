@@ -52,10 +52,10 @@ beta_col = "slope"
     
     <h4> Example xQTL file format (For each cell type,e.g. Astrocytes_eQTL.tsv):</h4>
 
-        Gene,SNP,p-value,beta
-        A1BG,rs1234567,0.02,0.213
-        A1BG,rs1234568,0.03,0.314
-        A1BG,rs1234569,0.01,0.615
+        Gene    SNP p-value beta
+        A1BG    rs1234567   0.02    0.213
+        A1BG    rs1234568   0.03    0.314
+        A1BG    rs1234569   0.01    0.615
 
 
 ## 4. Mapping cell type names to files
