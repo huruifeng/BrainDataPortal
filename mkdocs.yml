@@ -105,3 +105,7 @@ nav:
     - scRNAseq dataset: prepare_dataset/scrnaseq.md
     - VisiumST dataset: prepare_dataset/visiumst.md
     - xQTL dataset: prepare_dataset/xqtl.md
+  - Development:
+    - development/index.md
+    - Customize Home: development/customize_home.md
+    - Add view: development/add_view.md
