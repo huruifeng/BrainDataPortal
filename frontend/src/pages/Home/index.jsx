@@ -38,8 +38,8 @@ const tissueData = {
         {name: "Liver", datasets: 756, color: "#45B7D1"},
         {name: "Kidney", datasets: 634, color: "#96CEB4"},
         {name: "Lung", datasets: 523, color: "#FFEAA7"},
-        {name: "Muscle", datasets: 445, color: "#DDA0DD"},
-        {name: "Skin", datasets: 387, color: "#98D8C8"},
+        {name: "Intestine", datasets: 445, color: "#DDA0DD"},
+        {name: "Stomach", datasets: 387, color: "#98D8C8"},
         {name: "Pancreas", datasets: 298, color: "#F7DC6F"},
     ],
     mouse: [
@@ -48,8 +48,8 @@ const tissueData = {
         {name: "Liver", datasets: 1234, color: "#45B7D1"},
         {name: "Kidney", datasets: 987, color: "#96CEB4"},
         {name: "Lung", datasets: 876, color: "#FFEAA7"},
-        {name: "Muscle", datasets: 654, color: "#DDA0DD"},
-        {name: "Skin", datasets: 543, color: "#98D8C8"},
+        {name: "Intestine", datasets: 654, color: "#DDA0DD"},
+        {name: "Stomach", datasets: 543, color: "#98D8C8"},
         {name: "Pancreas", datasets: 432, color: "#F7DC6F"},
     ],
 }
@@ -100,8 +100,10 @@ const BodyDiagram = ({species, onTissueClick, hoveredTissue, setHoveredTissue}) 
         <Box sx={{display: "flex", justifyContent: "center", my: 2}}>
             {
                 species === "human" ?
-                <img src={Body.Human} alt="Body diagram" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/> :
-                <img src={Body.Mouse} alt="Body diagram" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+                    <img src={Body.Human} alt="Body diagram"
+                         style={{width: '100%', height: '100%', objectFit: 'contain'}}/> :
+                    <img src={Body.Mouse} alt="Body diagram"
+                         style={{width: '100%', height: '100%', objectFit: 'contain'}}/>
             }
         </Box>
     )
@@ -127,19 +129,31 @@ export default function Home_HM() {
             <Grid container spacing={3}>
                 {/* Header */}
                 <Grid item xs={12} textAlign="center">
-                        <Typography variant="h3" component="h1" gutterBottom sx={{color: "primary.main", fontWeight: "bold"}}>
-                            {/*{import.meta.env.VITE_APP_TITLE}*/}
-                            MODE: Multi-Omics Data Exploration
-                        </Typography>
-                        <Typography variant="h6" sx={{color: "text.secondary", opacity: 0.9}}>
-                            Single-cell, Spatial Transcriptomics and Multi-omics Data Analysis Platform
-                        </Typography>
+                    <Typography variant="h3" component="h1" gutterBottom
+                                sx={{color: "primary.main", fontWeight: "bold"}}>
+                        {/*{import.meta.env.VITE_APP_TITLE}*/}
+                        MODE: Multi-Omics Data Exploration
+                    </Typography>
+                    <Typography variant="h6" sx={{color: "text.secondary", opacity: 0.9}}>
+                        Single-cell, Spatial Transcriptomics and Multi-omics Data Analysis Platform
+                    </Typography>
                 </Grid>
 
                 {/* Main Content */}
-                <Grid item xs={12} md={3}>
+                <Grid item xs={12} md={3}
+                      sx={{
+                          alignItems: "stretch" // This makes all grid items stretch to the same height
+                      }}
+                >
                     {/* Tissues Panel */}
-                    <Paper elevation={3} sx={{p: 2, height: "fit-content"}}>
+                    <Paper elevation={3}
+                           sx={{
+                               p: 2,
+                               height: "100%", // Take full height of grid item
+                               display: "flex",
+                               flexDirection: "column"
+                           }}
+                    >
                         <Typography variant="h6" gutterBottom sx={{display: "flex", alignItems: "center", gap: 1}}>
                             <DatasetIcon color="primary"/>
                             Datasets by Tissue
@@ -186,8 +200,16 @@ export default function Home_HM() {
                 </Grid>
 
                 <Grid item xs={12} md={6}>
-                    {/* Interactive Body Model */}
-                    <Paper elevation={3} sx={{p: 3, textAlign: "center"}}>
+                    {/* Center Species Panel */}
+                    <Paper elevation={3}
+                           sx={{
+                               p: 3,
+                               textAlign: "center",
+                               height: "100%", // Take full height of grid item
+                               display: "flex",
+                               flexDirection: "column"
+                           }}
+                    >
                         <Box sx={{mb: 3}}>
                             <ButtonGroup variant="contained" sx={{mb: 2}}>
                                 <Button
@@ -206,13 +228,14 @@ export default function Home_HM() {
                                 </Button>
                             </ButtonGroup>
                         </Box>
-
-                        <BodyDiagram
-                            species={selectedSpecies}
-                            onTissueClick={handleTissueClick}
-                            hoveredTissue={hoveredTissue}
-                            setHoveredTissue={setHoveredTissue}
-                        />
+                        <Box sx={{flex: 1, display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                            <BodyDiagram
+                                species={selectedSpecies}
+                                onTissueClick={handleTissueClick}
+                                hoveredTissue={hoveredTissue}
+                                setHoveredTissue={setHoveredTissue}
+                            />
+                        </Box>
 
                         {hoveredTissue && (
                             <Box sx={{mt: 2}}>
@@ -228,7 +251,14 @@ export default function Home_HM() {
 
                 <Grid item xs={12} md={3}>
                     {/* Assays Panel */}
-                    <Paper elevation={3} sx={{p: 2, height: "fit-content"}}>
+                    <Paper elevation={3}
+                           sx={{
+                               p: 2,
+                               height: "100%", // Take full height of grid item
+                               display: "flex",
+                               flexDirection: "column"
+                           }}
+                    >
                         <Typography variant="h6" gutterBottom sx={{display: "flex", alignItems: "center", gap: 1}}>
                             <BiotechIcon color="primary"/>
                             Datasets by Assay ({selectedSpecies.charAt(0).toUpperCase() + selectedSpecies.slice(1)})
