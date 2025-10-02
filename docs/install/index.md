@@ -62,7 +62,13 @@ Before you begin, ensure you have the following installed on your system:
     ```bash
     # variables in the .env file (frontend/env/.env) - Global settings, always loaded
     VITE_APP_TITLE = BrainDataPortal
-    VITE_PORT = 3000 # This port number is used to access the frontend server, it is different from the backend port
+  
+    # home page view options, the folder name of the home page
+    VITE_HOME_PAGE = Home_BDP  
+  
+    # runnning port, for running locally in development mode
+    # This port number is used to access the frontend server, it is different from the backend port
+    VITE_PORT = 3000 
     ``` 
 - ### 4.2 Run the frontend
   - #### __Option A__: Development mode
