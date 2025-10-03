@@ -80,3 +80,5 @@ The Documentation for installation and running the app is available at <a href="
 
 #### Spatial Transcriptomics
 ![VisiumST Page](docs/screenshots/Visium_page.png)
+
+### Video examples are available here: [BrainDataPortal Video Demo](https://huruifeng.github.io/BrainDataPortal/#video-demo)
