@@ -109,3 +109,5 @@ nav:
     - development/index.md
     - Customize Home: development/customize_home.md
     - Add view: development/add_view.md
+  - Contribute:
+    - contribute/index.md

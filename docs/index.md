@@ -64,4 +64,17 @@ This documentation will guide you through the installation and data preparation 
     |   `-- ...
     `-- README.md
 
+## Video demo
+### Gene view UMAP
+<video width="800" controls>
+  <source src="screenshots/BDP_UMAP_2x.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+### VisiumST view
+<video width="800" controls>
+  <source src="screenshots/BDP_VisiumST_4_2x.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
  <a href="install/" title="Start to learn" class="md-button md-button--primary">Get Started</a>
