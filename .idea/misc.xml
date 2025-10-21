@@ -3,4 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="BrainDataPortal" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="BrainDataPortal" project-jdk-type="Python SDK" />
 </project>

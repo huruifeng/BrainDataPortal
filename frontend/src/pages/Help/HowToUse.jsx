@@ -878,7 +878,7 @@ export default function HelpPage() {
                                                         Sample sheet format (CSV)
                                                 </Typography>
                                                 <Box className="format-content format-content--primary">
-                                                    Please refer to the <Link href="/sample-sheet-format" target="_blank" rel="noopener noreferrer"> Example sample sheet file</Link>
+                                                    Please refer to the <Link href="/demos/notebooks/sc/example_data/Sample_snRNAseq_10Samples.csv" target="_blank" rel="noopener noreferrer"> Example sample sheet file</Link>
                                                     <Typography variant="subtitle1" className="format-title format-title--secondary">(PLEASE KEEP ALL THE COLUMN NAMES AND ORDER AS IS, JUST FILL IN YOUR DATA)</Typography>
                                                 </Box>
                                             </Paper>
@@ -887,7 +887,7 @@ export default function HelpPage() {
                                                         xQTL format (CSV)
                                                 </Typography>
                                                 <Box className="format-content format-content--primary">
-                                                    Please refer to the <Link href="/sample-sheet-format" target="_blank" rel="noopener noreferrer"> Example xQTL file</Link><br />
+                                                    Please refer to the <Link href="/demos/notebooks/xqtl/example_data/eQTL_Demo.zip" target="_blank" rel="noopener noreferrer"> Example xQTL file</Link><br />
                                                     <Box sx={{mt: 1}}>
                                                         <Box className="format-content format-content--primary">
                                                             <Typography variant="subtitle1" className="format-title">
@@ -1004,9 +1004,9 @@ genes = [ "SNCA",...]                    ## List of default gene names
                                     <Alert severity="primary" icon={<CheckCircle color="primary"/>} className="requirements-alert">
                                         <AlertTitle className="alert-title" variant="h6">Data processing scripts were provided:</AlertTitle>
                                         <List dense>
-                                            <ListItem>Single-cell RNA-seq data: <a href='https://github.com/BrainDataPortal/BrainDataPortal_DatasetProcessing'>BrainDataPortal_DatasetProcessing</a></ListItem>
-                                            <ListItem>Spatial transcriptomics data: <a href='https://github.com/BrainDataPortal/BrainDataPortal_DatasetProcessing'>BrainDataPortal_DatasetProcessing</a></ListItem>
-                                            <ListItem>xQTL data: <a href='https://github.com/BrainDataPortal/BrainDataPortal_xQTLProcessing'>BrainDataPortal_xQTLProcessing </a></ListItem>
+                                            <ListItem>Single-cell RNA-seq data: <a href='/demos/scripts/sc.zip'>BrainDataPortal_DatasetProcessing</a></ListItem>
+                                            <ListItem>Spatial transcriptomics data: <a href='/demos/scripts/visiumst.zip'>BrainDataPortal_DatasetProcessing</a></ListItem>
+                                            <ListItem>xQTL data: <a href="/demos/scripts/xqtl_script.zip">BrainDataPortal_xQTLProcessing </a></ListItem>
                                         </List>
                                     </Alert>
                                      <Typography variant="h5" className="data-requirements-title">
