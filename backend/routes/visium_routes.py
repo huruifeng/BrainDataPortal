@@ -46,7 +46,7 @@ async def getvisiumdefaults(request:Request):
     print("getvisiumdefaults() called================")
     dataset_id = request.query_params.get("dataset")
 
-    response = get_visium_defaults(dataset_id)
+    response = get_spatial_defaults(dataset_id)
     # print (response)
     if "Error" in response:
         raise HTTPException(status_code=404, detail="Error in getting visium defaults.")
