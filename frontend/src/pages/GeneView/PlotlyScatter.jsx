@@ -14,9 +14,9 @@ const PlotlyScatterPlot = React.memo(function PlotlyScatterPlot({
     if (umapData.length === 0) return "UMAP data is loading...";
 
     if (sampleList.length >= 1 && !sampleList.includes("all")) {
-        umapData = umapData.filter((point) => sampleList.includes(point[0].split(/_[cs]\d+$/)[0]));
+        umapData = umapData.filter((point) => sampleList.includes(point[0].split('_').slice(0, -1).join('_'))); //cs_id.split(/_(?:c|s|cs)\d+$/)[0]
     }
-
+    console.log("umapData: ", umapData);
     const createCategoryTraces = (plotData, colorGroup) => {
         // Generate distinct colors for each group and create a series for each group
         const colorPalette = [
@@ -91,7 +91,7 @@ const PlotlyScatterPlot = React.memo(function PlotlyScatterPlot({
     } else {
         updatedCellMetaData = Object.fromEntries(
             Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                const sample_id = cs_id.split(/_[cs]\d+$/)[0];
+                const sample_id = cs_id.split('_').slice(0, -1).join('_'); // cs_id.split(/_(?:c|s|cs)\d+$/)[0]
                 const newSubObj = {...csObj};  // shallow copy of inner object
                 newSubObj[group] = sampleMetaData[sample_id]?.[group];
                 return [cs_id, newSubObj];

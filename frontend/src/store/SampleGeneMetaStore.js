@@ -82,9 +82,8 @@ const useSampleGeneMetaStore = create((set, get) => ({
             return
         }
         if (query_str.length === 0) {
-            // query_str = "ABC";
-            set({geneList: ["SNCA", "SNCA-AS1", "LRRK2", "GBA", "PRKN", "MAPT", "PINK1", "PARK7"]})
-            return
+            // set({geneList: ["SNCA", "SNCA-AS1", "LRRK2", "GBA", "PRKN", "MAPT", "PINK1", "PARK7"]})
+            query_str="default"
         } else if (query_str.length < 3) {
             set({geneList: []})
             return

@@ -204,6 +204,8 @@ def get_gene_list(dataset, query_str="AB"):
             data = json.load(f)
         if query_str == "all":
             return data
+        elif query_str == "default":
+            return data[:10]
         else:
             return [gene for gene in data if gene.lower().startswith(query_str.lower())]
     else:

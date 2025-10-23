@@ -55,7 +55,7 @@ const PlotlyFeaturePlot = React.memo(function PlotlyFeaturePlot({visiumData, gen
             if(cell_level_meta.includes(feature)){
                 data[id] = cell_metadata_mapping[feature][item[feature]][0];
             } else{
-                const sample_id = id.split("_")[0]
+                const sample_id = id.split('_').slice(0,-1).join('_')
                 data[id] = sample_metadata[sample_id][feature];
             }
         });

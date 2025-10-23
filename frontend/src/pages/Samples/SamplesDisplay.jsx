@@ -128,7 +128,8 @@ const SamplesDisplay = ({ dataRecords}) => {
                                         <TableCell>{record.assay}</TableCell>
                                         <TableCell>
                                             <Link to={`/views/geneview?dataset=${record.dataset_id}&sample=${record.sample_id}`}>UMAP</Link> &nbsp;&nbsp;
-                                            {record.assay === "VisiumST" && <Link to={`/views/visiumview?dataset=${record.dataset_id}&sample=${record.sample_id}`}>VisiumST</Link>}
+                                            {record.assay.toLowerCase() === "visiumst" && <Link to={`/views/visiumview?dataset=${record.dataset_id}&sample=${record.sample_id}`}>VisiumST</Link>}
+                                            {record.assay.toLowerCase() === "merfish" && <Link to={`/views/visiumview?dataset=${record.dataset_id}&sample=${record.sample_id}`}>MERFISH</Link>}
                                         </TableCell>
                                     </TableRow>
                                 ))}
