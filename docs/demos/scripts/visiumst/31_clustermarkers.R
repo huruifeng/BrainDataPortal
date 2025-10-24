@@ -134,8 +134,8 @@ for (cell_type in cell_types) {
 			de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
 		
 			# Store the results in the list
-			de_results_list[[paste(cell_type, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results
-			de_results_topN_list[[paste(cell_type, paste(c1, c2, sep = "vs"), sep = ".")]] <- de_results_topN
+			de_results_list[[paste(cell_type, paste(c1, c2, sep = "_vs_"), sep = ".")]] <- de_results
+			de_results_topN_list[[paste(cell_type, paste(c1, c2, sep = "_vs_"), sep = ".")]] <- de_results_topN
 		}
 	} else {
 		de_results <- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = condition_col)
