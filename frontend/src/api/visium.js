@@ -26,16 +26,17 @@ export const getImage = async (dataset,sample) => {
         // Handle different error types
         if (error.response) {
             // Server responded with error status
-            const message = error.response.data?.message || `Server error: ${error.response.status}`;
-            return {"success": false, "message": message}
+            const errorText = await error.response.data.text();
+            const errorData = JSON.parse(errorText);
+            return {"data":errorData}
         } else if (error.request) {
             // Request made but no response received
             // throw new Error("No response from server. Please check your connection.");
-            return {"success": false, "message": "No response from server. Please check your connection."}
+            return {"data":{"success": false, "message": "No response from server. Please check your connection."}}
         } else {
             // Something else happened
             // throw new Error("Failed to fetch image");
-            return {"success": false, "message": "Failed to fetch image"}
+            return {"data":{"success": false, "message": "Failed to fetch image"}}
         }
     }
 }

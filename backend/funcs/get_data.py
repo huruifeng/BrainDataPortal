@@ -844,12 +844,11 @@ def get_visium_coordinates(dataset, sample):
     scales_file = None
     for f in coordinates_file_ls:
         if sample in f and "coordinates" in f:
-            coordinates_file = f
+            coordinates_file = os.path.join(coordinates_folder, f)
         if sample in f and "scalefactors" in f:
-            scales_file = f
+            scales_file = os.path.join(coordinates_folder, f)
 
     if coordinates_file and os.path.exists(coordinates_file) :
-        coordinates_file = os.path.join(coordinates_folder, coordinates_file)
         with open(coordinates_file, "r") as f:
             coordinates_df = pd.read_csv(coordinates_file, index_col=0, header=0)
             coordinates = coordinates_df.to_dict(orient="index")
@@ -857,7 +856,6 @@ def get_visium_coordinates(dataset, sample):
         coordinates = None
 
     if scales_file and os.path.exists(scales_file):
-        scales_file = os.path.join(coordinates_folder, scales_file)
         with open(scales_file, "r") as f:
             scales = json.load(f)
     else:
@@ -872,7 +870,7 @@ def get_spatial_defaults(dataset):
         return "Error: Dataset is not specified."
 
     config_info = get_config_info(dataset)
-    if config_info and "spatial_defaults" in config_info:
+    if ("Error" not in config_info) and ("spatial_defaults" in config_info):
         data = config_info["spatial_defaults"]
         return data
     else:

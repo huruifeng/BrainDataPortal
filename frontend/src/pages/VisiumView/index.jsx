@@ -18,10 +18,8 @@ import "./VisiumView.css";
 import useSampleGeneMetaStore from "../../store/SampleGeneMetaStore.js";
 import useDataStore from "../../store/DatatableStore.js";
 
-// import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
-// import CanvasFeaturePlot from "./VisiumCanvasPlot.jsx";
-import PlotlyFeaturePlot from "./VisiumPlotlyPlot.jsx";
 import useVisiumStore from "../../store/VisiumStore.jsx";
+import FeaturePlot from "./FeaturePlot.jsx";
 
 function VisiumView() {
 
@@ -38,15 +36,18 @@ function VisiumView() {
     }, [])
 
     const datasetOptions = []
+    const datasetAssays = {}
     datasetRecords.map((d) => {
         if (d.assay.toLowerCase() === "visiumst" || d.assay.toLowerCase() === "merfish") {
             datasetOptions.push(d.dataset_id)
+            datasetAssays[d.dataset_id] = d.assay
         }
     })
 
     const [datasetId, setDatasetId] = useState(urlDataset)
     const [datasetSearchText, setDatasetSearchText] = useState("")
 
+    const [assay, setAssay] = useState(datasetAssays[urlDataset] || "")
 
     // Prepare all the  data
     const {
@@ -62,19 +63,21 @@ function VisiumView() {
         imageDataDict, fetchImageData
     } = useSampleGeneMetaStore();
     const {loading, error} = useSampleGeneMetaStore();
-    const {fetchVisiumDefaults}  = useVisiumStore()
+    const {fetchVisiumDefaults} = useVisiumStore()
 
     const [selectedMetaFeatures, setSelectedMetaFeatures] = useState(urlMetas);
 
 
-     const fetchPrimaryData = async () => {
-          setDataset(datasetId);
+    const fetchPrimaryData = async () => {
+        setDataset(datasetId);
+        const assayType = datasetAssays[datasetId] || "";
+        setAssay(assayType)
         await fetchSampleList(datasetId);
         await fetchGeneList(datasetId);
         await fetchMetaList(datasetId, "cell_level");
         await fetchVisiumDefaults(datasetId);
 
-         if (!datasetId) {
+        if (!datasetId) {
             // Clear everything if no dataset is selected
             setSelectedSamples([]);
             setSelectedGenes([]);
@@ -85,7 +88,7 @@ function VisiumView() {
         }
 
         // Get the current state after fetching defaults
-        const { defaultSamples, defaultGenes, defaultFeatures } = useVisiumStore.getState();
+        const {defaultSamples, defaultGenes, defaultFeatures} = useVisiumStore.getState();
 
         const initialSelectedSamples = urlSamples.length ? urlSamples : defaultSamples;
         const initialSelectedGenes = urlGenes.length ? urlGenes : defaultGenes;
@@ -131,10 +134,65 @@ function VisiumView() {
         setQueryParams(newParams);
     };
 
-    const handleDatasetChange = (event, newValue) => {
-        setDataset(newValue)
-        setDatasetId(newValue)
-        updateQueryParams(newValue, selectedGenes, selectedSamples)
+    // const handleDatasetChange = (event, newValue) => {
+    //     setAssay("")
+    //     setSelectedSamples([])
+    //     setSelectedGenes([])
+    //     setSelectedMetaFeatures([])
+    //
+    //     updateQueryParams(newValue, selectedGenes, selectedSamples)
+    //     setDataset(newValue)
+    //     setDatasetId(newValue)
+    //     setAssay(datasetAssays[newValue])
+    //
+    // }
+
+    const handleDatasetChange = async (event, newValue) => {
+        // 清除当前状态
+        setSelectedSamples([]);
+        setSelectedGenes([]);
+        setSelectedMetaFeatures([]);
+
+        // 清空数据
+        useSampleGeneMetaStore.setState({
+            exprDataDict: {},
+            sampleMetaDict: {},
+            imageDataDict: {}
+        });
+
+        // 设置新的dataset
+        setDatasetId(newValue);
+        const newAssay = newValue ? datasetAssays[newValue] : "";
+        setAssay(newAssay);
+
+        // 更新URL参数
+        updateQueryParams(newValue, [], [], []);
+
+        // 如果选择了新dataset，则获取数据
+        if (newValue) {
+            setDataset(newValue);
+            await fetchSampleList(newValue);
+            await fetchGeneList(newValue);
+            await fetchMetaList(newValue, "cell_level");
+            await fetchVisiumDefaults(newValue);
+
+            // 获取默认值并设置
+            const {defaultSamples, defaultGenes, defaultFeatures} = useVisiumStore.getState();
+
+            useSampleGeneMetaStore.setState({
+                selectedSamples: defaultSamples,
+                selectedGenes: defaultGenes,
+            });
+            setSelectedMetaFeatures(defaultFeatures);
+
+            // 获取表达数据和图像数据
+            await fetchExprData(newValue);
+            await fetchImageData();
+            await fetchMetaDataOfSample();
+
+            // 更新URL参数包含默认值
+            updateQueryParams(newValue, defaultGenes, defaultSamples, defaultFeatures);
+        }
     }
 
     /** Handles sample selection change */
@@ -317,9 +375,14 @@ function VisiumView() {
                     {loading && datasetId ? (
                         <>
                             <Box sx={{width: '100%'}}><LinearProgress/></Box>
-                            <Box sx={{display: "flex", justifyContent: "center", paddingTop: "100px"}}><CircularProgress/></Box>
+                            <Box sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                paddingTop: "100px"
+                            }}><CircularProgress/></Box>
                             <Box sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
-                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading sample list and metadata...</Typography>
+                                <Typography sx={{marginLeft: "10px", color: "text.secondary"}} variant="h5">Loading
+                                    sample list and metadata...</Typography>
                             </Box>
                         </>
                     ) : !datasetId ? (
@@ -356,10 +419,12 @@ function VisiumView() {
                                                     <div key={`${sample_i}-${feature}-chart`}
                                                          className="feature-plot-echart">
                                                         {sampleMetaDict[sample_i] &&
-                                                            <PlotlyFeaturePlot visiumData={visiumData_i}
-                                                                               geneData={exprDataDict}
-                                                                               metaData={sampleMetaDict[sample_i] || {}}
-                                                                               feature={feature}/>}
+                                                            <FeaturePlot
+                                                                assayType={assay}
+                                                                visiumData={visiumData_i}
+                                                                geneData={exprDataDict}
+                                                                metaData={sampleMetaDict[sample_i] || {}}
+                                                                feature={feature}/>}
                                                         <Typography variant="caption" display="block" align="center">
                                                             {feature}
                                                         </Typography>

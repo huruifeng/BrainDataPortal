@@ -4,7 +4,7 @@ import Plotly from "plotly.js-dist";
 import PropTypes from "prop-types";
 import {calculateMinMax, isCategorical, sortObjectByKey} from "../../utils/funcs.js";
 
-const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumData, geneData, metaData, feature}) {
+const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumData, geneData, metaData, feature}) {
 
     const containerRef = useRef(null);
     const [imageUrl, setImageUrl] = useState("");
@@ -19,17 +19,20 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
 
     // Load image and extract dimensions
     useEffect(() => {
-        if (!image) return;
-        const url = URL.createObjectURL(image);
-        setImageUrl(url);
+        if("succcess" in image){
+            setImageUrl("");
+        }else {
+            const url = URL.createObjectURL(image);
+            setImageUrl(url);
 
-        const img = new Image();
-        img.onload = () => {
-            setNaturalDimensions({width: img.naturalWidth, height: img.naturalHeight});
-        };
-        img.src = url;
+            const img = new Image();
+            img.onload = () => {
+                setNaturalDimensions({width: img.naturalWidth, height: img.naturalHeight});
+            };
+            img.src = url;
 
-        return () => URL.revokeObjectURL(url);
+            return () => URL.revokeObjectURL(url);
+        }
     }, [image]);
 
     // Handle resize
@@ -236,7 +239,7 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
     );
 });
 
-PlotlyFeaturePlotVisium.propTypes = {
+PlotlyFeaturePlotMerfish.propTypes = {
     visiumData: PropTypes.shape({
         coordinates: PropTypes.object.isRequired,
         scales: PropTypes.object.isRequired,
@@ -247,4 +250,4 @@ PlotlyFeaturePlotVisium.propTypes = {
     feature: PropTypes.string.isRequired
 };
 
-export default PlotlyFeaturePlotVisium;
+export default PlotlyFeaturePlotMerfish;

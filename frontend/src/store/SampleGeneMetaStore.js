@@ -397,6 +397,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
                 if (!get().imageDataDict[sample]) {
                     const coor_response = await getCoordinates(dataset_id, sample)
                     const img_response = await getImage(dataset_id, sample)
+                    // console.log("img_response",img_response)
                     set({
                         imageDataDict: {
                             ...get().imageDataDict,
