@@ -114,11 +114,11 @@ for (i in 1:length(all_names)) {
     json_output <- toJSON(scale_factors_plain, pretty = TRUE, auto_unbox = TRUE)
 
     # Save to a JSON file
-    write(json_output, paste0(coordinates_dir, "/raw_scalefactors_", image_name, ".json"))
+    write(json_output, paste0(coordinates_dir, "/scalefactors_", image_name, ".json"))
     # Save coordinates
-    write.csv(coordinates, paste0(coordinates_dir, "/raw_coordinates_", image_name, ".csv"), row.names = TRUE)
+    write.csv(coordinates, paste0(coordinates_dir, "/coordinates_", image_name, ".csv"), row.names = TRUE)
     # Save as PNG (best for analysis)
-    png::writePNG(img_array, target = paste0(images_dir, "/raw_image_", image_name, ".png"))
+    png::writePNG(img_array, target = paste0(images_dir, "/image_", image_name, ".png"))
 }
 
 # Extract the normalized counts

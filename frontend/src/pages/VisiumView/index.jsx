@@ -18,8 +18,8 @@ import "./VisiumView.css";
 import useSampleGeneMetaStore from "../../store/SampleGeneMetaStore.js";
 import useDataStore from "../../store/DatatableStore.js";
 
-import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
-import CanvasFeaturePlot from "./VisiumCanvasPlot.jsx";
+// import EChartFeaturePlot from "./VisiumEChartPlot.jsx";
+// import CanvasFeaturePlot from "./VisiumCanvasPlot.jsx";
 import PlotlyFeaturePlot from "./VisiumPlotlyPlot.jsx";
 import useVisiumStore from "../../store/VisiumStore.jsx";
 
@@ -39,7 +39,7 @@ function VisiumView() {
 
     const datasetOptions = []
     datasetRecords.map((d) => {
-        if (d.assay.toLowerCase() === "visiumst") {
+        if (d.assay.toLowerCase() === "visiumst" || d.assay.toLowerCase() === "merfish") {
             datasetOptions.push(d.dataset_id)
         }
     })
@@ -183,7 +183,7 @@ function VisiumView() {
             ? "two-plots" : Object.keys(selectedFeatures).length === 3
                 ? "three-plots" : "four-plots";
 
-    // console.log("sampleMetaDict:", sampleMetaDict);
+    console.log("imageDataDict:", imageDataDict);
     return (
         <div className="plot-page-container" style={{display: 'flex', flexDirection: 'column', flex: 1}}>
             {/* Title Row */}
