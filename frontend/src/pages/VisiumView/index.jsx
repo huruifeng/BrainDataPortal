@@ -425,21 +425,18 @@ function VisiumView() {
                                     <div key={`${sample_i}-features`} className={`features-container ${plotClass}`}>
                                         {selectedFeatures.length > 0 ? (
                                             selectedFeatures.map(feature => (
-                                                <>
-                                                    <div key={`${sample_i}-${feature}-chart`}
-                                                         className="feature-plot-echart">
-                                                        {sampleMetaDict[sample_i] &&
-                                                            <FeaturePlot
-                                                                assayType={getAssayType(datasetId)}
-                                                                visiumData={visiumData_i}
-                                                                geneData={exprDataDict}
-                                                                metaData={sampleMetaDict[sample_i] || {}}
-                                                                feature={feature}/>}
-                                                        <Typography variant="caption" display="block" align="center">
-                                                            {feature}
-                                                        </Typography>
-                                                    </div>
-                                                </>
+                                                <div key={`${sample_i}-${feature}-div`} className="feature-plot-div">
+                                                    {sampleMetaDict[sample_i] &&
+                                                        <FeaturePlot
+                                                            assayType={getAssayType(datasetId)}
+                                                            visiumData={visiumData_i}
+                                                            geneData={exprDataDict}
+                                                            metaData={sampleMetaDict[sample_i] || {}}
+                                                            feature={feature}/>}
+                                                    <Typography variant="caption" display="block" align="center">
+                                                        {feature}
+                                                    </Typography>
+                                                </div>
                                             ))
                                         ) : (
                                             <Box className="no-feature">
