@@ -4,7 +4,7 @@ import Plotly from "plotly.js-dist";
 import PropTypes from "prop-types";
 import {calculateMinMax, isCategorical, sortObjectByKey} from "../../utils/funcs.js";
 
-const PlotlyFeaturePlot = React.memo(function PlotlyFeaturePlot({visiumData, geneData, metaData, feature}) {
+const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumData, geneData, metaData, feature}) {
 
     const containerRef = useRef(null);
     const [imageUrl, setImageUrl] = useState("");
@@ -55,7 +55,7 @@ const PlotlyFeaturePlot = React.memo(function PlotlyFeaturePlot({visiumData, gen
             if(cell_level_meta.includes(feature)){
                 data[id] = cell_metadata_mapping[feature][item[feature]][0];
             } else{
-                const sample_id = id.split("_")[0]
+                const sample_id = id.split('_').slice(0,-1).join('_')
                 data[id] = sample_metadata[sample_id][feature];
             }
         });
@@ -236,7 +236,7 @@ const PlotlyFeaturePlot = React.memo(function PlotlyFeaturePlot({visiumData, gen
     );
 });
 
-PlotlyFeaturePlot.propTypes = {
+PlotlyFeaturePlotVisium.propTypes = {
     visiumData: PropTypes.shape({
         coordinates: PropTypes.object.isRequired,
         scales: PropTypes.object.isRequired,
@@ -247,4 +247,4 @@ PlotlyFeaturePlot.propTypes = {
     feature: PropTypes.string.isRequired
 };
 
-export default PlotlyFeaturePlot;
+export default PlotlyFeaturePlotVisium;

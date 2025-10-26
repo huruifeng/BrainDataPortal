@@ -204,6 +204,8 @@ def get_gene_list(dataset, query_str="AB"):
             data = json.load(f)
         if query_str == "all":
             return data
+        elif query_str == "default":
+            return data[:10]
         else:
             return [gene for gene in data if gene.lower().startswith(query_str.lower())]
     else:
@@ -836,44 +838,43 @@ def get_visium_coordinates(dataset, sample):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
-    coordinates_file = os.path.join(
-        "backend",
-        "datasets",
-        dataset,
-        "coordinates",
-        "raw_coordinates_slice1_" + sample + ".csv",
-    )
-    scales_file = os.path.join(
-        "backend",
-        "datasets",
-        dataset,
-        "coordinates",
-        "raw_scalefactors_slice1_" + sample + ".json",
-    )
+    coordinates_folder = os.path.join("backend", "datasets", dataset, "coordinates")
+    coordinates_file_ls = os.listdir(coordinates_folder)
+    coordinates_file = None
+    scales_file = None
+    for f in coordinates_file_ls:
+        if sample in f and "coordinates" in f:
+            coordinates_file = os.path.join(coordinates_folder, f)
+        if sample in f and "scalefactors" in f:
+            scales_file = os.path.join(coordinates_folder, f)
 
-    # if os.path.exists(coordinates_file) and os.path.exists(scales_file):
-    with open(coordinates_file, "r") as f:
-        coordinates_df = pd.read_csv(coordinates_file, index_col=0, header=0)
-        coordinates = coordinates_df.to_dict(orient="index")
+    if coordinates_file and os.path.exists(coordinates_file) :
+        with open(coordinates_file, "r") as f:
+            coordinates_df = pd.read_csv(coordinates_file, index_col=0, header=0)
+            coordinates = coordinates_df.to_dict(orient="index")
+    else:
+        coordinates = None
 
-    with open(scales_file, "r") as f:
-        scales = json.load(f)
+    if scales_file and os.path.exists(scales_file):
+        with open(scales_file, "r") as f:
+            scales = json.load(f)
+    else:
+        scales = None
 
     return {"coordinates": coordinates, "scales": scales}
-    # else:
-    #     return "Error: Image file not found"
 
 
-def get_visium_defaults(dataset):
+
+def get_spatial_defaults(dataset):
     if dataset == "all":
         return "Error: Dataset is not specified."
 
     config_info = get_config_info(dataset)
-    if config_info and "visium_defaults" in config_info:
-        data = config_info["visium_defaults"]
+    if ("Error" not in config_info) and ("spatial_defaults" in config_info):
+        data = config_info["spatial_defaults"]
         return data
     else:
-        return f"Error: visium_defaults file not found."
+        return f"Error: spatial_defaults not found."
 
 
 def get_bw_data_exists(dataset):
