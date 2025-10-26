@@ -83,7 +83,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
         if (query_str.length === 0) {
             // set({geneList: ["SNCA", "SNCA-AS1", "LRRK2", "GBA", "PRKN", "MAPT", "PINK1", "PARK7"]})
-            query_str="default"
+            query_str = "default"
         } else if (query_str.length < 3) {
             set({geneList: []})
             return
@@ -162,9 +162,9 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
-    fetchMetaDataOfSample: async (dataset_id = null) => {
+    fetchMetaDataOfSample: async (dataset_id = null, explicitSamples = null) => {
         dataset_id = dataset_id ?? get().dataSet
-        const {selectedSamples} = get()
+        const selectedSamples = explicitSamples ?? get().selectedSamples  // 使用显式参数或store状态
 
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchSampleMetaData: No dataset selected", loading: false})
@@ -310,9 +310,10 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
-    fetchExprData: async (dataset_id) => {
-        const {selectedGenes} = get()
+    fetchExprData: async (dataset_id, explicitGenes = null) => {
+        const selectedGenes = explicitGenes ?? get().selectedGenes  // 使用显式参数或store状态
         dataset_id = dataset_id ?? get().dataSet
+
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchExprData: No dataset selected", loading: false})
             return
@@ -348,6 +349,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
+
     fetchPseudoExprData: async (dataset_id) => {
         dataset_id = dataset_id ?? get().dataSet
         const {selectedGenes} = get()
@@ -380,9 +382,10 @@ const useSampleGeneMetaStore = create((set, get) => ({
         }
     },
 
-    fetchImageData: async (dataset_id) => {
+    fetchImageData: async (dataset_id, explicitSamples = null) => {
         dataset_id = dataset_id ?? get().dataSet
-        const {selectedSamples} = get()
+        const selectedSamples = explicitSamples ?? get().selectedSamples  // 使用显式参数或store状态
+
         if (!dataset_id || dataset_id === "all") {
             set({error: "fetchImageData: No dataset selected", loading: false})
             return
@@ -391,13 +394,11 @@ const useSampleGeneMetaStore = create((set, get) => ({
         set({loading: true, error: null})
 
         try {
-            // get().imageDataDict = {};
             for (var sample of selectedSamples) {
                 if (sample === "all") continue
                 if (!get().imageDataDict[sample]) {
                     const coor_response = await getCoordinates(dataset_id, sample)
                     const img_response = await getImage(dataset_id, sample)
-                    // console.log("img_response",img_response)
                     set({
                         imageDataDict: {
                             ...get().imageDataDict,
@@ -422,6 +423,7 @@ const useSampleGeneMetaStore = create((set, get) => ({
             set({error: "Failed to fetch VisiumST data:" + error, loading: false})
         }
     },
+
 }))
 
 export default useSampleGeneMetaStore
