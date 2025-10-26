@@ -10,9 +10,9 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
     const [imageUrl, setImageUrl] = useState("");
     const [naturalDimensions, setNaturalDimensions] = useState({width: 0, height: 0});
     const [zoomLevel, setZoomLevel] = useState(1);
-    const [baseMarkerSize, setBaseMarkerSize] = useState(2);
-    const [isPlotInitialized, setIsPlotInitialized] = useState(false);
     const [currentLayout, setCurrentLayout] = useState(null);
+
+    const baseMarkerSize = 2.0;
 
     // Destructure visium data
     const {coordinates, image} = visiumData;
@@ -303,25 +303,9 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
         };
     }, [imageUrl, naturalDimensions, coordinateRanges, feature, isCat, scatterData.length]);
 
-    const resetZoom = useCallback((gd) => {
-        if (!gd) return;
-
-        const hasImage = imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0;
-        const xRange = hasImage ? [0, naturalDimensions.width] : coordinateRanges.xRange;
-        const yRange = hasImage ? [naturalDimensions.height, 0] : coordinateRanges.yRange;
-
-        Plotly.relayout(gd, {
-            'xaxis.range': xRange,
-            'yaxis.range': yRange
-        });
-
-        setZoomLevel(1);
-    }, [imageUrl, naturalDimensions, coordinateRanges]);
-
     // Handle plot initialization
     const handlePlotInitialized = useCallback((gd) => {
         plotRef.current = gd;
-        setIsPlotInitialized(true);
     }, []);
 
     // Calculate container aspect ratio
@@ -372,10 +356,12 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                         scale: 2
                     },
                     modeBarButtonsToRemove: [
-                        "autoScale2d",
-                        "resetScale2d",
-                        "select2d",
+                        // "autoScale2d",
+                        // "resetScale2d",
+                        // "select2d",
                         "lasso2d",
+                        "resetScale",
+                        // "autoScale"
                     ],
                     modeBarButtonsToAdd: [
                         [
@@ -384,13 +370,6 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                                 icon: Plotly.Icons.disk,
                                 click: function (gd) {
                                     Plotly.downloadImage(gd, {format: "svg", filename: `BDP_svg-${feature}`});
-                                },
-                            },
-                            {
-                                name: "Reset View",
-                                icon: Plotly.Icons.home,
-                                click: function (gd) {
-                                    resetZoom(gd);
                                 },
                             },
                         ],
