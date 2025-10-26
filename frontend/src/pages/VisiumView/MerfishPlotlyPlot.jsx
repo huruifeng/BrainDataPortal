@@ -49,8 +49,8 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
         const yMax = Math.max(...yValues);
 
         // Add some padding to the ranges
-        const xPadding = (xMax - xMin) * 0.05;
-        const yPadding = (yMax - yMin) * 0.05;
+        const xPadding = (xMax - xMin) * 0.02;
+        const yPadding = (yMax - yMin) * 0.02;
 
         return {
             xRange: [xMin - xPadding, xMax + xPadding],
@@ -106,11 +106,12 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
     }, [coordinates, featuredData, isCat]);
 
     const colorPalette = [
-        "#A7D16B", "#ADD9E9", "#A84D9D","#F68D40","#0A71B1","#016B62","#BFAFD4","#6BAED6","#7BCCC4",
+        "#A7D16B", "#ADD9E9", "#A84D9D","#F68D40","#0A71B1","#016B62","#BFAFD4","#6BAED6","#7BCCC4","#F00745",
         "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9"
     ];
 
     // Prepare trace data for Plotly
+    const pointSize = 2.0;
     const traces = useMemo(() => {
         if (!scatterData.length) return [];
 
@@ -131,7 +132,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 type: "scatter",
                 name: `${group}`,
                 marker: {
-                    size: 6,
+                    size: pointSize,
                     color: colorPalette[i % colorPalette.length],
                     opacity: 0.8
                 }
@@ -144,7 +145,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 mode: "markers",
                 type: "scatter",
                 marker: {
-                    size: 6,
+                    size: pointSize,
                     color: scatterData.map(p => p.value),
                     colorscale: [
                         ['0.000000000000', 'rgb(49,54,149)'],
