@@ -9,6 +9,10 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
     const plotRef = useRef(null);
     const [imageUrl, setImageUrl] = useState("");
     const [naturalDimensions, setNaturalDimensions] = useState({width: 0, height: 0});
+    const [zoomLevel, setZoomLevel] = useState(1);
+    const [baseMarkerSize, setBaseMarkerSize] = useState(2);
+    const [isPlotInitialized, setIsPlotInitialized] = useState(false);
+    const [currentLayout, setCurrentLayout] = useState(null);
 
     // Destructure visium data
     const {coordinates, image} = visiumData;
@@ -48,13 +52,14 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
         const yMin = Math.min(...yValues);
         const yMax = Math.max(...yValues);
 
-        // Add some padding to the ranges
-        const xPadding = (xMax - xMin) * 0.02;
-        const yPadding = (yMax - yMin) * 0.02;
+        const xPadding = (xMax - xMin) * 0.05;
+        const yPadding = (yMax - yMin) * 0.05;
 
         return {
             xRange: [xMin - xPadding, xMax + xPadding],
-            yRange: [yMin - yPadding, yMax + yPadding]
+            yRange: [yMin - yPadding, yMax + yPadding],
+            dataWidth: xMax - xMin,
+            dataHeight: yMax - yMin
         };
     }, [coordinates]);
 
@@ -106,12 +111,22 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
     }, [coordinates, featuredData, isCat]);
 
     const colorPalette = [
-        "#A7D16B", "#ADD9E9", "#A84D9D","#F68D40","#0A71B1","#016B62","#BFAFD4","#6BAED6","#7BCCC4","#F00745",
+        "#A7D16B", "#ADD9E9", "#A84D9D","#F68D40","#0A71B1","#016B62","#BFAFD4","#6BAED6","#7BCCC4",
         "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9"
     ];
 
+    // Calculate current marker size based on zoom level
+    const calculateMarkerSize = useCallback((currentZoomLevel = zoomLevel) => {
+        const dynamicSize = baseMarkerSize * Math.sqrt(currentZoomLevel);
+        return Math.max(2, Math.min(20, dynamicSize));
+    }, [baseMarkerSize, zoomLevel]);
+
+    // Current marker size based on zoom level
+    const currentMarkerSize = useMemo(() => {
+        return calculateMarkerSize();
+    }, [calculateMarkerSize]);
+
     // Prepare trace data for Plotly
-    const pointSize = 2.0;
     const traces = useMemo(() => {
         if (!scatterData.length) return [];
 
@@ -132,7 +147,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 type: "scatter",
                 name: `${group}`,
                 marker: {
-                    size: pointSize,
+                    size: currentMarkerSize,
                     color: colorPalette[i % colorPalette.length],
                     opacity: 0.8
                 }
@@ -145,7 +160,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 mode: "markers",
                 type: "scatter",
                 marker: {
-                    size: pointSize,
+                    size: currentMarkerSize,
                     color: scatterData.map(p => p.value),
                     colorscale: [
                         ['0.000000000000', 'rgb(49,54,149)'],
@@ -172,12 +187,65 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 }
             }];
         }
-    }, [scatterData, isCat, feature, minFeature, maxFeature]);
+    }, [scatterData, isCat, feature, minFeature, maxFeature, currentMarkerSize]);
 
-    // Plotly layout - handle both with and without image
+    // Handle plot updates to detect zoom
+    const handlePlotUpdate = useCallback((data) => {
+        if (!data || !plotRef.current) return;
+
+        try {
+            // 获取当前布局
+            const layout = data.layout;
+            if (!layout) return;
+
+            // 检查布局是否改变（包括缩放）
+            const xRange = layout.xaxis && layout.xaxis.range;
+            const yRange = layout.yaxis && layout.yaxis.range;
+
+            if (xRange && yRange) {
+                setCurrentLayout(layout);
+
+                // 计算缩放级别
+                const viewWidth = xRange[1] - xRange[0];
+                const viewHeight = yRange[1] - yRange[0];
+                const dataWidth = coordinateRanges.xRange[1] - coordinateRanges.xRange[0];
+                const dataHeight = coordinateRanges.yRange[1] - coordinateRanges.yRange[0];
+
+                const zoomX = dataWidth / viewWidth;
+                const zoomY = dataHeight / viewHeight;
+                const newZoomLevel = Math.max(1, (zoomX + zoomY) / 2);
+
+                setZoomLevel(newZoomLevel);
+            }
+            // console.log("zoomLevel", zoomLevel);
+        } catch (error) {
+            console.warn('Error handling plot update:', error);
+        }
+    }, [coordinateRanges, zoomLevel]);
+
+    // 使用 useEffect 来监听布局变化
+    useEffect(() => {
+        if (!currentLayout) return;
+
+        const xRange = currentLayout.xaxis && currentLayout.xaxis.range;
+        const yRange = currentLayout.yaxis && currentLayout.yaxis.range;
+
+        if (xRange && yRange) {
+            const viewWidth = xRange[1] - xRange[0];
+            const viewHeight = yRange[1] - yRange[0];
+            const dataWidth = coordinateRanges.xRange[1] - coordinateRanges.xRange[0];
+            const dataHeight = coordinateRanges.yRange[1] - coordinateRanges.yRange[0];
+
+            const zoomX = dataWidth / viewWidth;
+            const zoomY = dataHeight / viewHeight;
+            const newZoomLevel = Math.max(1, (zoomX + zoomY) / 2);
+
+            setZoomLevel(newZoomLevel);
+        }
+    }, [currentLayout, coordinateRanges, zoomLevel]);
+
+    // Plotly layout
     const layout = useMemo(() => {
-        // If we have an image, use image dimensions for layout
-        // If no image, use coordinate ranges
         const hasImage = imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0;
 
         const xRange = hasImage ? [0, naturalDimensions.width] : coordinateRanges.xRange;
@@ -210,7 +278,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 visible: false,
                 range: xRange,
                 autorange: false,
-                scaleanchor: hasImage ? undefined : 'y' // Maintain aspect ratio only when no image
+                scaleanchor: hasImage ? undefined : 'y'
             },
             yaxis: {
                 showgrid: false,
@@ -246,24 +314,25 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
             'xaxis.range': xRange,
             'yaxis.range': yRange
         });
+
+        setZoomLevel(1);
     }, [imageUrl, naturalDimensions, coordinateRanges]);
 
     // Handle plot initialization
     const handlePlotInitialized = useCallback((gd) => {
         plotRef.current = gd;
+        setIsPlotInitialized(true);
     }, []);
 
     // Calculate container aspect ratio
     const containerStyle = useMemo(() => {
         if (imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0) {
-            // If we have an image, use image aspect ratio
             return {
                 width: "100%",
                 position: "relative",
                 aspectRatio: `${naturalDimensions.width} / ${naturalDimensions.height}`
             };
         } else if (coordinateRanges.xRange && coordinateRanges.yRange) {
-            // If no image but have coordinates, use coordinate aspect ratio
             const width = coordinateRanges.xRange[1] - coordinateRanges.xRange[0];
             const height = coordinateRanges.yRange[1] - coordinateRanges.yRange[0];
             if (width > 0 && height > 0) {
@@ -275,7 +344,6 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
             }
         }
 
-        // Default fallback
         return {
             width: "100%",
             height: "400px",
@@ -292,7 +360,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 useResizeHandler
                 style={{width: "100%", height: "100%"}}
                 onInitialized={handlePlotInitialized}
-                onUpdate={handlePlotInitialized}
+                onUpdate={handlePlotUpdate}
                 config={{
                     responsive: true,
                     displaylogo: false,

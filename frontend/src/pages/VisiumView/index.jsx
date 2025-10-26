@@ -177,8 +177,6 @@ function VisiumView() {
             // 获取新 dataset 的默认值
             const {defaultSamples, defaultGenes, defaultFeatures} = useVisiumStore.getState();
 
-            console.log("New dataset defaults:", {defaultSamples, defaultGenes, defaultFeatures});
-
             // 直接设置 store 状态
             useSampleGeneMetaStore.setState({
                 selectedSamples: defaultSamples,
@@ -246,7 +244,7 @@ function VisiumView() {
     }
 
     const selectedFeatures = [...new Set([...selectedGenes, ...selectedMetaFeatures])];
-    console.log("selectedFeatures:", selectedFeatures);
+
     const plotClass = Object.keys(selectedFeatures).length <= 1
         ? "single-plot" : Object.keys(selectedFeatures).length === 2
             ? "two-plots" : Object.keys(selectedFeatures).length === 3
