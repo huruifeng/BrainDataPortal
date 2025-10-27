@@ -20,9 +20,9 @@ export default function HomePage() {
             href: "clusters",
         },
         {
-            title: "Visium ST View",
+            title: "Spatial Tx View",
             description:
-                "Analyze spatial transcriptomics data with Visium technology for tissue-wide gene expression patterns.",
+                "Visualize and explore spatial transcriptomics data for gene expression patterns and cell type locations.",
             icon: <Grid3X3 size={48} style={{color: "#f43f5e"}}/>,
             href: "visiumview",
         },
