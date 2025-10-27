@@ -255,15 +255,15 @@ function XDatasetsView() {
 
             // Fetch data in parallel where possible
             const [exprData, metaData] = await Promise.all([
-                fetchExprData(datasetId).then(() => useSampleGeneMetaStore.getState().exprDataDict),
-                fetchMetaDataOfSample(datasetId).then(() => useSampleGeneMetaStore.getState().sampleMetaDict),
+                fetchExprData(datasetId,geneFeatures).then(() => useSampleGeneMetaStore.getState().exprDataDict),
+                fetchMetaDataOfSample(datasetId, [sample]).then(() => useSampleGeneMetaStore.getState().sampleMetaDict),
             ])
 
             // Only fetch image data for Visium datasets if needed
             const effectivePlotType = getEffectivePlotType(datasetId, dataset.plotType)
             let imageData = {}
-            if ((effectivePlotType === "visium" || effectivePlotType === "both") && sample !== "all") {
-                await fetchImageData(datasetId)
+            if ((effectivePlotType === "visium" || effectivePlotType === "both" || effectivePlotType === "merfish") && sample !== "all") {
+                await fetchImageData(datasetId, [sample])
                 imageData = useSampleGeneMetaStore.getState().imageDataDict
             }
 
@@ -555,8 +555,8 @@ function XDatasetsView() {
 
         if (datasetType === "visiumst") {
             return ["umap", "visium"]
-        }else if (datasetType === "merfish") {
-            return ["umap","merfish"]
+        } else if (datasetType === "merfish") {
+            return ["umap", "merfish"]
         } else {
             return ["umap"]
         }
@@ -626,6 +626,8 @@ function XDatasetsView() {
         }
         return getAssayType(datasetRecords, datasetId)
     }, [datasetRecords])
+
+    console.log("plotData", plotData)
 
     return (
         <div className="plot-page-container" style={{display: "flex", flexDirection: "column", flex: 1}}>
@@ -731,15 +733,9 @@ function XDatasetsView() {
                                             >
                                                 {getAvailablePlotTypes(dataset.id).map((type) => (
                                                     <MenuItem key={type} value={type}>
-                                                        {type === "auto"
-                                                            ? "Auto"
-                                                            : type === "umap"
-                                                                ? "UMAP"
-                                                                : type === "visium"
-                                                                    ? "Visium"
-                                                                    : type === "merfish"
-                                                                        ? "MERFISH"
-                                                                        : "UMAP"}
+                                                        {type === "umap" ? "UMAP"
+                                                            : type === "visium" ? "Visium"
+                                                                : type === "merfish" ? "MERFISH" : "UMAP"}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
@@ -915,7 +911,7 @@ function XDatasetsView() {
                                                         )}
 
                                                         {/* Visium Plot */}
-                                                        {(effectivePlotType === "visium" || effectivePlotType === "both") && (
+                                                        {(effectivePlotType === "visium" || effectivePlotType === "both" || effectivePlotType === "merfish") && (
                                                             <Box className="feature-plots">
                                                                 {isVisiumDataAvailable(dataset.id, dataset.sample) ? (
                                                                     <div className="visium-item">
@@ -939,15 +935,11 @@ function XDatasetsView() {
                                                                         bgcolor: "#ffffff",
                                                                         borderRadius: 1,
                                                                     }}>
-                                                                        <Typography variant="body2"
-                                                                                    color="text.secondary" sx={{mb: 1}}>
-                                                                            {!plotData[dataset.id]?.imagedict
-                                                                                ? "Image data is loading"
-                                                                                : dataset.sample === "all"
-                                                                                    ? "Please select a specific sample for Visium plots"
-                                                                                    : !plotData[dataset.id]?.imagedict[dataset.sample]
-                                                                                        ? `No image data for sample ${dataset.sample}`
-                                                                                        : "Loading Visium data..."}
+                                                                        <Typography variant="body2" color="text.secondary" sx={{mb: 1}}>
+                                                                            {!plotData[dataset.id]?.imagedict ? "Image data is loading"
+                                                                                : dataset.sample === "all" ? "Please select a specific sample for Visium plots"
+                                                                                    : !plotData[dataset.id]?.imagedict[dataset.sample] ? `No image data for sample ${dataset.sample}`
+                                                                                        : "Loading spatial data..."}
                                                                         </Typography>
                                                                     </Box>
                                                                 )}
