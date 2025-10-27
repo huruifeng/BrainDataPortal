@@ -4,11 +4,12 @@ import PropTypes from "prop-types";
 import PlotlyFeaturePlotMerfish from "./MerfishPlotlyPlot.jsx";
 import PlotlyFeaturePlotVisium from "./VisiumPlotlyPlot.jsx";
 
-const FeaturePlot = React.memo(function FeaturePlot({assayType, visiumData, geneData, metaData, feature}) {
+const FeaturePlot = React.memo(function FeaturePlot({assayType,visiumData, geneData, metaData, feature, showImage=false}) {
+    console.log("showImage", showImage);
     if (assayType.toLowerCase() === "visiumst") {
-        return <PlotlyFeaturePlotVisium visiumData={visiumData} geneData={geneData} metaData={metaData} feature={feature}/>;
+        return <PlotlyFeaturePlotVisium visiumData={visiumData} geneData={geneData} metaData={metaData} feature={feature} showImage={showImage}/>;
     } else if (assayType.toLowerCase() === "merfish") {
-        return <PlotlyFeaturePlotMerfish visiumData={visiumData} geneData={geneData} metaData={metaData} feature={feature}/>;
+        return <PlotlyFeaturePlotMerfish visiumData={visiumData} geneData={geneData} metaData={metaData} feature={feature} showImage={showImage}/>;
     } else {
         return (
             <Box className="no-feature">
@@ -29,7 +30,8 @@ FeaturePlot.propTypes = {
     }).isRequired,
     geneData: PropTypes.object.isRequired,
     metaData: PropTypes.object.isRequired,
-    feature: PropTypes.string.isRequired
+    feature: PropTypes.string.isRequired,
+    showImage: PropTypes.bool.isRequired
 };
 
 export default FeaturePlot;
