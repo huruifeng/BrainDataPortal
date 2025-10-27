@@ -303,10 +303,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
         }] : [];
 
         return {
-            title: {
-                text: feature,
-                font: { size: 14 }
-            },
+            // title: {text: feature, font: { size: 14 }},
             showlegend: isCat && scatterData.length > 0,
             autosize: true,
             scrollZoom: true,
@@ -333,11 +330,11 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 y: 0.8,
                 itemsizing: "constant",
                 bgcolor: "rgba(255,255,255,0.8)",
-                bordercolor: "rgba(0,0,0,0.2)",
-                borderwidth: 1
+                // bordercolor: "rgba(0,0,0,0.2)",
+                // borderwidth: 1
             },
-            plot_bgcolor: hasImage ? 'rgba(0,0,0,0)' : '#f5f5f5', // Background when no image
-            paper_bgcolor: 'rgba(0,0,0,0)',
+            // plot_bgcolor: hasImage ? 'rgba(0,0,0,0)' : '#f5f5f5', // Background when no image
+            // paper_bgcolor: 'rgba(0,0,0,0)',
         };
     }, [imageUrl, naturalDimensions, coordinateRanges, feature, isCat, scatterData.length, showImage]);
 
@@ -360,7 +357,9 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
             return {
                 width: "100%",
                 position: "relative",
-                aspectRatio: `${coordinateRanges.dataWidth} / ${coordinateRanges.dataHeight}`
+                aspectRatio: `${coordinateRanges.dataWidth} / ${coordinateRanges.dataHeight}`,
+                border: "1px solid #e0e0e0",
+                borderRadius: "4px"
             };
         }
 
