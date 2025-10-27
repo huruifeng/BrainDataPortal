@@ -8,7 +8,7 @@ import {
     TextField,
     LinearProgress,
     CircularProgress,
-    Autocomplete, Link,
+    Autocomplete, Link, Switch, FormControlLabel, Menu, MenuItem,
 } from "@mui/material";
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import {useSearchParams} from "react-router-dom";
@@ -29,6 +29,10 @@ function VisiumView() {
     const urlSamples = queryParams.getAll("sample") ?? [];
     const urlMetas = queryParams.getAll("meta") ?? [];
     const urlDataset = queryParams.get("dataset") ?? "";
+
+    const [settingOptions, setSettingOptions] = useState({
+        showImage: true,
+    });
 
     const {datasetRecords, fetchDatasetList} = useDataStore()
     useEffect(() => {
@@ -243,6 +247,14 @@ function VisiumView() {
         fetchMetaDataOfSample(datasetId, selectedSamples);
     }
 
+    const handleOptionChange = (option) => (event) => {
+        // Update immediately for switches
+        setSettingOptions({
+            ...settingOptions,
+            [option]: event.target.checked,
+        });
+    };
+
     const selectedFeatures = [...new Set([...selectedGenes, ...selectedMetaFeatures])];
 
     const plotClass = Object.keys(selectedFeatures).length <= 1
@@ -368,9 +380,21 @@ function VisiumView() {
                                                             variant="standard"/>}
                     />
 
+                    {/*<Divider sx={{marginTop: "50px"}}/>*/}
+                    <Typography sx={{marginTop: "30px"}} variant="subtitle1">Settings:</Typography>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={settingOptions.showImage}
+                                onChange={handleOptionChange("showImage")}
+                            />
+                        }
+                        label="Show H&E image"
+                    />
+                    <Divider />
 
                     {/* a button to fetch data and a loading indicator*/}
-                    <Box sx={{display: "flex", justifyContent: "center", margin: "20px 0px"}}>
+                    <Box sx={{display: "flex", justifyContent: "center", margin: "50px 0px"}}>
                         <Button variant="outlined" endIcon={<ScatterPlotIcon/>} disabled={loading}
                                 onClick={handleLoadPlot}>
                             {loading ? "Loading plots..." : "Refresh Plots"}
@@ -430,7 +454,10 @@ function VisiumView() {
                                                             visiumData={visiumData_i}
                                                             geneData={exprDataDict}
                                                             metaData={sampleMetaDict[sample_i] || {}}
-                                                            feature={feature}/>}
+                                                            feature={feature}
+                                                            showImage={settingOptions.showImage}
+                                                        />
+                                                    }
                                                     <Typography variant="caption" display="block" align="center">
                                                         {feature}
                                                     </Typography>

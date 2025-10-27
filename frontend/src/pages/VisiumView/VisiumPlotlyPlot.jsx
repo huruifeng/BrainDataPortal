@@ -4,7 +4,13 @@ import Plotly from "plotly.js-dist";
 import PropTypes from "prop-types";
 import {calculateMinMax, isCategorical, sortObjectByKey} from "../../utils/funcs.js";
 
-const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumData, geneData, metaData, feature}) {
+const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({
+                                                                          visiumData,
+                                                                          geneData,
+                                                                          metaData,
+                                                                          feature,
+                                                                          showImage = false
+                                                                      }) {
 
     const containerRef = useRef(null);
     const plotRef = useRef(null);
@@ -20,8 +26,15 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
     const {cell_metadata, cell_metadata_mapping, sample_metadata} = metaData
     const cell_level_meta = Object.keys(cell_metadata_mapping);
 
-    // Load image and extract dimensions - ENHANCED
+    // Load image and extract dimensions - FIXED: Properly use showImage prop
     useEffect(() => {
+        // Check if image should be shown
+        if (!showImage) {
+            setImageUrl("");
+            setNaturalDimensions({width: 0, height: 0});
+            return;
+        }
+
         // More robust image availability check
         if (!image || ("success" in image && !image.success)) {
             setImageUrl("");
@@ -66,7 +79,7 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
             setImageUrl("");
             setNaturalDimensions({width: 0, height: 0});
         }
-    }, [image]);
+    }, [image, showImage]); // Added showImage to dependency array
 
 
     // Extract feature data
@@ -118,20 +131,20 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
         const yMin = Math.min(...yValues);
         const yMax = Math.max(...yValues);
 
-        const xPadding = (xMax - xMin) * 0.05;
-        const yPadding = (yMax - yMin) * 0.05;
+        const xPadding = (xMax - xMin) * 0.2;
+        const yPadding = (yMax - yMin) * 0.2;
 
-        // Use natural dimensions if available, otherwise use data bounds
-        const effectiveWidth = naturalDimensions.width > 0 ? naturalDimensions.width : xMax + xPadding;
-        const effectiveHeight = naturalDimensions.height > 0 ? naturalDimensions.height : yMax + yPadding;
+        // Use natural dimensions if available and showImage is true, otherwise use data bounds
+        const effectiveWidth = (showImage && naturalDimensions.width > 0) ? naturalDimensions.width : xMax + xPadding;
+        const effectiveHeight = (showImage && naturalDimensions.height > 0) ? naturalDimensions.height : yMax + yPadding;
 
         return {
             xRange: [Math.max(0, xMin - xPadding), Math.max(effectiveWidth, xMax + xPadding)],
-            yRange: [Math.max(effectiveHeight, yMax + yPadding),Math.max(0, yMin - yPadding)],
+            yRange: [Math.max(effectiveHeight, yMax + yPadding), Math.max(0, yMin - yPadding)],
             dataWidth: Math.max(1, xMax - xMin),
             dataHeight: Math.max(1, yMax - yMin)
         };
-    }, [coordinates, lowres, naturalDimensions]);
+    }, [coordinates, lowres, naturalDimensions, showImage]); // Added showImage to dependency array
 
     const colorPalette = [
         "#A7D16B", "#ADD9E9", "#A84D9D", "#F68D40", "#0A71B1", "#016B62", "#BFAFD4", "#6BAED6", "#7BCCC4",
@@ -184,16 +197,16 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
                     size: currentMarkerSize,
                     color: scatterData.map(p => p.value),
                     colorscale: [
-                        ['0.000000000000', 'rgb(49,54,149)'],
-                        ['0.111111111111', 'rgb(69,117,180)'],
-                        ['0.222222222222', 'rgb(116,173,209)'],
-                        ['0.333333333333', 'rgb(171,217,233)'],
-                        ['0.444444444444', 'rgb(224,243,248)'],
-                        ['0.555555555556', 'rgb(254,224,144)'],
-                        ['0.666666666667', 'rgb(253,174,97)'],
-                        ['0.777777777778', 'rgb(244,109,67)'],
-                        ['0.888888888889', 'rgb(215,48,39)'],
-                        ['1.000000000000', 'rgb(165,0,38)']
+                        ['0.0000', 'rgb(49,54,149)'],
+                        ['0.1111', 'rgb(69,117,180)'],
+                        ['0.2222', 'rgb(116,173,209)'],
+                        ['0.3333', 'rgb(171,217,233)'],
+                        ['0.4444', 'rgb(224,243,248)'],
+                        ['0.5556', 'rgb(254,224,144)'],
+                        ['0.6667', 'rgb(253,174,97)'],
+                        ['0.7778', 'rgb(244,109,67)'],
+                        ['0.8889', 'rgb(215,48,39)'],
+                        ['1.0000', 'rgb(165,0,38)']
                     ],
                     colorbar: {titleside: 'right', len: 0.4, thickness: 20, x: 0.85, y: 0.5},
                     cmin: minFeature,
@@ -273,7 +286,7 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
         }
     }, [currentLayout, coordinateRanges]);
 
-    // Plotly layout - ENHANCED
+    // Plotly layout - FIXED: Conditionally add image based on showImage
     const layout = useMemo(() => {
         const baseLayout = {
             title: feature,
@@ -304,8 +317,8 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
             },
         };
 
-        // Only add image if available
-        if (imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0) {
+        // Only add image if available AND showImage is true
+        if (showImage && imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0) {
             baseLayout.images = [{
                 source: imageUrl,
                 x: 0, y: 0,
@@ -318,23 +331,17 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
         }
 
         return baseLayout;
-    }, [imageUrl, naturalDimensions, feature, isCat, coordinateRanges]);
+    }, [imageUrl, naturalDimensions, feature, isCat, coordinateRanges, showImage]); // Added showImage to dependency array
 
     // Improved reset zoom function
     const resetZoom = (gd) => {
-         // Get the container size
+        // Get the container size
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
 
         // Set zoom-out level to fit the container
         const xRange = [0, containerWidth];
         const yRange = [containerHeight, 0];
-
-        // const { width, height } = naturalDimensions;
-        // console.log("Container size:",containerWidth, containerHeight);
-        // console.log("Natural dimensions:",width, height);
-        //
-        // console.log(displayScale)
 
         // Apply new range with relayout
         Plotly.relayout(gd, {
@@ -347,11 +354,11 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({visiumDat
         <div ref={containerRef} style={{
             width: "100%",
             position: "relative",
-            aspectRatio: naturalDimensions.width > 0 && naturalDimensions.height > 0
+            aspectRatio: (showImage && naturalDimensions.width > 0 && naturalDimensions.height > 0)
                 ? `${naturalDimensions.width / naturalDimensions.height}`
                 : "1",
-            backgroundColor: imageUrl ? "transparent" : "#f5f5f5",
-            border: imageUrl ? "none" : "1px solid #e0e0e0",
+            backgroundColor: (showImage && imageUrl) ? "transparent" : "#f5f5f5",
+            border: (showImage && imageUrl) ? "none" : "1px solid #e0e0e0",
             borderRadius: "4px"
         }}>
             <Plot
@@ -409,7 +416,8 @@ PlotlyFeaturePlotVisium.propTypes = {
     }).isRequired,
     geneData: PropTypes.object.isRequired,
     metaData: PropTypes.object.isRequired,
-    feature: PropTypes.string.isRequired
+    feature: PropTypes.string.isRequired,
+    showImage: PropTypes.bool.isRequired
 };
 
 export default PlotlyFeaturePlotVisium;

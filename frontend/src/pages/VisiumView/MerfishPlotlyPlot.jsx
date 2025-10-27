@@ -4,7 +4,7 @@ import Plotly from "plotly.js-dist";
 import PropTypes from "prop-types";
 import {calculateMinMax, isCategorical, sortObjectByKey} from "../../utils/funcs.js";
 
-const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumData, geneData, metaData, feature}) {
+const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumData, geneData, metaData, feature, showImage=false}) {
     const containerRef = useRef(null);
     const plotRef = useRef(null);
     const [imageUrl, setImageUrl] = useState("");
@@ -19,29 +19,60 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
     const {cell_metadata, cell_metadata_mapping, sample_metadata} = metaData
     const cell_level_meta = Object.keys(cell_metadata_mapping);
 
-    // Load image and extract dimensions
+    // Load image and extract dimensions - FIXED
     useEffect(() => {
-        if (!image || ("success" in image && !image.success)) {
+        // Clear image if showImage is false or no image available
+        if (!showImage || !image || ("success" in image && !image.success)) {
             setImageUrl("");
+            setNaturalDimensions({width: 0, height: 0});
             return;
         }
 
-        const url = URL.createObjectURL(image);
-        setImageUrl(url);
+        // Handle different image types
+        let urlToUse = "";
+
+        if (typeof image === "string") {
+            // Image is already a URL string
+            urlToUse = image;
+        } else if (image instanceof Blob) {
+            // Image is a Blob - create object URL
+            urlToUse = URL.createObjectURL(image);
+        } else {
+            console.warn("Unsupported image type:", typeof image);
+            setImageUrl("");
+            setNaturalDimensions({width: 0, height: 0});
+            return;
+        }
+
+        setImageUrl(urlToUse);
 
         const img = new Image();
         img.onload = () => {
             setNaturalDimensions({width: img.naturalWidth, height: img.naturalHeight});
         };
-        img.src = url;
+        img.onerror = () => {
+            console.warn("Failed to load image");
+            setImageUrl("");
+            setNaturalDimensions({width: 0, height: 0});
+            // Only revoke if we created the URL
+            if (typeof image !== "string") {
+                URL.revokeObjectURL(urlToUse);
+            }
+        };
+        img.src = urlToUse;
 
-        return () => URL.revokeObjectURL(url);
-    }, [image]);
+        // Cleanup function - only revoke if we created the URL
+        return () => {
+            if (typeof image !== "string" && urlToUse) {
+                URL.revokeObjectURL(urlToUse);
+            }
+        };
+    }, [image, showImage]); // Added showImage to dependencies
 
     // Calculate coordinate ranges from object format
     const coordinateRanges = useMemo(() => {
         if (!coordinates || Object.keys(coordinates).length === 0) {
-            return { xRange: [0, 1], yRange: [0, 1] };
+            return { xRange: [0, 1], yRange: [0, 1], dataWidth: 1, dataHeight: 1 };
         }
 
         const xValues = Object.values(coordinates).map(coord => coord.x);
@@ -194,36 +225,37 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
         if (!data || !plotRef.current) return;
 
         try {
-            // 获取当前布局
             const layout = data.layout;
             if (!layout) return;
 
-            // 检查布局是否改变（包括缩放）
             const xRange = layout.xaxis && layout.xaxis.range;
             const yRange = layout.yaxis && layout.yaxis.range;
 
             if (xRange && yRange) {
                 setCurrentLayout(layout);
 
-                // 计算缩放级别
-                const viewWidth = xRange[1] - xRange[0];
-                const viewHeight = yRange[1] - yRange[0];
-                const dataWidth = coordinateRanges.xRange[1] - coordinateRanges.xRange[0];
-                const dataHeight = coordinateRanges.yRange[1] - coordinateRanges.yRange[0];
+                const viewWidth = Math.abs(xRange[1] - xRange[0]);
+                const viewHeight = Math.abs(yRange[1] - yRange[0]);
 
-                const zoomX = dataWidth / viewWidth;
-                const zoomY = dataHeight / viewHeight;
+                // Prevent division by zero
+                if (viewWidth <= 0 || viewHeight <= 0 ||
+                    coordinateRanges.dataWidth <= 0 || coordinateRanges.dataHeight <= 0) {
+                    setZoomLevel(1);
+                    return;
+                }
+
+                const zoomX = coordinateRanges.dataWidth / viewWidth;
+                const zoomY = coordinateRanges.dataHeight / viewHeight;
                 const newZoomLevel = Math.max(1, (zoomX + zoomY) / 2);
 
                 setZoomLevel(newZoomLevel);
             }
-            console.log("zoomLevel", zoomLevel);
         } catch (error) {
             console.warn('Error handling plot update:', error);
         }
-    }, [coordinateRanges, zoomLevel]);
+    }, [coordinateRanges]);
 
-    // 使用 useEffect 来监听布局变化
+    // Use useEffect to listen for layout changes
     useEffect(() => {
         if (!currentLayout) return;
 
@@ -231,30 +263,36 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
         const yRange = currentLayout.yaxis && currentLayout.yaxis.range;
 
         if (xRange && yRange) {
-            const viewWidth = xRange[1] - xRange[0];
-            const viewHeight = yRange[1] - yRange[0];
-            const dataWidth = coordinateRanges.xRange[1] - coordinateRanges.xRange[0];
-            const dataHeight = coordinateRanges.yRange[1] - coordinateRanges.yRange[0];
+            const viewWidth = Math.abs(xRange[1] - xRange[0]);
+            const viewHeight = Math.abs(yRange[1] - yRange[0]);
 
-            const zoomX = dataWidth / viewWidth;
-            const zoomY = dataHeight / viewHeight;
+            // Prevent division by zero
+            if (viewWidth <= 0 || viewHeight <= 0 ||
+                coordinateRanges.dataWidth <= 0 || coordinateRanges.dataHeight <= 0) {
+                setZoomLevel(1);
+                return;
+            }
+
+            const zoomX = coordinateRanges.dataWidth / viewWidth;
+            const zoomY = coordinateRanges.dataHeight / viewHeight;
             const newZoomLevel = Math.max(1, (zoomX + zoomY) / 2);
 
             setZoomLevel(newZoomLevel);
         }
-    }, [currentLayout, coordinateRanges, zoomLevel]);
+    }, [currentLayout, coordinateRanges]);
 
-    // Plotly layout
+    // Plotly layout - FIXED
     const layout = useMemo(() => {
-        const hasImage = imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0;
+        const hasImage = showImage && imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0;
 
+        // Use image dimensions if available and showImage is true, otherwise use coordinate ranges
         const xRange = hasImage ? [0, naturalDimensions.width] : coordinateRanges.xRange;
         const yRange = hasImage ? [naturalDimensions.height, 0] : coordinateRanges.yRange;
 
         const images = hasImage ? [{
             source: imageUrl,
             x: 0,
-            y: naturalDimensions.height,
+            y: 0, // Fixed: Start from bottom (0) instead of naturalDimensions.height
             xref: "x",
             yref: "y",
             sizex: naturalDimensions.width,
@@ -278,7 +316,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 visible: false,
                 range: xRange,
                 autorange: false,
-                scaleanchor: hasImage ? undefined : 'y'
+                scaleanchor: 'y' // Keep aspect ratio
             },
             yaxis: {
                 showgrid: false,
@@ -298,34 +336,32 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                 bordercolor: "rgba(0,0,0,0.2)",
                 borderwidth: 1
             },
-            plot_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: hasImage ? 'rgba(0,0,0,0)' : '#f5f5f5', // Background when no image
             paper_bgcolor: 'rgba(0,0,0,0)',
         };
-    }, [imageUrl, naturalDimensions, coordinateRanges, feature, isCat, scatterData.length]);
+    }, [imageUrl, naturalDimensions, coordinateRanges, feature, isCat, scatterData.length, showImage]);
 
     // Handle plot initialization
     const handlePlotInitialized = useCallback((gd) => {
         plotRef.current = gd;
     }, []);
 
-    // Calculate container aspect ratio
+    // Calculate container aspect ratio - FIXED
     const containerStyle = useMemo(() => {
-        if (imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0) {
+        const hasImage = showImage && imageUrl && naturalDimensions.width > 0 && naturalDimensions.height > 0;
+
+        if (hasImage) {
             return {
                 width: "100%",
                 position: "relative",
                 aspectRatio: `${naturalDimensions.width} / ${naturalDimensions.height}`
             };
-        } else if (coordinateRanges.xRange && coordinateRanges.yRange) {
-            const width = coordinateRanges.xRange[1] - coordinateRanges.xRange[0];
-            const height = coordinateRanges.yRange[1] - coordinateRanges.yRange[0];
-            if (width > 0 && height > 0) {
-                return {
-                    width: "100%",
-                    position: "relative",
-                    aspectRatio: `${width} / ${height}`
-                };
-            }
+        } else if (coordinateRanges.dataWidth > 0 && coordinateRanges.dataHeight > 0) {
+            return {
+                width: "100%",
+                position: "relative",
+                aspectRatio: `${coordinateRanges.dataWidth} / ${coordinateRanges.dataHeight}`
+            };
         }
 
         return {
@@ -333,7 +369,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
             height: "400px",
             position: "relative"
         };
-    }, [imageUrl, naturalDimensions, coordinateRanges]);
+    }, [imageUrl, naturalDimensions, coordinateRanges, showImage]);
 
     return (
         <div ref={containerRef} style={containerStyle}>
@@ -356,12 +392,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
                         scale: 2
                     },
                     modeBarButtonsToRemove: [
-                        // "autoScale2d",
-                        // "resetScale2d",
-                        // "select2d",
                         "lasso2d",
-                        "resetScale",
-                        // "autoScale"
                     ],
                     modeBarButtonsToAdd: [
                         [
@@ -386,11 +417,16 @@ PlotlyFeaturePlotMerfish.propTypes = {
             x: PropTypes.number.isRequired,
             y: PropTypes.number.isRequired
         })).isRequired,
-        image: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+        image: PropTypes.oneOfType([
+            PropTypes.instanceOf(Blob),
+            PropTypes.string,
+            PropTypes.object
+        ]),
     }).isRequired,
     geneData: PropTypes.object.isRequired,
     metaData: PropTypes.object.isRequired,
-    feature: PropTypes.string.isRequired
+    feature: PropTypes.string.isRequired,
+    showImage: PropTypes.bool.isRequired
 };
 
 export default PlotlyFeaturePlotMerfish;
