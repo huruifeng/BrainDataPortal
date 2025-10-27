@@ -9,7 +9,7 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({
                                                                           geneData,
                                                                           metaData,
                                                                           feature,
-                                                                          showImage = false
+                                                                          showImage = true
                                                                       }) {
 
     const containerRef = useRef(null);

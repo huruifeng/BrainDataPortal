@@ -6,9 +6,9 @@ import PlotlyFeaturePlotVisium from "./VisiumPlotlyPlot.jsx";
 
 const FeaturePlot = React.memo(function FeaturePlot({assayType,visiumData, geneData, metaData, feature, showImage=false}) {
     console.log("showImage", showImage);
-    if (assayType.toLowerCase() === "visiumst") {
+    if (assayType.toLowerCase().startsWith("visium")) {
         return <PlotlyFeaturePlotVisium visiumData={visiumData} geneData={geneData} metaData={metaData} feature={feature} showImage={showImage}/>;
-    } else if (assayType.toLowerCase() === "merfish") {
+    } else if (assayType.toLowerCase().startsWith("merfish")) {
         return <PlotlyFeaturePlotMerfish visiumData={visiumData} geneData={geneData} metaData={metaData} feature={feature} showImage={showImage}/>;
     } else {
         return (
