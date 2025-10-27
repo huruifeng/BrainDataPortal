@@ -117,8 +117,8 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
 
     // Calculate current marker size based on zoom level
     const calculateMarkerSize = useCallback((currentZoomLevel = zoomLevel) => {
-        const dynamicSize = baseMarkerSize * Math.sqrt(currentZoomLevel);
-        return Math.max(2, Math.min(20, dynamicSize));
+        const dynamicSize = baseMarkerSize * Math.abs(currentZoomLevel);
+        return Math.max(2, Math.min(100, dynamicSize));
     }, [baseMarkerSize, zoomLevel]);
 
     // Current marker size based on zoom level
@@ -217,7 +217,7 @@ const PlotlyFeaturePlotMerfish = React.memo(function PlotlyFeaturePlot({visiumDa
 
                 setZoomLevel(newZoomLevel);
             }
-            // console.log("zoomLevel", zoomLevel);
+            console.log("zoomLevel", zoomLevel);
         } catch (error) {
             console.warn('Error handling plot update:', error);
         }
