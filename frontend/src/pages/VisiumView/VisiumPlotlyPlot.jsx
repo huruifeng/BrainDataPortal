@@ -184,7 +184,8 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({
                 mode: "markers",
                 type: "scatter",
                 name: `${group}`,
-                marker: {size: currentMarkerSize, color: colorPalette[i % colorPalette.length]}
+                marker: {size: currentMarkerSize, color: colorPalette[i % colorPalette.length]},
+                hovertemplate: `${feature}: ${group}<br><extra></extra>`
             }));
         } else {
             return [{
@@ -210,8 +211,9 @@ const PlotlyFeaturePlotVisium = React.memo(function PlotlyFeaturePlot({
                     ],
                     colorbar: {titleside: 'right', len: 0.4, thickness: 20, x: 0.85, y: 0.5},
                     cmin: minFeature,
-                    cmax: maxFeature
-                }
+                    cmax: maxFeature,
+                },
+                hovertemplate: `${feature}: %{text}<br><extra></extra>`
             }];
         }
     }, [scatterData, isCat, currentMarkerSize, feature, minFeature, maxFeature]);
