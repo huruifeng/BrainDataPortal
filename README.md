@@ -2,6 +2,17 @@
 
 ## Installation and running
 The Documentation for installation and running the app is available at <a href="https://huruifeng.github.io/BrainDataPortal/" target="_blank">BrainDataPortal Docs</a>.
+- pyBigWig is required for chromatin and peak signal visualization, but pyBigWig is only available for Linux/MacOS system.
+  - To run the app, you need to install the dependencies first:
+    >   pip install -r backend/requirements.txt
+  - Then run the backend:
+    > uvicorn main:app --reload --port 8000
+  - To run the frontend, you need to install the dependencies first:
+    > cd frontend
+    >
+    > npm install
+    >
+    > npm run dev
 
 ### NOTES:
 - 1. Load all the meta data when first load the page, separate the meta data into cell level and sample level
