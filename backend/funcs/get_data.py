@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import polars as pl
-import numpy as np
 import pyBigWig
 import math
 import json
@@ -49,9 +48,7 @@ def get_snp_location(dataset, snp):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
-        snps_file = os.path.join(
-            "backend", "datasets", dataset, "snp_jsons", safe_filename(snp) + ".json"
-        )
+        snps_file = os.path.join("backend", "datasets", dataset, "snp_jsons", safe_filename(snp) + ".json")
 
     if os.path.exists(snps_file):
         with open(snps_file, "r") as f:

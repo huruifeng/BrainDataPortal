@@ -13,3 +13,4 @@ fastparquet == 2024.11.0
 types-pytz == 2025.2.*
 pydantic-settings == 2.10.1
 pyBigWig == 0.3.24
+
