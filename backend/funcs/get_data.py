@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import polars as pl
+import numpy as np
 import pyBigWig
 import math
 import json
@@ -12,6 +13,13 @@ from functools import lru_cache
 def safe_filename(name):
     return re.sub(r"[^a-zA-Z0-9_\-]", "_", name)
 
+def get_snp_group(rs_id: str) -> str:
+    digits = rs_id[2:]
+    if not digits.isdigit():
+        raise ValueError
+    if len(digits) < 4:
+        return "rs_lt1k"
+    return "rs" + digits[:4]
 
 def get_gene_location(dataset, gene):
     if dataset == "all":
@@ -48,13 +56,16 @@ def get_snp_location(dataset, snp):
     if dataset == "all":
         return "Error: Dataset is not specified."
     else:
-        snps_file = os.path.join("backend", "datasets", dataset, "snp_jsons", safe_filename(snp) + ".json")
+        snps_file = os.path.join(
+            "backend", "datasets", dataset, "snp_jsons_merged", get_snp_group(snp) + ".json"
+        )
 
     if os.path.exists(snps_file):
         with open(snps_file, "r") as f:
             data = json.load(f)
-        if data:
-            position = data["position"]
+            snp = data.get(snp, None)
+        if data and snp:
+            position = snp["position"]
 
             if position is not None:
                 return {
@@ -175,14 +186,15 @@ def get_snp_chromosome(dataset, snp):
         return "Error: Dataset is not specified."
     else:
         snps_file = os.path.join(
-            "backend", "datasets", dataset, "snp_jsons", safe_filename(snp) + ".json"
+            "backend", "datasets", dataset, "snp_jsons_merged", get_snp_group(snp) + ".json"
         )
 
     if os.path.exists(snps_file):
         with open(snps_file, "r") as f:
             data = json.load(f)
-        if data:
-            return data["chromosome"]
+            snp = data.get(snp, None)
+        if data and snp:
+            return snp["chromosome"]
         else:
             return f"Error: SNP {snp} not found in {dataset} dataset."
     else:
@@ -271,14 +283,15 @@ def get_snp_celltypes(dataset, snp):
         return "Error: Dataset is not specified."
     else:
         snps_file = os.path.join(
-            "backend", "datasets", dataset, "snp_jsons", safe_filename(snp) + ".json"
+            "backend", "datasets", dataset, "snp_jsons_merged", get_snp_group(snp) + ".json"
         )
 
     if os.path.exists(snps_file):
         with open(snps_file, "r") as f:
             data = json.load(f)
-        if data:
-            return data["celltypes"]
+            snp = data.get(snp, None)
+        if data and snp:
+            return snp["celltypes"]
         else:
             return f"Error: SNP not found in dataset."
     else:
