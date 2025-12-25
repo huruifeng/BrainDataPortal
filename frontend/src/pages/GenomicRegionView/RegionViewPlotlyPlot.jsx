@@ -136,83 +136,12 @@ const RegionViewPlotlyPlot = React.memo(function RegionViewPlotlyPlot({
     [gwasMin, gwasMax],
   );
 
-  // const nearbyXValues = useMemo(
-  //   () => genes.flatMap((gene) => [gene.position_start, gene.position_end]),
-  //   [genes],
-  // );
-
-  // const nearbyGenesRange = useMemo(() => {
-  //   const nearbyMin = Math.min(...nearbyXValues);
-  //   const nearbyMax = Math.max(...nearbyXValues);
-  //   const nearbyPadding =
-  //     Math.round(((nearbyMax - nearbyMin) * 0.05) / 1000) * 1000; // 5% padding
-  //   return [
-  //     Math.max(nearbyMin - nearbyPadding),
-  //     Math.min(nearbyMax + nearbyPadding),
-  //   ];
-  // }, [nearbyXValues]);
-
   const formatNumber = (num, precision) => {
     const rounded = round(num, precision);
     return rounded < 0 // Just in case there's a hyphen in there somehow
       ? rounded.toString().replace("-", "−")
       : rounded.toString();
   };
-
-  // const snpTraces = useMemo(() => {
-  //   return cellTypes.flatMap((celltype, i) => {
-  //     const cellSnps = snpData[celltype] || [];
-  //     const snpList = cellSnps.map(
-  //       ({ snp_id, p_value, beta_value, position, ...rest }) => ({
-  //         ...rest,
-  //         id: snp_id,
-  //         y: -Math.log10(Math.max(p_value, 1e-20)), // Avoid log10(0)
-  //         beta: beta_value,
-  //         x: position,
-  //         p_value,
-  //       }),
-  //     );
-
-  //     return [
-  //       {
-  //         name: celltype,
-  //         x: snpList.map((snp) => snp.x),
-  //         y: snpList.map((snp) => snp.y),
-  //         xaxis: "x",
-  //         yaxis: `y${i + (hasGwas ? 3 : 2)}`,
-  //         type: useWebGL ? "scattergl" : "scatter",
-  //         mode: "markers",
-  //         marker: {
-  //           color: snpList.map((snp) =>
-  //             dataToRGB(snp, minBetaMagnitude, maxBetaMagnitude),
-  //           ),
-  //           opacity: 1,
-  //           size: snpList.map((snp) => (Math.abs(snp.y) < 2 ? 6 : 8)),
-  //           line: {
-  //             width: 0,
-  //           },
-  //         },
-  //         customdata: snpList.map((snp) => snp.id),
-  //         hoverinfo: "text",
-  //         text: snpList.map(
-  //           (snp) =>
-  //             `<b>SNP:</b> ${snp.id}<br>` +
-  //             `<b>Position:</b> ${snp.x}<br>` +
-  //             `<b>β:</b> ${formatNumber(snp.beta, 3)}<br>` +
-  //             `<b>−log10(p):</b> ${formatNumber(snp.y, 3)}`,
-  //         ),
-  //         pointType: "snp",
-  //       },
-  //     ];
-  //   });
-  // }, [
-  //   cellTypes,
-  //   snpData,
-  //   hasGwas,
-  //   useWebGL,
-  //   minBetaMagnitude,
-  //   maxBetaMagnitude,
-  // ]);
 
   const gwasTrace = useMemo(() => {
     return [
@@ -225,7 +154,7 @@ const RegionViewPlotlyPlot = React.memo(function RegionViewPlotlyPlot({
         mode: "markers",
         marker: {
           color: gwasData.map((s) =>
-            s.beta > 0 ? "rgb(230, 120, 120)" : "rgb(120, 120, 230)",
+            s.beta > 0 ? "rgb(230, 80, 80)" : "rgb(80, 80, 230)",
           ),
           // color: gwasData.map((s) =>
           //   dataToRGB(s, minBetaMagnitude, maxBetaMagnitude),
@@ -317,21 +246,6 @@ const RegionViewPlotlyPlot = React.memo(function RegionViewPlotlyPlot({
       pointType: "gene",
       showlegend: false,
     };
-
-    // const otherLabels = {
-    //   x: nearbyGenes.flatMap((gene) => [(getStart(gene) + getEnd(gene)) / 2]),
-    //   y: nearbyGenes.flatMap((gene) => [jitterMap.get(gene.gene_id) - 0.2]),
-    //   type: "scatter",
-    //   mode: "text",
-    //   text: nearbyGenes.map((gene) => gene.gene_id),
-    //   textposition: "bottom center",
-    //   showlegend: false,
-    //   hoverinfo: "skip",
-    //   textfont: {
-    //     size: 10,
-    //     color: "rgb(161,161,161)",
-    //   },
-    // };
 
     return [others];
   }, [jitterMap, nearbyGenes]);
