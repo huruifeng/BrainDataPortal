@@ -376,8 +376,8 @@ function GenomicRegionView() {
     const [anchorEl, setAnchorEl] = useState(null);
     const [displayOptions, setDisplayOptions] = useState({
         showGrid: true,
-        trackHeight: 50,
-        gapHeight: 12,
+        trackHeight: 120,
+        gapHeight: 10,
         yHeight: "",
         showGwas: true,
     });
