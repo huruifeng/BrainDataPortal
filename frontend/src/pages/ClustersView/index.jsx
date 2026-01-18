@@ -65,9 +65,10 @@ function ClustersView() {
 
         useClusterStore.setState({clusterList: []}) // clear the clusterList
 
+        await fetchClusterList(selectedDataset)
         await fetchUMAPData(selectedDataset)
         await fetchSelectedMetaData(selectedDataset, [mainCluster])
-        await fetchClusterList(selectedDataset)
+        
     }
     useEffect(() => {
         fetchPrimaryData(initialClusters)
