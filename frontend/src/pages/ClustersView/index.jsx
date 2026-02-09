@@ -190,6 +190,25 @@ function ClustersView() {
                             {loading ? "Loading plots..." : "Refresh Plots"}
                         </Button>
                     </Box>
+                
+                    <div className="plot-section" id="umap-section">
+                        <Typography variant="p" sx={{marginTop: "10px"}}>Cluster locations</Typography>
+                        {/* <div className="umap-container single-plot"> */}
+                            <div className="umap-item">
+                                <div className="umap-wrapper">
+                                    {umapData && (
+                                        <UMAPPlot
+                                            umapData={umapData}
+                                            metaData={selectedMetaData}
+                                            selectedClusters={selectedClusters}
+                                            isAllClustersSelected={isAllClustersSelected}
+                                            mainCluster={mainCluster}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        {/* </div> */}
+                    </div>
                 </div>
 
                 {/* Right Plot Area (75%) */}
@@ -215,26 +234,8 @@ function ClustersView() {
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : (
+                        
                         <>
-                            <div className="plot-section" id="umap-section">
-                                <Typography variant="p" sx={{marginTop: "10px"}}>UMAP Visualization</Typography>
-                                <div className="umap-container single-plot">
-                                    <div className="umap-item">
-                                        <div className="umap-wrapper">
-                                            {umapData && (
-                                                <UMAPPlot
-                                                    umapData={umapData}
-                                                    metaData={selectedMetaData}
-                                                    selectedClusters={selectedClusters}
-                                                    isAllClustersSelected={isAllClustersSelected}
-                                                    mainCluster={mainCluster}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             {selectedClusters.length > 0 && <div className="plot-section" id="marker-genes-section">
                                 <Divider sx={{marginTop: "10px"}} flexItem>Marker Genes</Divider>
                                 <div className="dot-container">
