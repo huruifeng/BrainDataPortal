@@ -39,6 +39,8 @@ def get_gene_location(dataset, gene):
             "backend", "datasets", dataset, "gene_jsons", get_gene_file_name(safe_filename(gene)) + ".json"
         )
 
+    default_gene_locations_file = os.path.join("backend", "datasets", "gene_locations.json")
+
     if os.path.exists(genes_file):
         with open(genes_file, "r") as f:
             data = json.load(f)
@@ -48,12 +50,14 @@ def get_gene_location(dataset, gene):
                 gene_x = data
 
         if gene_x:
+            chromosome = gene_x["chromosome"]
             position_start = gene_x["position_start"]
             position_end = gene_x["position_end"]
             strand = gene_x["strand"]
 
             if position_start is not None and position_end is not None:
                 return {
+                    "chromosome": chromosome,
                     "start": position_start,
                     "end": position_end,
                     "strand": strand,
@@ -62,8 +66,29 @@ def get_gene_location(dataset, gene):
                 return f"Error: Gene does not have valid position data in dataset."
         else:
             return f"Error: Gene not found in dataset."
+    elif os.path.exists(default_gene_locations_file):
+        with open(default_gene_locations_file, "r") as f:
+            data = json.load(f)
+            gene_x = data.get(gene, None)
+        if gene_x:
+            chromosome = gene_x["chromosome"]
+            position_start = gene_x["start"]
+            position_end = gene_x["end"]
+            strand = gene_x["strand"]
+
+            if position_start is not None and position_end is not None:
+                return {
+                    "chromosome": chromosome,
+                    "start": position_start,
+                    "end": position_end,
+                    "strand": strand,
+                }
+            else:
+                return f"Error: Gene does not have valid position data in default dataset."
+        else:
+            return f"Error: Gene not found in default dataset."
     else:
-        print(genes_file + " not found")
+        print(default_gene_locations_file + " not found")
         return "Error: Gene list file not found for the specified dataset."
 
 
@@ -75,6 +100,8 @@ def get_snp_location(dataset, snp):
             "backend", "datasets", dataset, "snp_jsons_merged", get_snp_group(snp) + ".json"
         )
 
+    default_snp_locations_file = os.path.join("backend", "datasets", "snp_locations.json")
+
     if os.path.exists(snps_file):
         with open(snps_file, "r") as f:
             data = json.load(f)
@@ -84,14 +111,29 @@ def get_snp_location(dataset, snp):
 
             if position is not None:
                 return {
+                    "chromosome": snp["chromosome"],
                     "position": position,
                 }
             else:
                 return f"Error: SNP {snp} does not have valid position data in {dataset} dataset."
         else:
             return f"Error: SNP {snp} not found in {dataset} dataset."
+    elif os.path.exists(default_snp_locations_file):
+        with open(default_snp_locations_file, "r") as f:
+            data = json.load(f)
+            snp = data.get(snp, None)
+        if snp:
+            position = snp["position"]
+
+            if position is not None:
+                return {
+                    "chromosome": snp["chromosome"],
+                    "position": position,
+                }
+            else:
+                return f"Error: SNP {snp} does not have valid position data in default dataset."
     else:
-        print(snps_file + " not found")
+        print(default_snp_locations_file + " not found")
         return "Error: SNP list file not found for the specified dataset."
 
 
@@ -844,7 +886,7 @@ def get_all_metadata(dataset, cols=["all"], rows=["all"]):
 
 def get_expr_data(dataset, gene):
     gene_expr_file = os.path.join(
-        "backend", "datasets", dataset, "gene_jsons", gene + ".json"
+        "backend", "datasets", dataset, "gene_exprs", gene + ".json"
     )
     if not os.path.exists(gene_expr_file):
         return "Error: Gene expression file not found"
