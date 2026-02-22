@@ -115,9 +115,17 @@ const Home = () => {
                                 Upload your own dataset to visualize
                             </Button>
                         </Box>
-
                 </Grid2>
+                
             </Grid2>
+            {/* <Grid2 item xs={12} justifyContent="left" sx={{mt: 5}}>
+                <Typography variant="body" align="left" sx={{mt: 2}}>
+                    <strong>Main contributors:</strong> Ruifeng Hu<sup>#</sup>, Christopher Chenghang Zhang<sup>#</sup>, Yanqing Lou, Jie Yuan, Mingming Lu, Jacob Parker, Zechuan Lin, Weiqing Liu, and Xianjun Dong*.
+                </Typography>
+                <Typography variant="body2" align="left" sx={{mt: 2}}>
+                    Core support is provided by the Yale School of Medicine and the Xianjun Dong Lab. We also acknowledge the contributions of our collaborators and the broader neuroscience community for their invaluable feedback and support.
+                </Typography>
+            </Grid2> */}
         </Container>
     );
 };
