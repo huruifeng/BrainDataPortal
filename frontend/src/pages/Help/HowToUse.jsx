@@ -381,13 +381,13 @@ export default function HelpPage() {
                                             <CodeBlock>
                                                 <div>
                                                     <span className="comment"># Clone the repository or Download the Zipped repository</span><br/>
-                                                    git clone https://github.com/huruifeng/BrainDataPortal.git<br/>
+                                                    git clone https://github.com/TheDongLab/VizIt.git<br/>
 
                                                     <br/>
                                                     <span className="comment"># Or</span><br/>
                                                     (Download the zipped repository from <a
-                                                    href="https://github.com/huruifeng/BrainDataPortal" target="_blank"
-                                                    style={{color: "#2196f3"}}>https://github.com/huruifeng/BrainDataPortal</a>)
+                                                    href="https://github.com/TheDongLab/VizIt" target="_blank"
+                                                    style={{color: "#2196f3"}}>https://github.com/TheDongLab/VizIt</a>)
                                                 </div>
                                             </CodeBlock>
                                             <br/>
@@ -416,8 +416,7 @@ export default function HelpPage() {
                                                                 </div>
                                                             </CodeBlock>
                                                             <br/>
-                                                            <Typography variant="h6"
-                                                                        className="env-title env-title--secondary">
+                                                            <Typography variant="h6" className="env-title env-title--secondary">
                                                                 2.2 Start the backend server
                                                             </Typography>
                                                             <CodeBlock>
@@ -878,7 +877,7 @@ export default function HelpPage() {
                                                         Sample sheet format (CSV)
                                                 </Typography>
                                                 <Box className="format-content format-content--primary">
-                                                    Please refer to the <Link href="/demos/notebooks/sc/example_data/Sample_snRNAseq_10Samples.csv" target="_blank" rel="noopener noreferrer"> Example sample sheet file</Link>
+                                                    Please refer to the <Link href="/sample-sheet-format" target="_blank" rel="noopener noreferrer"> Example sample sheet file</Link>
                                                     <Typography variant="subtitle1" className="format-title format-title--secondary">(PLEASE KEEP ALL THE COLUMN NAMES AND ORDER AS IS, JUST FILL IN YOUR DATA)</Typography>
                                                 </Box>
                                             </Paper>
@@ -887,7 +886,7 @@ export default function HelpPage() {
                                                         xQTL format (CSV)
                                                 </Typography>
                                                 <Box className="format-content format-content--primary">
-                                                    Please refer to the <Link href="/demos/notebooks/xqtl/example_data/eQTL_Demo.zip" target="_blank" rel="noopener noreferrer"> Example xQTL file</Link><br />
+                                                    Please refer to the <Link href="/sample-sheet-format" target="_blank" rel="noopener noreferrer"> Example xQTL file</Link><br />
                                                     <Box sx={{mt: 1}}>
                                                         <Box className="format-content format-content--primary">
                                                             <Typography variant="subtitle1" className="format-title">
