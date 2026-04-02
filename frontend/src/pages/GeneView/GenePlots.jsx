@@ -38,7 +38,7 @@ function filterExprBySampleId(exprObj, sampleList) {
 
 const GeneMetaPlots = ({
                            geneList, sampleList, exprData, cellMetaData, sampleMetaData, CellMetaMap,
-                           group, exprValueType,mainCluster,datasetId
+                           group, group2, exprValueType,mainCluster,datasetId
                        }) => {
 
     console.log("geneMetaPlots: mainCluster",mainCluster,"datasetId",datasetId)
@@ -50,26 +50,28 @@ const GeneMetaPlots = ({
 
         let newExprData = {...exprData};
         let newMetaData = {};
-        if (cell_level_meta.includes(group)) {
-            newMetaData = Object.fromEntries(
-                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                    const newSubObj = {...csObj};
-                    const targetValue = csObj[group];
-                    newSubObj[group] = CellMetaMap[group][targetValue][0];
-                    return [cs_id, newSubObj];
-                })
-            );
-        } else {
-            newMetaData = Object.fromEntries(
-                Object.entries(cellMetaData).map(([cs_id, csObj]) => {
-                    const sample_id = cs_id.split('_').slice(0,-1).join('_');
-                    ;
-                    const newSubObj = {...csObj};
-                    newSubObj[group] = sampleMetaData[sample_id][group];
-                    return [cs_id, newSubObj];
-                })
-            );
-        }
+
+        // Helper to resolve a metadata field value for a cell
+        const resolveMetaValue = (csObj, cs_id, field) => {
+            if (cell_level_meta.includes(field)) {
+                const targetValue = csObj[field];
+                return CellMetaMap[field][targetValue][0];
+            } else {
+                const sample_id = cs_id.split('_').slice(0,-1).join('_');
+                return sampleMetaData[sample_id]?.[field];
+            }
+        };
+
+        newMetaData = Object.fromEntries(
+            Object.entries(cellMetaData).map(([cs_id, csObj]) => {
+                const newSubObj = {...csObj};
+                newSubObj[group] = resolveMetaValue(csObj, cs_id, group);
+                if (group2) {
+                    newSubObj[group2] = resolveMetaValue(csObj, cs_id, group2);
+                }
+                return [cs_id, newSubObj];
+            })
+        );
 
         let isValidPseudobulk = false;
 
@@ -92,7 +94,7 @@ const GeneMetaPlots = ({
         }
 
         return {processedExprData: newExprData, processedMetaData: newMetaData};
-    }, [exprValueType, geneList, group, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData, includeZeros]);
+    }, [exprValueType, geneList, group, group2, sampleMetaData, pseudoExprDict, sampleList, cellMetaData, exprData, includeZeros]);
 
     useEffect(() => {
         fetchPseudoExprData();
@@ -194,6 +196,7 @@ const GeneMetaPlots = ({
                                         exprData={processedExprData}
                                         metaData={processedMetaData}
                                         group={group}
+                                        group2={group2}
                                         includeZeros={includeZeros}
                                         mainCluster = {mainCluster}
                                         datasetId = {datasetId}
@@ -213,6 +216,7 @@ const GeneMetaPlots = ({
                                         exprData={processedExprData}
                                         metaData={processedMetaData}
                                         group={group}
+                                        group2={group2}
                                         includeZeros={includeZeros}
                                         mainCluster = {mainCluster}
                                         datasetId = {datasetId}
@@ -253,6 +257,7 @@ GeneMetaPlots.propTypes = {
     sampleMetaData: PropTypes.object.isRequired,
     CellMetaMap: PropTypes.object.isRequired,
     group: PropTypes.string.isRequired,
+    group2: PropTypes.string,
     exprValueType: PropTypes.string.isRequired,
     mainCluster: PropTypes.string.isRequired,
     datasetId: PropTypes.string.isRequired

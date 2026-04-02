@@ -72,6 +72,8 @@ function GeneView() {
     const {metadataLoading, loading, error} = useSampleGeneMetaStore()
     const [coloring, setColoring] = useState(initialColoring || mainCluster)
     const [grouping, setGrouping] = useState(initialGrouping || mainCluster)
+    const initialGrouping2 = queryParams.get("group2") ?? ""
+    const [grouping2, setGrouping2] = useState(initialGrouping2)
 
     const [exprValueType, setExprValueType] = useState("celllevel")
 
@@ -140,13 +142,14 @@ function GeneView() {
     }, [geneSearchText, datasetId])
 
     /** Updates the query parameters in the URL */
-    const updateQueryParams = (dataset, genes, samples, color = null, group = null) => {
+    const updateQueryParams = (dataset, genes, samples, color = null, group = null, group2 = null) => {
         const newParams = new URLSearchParams()
         dataset && newParams.set("dataset", dataset)
         genes.forEach((gene) => newParams.append("gene", gene))
         samples.forEach((sample) => newParams.append("sample", sample))
         if (color) newParams.append("color", color)
         if (group) newParams.append("group", group)
+        if (group2) newParams.append("group2", group2)
         setQueryParams(newParams)
     }
 
@@ -191,7 +194,12 @@ function GeneView() {
 
     const handleGroupingChange = (event) => {
         setGrouping(event.target.value)
-        updateQueryParams(datasetId, selectedGenes, selectedSamples, coloring, event.target.value)
+        updateQueryParams(datasetId, selectedGenes, selectedSamples, coloring, event.target.value, grouping2)
+    }
+
+    const handleGrouping2Change = (event) => {
+        setGrouping2(event.target.value)
+        updateQueryParams(datasetId, selectedGenes, selectedSamples, coloring, grouping, event.target.value)
     }
 
     const handleColoringChange = (event) => {
@@ -360,6 +368,36 @@ function GeneView() {
                                 display: "flex",
                                 justifyContent: "start",
                                 marginBottom: "10px",
+                                marginLeft: "20px",
+                            }}>
+                                <FormControl variant="standard" sx={{width: "100%"}}>
+                                    <InputLabel id="grouping2-label">Secondary grouping (optional)</InputLabel>
+                                    <Select
+                                        labelId="grouping2-label"
+                                        id="grouping2-select"
+                                        value={grouping2}
+                                        onChange={handleGrouping2Change}
+                                        size="small"
+                                        variant="standard">
+                                        <MenuItem value="">
+                                            <em>None</em>
+                                        </MenuItem>
+                                        {metaList && metaList.length > 0 ? (
+                                            metaList.map((option) => {
+                                                if (excludedKeys.has(option)) return null
+                                                if (option === grouping) return null
+                                                return (<MenuItem key={option} value={option}>{option}</MenuItem>)
+                                            })
+                                        ) : (<MenuItem
+                                            disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                            <Box sx={{
+                                display: "flex",
+                                justifyContent: "start",
+                                marginBottom: "10px",
                                 marginLeft: "20px"
                             }}>
                                 <FormControl variant="standard" sx={{width: "100%"}}>
@@ -444,6 +482,7 @@ function GeneView() {
                                     sampleMetaData={allSampleMetaData}
                                     CellMetaMap={CellMetaMap}
                                     group={grouping}
+                                    group2={grouping2}
                                     exprValueType={exprValueType}
                                     mainCluster={mainCluster}
                                     datasetId={datasetId}
