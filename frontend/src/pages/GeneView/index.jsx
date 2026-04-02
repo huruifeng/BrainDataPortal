@@ -222,6 +222,21 @@ function GeneView() {
 
     const excludedKeys = new Set(["cs_id", "sample_id", "Cell", "Spot", "UMAP_1", "UMAP_2"])
 
+    // Secondary groupby: only show categorical features with < 5 unique values
+    const group2Options = (metaList || []).filter((option) => {
+        if (excludedKeys.has(option) || option === grouping) return false
+        // Cell-level meta: CellMetaMap has unique values as keys
+        if (CellMetaMap && CellMetaMap[option]) {
+            return Object.keys(CellMetaMap[option]).length < 5
+        }
+        // Sample-level meta: count unique values across samples
+        if (allSampleMetaData && Object.keys(allSampleMetaData).length > 0) {
+            const uniqueVals = new Set(Object.values(allSampleMetaData).map(s => s[option]))
+            return uniqueVals.size > 0 && uniqueVals.size < 5
+        }
+        return false
+    })
+
     // console.log("selectedGenes", selectedGenes, CellMetaMap, allCellMetaData, allSampleMetaData);
 
     return (
@@ -382,14 +397,12 @@ function GeneView() {
                                         <MenuItem value="">
                                             <em>None</em>
                                         </MenuItem>
-                                        {metaList && metaList.length > 0 ? (
-                                            metaList.map((option) => {
-                                                if (excludedKeys.has(option)) return null
-                                                if (option === grouping) return null
-                                                return (<MenuItem key={option} value={option}>{option}</MenuItem>)
-                                            })
+                                        {group2Options.length > 0 ? (
+                                            group2Options.map((option) => (
+                                                <MenuItem key={option} value={option}>{option}</MenuItem>
+                                            ))
                                         ) : (<MenuItem
-                                            disabled>{loading ? "Loading metadata..." : "No metadata available"}</MenuItem>)
+                                            disabled>No suitable categorical features</MenuItem>)
                                         }
                                     </Select>
                                 </FormControl>
