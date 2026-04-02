@@ -77,22 +77,38 @@ function GeneView() {
 
     const [exprValueType, setExprValueType] = useState("celllevel")
 
-    // Load these in parallel immediately
+    // Initialize selections from URL params synchronously before any effects fire
+    const [initialized] = useState(() => {
+        const initSamples = initialSamples.length ? initialSamples : ["all"]
+        const initGenes = initialGenes.length ? initialGenes : []
+        useSampleGeneMetaStore.setState({
+            dataSet: initialDataset,
+            selectedSamples: initSamples.length > 1 && initSamples.includes("all")
+                ? initSamples.filter(item => item !== "all")
+                : initSamples,
+            selectedGenes: initGenes,
+        })
+        return true
+    })
+
+    // Load data in parallel
     const fetchPrimaryData = async () => {
         setDataset(datasetId);
-        await fetchUMAPData(datasetId);
-        await fetchGeneList(datasetId)
-        await fetchSampleList(datasetId)
-        await fetchMetaList(datasetId)
 
-        // 清空旧数据，并重新获取 exprData
-        useSampleGeneMetaStore.setState({exprDataDict: {}}); // 先清空
-        await fetchExprData(datasetId);
-
-        // 清空旧数据，并重新获取 metaData
+        // Clear old data before fetching
+        useSampleGeneMetaStore.setState({exprDataDict: {}});
         useSampleGeneMetaStore.setState({allCellMetaData: {}, allSampleMetaData: {}, CellMetaMap: {}});
-        await fetchAllMetaData(datasetId);
-        await fetchMainClusterInfo(datasetId);
+
+        // Fire all independent fetches in parallel
+        await Promise.all([
+            fetchUMAPData(datasetId),
+            fetchGeneList(datasetId),
+            fetchSampleList(datasetId),
+            fetchMetaList(datasetId),
+            fetchExprData(datasetId),
+            fetchAllMetaData(datasetId),
+            fetchMainClusterInfo(datasetId),
+        ]);
     }
     useEffect(() => {
         fetchPrimaryData()
@@ -100,7 +116,7 @@ function GeneView() {
 
     useEffect(() => {
         if (datasetId && mainCluster) {
-            setColoring(mainCluster); // 强制更新 coloring
+            setColoring(mainCluster);
             setGrouping(mainCluster);
             updateQueryParams(datasetId, selectedGenes, selectedSamples, mainCluster, mainCluster);
         }
@@ -111,25 +127,6 @@ function GeneView() {
 
     const [geneSearchText, setGeneSearchText] = useState("")
     const [sampleSearchText, setSampleSearchText] = useState("")
-
-    useEffect(() => {
-        const initialSelectedSamples = initialSamples.length ? initialSamples : ["all"]
-        const initialSelectedGenes = initialGenes.length ? initialGenes : []
-
-        setDataset(datasetId)
-
-        useSampleGeneMetaStore.setState({
-            selectedSamples: initialSelectedSamples.length > 1 && initialSelectedSamples.includes("all")
-                ? initialSelectedSamples.filter(item => item !== "all")
-                : initialSelectedSamples,
-            selectedGenes: initialSelectedGenes,
-        })
-    }, [])
-
-    // useEffect(() => {
-    //     fetchExprData(datasetId);
-    //     fetchAllMetaData(datasetId);
-    // }, [datasetId])
 
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
