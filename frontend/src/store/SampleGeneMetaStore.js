@@ -93,7 +93,11 @@ const useSampleGeneMetaStore = create((set, get) => ({
             const response = await getGeneList(dataset_id, query_str)
             if (response.status === 200) {
                 const data = await response.data
-                await set({geneList: data})
+                // Normalize: gene_list.json may contain {id, name} objects or plain strings
+                const normalized = Array.isArray(data)
+                    ? data.map((g) => (typeof g === "object" && g !== null ? (g.name || g.id || String(g)) : g))
+                    : []
+                await set({geneList: normalized})
             } else {
                 console.error("Error fetching gene list:", response.message)
                 await set({geneList: []})

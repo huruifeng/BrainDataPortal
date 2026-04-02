@@ -77,7 +77,9 @@ function ClustersView() {
     // Filter qtl datasets
     const datasetOptions = datasetRecords
     .filter((d) => !d.assay.toLowerCase().endsWith("qtl"))
-    .map((d) => d.dataset_id);
+    .filter((d) => d.has_bw >= 2)
+    .map((d) => d.dataset_id)
+    .sort();
 
     useEffect(() => {
         setDataset(selectedDataset)

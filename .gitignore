@@ -36,4 +36,5 @@ CLAUDE.md
 
 ._*
 
-backend/datasets.zip
+backend/dataset*
+backend/*.zip
