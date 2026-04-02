@@ -83,8 +83,9 @@ function GenomicRegionView() {
     }, []);
 
     const datasetOptions = datasetRecords
-        .filter((d) => /[A-Za-z]*?(RNAseq|ATACseq)$/i.test(d.assay) && d.has_bw)
-        .map((d) => d.dataset_id);
+        .filter((d) => /[A-Za-z]*?(RNAseq|ATACseq)$/i.test(d.assay) && (d.has_bw==1 || d.has_bw==3))
+        .map((d) => d.dataset_id)
+        .sort();
 
     const [datasetId, setDatasetId] = useState(urlDataset);
     const [datasetSearchText, setDatasetSearchText] = useState("");
@@ -115,6 +116,7 @@ function GenomicRegionView() {
     const { loading, error } = useSignalStore();
 
     const [dataLoading, setDataLoading] = useState(false);
+    const [combinedListLoading, setCombinedListLoading] = useState(false);
 
     const parseRegionString = (str) => {
         if (str === null || str === undefined || str.trim() === "") {
@@ -159,6 +161,8 @@ function GenomicRegionView() {
 
     const ignoreNextUrlRegionRef = useRef(false);
     const firstRenderRef = useRef(true);
+    const initialUrlRegionAppliedRef = useRef(false);
+    const initializingRef = useRef(false);
 
     const [combinedList, setCombinedList] = useState([]);
     const [filteredCombinedList, setFilteredCombinedList] = useState([]);
@@ -171,6 +175,8 @@ function GenomicRegionView() {
         const initialize = async () => {
             if (!datasetId || datasetId === "") return;
 
+            setCombinedListLoading(true);
+            initializingRef.current = true;
             try {
                 await setDataset(datasetId);
                 await fetchCellTypes(datasetId);
@@ -193,23 +199,27 @@ function GenomicRegionView() {
                 setCombinedList(combined);
                 setFilteredCombinedList(combined.slice(0, listLength));
 
-                // if (urlRegion) {
-                //   const parsedRegion = parseRegionString(urlRegion);
-                //   if (parsedRegion) {
-                //     setRegion(
-                //       parsedRegion.chromosome,
-                //       parsedRegion.start,
-                //       parsedRegion.end,
-                //     );
-                //     setRegionSearchText(
-                //       `${parsedRegion.chromosome}:${parsedRegion.start}-${parsedRegion.end}`,
-                //     );
-                //   } else {
-                //     console.warn("Invalid region format in URL:", urlRegion);
-                //   }
-                // }
+                if (urlRegion && !initialUrlRegionAppliedRef.current) {
+                    initialUrlRegionAppliedRef.current = true;
+                    const parsedRegion = parseRegionString(urlRegion);
+                    if (parsedRegion) {
+                        setRegion(
+                            parsedRegion.chromosome,
+                            parsedRegion.start,
+                            parsedRegion.end,
+                        );
+                        setRegionSearchText(
+                            `${parsedRegion.chromosome}:${parsedRegion.start}-${parsedRegion.end}`,
+                        );
+                    } else {
+                        console.warn("Invalid region format in URL:", urlRegion);
+                    }
+                }
             } catch (error) {
                 console.error("Error in data fetching:", error);
+            } finally {
+                initializingRef.current = false;
+                setCombinedListLoading(false);
             }
         };
 
@@ -252,6 +262,9 @@ function GenomicRegionView() {
             firstRenderRef.current = false;
             return;
         }
+
+        // Don't update URL while dataset is initializing — state is in flux
+        if (initializingRef.current) return;
 
         const newParams = new URLSearchParams();
 
@@ -497,8 +510,12 @@ function GenomicRegionView() {
     const handleDatasetChange = (event, newValue) => {
         setDataset(newValue);
         setDatasetId(newValue);
-        // setSelectedChromosome(null);
-        // setSelectedRange(null, null );
+        setSelectedChromosome(null);
+        setSelectedRange(null, null);
+        setVisibleRange({ start: null, end: null });
+        setRegionSearchText("");
+        setCombinedList([]);
+        setFilteredCombinedList([]);
     };
 
     // click the button to fetch umap data
@@ -684,6 +701,9 @@ function GenomicRegionView() {
                 ) {
                     let [start, end] = figure.layout.xaxis.range;
 
+                    // Ignore Plotly's default [0, 1] range emitted before real data loads
+                    if (end - start <= 1) return;
+
                     // Clamp at 0
                     if (start < 0) {
                         const width = end - start;
@@ -868,6 +888,7 @@ function GenomicRegionView() {
                                 </li>
                             );
                         }}
+                        loading={combinedListLoading}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -879,6 +900,17 @@ function GenomicRegionView() {
                                         e.preventDefault();
                                         handleEnterSubmit();
                                     }
+                                }}
+                                slotProps={{
+                                    input: {
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                            <>
+                                                {combinedListLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                                                {params.InputProps.endAdornment}
+                                            </>
+                                        ),
+                                    },
                                 }}
                             />
                         )}

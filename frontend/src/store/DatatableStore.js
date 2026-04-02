@@ -67,15 +67,15 @@ const useDatatableStore = create((set) => ({
             if (response.status === 200) {
                 const data = await response.data;
 
-                // Add has_bw property to each record
-                const recordsWithBW = await Promise.all(
+                // Add has_bw/has_expr properties to each record
+                const recordsWithBWEXPR = await Promise.all(
                     data[0].map(async (record) => {
-                        const hasBW = await checkBWDataExists(record.dataset_id);
-                        return {...record, has_bw: hasBW};
+                        const hasBWEXPR = await checkBWDataExists(record.dataset_id);
+                        return {...record, has_bw:  hasBWEXPR};
                     })
                 );
 
-                await set({datasetRecords: recordsWithBW, datasetFilters: data[1], datasetfetchStatus: "success"});
+                await set({datasetRecords: recordsWithBWEXPR, datasetFilters: data[1], datasetfetchStatus: "success"});
                 // toast.success("Sample loaded successfully!");
             } else {
                 console.error("Error fetching data:", response.data);

@@ -287,12 +287,18 @@ def get_gene_list(dataset, query_str="AB"):
     if os.path.exists(genes_file):
         with open(genes_file, "r") as f:
             data = json.load(f)
+        # Normalize: gene_list.json may contain {id, name} objects or plain strings
+        normalized = [
+            (g["name"] if isinstance(g, dict) and "name" in g else g["id"] if isinstance(g, dict) and "id" in g else g)
+            for g in data
+        ] if data and isinstance(data[0], dict) else data
+
         if query_str == "all":
-            return data
+            return normalized
         elif query_str == "default":
-            return data[:10]
+            return normalized[:10]
         else:
-            return [gene for gene in data if gene.lower().startswith(query_str.lower())]
+            return [gene for gene in normalized if gene.lower().startswith(query_str.lower())]
     else:
         print(genes_file + " not found")
         return "Error: Gene list file not found"
@@ -968,16 +974,30 @@ def get_all_metadata(dataset, cols=["all"], rows=["all"]):
 
 
 def get_expr_data(dataset, gene):
+    # Try gene_exprs/ first (plain gene symbol filenames)
     gene_expr_file = os.path.join(
         "backend", "datasets", dataset, "gene_exprs", gene + ".json"
     )
-    if not os.path.exists(gene_expr_file):
-        return "Error: Gene expression file not found"
+    if os.path.exists(gene_expr_file):
+        with open(gene_expr_file, "r") as f:
+            return json.load(f)
 
-    with open(gene_expr_file, "r") as f:
-        cell_expr = json.load(f)
+    # Try gene_jsons/ with Ensembl ID lookup (gene_list.json has {id, name} objects)
+    gene_list_file = os.path.join("backend", "datasets", dataset, "gene_list.json")
+    gene_jsons_dir = os.path.join("backend", "datasets", dataset, "gene_jsons")
+    if os.path.exists(gene_list_file) and os.path.isdir(gene_jsons_dir):
+        with open(gene_list_file, "r") as f:
+            gene_list = json.load(f)
+        if gene_list and isinstance(gene_list[0], dict):
+            for g in gene_list:
+                if g.get("name") == gene or g.get("id") == gene:
+                    gene_id_file = os.path.join(gene_jsons_dir, g["id"] + ".json")
+                    if os.path.exists(gene_id_file):
+                        with open(gene_id_file, "r") as f:
+                            return json.load(f)
+                    break
 
-    return cell_expr
+    return "Error: Gene expression file not found"
 
 
 def get_pseudoexpr_data(dataset, gene):
@@ -1041,9 +1061,17 @@ def get_bw_data_exists(dataset):
         return "Error: Dataset is not specified."
 
     bw_folder = os.path.join("backend", "datasets", dataset,"bigwig")
-    if not os.path.exists(bw_folder):
-        return False
-    return True
+    expr_folder = os.path.join("backend", "datasets", dataset,"gene_exprs")
+
+    exist_n = 0
+    if os.path.exists(bw_folder) and os.path.isdir(bw_folder):
+        exist_n = 1
+    
+    if os.path.exists(expr_folder) and os.path.isdir(expr_folder):
+        exist_n += 2
+    
+    return exist_n  # 0: neither exists, 1: only bigwig exists, 2: only gene_exprs exists, 3: both exist
+
 
 @lru_cache(maxsize=128)
 def get_cached_bigwig_handle(dataset, celltype, strand=None):

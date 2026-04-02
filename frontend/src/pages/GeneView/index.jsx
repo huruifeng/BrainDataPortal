@@ -46,7 +46,9 @@ function GeneView() {
 
     const datasetOptions = datasetRecords
     .filter((d) => !d.assay.toLowerCase().endsWith("qtl"))
+    .filter((d) => d.has_bw >= 2)
     .map((d) => d.dataset_id)
+    .sort();
 
     const [datasetId, setDatasetId] = useState(initialDataset)
     const [datasetSearchText, setDatasetSearchText] = useState("")

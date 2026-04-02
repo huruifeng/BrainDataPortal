@@ -4,7 +4,7 @@ import {useState, useEffect} from "react"
 import {useSearchParams} from "react-router-dom"
 import {
     Box, Typography, Paper, Pagination,
-    Table, TableHead, TableBody, TableRow, TableCell,
+    Table, TableHead, TableBody, TableRow, TableCell, TableSortLabel,
     ToggleButtonGroup, ToggleButton,
     TextField, FormControl, InputLabel,
     Select, MenuItem, Button,
@@ -26,6 +26,18 @@ const DatasetDisplay = ({dataRecords, deleteMode}) => {
     const [displayMode, setDisplayMode] = useState(searchParams.get("view") || "table")
     const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "")
     const [recordsPerPage, setRecordsPerPage] = useState(Number.parseInt(searchParams.get("limit")) || 15)
+    const [sortField, setSortField] = useState(searchParams.get("sort") || "dataset_id")
+    const [sortDirection, setSortDirection] = useState(searchParams.get("dir") || "asc")
+
+    const handleSortChange = (field) => {
+        if (sortField === field) {
+            setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
+        } else {
+            setSortField(field)
+            setSortDirection("asc")
+        }
+        setPage(1)
+    }
 
     // Update URL when display settings change
     useEffect(() => {
@@ -44,8 +56,14 @@ const DatasetDisplay = ({dataRecords, deleteMode}) => {
         if (recordsPerPage !== 15) newSearchParams.set("limit", recordsPerPage.toString())
         else newSearchParams.delete("limit")
 
+        if (sortField) newSearchParams.set("sort", sortField)
+        else newSearchParams.delete("sort")
+
+        if (sortField && sortDirection !== "asc") newSearchParams.set("dir", sortDirection)
+        else newSearchParams.delete("dir")
+
         setSearchParams(newSearchParams, {replace: true})
-    }, [page, displayMode, searchQuery, recordsPerPage, searchParams, setSearchParams])
+    }, [page, displayMode, searchQuery, recordsPerPage, sortField, sortDirection, searchParams, setSearchParams])
 
     const handleRecordsPerPageChange = (event) => {
         setRecordsPerPage(event.target.value)
@@ -74,9 +92,26 @@ const DatasetDisplay = ({dataRecords, deleteMode}) => {
             item.assay.toLowerCase().includes(searchQuery.toLowerCase()),
     )
 
+    // Sort data
+    const sortedData = [...searchFilteredData].sort((a, b) => {
+        if (!sortField) return 0
+        let aVal = a[sortField]
+        let bVal = b[sortField]
+        if (sortField === "n_samples") {
+            aVal = Number(aVal) || 0
+            bVal = Number(bVal) || 0
+        } else {
+            aVal = String(aVal ?? "").toLowerCase()
+            bVal = String(bVal ?? "").toLowerCase()
+        }
+        if (aVal < bVal) return sortDirection === "asc" ? -1 : 1
+        if (aVal > bVal) return sortDirection === "asc" ? 1 : -1
+        return 0
+    })
+
     // Pagination logic: Get only the records for the current page
-    const totalPages = Math.ceil(searchFilteredData.length / recordsPerPage)
-    const displayedData = searchFilteredData.slice((page - 1) * recordsPerPage, page * recordsPerPage)
+    const totalPages = Math.ceil(sortedData.length / recordsPerPage)
+    const displayedData = sortedData.slice((page - 1) * recordsPerPage, page * recordsPerPage)
 
     const handlePageChange = (event, value) => {
         setPage(value)
@@ -125,6 +160,8 @@ const DatasetDisplay = ({dataRecords, deleteMode}) => {
             console.log("Deletion canceled");
         }
     }
+
+    console.log("DatasetDisplay rendered with dataRecords:", dataRecords);
 
     return (
         <Box className="data-display-area" style={{flex: 1, display: "flex", flexDirection: "column"}}>
@@ -194,12 +231,24 @@ const DatasetDisplay = ({dataRecords, deleteMode}) => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Dataset ID</TableCell>
-                                    <TableCell>PI</TableCell>
-                                    <TableCell>First contributor</TableCell>
-                                    <TableCell># Samples</TableCell>
-                                    <TableCell>Brain region</TableCell>
-                                    <TableCell>Assay</TableCell>
+                                    {[
+                                        {id: "dataset_id", label: "Dataset ID"},
+                                        {id: "PI_full_name", label: "PI"},
+                                        {id: "first_contributor", label: "First contributor"},
+                                        {id: "n_samples", label: "# Samples"},
+                                        {id: "brain_region", label: "Brain region"},
+                                        {id: "assay", label: "Assay"},
+                                    ].map((col) => (
+                                        <TableCell key={col.id} sortDirection={sortField === col.id ? sortDirection : false}>
+                                            <TableSortLabel
+                                                active={sortField === col.id}
+                                                direction={sortField === col.id ? sortDirection : "asc"}
+                                                onClick={() => handleSortChange(col.id)}
+                                            >
+                                                {col.label}
+                                            </TableSortLabel>
+                                        </TableCell>
+                                    ))}
                                     <TableCell>View</TableCell>
                                     {deleteMode && <TableCell>Delete</TableCell>}
                                 </TableRow>
@@ -218,10 +267,12 @@ const DatasetDisplay = ({dataRecords, deleteMode}) => {
                                         <TableCell>{record.assay}</TableCell>
                                         <TableCell>
                                             <Box sx={{display: "flex", gap: "10px"}}>
-                                                {["scrnaseq", "snrnaseq", "visiumst","merfish"].includes(record.assay.toLowerCase()) && (<Link to={`/views/geneview?dataset=${record.dataset_id}&sample=all`}>UMAP</Link>)}
+                                                {/* has_bw: 0: neither exists, 1: only bigwig exists, 2: only gene_exprs exists, 3: both exist */}
+                                                {/* {["scrnaseq", "snrnaseq", "visiumst","merfish"].includes(record.assay.toLowerCase()) && (<Link to={`/views/geneview?dataset=${record.dataset_id}&sample=all`}>UMAP</Link>)} */}
+                                                {["scrnaseq", "snrnaseq", "visiumst","merfish"].includes(record.assay.toLowerCase()) && (record.has_bw>=2) && (<Link to={`/views/geneview?dataset=${record.dataset_id}&sample=all`}>UMAP</Link>)}
                                                 {/*{["visiumst","visium"].includes(record.assay.toLowerCase()) && (<Link to={`/views/visiumview?dataset=${record.dataset_id}`}>Visium</Link>)}*/}
                                                 {["eqtl", "caqtl"].includes(record.assay.toLowerCase()) && (<Link to={`/views/xqtlview?dataset=${record.dataset_id}`}>xQTL</Link>)}
-                                                {record.has_bw && (<Link to={`/views/genomicregionview?dataset=${record.dataset_id}&region=chr1:1000000-2000000`}>Peaks</Link>)}
+                                                {(record.has_bw === 1 || record.has_bw === 3) && (<Link to={`/views/genomicregionview?dataset=${record.dataset_id}&region=chr1:1000000-2000000`}>Peaks</Link>)}
                                             </Box>
                                         </TableCell>
                                         {deleteMode && (
@@ -262,10 +313,10 @@ const DatasetDisplay = ({dataRecords, deleteMode}) => {
                                     </Box>
                                 </Box>
                                 <Box sx={{fontSize: "14px", padding: "8px 0", display: "flex", gap: "8px"}}>
-                                    {["scrnaseq", "snrnaseq", "visiumst", "merfish"].includes(record.assay.toLowerCase()) && (<Link to={`/views/geneview?dataset=${record.dataset_id}&sample=all`}>UMAP</Link>)}
+                                    {["scrnaseq", "snrnaseq", "visiumst", "merfish"].includes(record.assay.toLowerCase()) && (record.has_bw >= 2) && (<Link to={`/views/geneview?dataset=${record.dataset_id}&sample=all`}>UMAP</Link>)}
                                     {/*{["visiumst","visium"].includes(record.assay.toLowerCase()) && (<Link to={`/views/visiumview?dataset=${record.dataset_id}`}>Visium</Link>)}*/}
                                     {["eqtl", "caqtl"].includes(record.assay.toLowerCase()) && (<Link to={`/views/xqtlview?dataset=${record.dataset_id}`}>xQTL</Link>)}
-                                    {record.has_bw && (<Link to={`/views/genomicregionview?dataset=${record.dataset_id}&region=chr1:1000000-2000000`}>Peaks</Link>)}
+                                    {(record.has_bw === 1 || record.has_bw === 3) && (<Link to={`/views/genomicregionview?dataset=${record.dataset_id}&region=chr1:1000000-2000000`}>Peaks</Link>)}
                                 </Box>
                                 <Box sx={{fontSize: "14px", display: "flex", gap: "8px", justifyContent: "flex-end"}}>
                                     {deleteMode && (

@@ -16,7 +16,7 @@ const PlotlyScatterPlot = React.memo(function PlotlyScatterPlot({
     if (sampleList.length >= 1 && !sampleList.includes("all")) {
         umapData = umapData.filter((point) => sampleList.includes(point[0].split('_').slice(0, -1).join('_'))); //cs_id.split(/_(?:c|s|cs)\d+$/)[0]
     }
-    console.log("umapData: ", umapData);
+    // console.log("umapData: ", umapData);
     const createCategoryTraces = (plotData, colorGroup) => {
         // Generate distinct colors for each group and create a series for each group
         const colorPalette = [
