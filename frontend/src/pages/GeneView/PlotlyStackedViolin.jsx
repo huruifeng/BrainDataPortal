@@ -91,10 +91,11 @@ const PlotlyStackedViolin = React.memo(function PlotlyStackedViolin({gene, exprD
     const createTraces = () => {
         const traces = [];
 
+        const legendShown = new Set();
+
         genes.forEach((geneName, geneIndex) => {
             if (group2 && group2Values) {
                 // Secondary groupby: side-by-side violins via manual x offsets
-                const legendShown = new Set();
                 xCategories.forEach((x_i, catIndex) => {
                     group2Values.forEach((g2Val, g2Index) => {
                         const data = expressionData[geneName][x_i]?.[g2Val] || [0];

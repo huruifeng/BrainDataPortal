@@ -140,7 +140,9 @@ const DatasetManage = () => {
                 <Paper sx={{flex: 1, p: 4}}>
                     <Typography variant="h6" sx={{mb: 2}}>
                         <strong>Option 1: Use command line to process dataset</strong>
-                        <br /> 1. Process the dataset using the provided <a href="/help/howtouse?tab=2">scripts </a>(Customize the scripts for your dataset)
+                        {/* <br /> 1. Process the dataset using the provided <a href="/help/howtouse?tab=2">scripts </a>(Customize the scripts for your dataset) */}
+                        <br /> 1. Process the dataset using the provided <a href="https://thedonglab.github.io/VizIt/prepare_dataset/">scripts </a>(Customize the scripts for your dataset)
+
                         <br /> 2. Upload the processed dataset to &quot;backend &gt; datasets&quot; folder,
                         <br /> 3. Click the &quot;Refresh DB&quot; button
                     </Typography>
