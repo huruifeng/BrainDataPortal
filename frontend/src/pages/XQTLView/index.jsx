@@ -598,6 +598,10 @@ function XQTLView() {
                         onOpen={handleCombinedAutocompleteOpen}
                         inputValue={combinedSearchText}
                         onInputChange={handleCombinedInputChange}
+                        noOptionsText={datasetId
+                            ? "No genes or SNPs found in this dataset"
+                            : "Please select a dataset first"
+                        }
                         /* isOptionEqualToValue={(option, value) => option.id === value.id} */
                         slots={{
                             popper: StyledPopper,
