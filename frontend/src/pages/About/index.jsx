@@ -52,18 +52,6 @@ const About = () => {
             </ul>
             Together, these data enable a systems-level understanding of PD, from early vulnerability to advanced disease.
           </p>
-          {/* <h4>Main Contributors</h4>
-          <ul>
-            <li><strong>Xianjun Dong</strong> (Principal Investigator, YSM) - Oversee all aspects of development and research.</li>
-            <li><strong>Ruifeng Hu</strong> (Lead Developer, YSM & BMS) - Lead the project, design and implement the portal's features, ensuring that the portal is both powerful and user-friendly.</li>
-            <li><strong>Christopher Zhang</strong> (Developer, Concord Academy) - xQTL datasets processing and view page implementations.</li>
-            <li><strong>Yanqing Lou</strong> (Developer, Northeastern University) - Frontend development and UI enhancements.</li>
-            <li><strong>Zechuan Lin</strong> (Researcher, YSM) - Raw data analysis and management (eQTL/GWAS dataset), ensuring data quality and accessibility.</li>
-            <li><strong>Mingming Lu</strong> (Researcher, YSM) - Raw data processing and management (scATACseq/caQTL dataset), ensuring data quality and accessibility.</li>
-            <li><strong>Jacob Parker</strong> (Researcher, YSM) - Raw data analysis and management (snRNAseq dataset), ensuring data quality and accessibility.</li>
-            <li><strong>Weiqing Liu</strong> (Researcher, YSM) - Raw data analysis and management (multi-omics dataset), ensuring data quality and accessibility.</li>
-            <li><strong>Jie Yuan</strong> (Researcher, YSM) - Raw data analysis and management (Visium ST dataset), ensuring data quality and accessibility.</li>
-          </ul> */}
         </div>
 
         <div className="section">
@@ -91,6 +79,21 @@ const About = () => {
             We encourage the community to explore, reuse, and extend these resources to advance our collective understanding of Parkinson’s disease.
 
           </p>
+        </div>
+
+        <div className="section">
+          <h2>Contributors to the portal development</h2>
+          <ul>
+            <li><strong>Xianjun Dong (Principal Investigator, Yale)</strong> - Oversee all aspects of development and research.</li>
+            <li><strong>Ruifeng Hu (Lead Developer, Yale)</strong> - Lead the project, design and implement the portal's features, ensuring that the portal is both powerful and user-friendly.</li>
+            <li><strong>Christopher Zhang (Developer, Concord Academy)</strong> - xQTL datasets processing, xQTL visualization, and genomic view page development.</li>
+            <li><strong>Yanqing Lou (Developer, Northeastern University)</strong> - Frontend development and UI enhancements.</li>
+            <li><strong>Zechuan Lin (Data contributor, Yale)</strong> - MTG eQTL, PD GWAS dataset.</li>
+            <li><strong>Mingming Lu (Data contributor, Yale)</strong> - Midbrain eQTL/scQTL, scATACseq dataset.</li>
+            <li><strong>Jacob Parker (Data contributor, Yale)</strong> - MTG snRNAseq dataset.</li>
+            <li><strong>Weiqiang Liu (Data contributor, Yale)</strong> - Multi-omics bigwig dataset.</li>
+            <li><strong>Jie Yuan (Data contributor, Yale)</strong> - Visium ST dataset.</li>
+          </ul>
         </div>
 
         <div className="section">
